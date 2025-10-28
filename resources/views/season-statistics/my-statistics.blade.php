@@ -3,18 +3,24 @@
 @section('content')
 <div class="season-statistics-container">
 <div class="container">
+    <!-- Page Header -->
+    <div style="text-align: center; margin-bottom: 2rem; padding: 2rem 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 700;">📊 إحصائياتي في المواسم</h1>
+        <p style="font-size: 1.1rem; opacity: 0.9;">عرض وتحليل أدائي الشخصي في جميع المواسم</p>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-md-12 animate-fade-in-up">
             <div class="modern-card">
                 <div class="modern-card-header">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h3>إحصائياتي في المواسم</h3>
+                            <h3><i class="fas fa-chart-bar me-2"></i>تفاصيل الإحصائيات</h3>
                         </div>
                         <div>
                             <form action="{{ route('seasons.statistics.my') }}" method="GET" class="form-inline">
-                                <div class="form-group mx-2">
-                                    <label for="season_id" class="ml-2">اختر الموسم:</label>
+                                <div class="form-group">
+                                    <label for="season_id"><i class="fas fa-filter"></i> اختر الموسم:</label>
                                     <select name="season_id" id="season_id" class="modern-form-control" onchange="this.form.submit()">
                                         @foreach($seasons as $season)
                                             <option value="{{ $season->id }}" {{ $selectedSeason && $selectedSeason->id == $season->id ? 'selected' : '' }}>
