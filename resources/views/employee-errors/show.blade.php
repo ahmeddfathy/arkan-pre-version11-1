@@ -5,32 +5,34 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-4 employee-errors-page">
-    <!-- Header -->
-    <div class="error-detail-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <a href="{{ route('employee-errors.index') }}" class="btn btn-outline-secondary mb-3">
-                    <i class="fas fa-arrow-right"></i> العودة للقائمة
-                </a>
-                <h2>تفاصيل الخطأ</h2>
-            </div>
+<div class="simple-container">
+    <div class="container-fluid px-4 employee-errors-page">
+        <!-- Header - Enhanced Design -->
+        <div class="employee-errors-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{{ route('employee-errors.index') }}" class="btn btn-danger mb-3" style="background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3);">
+                        <i class="fas fa-arrow-right"></i> العودة للقائمة
+                    </a>
+                    <h2>🔍 تفاصيل الخطأ</h2>
+                    <p>عرض معلومات مفصلة عن الخطأ المسجل</p>
+                </div>
 
-            <div class="btn-group-modern">
-                @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr', 'project_manager']) || $error->reported_by === Auth::id())
-                <button onclick="openEditModal()" class="btn btn-outline-primary">
-                    <i class="fas fa-edit"></i> تعديل
-                </button>
-                @endif
+                <div class="btn-group-modern">
+                    @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr', 'project_manager']) || $error->reported_by === Auth::id())
+                    <button onclick="openEditModal()" class="btn" style="background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); color: white;">
+                        <i class="fas fa-edit"></i> تعديل
+                    </button>
+                    @endif
 
-                @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr']) || $error->reported_by === Auth::id())
-                <button onclick="deleteError()" class="btn btn-outline-danger">
-                    <i class="fas fa-trash"></i> حذف
-                </button>
-                @endif
+                    @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr']) || $error->reported_by === Auth::id())
+                    <button onclick="deleteError()" class="btn" style="background: rgba(255, 100, 100, 0.3); border: 2px solid rgba(255, 100, 100, 0.5); color: white;">
+                        <i class="fas fa-trash"></i> حذف
+                    </button>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 
     <div class="row">
         <!-- معلومات الخطأ الرئيسية -->
@@ -211,6 +213,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </div>
 

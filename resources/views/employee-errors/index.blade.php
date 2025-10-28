@@ -5,27 +5,31 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-4 employee-errors-page">
-    <!-- Header -->
-    <div class="employee-errors-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2>إدارة الأخطاء</h2>
+<div class="simple-container">
+    <div class="container-fluid px-4 employee-errors-page">
+        <!-- Header - Inspired Design -->
+        <div class="employee-errors-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>⚠️ إدارة الأخطاء</h2>
+                    <p>عرض وإدارة جميع أخطاء الموظفين بشكل احترافي</p>
+                </div>
 
-            @php
-                $user = Auth::user();
-                $globalLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
-                $departmentLevel = \App\Models\DepartmentRole::getUserDepartmentHierarchyLevel($user);
-                $canReportErrors = ($globalLevel && $globalLevel >= 2) || ($departmentLevel && $departmentLevel >= 2);
-            @endphp
+                @php
+                    $user = Auth::user();
+                    $globalLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
+                    $departmentLevel = \App\Models\DepartmentRole::getUserDepartmentHierarchyLevel($user);
+                    $canReportErrors = ($globalLevel && $globalLevel >= 2) || ($departmentLevel && $departmentLevel >= 2);
+                @endphp
 
-            @if($canReportErrors)
-            <button onclick="openCreateModal()" class="btn btn-danger">
-                <i class="fas fa-plus"></i>
-                تسجيل خطأ جديد
-            </button>
-            @endif
+                @if($canReportErrors)
+                <button onclick="openCreateModal()" class="btn btn-danger">
+                    <i class="fas fa-plus"></i>
+                    تسجيل خطأ جديد
+                </button>
+                @endif
+            </div>
         </div>
-    </div>
 
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs employee-errors-tabs mb-4" id="errorTabs" role="tablist">
@@ -53,81 +57,87 @@
         @endif
     </ul>
 
-    <!-- إحصائيات الأخطاء -->
-    <div class="row mb-4">
-        <!-- إجمالي الأخطاء -->
-        <div class="col-md-3 mb-3">
-            <div class="stats-card total-errors">
-                <div class="d-flex align-items-center">
-                    <div class="icon-wrapper">
-                        <i class="fas fa-exclamation-triangle"></i>
+        <!-- إحصائيات الأخطاء - Enhanced Style -->
+        <div class="row mb-4">
+            <!-- إجمالي الأخطاء -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card total-errors">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="mb-1">إجمالي الأخطاء</p>
+                            <h3>{{ $stats['total_errors'] }}</h3>
+                        </div>
                     </div>
-                    <div class="ms-3">
-                        <p class="mb-1">إجمالي الأخطاء</p>
-                        <h3>{{ $stats['total_errors'] }}</h3>
+                </div>
+            </div>
+
+            <!-- الأخطاء الجوهرية -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card critical-errors">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="mb-1">أخطاء جوهرية</p>
+                            <h3>{{ $stats['critical_errors'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الأخطاء العادية -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card normal-errors">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="mb-1">أخطاء عادية</p>
+                            <h3>{{ $stats['normal_errors'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أخطاء الجودة -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card quality-errors">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="mb-1">أخطاء جودة</p>
+                            <h3>{{ $stats['by_category']['quality'] ?? 0 }}</h3>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- الأخطاء الجوهرية -->
-        <div class="col-md-3 mb-3">
-            <div class="stats-card critical-errors">
-                <div class="d-flex align-items-center">
-                    <div class="icon-wrapper">
-                        <i class="fas fa-times"></i>
-                    </div>
-                    <div class="ms-3">
-                        <p class="mb-1">أخطاء جوهرية</p>
-                        <h3>{{ $stats['critical_errors'] }}</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- الأخطاء العادية -->
-        <div class="col-md-3 mb-3">
-            <div class="stats-card normal-errors">
-                <div class="d-flex align-items-center">
-                    <div class="icon-wrapper">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <div class="ms-3">
-                        <p class="mb-1">أخطاء عادية</p>
-                        <h3>{{ $stats['normal_errors'] }}</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- أخطاء الجودة -->
-        <div class="col-md-3 mb-3">
-            <div class="stats-card quality-errors">
-                <div class="d-flex align-items-center">
-                    <div class="icon-wrapper">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="ms-3">
-                        <p class="mb-1">أخطاء جودة</p>
-                        <h3>{{ $stats['by_category']['quality'] ?? 0 }}</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- الفلاتر -->
-    <div class="filters-card">
-        <form method="GET" action="{{ route('employee-errors.index') }}" class="row g-3">
+        <!-- الفلاتر - Enhanced Layout -->
+        <div class="filters-card">
+            <form method="GET" action="{{ route('employee-errors.index') }}" class="row g-3">
                 <!-- الشهر -->
                 <div class="col-md-2">
-                    <label class="form-label">الشهر</label>
+                    <label class="form-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        الشهر
+                    </label>
                     <input type="month" name="month" class="form-control" value="{{ request('month') }}" onchange="this.form.submit()">
                 </div>
 
                 <!-- كود المشروع -->
                 <div class="col-md-2">
-                    <label class="form-label">كود المشروع</label>
+                    <label class="form-label">
+                        <i class="fas fa-project-diagram"></i>
+                        كود المشروع
+                    </label>
                     <div class="input-group">
                         <input type="text" name="project_code" class="form-control" value="{{ request('project_code') }}" placeholder="أدخل كود المشروع..." list="projectCodesList" id="projectCodeInput">
                         <button type="button" class="btn btn-primary" onclick="this.form.submit()">
@@ -146,7 +156,10 @@
 
                 <!-- نوع الخطأ -->
                 <div class="col-md-2">
-                    <label class="form-label">نوع الخطأ</label>
+                    <label class="form-label">
+                        <i class="fas fa-exclamation-circle"></i>
+                        نوع الخطأ
+                    </label>
                     <select name="error_type" class="form-select" onchange="this.form.submit()">
                         <option value="">الكل</option>
                         <option value="normal" {{ request('error_type') == 'normal' ? 'selected' : '' }}>عادي</option>
@@ -156,7 +169,10 @@
 
                 <!-- تصنيف الخطأ -->
                 <div class="col-md-2">
-                    <label class="form-label">التصنيف</label>
+                    <label class="form-label">
+                        <i class="fas fa-tags"></i>
+                        التصنيف
+                    </label>
                     <select name="error_category" class="form-select" onchange="this.form.submit()">
                         <option value="">الكل</option>
                         <option value="quality" {{ request('error_category') == 'quality' ? 'selected' : '' }}>جودة</option>
@@ -170,7 +186,10 @@
 
                 <!-- نوع المصدر -->
                 <div class="col-md-2">
-                    <label class="form-label">المصدر</label>
+                    <label class="form-label">
+                        <i class="fas fa-layer-group"></i>
+                        المصدر
+                    </label>
                     <select name="errorable_type" class="form-select" onchange="this.form.submit()">
                         <option value="">الكل</option>
                         <option value="App\Models\TaskUser" {{ request('errorable_type') == 'App\Models\TaskUser' ? 'selected' : '' }}>مهام عادية</option>
@@ -187,7 +206,7 @@
                     </a>
                 </div>
             </form>
-    </div>
+        </div>
 
     <!-- Tab Content -->
     <div class="tab-content" id="errorTabsContent">
@@ -536,6 +555,7 @@
             </div>
         </div>
         @endif
+    </div>
     </div>
 </div>
 
