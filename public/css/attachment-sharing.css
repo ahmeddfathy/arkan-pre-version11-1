@@ -1,0 +1,342 @@
+/* تنسيقات مشاركة المرفقات */
+
+.attachment-checkbox {
+    cursor: pointer;
+}
+
+.list-group-item {
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-toggle::after {
+    margin-left: 0;
+}
+
+.attachment-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.share-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+}
+
+.bulk-actions-toolbar {
+    position: sticky;
+    top: 70px;
+    z-index: 1020;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.selected-files-display {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.share-modal .form-select {
+    min-height: 100px;
+}
+
+.permissions-section {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.share-info-badge {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+}
+
+.access-time {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.share-expires {
+    color: #dc3545;
+    font-size: 0.8rem;
+}
+
+.share-permanent {
+    color: #28a745;
+    font-size: 0.8rem;
+}
+
+/* تحسينات للهواتف المحمولة */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        font-size: 0.9rem;
+    }
+
+    .btn-sm {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .list-group-item {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .attachment-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* تحسينات للتفاعل */
+.share-attachment-btn:hover,
+.view-shares-btn:hover {
+    background-color: #e9ecef;
+}
+
+.remove-shares-btn:hover {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* مؤشرات التحميل */
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* تحسينات لقوائم المستخدمين */
+.user-select-container {
+    position: relative;
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #007bff;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+}
+
+/* تنسيقات الإشعارات */
+.share-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+}
+
+/* تحسينات للمودال */
+.modal-content {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e9ecef;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* تحسينات الجداول */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* أيقونات الحالة */
+.status-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 0.5rem;
+}
+
+.status-active {
+    background-color: #28a745;
+}
+
+.status-expired {
+    background-color: #dc3545;
+}
+
+.status-warning {
+    background-color: #ffc107;
+}
+
+/* ============================
+   View Shares Sidebar Styles
+   تصميم سايد بار مشاركات الملفات
+   ============================ */
+
+/* السايد بار الأساسي */
+.view-shares-sidebar {
+    transition: right 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    border-left: 3px solid #17a2b8;
+}
+
+/* إخفاء scrollbar */
+.view-shares-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* حالة فتح السايد بار */
+.view-shares-sidebar.show {
+    right: 0 !important;
+}
+
+/* overlay عند فتح السايد بار */
+.view-shares-sidebar-overlay.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* تحسينات لكروت المشاركات داخل السايد بار */
+.view-shares-sidebar .card {
+    border: none;
+    border-left: 4px solid #17a2b8;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.view-shares-sidebar .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+
+/* تحسين رأس الكارد */
+.view-shares-sidebar .card-body {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+/* تحسين العناوين */
+.view-shares-sidebar .card-title {
+    color: #495057;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+/* تحسين النصوص الصغيرة */
+.view-shares-sidebar .card-text small {
+    line-height: 1.6;
+    color: #6c757d;
+}
+
+/* تحسين الـ badges */
+.view-shares-sidebar .badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.view-shares-sidebar .badge.bg-success {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white;
+}
+
+.view-shares-sidebar .badge.bg-warning {
+    background: linear-gradient(135deg, #ffc107, #fd7e14) !important;
+    color: #212529;
+}
+
+.view-shares-sidebar .badge.bg-danger {
+    background: linear-gradient(135deg, #dc3545, #e91e63) !important;
+    color: white;
+}
+
+/* تحسين الأزرار */
+.view-shares-sidebar .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.view-shares-sidebar .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* تحسين الرسائل الفارغة */
+.view-shares-sidebar .empty-shares {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.view-shares-sidebar .empty-shares i {
+    font-size: 3rem;
+    color: #e9ecef;
+    margin-bottom: 1rem;
+}
+
+/* تحسينات للهواتف المحمولة */
+@media (max-width: 768px) {
+    .view-shares-sidebar {
+        width: 100vw !important;
+        right: -100vw !important;
+    }
+
+    .view-shares-sidebar.show {
+        right: 0 !important;
+    }
+}
+
+/* تحسينات للتفاعل */
+.view-shares-sidebar .sidebar-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}

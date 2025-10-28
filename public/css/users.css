@@ -1,0 +1,757 @@
+/* ========================================
+   ARKAN - Users Management CSS
+   استايلات إدارة المستخدمين
+   ======================================== */
+
+/* ========================================
+   GLOBAL CARD STYLES
+   ======================================== */
+.card {
+    opacity: 1 !important;
+}
+
+/* ========================================
+   INDEX PAGE STYLES
+   استايلات صفحة قائمة المستخدمين
+   ======================================== */
+
+/* تحسين مظهر قائمة الأدوار */
+#rolesContainer {
+    background-color: #f8f9fa;
+}
+
+#rolesContainer .form-check {
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+#rolesContainer .form-check:hover {
+    background-color: #e9ecef;
+}
+
+#rolesContainer .form-check-input:checked + .form-check-label {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+/* تحسين مظهر الصلاحيات مع الشارات */
+#permissionsContainer .form-check {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#permissionsContainer .form-check:last-child {
+    border-bottom: none;
+}
+
+#permissionsContainer .badge {
+    font-size: 0.75em;
+    margin-right: 2px;
+}
+
+/* تحسين شارات الصلاحيات */
+.badge.bg-primary {
+    background-color: #0d6efd !important;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* تحسين مظهر الجدول */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+/* تحسين أزرار الإجراءات */
+.btn-group .btn {
+    border-radius: 0.375rem !important;
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* استايلات inline من index.blade.php */
+.import-summary-alert {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    border-right: 4px solid #ffbc00;
+}
+
+.import-summary-content {
+    direction: rtl;
+    text-align: right;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ffe69c;
+}
+
+.modal-body-pre {
+    max-height: 400px;
+    overflow-y: auto;
+    direction: rtl;
+    text-align: right;
+}
+
+.roles-container-inline {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* ========================================
+   SHOW PAGE STYLES (USER PROFILE)
+   استايلات صفحة عرض المستخدم
+   ======================================== */
+
+.user-profile-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.profile-header {
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.profile-cover {
+    height: 200px;
+    background: linear-gradient(135deg, #2152ff, #21d4fd);
+}
+
+.profile-avatar {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #2152ff, #21d4fd);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    border: 5px solid white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+    margin-top: 4rem;
+    padding: 1rem;
+}
+
+.profile-info h2 {
+    color: #252f40;
+    font-weight: 700;
+}
+
+.detail-card {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    background: #f8f9fa;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.detail-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    background: white;
+}
+
+.detail-icon {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #2152ff, #21d4fd);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.detail-icon i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.detail-info {
+    flex: 1;
+}
+
+.detail-info label {
+    display: block;
+    font-size: 0.875rem;
+    color: #67748e;
+    margin-bottom: 0.25rem;
+}
+
+.detail-info p {
+    margin: 0;
+    color: #252f40;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn i {
+    font-size: 1rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   WORK SHIFTS ASSIGNMENT STYLES
+   استايلات تعيين ورديات العمل
+   ======================================== */
+
+.page-title {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-title h2 {
+    color: #343a40;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.page-title h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(135deg, #2152ff, #21d4fd);
+    border-radius: 2px;
+}
+
+.search-form {
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-clear {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-clear:hover {
+    background: linear-gradient(135deg, #495057, #343a40);
+    transform: translateY(-2px);
+}
+
+.shift-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.shift-type {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    font-weight: 500;
+}
+
+.shift-type:hover {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform: translateX(5px);
+}
+
+.form-check-input:checked + .form-check-label .shift-type {
+    background: linear-gradient(135deg, #2152ff, #21d4fd);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-color: #2152ff;
+}
+
+.shift-morning {
+    border-left: 4px solid #ffc107;
+}
+
+.shift-night {
+    border-left: 4px solid #6f42c1;
+}
+
+.shift-none {
+    border-left: 4px solid #6c757d;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #2152ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.user-name {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.user-email {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.department-badge {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.empty-state {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* ========================================
+   WITHOUT ROLES PAGE STYLES
+   استايلات صفحة المستخدمين بدون أدوار
+   ======================================== */
+
+.select-all-checkbox {
+    cursor: pointer;
+    transform: scale(1.2);
+}
+
+.user-checkbox {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.assign-role-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.assign-role-btn:hover {
+    background: linear-gradient(135deg, #20c997, #17a2b8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+.toast {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.toast .toast-body {
+    font-weight: 500;
+}
+
+.toast.bg-success {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+}
+
+.toast.bg-danger {
+    background: linear-gradient(135deg, #dc3545, #e83e8c) !important;
+}
+
+/* ========================================
+   MODAL ENHANCEMENTS
+   ======================================== */
+.modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2152ff, #21d4fd);
+    color: white;
+    border: none;
+    padding: 1.5rem 2rem;
+}
+
+.modal-header .modal-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.modal-header .btn-close {
+    background: white;
+    border-radius: 50%;
+    opacity: 1;
+    width: 32px;
+    height: 32px;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    border: none;
+    padding: 1rem 2rem 2rem;
+    background: #f8f9fa;
+}
+
+/* ========================================
+   FORM ENHANCEMENTS
+   ======================================== */
+.form-control:focus,
+.form-select:focus {
+    border-color: #2152ff;
+    box-shadow: 0 0 0 0.2rem rgba(33, 82, 255, 0.25);
+}
+
+.search-input {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #2152ff;
+    transform: translateY(-1px);
+    background: white;
+}
+
+/* ========================================
+   TABLE ENHANCEMENTS
+   ======================================== */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: none;
+    color: #343a40;
+    font-weight: 700;
+    padding: 1rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table thead th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody td {
+    padding: 1.25rem 1rem;
+    border: none;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+}
+
+.table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+}
+
+/* ========================================
+   ALERT ENHANCEMENTS
+   ======================================== */
+.alert {
+    border: none;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(32, 201, 151, 0.1));
+    border-left-color: #28a745;
+    color: #155724;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(253, 126, 20, 0.1));
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(19, 132, 150, 0.1));
+    border-left-color: #17a2b8;
+    color: #0c5460;
+}
+
+/* ========================================
+   BADGE ENHANCEMENTS
+   ======================================== */
+.badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.badge.bg-info {
+    background: linear-gradient(135deg, #17a2b8, #138496) !important;
+    color: white;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+    .col-md-6 {
+        padding: 0 0.5rem;
+    }
+
+    .detail-card {
+        padding: 1rem;
+    }
+
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 2rem;
+    }
+
+    .profile-cover {
+        height: 150px;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .btn-group .btn {
+        margin: 0;
+    }
+
+    .search-form {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .search-form .input-group {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .shift-options {
+        gap: 0.5rem;
+    }
+
+    .shift-type {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .modal-dialog {
+        margin: 1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .card-header {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title h2 {
+        font-size: 1.5rem;
+    }
+
+    .card-header h4 {
+        font-size: 1.1rem;
+    }
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.card,
+.alert {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.detail-card {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.badge {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+.text-gradient {
+    background: linear-gradient(135deg, #2152ff, #21d4fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.border-gradient {
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #2152ff, #21d4fd) 1;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+}
+
+/* ========================================
+   HIDDEN SCROLLBAR
+   إخفاء شريط التمرير مع الحفاظ على إمكانية التمرير
+   ======================================== */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: none;
+}
+
+/* Internet Explorer and Edge */
+* {
+    -ms-overflow-style: none;
+}

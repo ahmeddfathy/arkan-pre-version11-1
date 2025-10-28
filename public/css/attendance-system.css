@@ -1,0 +1,363 @@
+/* Attendance System Styles */
+:root {
+    --primary-color: #0095B2;
+    --primary-dark: #007A94;
+    --primary-light: #33C5E6;
+    --secondary-color: #5A6577;
+    --success-color: #1D6540;
+    --danger-color: #CC2424;
+    --warning-color: #C85A10;
+    --info-color: #0095B2;
+}
+
+/* Custom Card Styles */
+.attendance-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Attendance Modal Styles */
+.attendance-modal .modal-content {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.attendance-modal .modal-header {
+    background: linear-gradient(135deg, var(--warning-color), #E67E22);
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.attendance-modal .modal-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attendance-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.attendance-modal .modal-footer {
+    border-top: none;
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.attendance-modal .alert {
+    border-radius: 0.75rem;
+    border: none;
+    padding: 1.25rem;
+    margin-bottom: 0;
+}
+
+.attendance-modal .alert-warning {
+    background-color: rgba(200, 90, 16, 0.1);
+    color: var(--warning-color);
+}
+
+.attendance-modal .btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.attendance-modal .btn-warning:hover {
+    background-color: #B54E0E;
+    border-color: #B54E0E;
+    transform: translateY(-2px);
+}
+
+.attendance-modal .btn-secondary {
+    background-color: #E2E6EA;
+    border-color: #E2E6EA;
+    color: var(--secondary-color);
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.attendance-modal .btn-secondary:hover {
+    background-color: #D1D6DB;
+    border-color: #D1D6DB;
+    transform: translateY(-2px);
+}
+
+.attendance-modal .modal-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+/* RTL support for modal */
+[dir="rtl"] .attendance-modal .modal-icon {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+.attendance-modal .btn-close:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.attendance-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.attendance-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-light {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+}
+
+.btn-light:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Table Styles */
+.attendance-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.attendance-table th {
+    background: #f8f9fa;
+    color: var(--secondary-color);
+    font-weight: 600;
+    padding: 1rem;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--primary-light);
+}
+
+.attendance-table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+}
+
+.attendance-table tbody tr:hover {
+    background-color: rgba(0, 149, 178, 0.05);
+}
+
+/* Row colors based on check-in status */
+.attendance-table tr.checked-in {
+    background-color: rgba(29, 101, 64, 0.05);
+}
+
+.attendance-table tr.not-checked-in {
+    background-color: rgba(204, 36, 36, 0.05);
+}
+
+.attendance-table tr.checked-in:hover {
+    background-color: rgba(29, 101, 64, 0.1);
+}
+
+.attendance-table tr.not-checked-in:hover {
+    background-color: rgba(204, 36, 36, 0.1);
+}
+
+/* Employee Card */
+.employee-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.employee-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.employee-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.employee-info h4 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.employee-info p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-present {
+    background-color: rgba(29, 101, 64, 0.1);
+    color: var(--success-color);
+}
+
+.status-late {
+    background-color: rgba(200, 90, 16, 0.1);
+    color: var(--warning-color);
+}
+
+.status-early-leave {
+    background-color: rgba(204, 36, 36, 0.1);
+    color: var(--danger-color);
+}
+
+.status-absent {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+/* Time indicators */
+.text-success.small {
+    color: var(--success-color) !important;
+    font-weight: 600;
+}
+
+.text-danger.small {
+    color: var(--danger-color) !important;
+    font-weight: 600;
+}
+
+.text-warning.small {
+    color: var(--warning-color) !important;
+    font-weight: 600;
+}
+
+.text-info.small {
+    color: var(--info-color) !important;
+    font-weight: 600;
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .attendance-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-controls {
+        flex-direction: column;
+    }
+
+    .filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .attendance-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* RTL Support */
+[dir="rtl"] .employee-card {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .filter-btn i {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+/* Print Styles */
+@media print {
+    .attendance-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .filter-controls {
+        display: none;
+    }
+
+    .attendance-table th {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+}

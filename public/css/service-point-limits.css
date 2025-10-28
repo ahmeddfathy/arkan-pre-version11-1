@@ -1,0 +1,109 @@
+/* تصميم خاص بحدود النقاط للخدمات */
+
+.cs-limit-badge {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.cs-unlimited-badge {
+    background: linear-gradient(135deg, #6c757d, #adb5bd);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+}
+
+.cs-help-text {
+    color: #6c757d;
+    font-size: 11px;
+    margin-top: 5px;
+    display: block;
+}
+
+.cs-help-text i {
+    color: #17a2b8;
+}
+
+/* تحسين تصميم الجدول للعمود الجديد */
+.cs-table th:nth-child(5) {
+    text-align: center;
+}
+
+.cs-table td:nth-child(5) {
+    text-align: center;
+}
+
+/* تصميم محدث للـ badges */
+.cs-points-badge {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #212529;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+}
+
+/* تأثيرات hover للـ badges */
+.cs-limit-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+.cs-unlimited-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
+}
+
+/* تصميم الفورم */
+.cs-form-group label[for="max_points_per_project"] {
+    font-weight: 600;
+    color: #495057;
+}
+
+.cs-form-group input[name="max_points_per_project"] {
+    border: 2px solid #e9ecef;
+    transition: border-color 0.3s ease;
+}
+
+.cs-form-group input[name="max_points_per_project"]:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* تصميم صفحة العرض */
+.cs-service-info-item h5 i.fa-shield-alt {
+    color: #28a745;
+}
+
+/* responsive design */
+@media (max-width: 768px) {
+    .cs-limit-badge,
+    .cs-unlimited-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .cs-help-text {
+        font-size: 10px;
+    }
+}

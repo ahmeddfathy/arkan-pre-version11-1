@@ -1,0 +1,1577 @@
+/* Attachments and Drag & Drop Styles */
+
+/* منطقة السحب والإفلات */
+.drag-drop-upload-container {
+    margin-bottom: 20px;
+}
+
+.drag-drop-area {
+    border: 3px dashed var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 30px;
+    text-align: center;
+    transition: all var(--transition-medium);
+    background: linear-gradient(135deg, rgba(76, 205, 196, 0.02) 0%, rgba(255,255,255,0.8) 100%);
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.drag-drop-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: -1;
+    border-radius: 12px;
+}
+
+.drag-drop-area:hover::before,
+.drag-drop-area.drag-over::before {
+    opacity: 0.08;
+}
+
+.drag-drop-area:hover,
+.drag-drop-area.drag-over {
+    border-color: #17a2b8;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(23, 162, 184, 0.15);
+    border-style: solid;
+}
+
+.drag-drop-message {
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.drag-drop-message i {
+    color: #17a2b8;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.drag-drop-message p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.drag-drop-message .small {
+    font-size: 12px;
+    margin: 8px 0;
+}
+
+.drag-drop-area:hover i {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.05);
+    color: #138496;
+}
+
+.file-select-button {
+    font-size: 13px;
+    padding: 8px 16px;
+    border: 1px solid #17a2b8;
+    background: transparent;
+    color: #17a2b8;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.file-select-button:hover {
+    background: #17a2b8;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+}
+
+.selected-files-container {
+    margin-top: 15px;
+}
+
+.selected-file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: var(--border-radius-md);
+    background: var(--gradient-light);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.selected-file-item:hover {
+    background: rgba(76, 205, 196, 0.05);
+    border-color: var(--arkan-primary);
+    transform: translateX(5px);
+}
+
+.selected-file-name {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.selected-file-size {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin: 0 10px;
+    font-weight: 500;
+}
+
+.selected-file-remove {
+    color: var(--arkan-primary-dark);
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 4px 8px;
+    font-size: 1.1rem;
+    transition: all var(--transition-fast);
+    border-radius: 50%;
+}
+
+.selected-file-remove:hover {
+    background: rgba(76, 205, 196, 0.1);
+    transform: scale(1.2);
+}
+
+.selected-file-progress {
+    height: 4px;
+    background: var(--arkan-primary);
+    margin-top: 8px;
+    width: 0;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    box-shadow: 0 1px 3px rgba(76, 205, 196, 0.3);
+}
+
+/* Enhanced attachment headers */
+.attachment-section-header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+    border: none !important;
+    padding: 20px 24px !important;
+    color: white !important;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0 !important;
+    box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+}
+
+.attachment-section-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.15), transparent);
+    transform: skewX(-20deg);
+    transition: all var(--transition-slow);
+}
+
+.attachment-section-header:hover::before {
+    right: 50%;
+}
+
+.attachment-section-header h5 {
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    margin: 0 !important;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.attachment-section-header i {
+    font-size: 1.6rem;
+    opacity: 0.9;
+    transition: all var(--transition-medium);
+}
+
+.attachment-section-header:hover i {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+}
+
+/* Alternative header style for services */
+.services-section-header {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+    border: none !important;
+    padding: 20px 24px !important;
+    color: white !important;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0 !important;
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.2);
+}
+
+.services-section-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.15), transparent);
+    transform: skewX(-20deg);
+    transition: all var(--transition-slow);
+}
+
+.services-section-header:hover::before {
+    right: 50%;
+}
+
+.services-section-header h5 {
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    margin: 0 !important;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.services-section-header i {
+    font-size: 1.6rem;
+    opacity: 0.9;
+    transition: all var(--transition-medium);
+}
+
+.services-section-header:hover i {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+}
+
+/* Header animations and effects */
+.attachment-section-header,
+.services-section-header {
+    transition: all var(--transition-medium);
+    cursor: pointer;
+}
+
+.attachment-section-header:hover,
+.services-section-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Pulse animation for icons */
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.attachment-section-header i,
+.services-section-header i {
+    animation: iconPulse 3s infinite;
+}
+
+/* Enhanced text styling */
+.attachment-section-header h5,
+.services-section-header h5 {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Additional gradient overlay for depth */
+.attachment-section-header::after,
+.services-section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    z-index: 1;
+}
+
+/* Attachment selection and toolbar */
+.attachment-select {
+    margin-left: 10px;
+}
+
+.multi-share-toolbar {
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* User selection containers */
+.users-selection-container .user-card {
+    border: 2px solid #e9ecef;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.users-selection-container .user-card:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.users-selection-container .user-card.selected {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+}
+
+.selected-users-list .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Share link container */
+.share-link-container .input-group {
+    direction: ltr;
+}
+
+.share-link-container input {
+    text-align: left;
+}
+
+/* Attachment names and dropdowns */
+.attachment-name {
+    font-weight: 500;
+    color: #2c3e50;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.attachment-name:hover {
+    color: #007bff;
+    text-decoration: underline !important;
+    transform: translateX(2px);
+}
+
+/* Service attachment names styling */
+.attachment-info a {
+    color: #2c3e50;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.attachment-info a:hover {
+    color: #007bff;
+    text-decoration: underline !important;
+    transform: translateX(2px);
+}
+
+/* Enhanced attachment item styling */
+.attachment-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.attachment-item:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+/* List group item enhancements */
+.list-group-item {
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    border-left-color: #007bff !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+/* Attachment replies */
+.attachment-replies {
+    margin-top: 10px;
+    padding-left: 20px;
+    border-left: 2px solid #e9ecef;
+}
+
+.reply-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+.reply-item:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transform: translateX(2px);
+}
+
+.reply-item .reply-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.reply-item .reply-author {
+    font-weight: 500;
+    color: #495057;
+}
+
+.reply-item .reply-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.reply-item .reply-description {
+    font-size: 0.9rem;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.reply-item .reply-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reply-item .reply-file a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.reply-item .reply-file a:hover {
+    text-decoration: underline;
+}
+
+/* Task groups */
+.task-group {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.task-group-header h6 {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+    font-weight: 600;
+}
+
+.task-group .list-group {
+    box-shadow: none;
+    border-radius: 6px;
+}
+
+.task-group .list-group-item {
+    border-left: 3px solid #007bff;
+    margin-bottom: 8px;
+    border-radius: 6px !important;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+}
+
+.task-group .list-group-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Different colors for different task types */
+.task-group.template-task .list-group-item {
+    border-left-color: #17a2b8;
+    background: #ffffff;
+}
+
+.task-group.regular-task .list-group-item {
+    border-left-color: #28a745;
+    background: #ffffff;
+}
+
+.task-group.no-task .list-group-item {
+    border-left-color: #6c757d;
+    background: #ffffff;
+}
+
+.task-group-header .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Attachment list containers with scroll */
+.attachment-list-container,
+.service-attachment-list-container {
+    scrollbar-width: thin;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #ffffff;
+    overflow-x: hidden; /* إلغاء السكرول الأفقي */
+    overflow-y: auto; /* الحفاظ على السكرول العمودي فقط */
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.attachment-list-container::-webkit-scrollbar,
+.service-attachment-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.attachment-list-container::-webkit-scrollbar-track,
+.service-attachment-list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.attachment-list-container::-webkit-scrollbar-thumb,
+.service-attachment-list-container::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 10px;
+}
+
+.attachment-list-container::-webkit-scrollbar-thumb:hover,
+.service-attachment-list-container::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+/* Attachment list styling */
+.attachment-list-container .list-group {
+    margin-bottom: 0;
+}
+
+.service-attachment-list-container .list-unstyled {
+    margin-bottom: 0;
+}
+
+/* Service replies styling */
+.replies-section .reply-item {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
+}
+
+.replies-section .reply-item:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    transform: translateX(2px);
+}
+
+/* Gradient effect for scrollable content */
+.attachment-list-container::after,
+.service-attachment-list-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+    pointer-events: none;
+}
+
+/* Prevent horizontal scroll for attachments */
+.card-body {
+    overflow-x: hidden;
+    background-color: #ffffff;
+}
+
+/* Enhanced card styling for attachment sections */
+.card {
+    background-color: #ffffff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+/* Card hover effects */
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+/* Card body improvements */
+.card-body {
+    padding: 20px;
+    overflow-x: hidden;
+    background-color: #ffffff;
+}
+
+/* Form improvements */
+.card-body form {
+    margin-bottom: 0;
+}
+
+.card-body .mb-3:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 15px;
+    }
+
+    .attachment-section-header,
+    .services-section-header {
+        padding: 15px 18px !important;
+    }
+
+    .attachment-section-header h5,
+    .services-section-header h5 {
+        font-size: 1.1rem !important;
+    }
+
+    .drag-drop-area {
+        min-height: 100px;
+        padding: 20px 10px;
+    }
+
+    .drag-drop-message i {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }
+
+    .drag-drop-message {
+        font-size: 13px;
+    }
+
+    .file-select-button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-md-4 {
+        margin-bottom: 15px;
+    }
+
+    .card-body {
+        padding: 12px;
+    }
+
+    .attachment-upload-form .btn-primary {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .drag-drop-area {
+        min-height: 90px;
+        padding: 15px 8px;
+    }
+}
+
+/* Column layout fixes */
+.row {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.col-md-4 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Ensure equal height cards */
+.col-md-4 .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.col-md-4 .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.col-md-4 .attachment-upload-form {
+    flex-shrink: 0;
+}
+
+/* Attachment lists take remaining space */
+.attachments-list {
+    flex: 1;
+    margin-top: 15px;
+}
+
+/* ===== General Layout Improvements ===== */
+
+/* Main container spacing */
+.row.mt-4 {
+    margin-top: 20px !important;
+}
+
+/* Card spacing */
+.card.mb-4 {
+    margin-bottom: 25px !important;
+}
+
+/* Header icon improvements */
+.attachment-section-header i,
+.services-section-header i {
+    font-size: 1.3rem;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+
+/* Remove excessive margins */
+.attachment-upload-form .mb-3 {
+    margin-bottom: 15px !important;
+}
+
+.attachment-upload-form .mt-2 {
+    margin-top: 12px !important;
+}
+
+/* Improve small text readability */
+.attachment-upload-form small {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Button improvements */
+.attachment-upload-form button[type="submit"] {
+    margin-top: 8px;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.attachment-upload-form button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.attachment-upload-form button[type="submit"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+}
+
+/* منع أي تأثيرات حركة على أزرار رفع الملفات */
+.attachment-upload-form .btn-primary {
+    transform: none !important;
+    transition: none !important;
+}
+
+.attachment-upload-form .btn-primary:hover {
+    transform: none !important;
+    transition: none !important;
+}
+
+.attachment-upload-form .btn-primary:active {
+    transform: none !important;
+    transition: none !important;
+}
+
+.attachment-upload-form .btn-primary:focus {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* إعادة تعريف تنسيقات الزرار لتجنب التداخل مع CSS العام */
+.attachment-upload-form button[type="submit"] {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* منع جميع تأثيرات الحركة على الأزرار */
+.attachment-upload-form .btn {
+    transform: none !important;
+    transition: none !important;
+}
+
+.attachment-upload-form .btn:hover {
+    transform: none !important;
+    transition: none !important;
+}
+
+.attachment-upload-form .btn:active {
+    transform: none !important;
+    transition: none !important;
+}
+
+.attachment-upload-form .btn:focus {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Selected files container improvements */
+.selected-files-container {
+    margin-top: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #17a2b8 #f1f1f1;
+}
+
+.selected-files-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.selected-files-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.selected-files-container::-webkit-scrollbar-thumb {
+    background: #17a2b8;
+    border-radius: 10px;
+}
+
+/* File item improvements */
+.selected-file-item {
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+.selected-file-item:hover {
+    background: #e9ecef;
+    border-color: #17a2b8;
+    transform: translateX(3px);
+}
+
+.selected-file-name {
+    flex-grow: 1;
+    margin-left: 8px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.selected-file-size {
+    color: #6c757d;
+    font-size: 11px;
+    margin: 0 8px;
+}
+
+.selected-file-remove {
+    color: #dc3545;
+    background: transparent;
+    border: none;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.selected-file-remove:hover {
+    background: rgba(220, 53, 69, 0.1);
+    transform: scale(1.1);
+}
+
+/* Text and description improvements */
+.card-body input[placeholder] {
+    font-size: 13px;
+}
+
+/* Loading states */
+.drag-drop-area.uploading {
+    pointer-events: none;
+    opacity: 0.7;
+    background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(255,255,255,0.9));
+}
+
+/* Focus improvements */
+.drag-drop-area:focus-within {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.15);
+}
+
+.attachment-item,
+.list-group-item {
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+/* ===== Progress and Upload Status Styles ===== */
+
+/* Upload Progress Container */
+.upload-progress-container {
+    display: none;
+    margin: 15px 0 10px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+    position: relative;
+    z-index: 5;
+}
+
+.upload-progress-container.show {
+    display: block;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Progress Text Container */
+.progress-text-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.progress-percentage {
+    font-weight: 600;
+    font-size: 13px;
+    color: #17a2b8;
+    background: rgba(23, 162, 184, 0.1);
+    padding: 4px 12px;
+    border-radius: 15px;
+    border: 1px solid rgba(23, 162, 184, 0.2);
+    min-width: 50px;
+    text-align: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+    position: relative;
+    z-index: 11;
+    display: inline-block;
+}
+
+.progress-percentage.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.progress-percentage.completed {
+    background: rgba(40, 167, 69, 0.1);
+    border-color: rgba(40, 167, 69, 0.3);
+    color: #28a745;
+}
+
+.progress-percentage.error {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+}
+
+/* تأكيد عدم تداخل النسبة مع Bootstrap progress */
+.upload-progress-container .progress {
+    display: none !important;
+}
+
+.upload-progress-container .progress-bar {
+    display: none !important;
+}
+
+/* منع أي تداخل من عناصر أخرى */
+.progress-text-container * {
+    position: relative !important;
+}
+
+.progress-percentage {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    background-clip: padding-box !important;
+    clear: both !important;
+    float: none !important;
+    margin: 0 auto !important;
+}
+
+/* تأكد من عدم وجود أي عناصر تتداخل */
+.upload-progress-container .progress-text-container {
+    clear: both;
+    width: 100%;
+    position: relative;
+    z-index: 999 !important;
+}
+
+.upload-progress-container .progress-bar-container {
+    clear: both;
+    width: 100%;
+    position: relative;
+    z-index: 1 !important;
+    margin-bottom: 8px;
+}
+
+/* إضافة فاصل واضح بين الشريط والنسبة */
+.upload-progress-container .progress-bar-container::after {
+    content: "";
+    display: block;
+    height: 5px;
+    width: 100%;
+    clear: both;
+}
+
+/* تأكد من أن النسبة تظهر بوضوح */
+.progress-percentage {
+    background: rgba(23, 162, 184, 0.15) !important;
+    border: 2px solid rgba(23, 162, 184, 0.3) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 3px 10px rgba(23, 162, 184, 0.2) !important;
+}
+
+/* مسافة إضافية لضمان الفصل */
+.upload-progress-container {
+    padding: 15px !important;
+}
+
+.progress-text-container {
+    margin-top: 12px !important;
+    padding: 5px 0 !important;
+}
+
+/* Progress Bar Styles */
+.progress-bar-container {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+.progress-bar-animated {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #17a2b8, #20c997);
+    transition: width 0.4s ease;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(23, 162, 184, 0.3);
+}
+
+.progress-bar-animated::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* إصلاح أي مشاكل في العرض */
+.upload-progress-container {
+    overflow: visible !important;
+}
+
+.progress-text-container {
+    overflow: visible !important;
+    height: auto !important;
+    line-height: normal !important;
+}
+
+/* Upload Status Alert */
+.upload-status {
+    display: none;
+    margin: 12px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.upload-status.show {
+    display: block;
+}
+
+.upload-status.uploading {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.upload-status.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.upload-status.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.upload-status.warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.upload-status .upload-icon {
+    margin-left: 8px;
+}
+
+.upload-status .upload-icon.pulse {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===== Scrollable Container Styles ===== */
+
+/* Attachment List Container Heights */
+.attachment-list-container-400 {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.service-attachment-list-container-350 {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+/* ===== Badge and Text Styles ===== */
+
+/* Small Badge Text */
+.badge-small-text {
+    font-size: 0.7em;
+}
+
+/* ===== File Input Hidden ===== */
+.file-input-hidden {
+    display: none;
+}
+
+/* ===== Form Improvements ===== */
+.attachment-upload-form {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+.attachment-upload-form .mb-2 {
+    margin-bottom: 15px !important;
+}
+
+.attachment-upload-form .form-control {
+    border: 1px solid #d1ecf1;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.attachment-upload-form .form-control:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.15);
+}
+
+.attachment-upload-form .form-control-sm {
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.attachment-upload-form .btn-primary {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: none !important;
+    width: 100%;
+    transform: none !important;
+}
+
+.attachment-upload-form .btn-primary:hover {
+    background: linear-gradient(135deg, #138496, #117a8b);
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+    transform: none !important;
+    transition: none !important;
+}
+
+.attachment-upload-form .btn-primary:active {
+    background: linear-gradient(135deg, #117a8b, #0f6674);
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(23, 162, 184, 0.4);
+    transition: none !important;
+}
+
+/* Form labels */
+.attachment-upload-form .form-label {
+    font-weight: 500;
+    color: #495057;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+/* Checkbox styling */
+.attachment-upload-form .form-check {
+    margin: 12px 0;
+}
+
+.attachment-upload-form .form-check-input {
+    margin-top: 0.25em;
+}
+
+.attachment-upload-form .form-check-label {
+    font-size: 13px;
+    color: #6c757d;
+    margin-left: 8px;
+}
+
+/* Select styling */
+.attachment-upload-form select.form-control,
+.attachment-upload-form select.form-control-sm {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: left 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+    padding-left: 40px;
+}
+
+/* Text inputs spacing */
+.attachment-upload-form input[type="text"] {
+    background-color: #fff;
+}
+
+.attachment-upload-form input[type="text"]:focus {
+    background-color: #fff;
+}
+
+/* ===== Multi-Share Header Styles ===== */
+.multi-share-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #f8f9fa;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+/* ===== Dropdown Menu Z-Index Fix ===== */
+.attachment-list-container .dropdown-menu,
+.service-attachment-list-container .dropdown-menu,
+.attachment-item .dropdown-menu,
+.reply-item .dropdown-menu {
+    z-index: 1050 !important;
+    position: absolute !important;
+}
+
+.attachment-list-container .dropdown,
+.service-attachment-list-container .dropdown,
+.attachment-item .dropdown,
+.reply-item .dropdown {
+    position: static !important;
+}
+
+.attachment-list-container,
+.service-attachment-list-container {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* Ensure dropdowns don't get cut off */
+.card-body {
+    overflow: visible !important;
+}
+
+.list-group {
+    overflow: visible !important;
+}
+
+.attachment-item {
+    overflow: visible !important;
+}
+
+.multi-share-header.show {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.multi-share-header .selected-info {
+    color: #495057;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.multi-share-header .selected-info i {
+    color: #28a745;
+}
+
+.multi-share-header .share-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.multi-share-header .share-btn:hover {
+    background: #0056b3;
+    color: white;
+}
+
+.multi-share-header .clear-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.multi-share-header .clear-btn:hover {
+    background: #545b62;
+    color: white;
+}
+
+/* ===== تنسيق أزرار نسخ الرابط ===== */
+.copy-attachment-link {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.copy-attachment-link:hover {
+    background-color: #fff3cd !important;
+    color: #856404 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.copy-attachment-link:active {
+    transform: translateY(0);
+}
+
+/* تأثير الضغط لزر النسخ */
+.copy-attachment-link.copying {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    animation: copyPulse 0.6s ease-in-out;
+}
+
+@keyframes copyPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* تأثير خاص للأزرار الصغيرة في replies */
+.btn-sm.copy-attachment-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+}
+
+.btn-sm.copy-attachment-link:hover {
+    background-color: #fff3cd !important;
+    border-color: #ffeeba !important;
+    color: #856404 !important;
+}
+
+/* تحسين tooltip لزر النسخ */
+.copy-attachment-link[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+/* تحسين أيقونة النسخ */
+.copy-attachment-link i {
+    transition: all 0.3s ease;
+}
+
+.copy-attachment-link:hover i {
+    transform: scale(1.1);
+}
+
+.copy-attachment-link.copying i {
+    animation: copyIconSpin 0.5s ease-in-out;
+}
+
+@keyframes copyIconSpin {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.2);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* تأثيرات متجاوبة للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .copy-attachment-link {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .btn-sm.copy-attachment-link {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* ===== منع تغيير شكل أزرار رفع الملفات عند الضغط ===== */
+
+/* منع تأثيرات الضغط على زر submit الخاص برفع الملفات */
+.attachment-upload-form .btn-primary,
+.attachment-upload-form .btn.btn-primary,
+.upload-form .btn-primary,
+.upload-form .btn.btn-primary,
+button[type="submit"].btn-primary {
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.attachment-upload-form .btn-primary:hover,
+.upload-form .btn-primary:hover {
+    transform: none !important;
+}
+
+.attachment-upload-form .btn-primary:active,
+.attachment-upload-form .btn-primary:focus,
+.upload-form .btn-primary:active,
+.upload-form .btn-primary:focus,
+button[type="submit"].btn-primary:active,
+button[type="submit"].btn-primary:focus {
+    transform: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+/* منع تأثيرات Bootstrap الافتراضية على أزرار رفع الملفات */
+.attachment-upload-form .btn-primary:not(:disabled):not(.disabled):active,
+.upload-form .btn-primary:not(:disabled):not(.disabled):active,
+button[type="submit"].btn-primary:not(:disabled):not(.disabled):active {
+    transform: none !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    box-shadow: none !important;
+}
+
+/* منع تأثيرات الضغط على زر اختيار الملفات أيضاً */
+.file-select-button {
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+.file-select-button:hover,
+.file-select-button:active,
+.file-select-button:focus {
+    transform: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* منع تأثيرات الضغط على منطقة drag-drop */
+.drag-drop-area {
+    transform: none !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.drag-drop-area:active {
+    transform: none !important;
+}

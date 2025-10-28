@@ -1,0 +1,609 @@
+/* Arkan Economic Consultancy - Assign Work Shifts CSS */
+
+:root {
+    --primary-color: #3a9cc7; /* Darker Arkan blue for better contrast */
+    --primary-dark: #2a7a9e; /* Even darker shade for more contrast */
+    --primary-light: #d0ebf6;
+    --secondary-color: #1a2a3a; /* Darker secondary color */
+    --light-gray: #f8f9fa;
+    --border-color: #dee2e6; /* Slightly darker border */
+    --success-color: #198754; /* Darker success color */
+    --danger-color: #dc3545;
+    --text-color: #212529; /* Darker text for better readability */
+    --text-muted: #495057; /* Darker muted text */
+    --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+    --transition: all 0.3s ease;
+}
+
+/* General Page Styling */
+body {
+    font-family: 'Cairo', sans-serif;
+    direction: ltr;
+    text-align: left;
+    color: var(--text-color);
+    background-color: #f0f4f8; /* Slightly darker background for contrast */
+}
+
+.container-fluid {
+    padding: 25px;
+}
+
+/* Page Title Styling */
+.page-title {
+    margin: 0 0 30px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.page-title h2 {
+    color: var(--secondary-color);
+    font-weight: 800; /* Bolder font */
+    font-size: 2rem; /* Larger font size */
+    margin-bottom: 10px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Text shadow for depth */
+}
+
+.page-title:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 5px; /* Thicker underline */
+    width: 70px; /* Wider underline */
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.page-title p {
+    color: var(--text-muted);
+    margin-bottom: 0;
+    font-size: 1.1rem; /* Larger subtitle */
+}
+
+/* Card Styling - Enhanced with more depth and contrast */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18); /* Stronger shadow */
+    margin-bottom: 30px;
+    border: none;
+    transition: var(--transition);
+    background-color: white;
+    overflow: hidden;
+    position: relative;
+}
+
+.card:hover {
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22); /* Even stronger shadow on hover */
+    transform: translateY(-7px); /* More pronounced lift effect */
+}
+
+.card-header {
+    background-color: var(--primary-dark) !important; /* Darker header for contrast */
+    border-bottom: 1px solid var(--border-color);
+    padding: 22px 25px; /* Slightly more padding */
+    border-radius: 12px 12px 0 0 !important;
+    color: white;
+}
+
+.card-header h4 {
+    margin: 0;
+    color: white;
+    font-weight: 700;
+    font-size: 1.4rem; /* Larger header text */
+    letter-spacing: 0.5px; /* Better letter spacing */
+}
+
+.card-body {
+    padding: 30px; /* More padding */
+}
+
+/* Table Styling - Enhanced for elegant design */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Add shadow to table */
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    color: var(--text-color);
+    vertical-align: middle;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: var(--primary-dark);
+    color: white;
+    font-weight: 700; /* Bolder headers */
+    border: none;
+    padding: 20px 22px; /* More padding */
+    text-align: left;
+    font-size: 1rem; /* Larger font */
+    letter-spacing: 0.5px;
+    position: relative;
+    text-transform: uppercase; /* Uppercase for emphasis */
+}
+
+.table thead th:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px; /* Thicker line */
+    width: 100%;
+    background: linear-gradient(90deg, rgba(58, 156, 199, 0.9), rgba(58, 156, 199, 0.3)); /* More opaque gradient */
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody td {
+    padding: 20px 22px; /* More padding */
+    text-align: left;
+    vertical-align: middle;
+    font-size: 1rem; /* Larger text */
+    border: none;
+    background-color: transparent;
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: rgba(58, 156, 199, 0.08); /* Slightly darker alternating rows */
+}
+
+.table tbody tr:hover {
+    background-color: rgba(58, 156, 199, 0.15); /* Darker hover state */
+    transform: translateY(-3px); /* More pronounced lift */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Stronger shadow on hover */
+}
+
+/* User Info Styling */
+.user-name {
+    font-weight: 700; /* Bolder name */
+    color: var(--secondary-color);
+    font-size: 1.1rem; /* Larger name */
+    display: block;
+}
+
+.user-email {
+    color: var(--text-muted);
+    font-size: 0.9rem; /* Slightly larger email */
+    display: block;
+    margin-top: 5px;
+}
+
+.department-badge {
+    display: inline-block;
+    padding: 8px 16px; /* More padding */
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600; /* Bolder text */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+    border: 1px solid rgba(58, 156, 199, 0.2); /* Subtle border */
+}
+
+/* Shift Options Styling */
+.shift-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* More space between options */
+}
+
+/* Modern Radio Button Styling */
+.form-check {
+    margin-bottom: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.form-check-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.form-check-label {
+    margin: 0;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 55px; /* More padding */
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+/* Custom radio button */
+.form-check-label:before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px; /* Larger radio button */
+    height: 24px;
+    border: 2px solid #ccc; /* Darker border */
+    border-radius: 50%;
+    background-color: #fff;
+    transition: var(--transition);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08); /* Stronger shadow */
+}
+
+.form-check-input:checked + .form-check-label:before {
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(58, 156, 199, 0.25); /* Larger, more visible glow */
+}
+
+.form-check-input:checked + .form-check-label:after {
+    content: '';
+    position: absolute;
+    left: 21px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px; /* Larger dot */
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    transition: var(--transition);
+}
+
+/* Shift Type Styling */
+.shift-type {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 20px; /* More padding */
+    border-radius: 30px;
+    font-size: 0.95rem; /* Larger text */
+    font-weight: 600; /* Bolder text */
+    transition: var(--transition);
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* Stronger shadow */
+    border: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border */
+}
+
+.shift-type i {
+    margin-right: 12px;
+    font-size: 16px; /* Larger icon */
+}
+
+.shift-morning {
+    background-color: #d1e7ff; /* More saturated color */
+    color: #0055cc; /* Darker text for contrast */
+}
+
+.shift-night {
+    background-color: #e6e0ff; /* More saturated color */
+    color: #5000ca; /* Darker text for contrast */
+}
+
+.shift-none {
+    background-color: #eeeeee; /* Darker background */
+    color: #555555; /* Darker text */
+}
+
+.form-check-input:checked + .form-check-label .shift-morning {
+    background-color: #b8daff; /* Darker when selected */
+    box-shadow: 0 6px 14px rgba(0, 85, 204, 0.25); /* Stronger shadow */
+    transform: translateX(8px); /* More movement */
+    border: 1px solid rgba(0, 85, 204, 0.2); /* Subtle border */
+}
+
+.form-check-input:checked + .form-check-label .shift-night {
+    background-color: #d4c6ff; /* Darker when selected */
+    box-shadow: 0 6px 14px rgba(80, 0, 202, 0.25); /* Stronger shadow */
+    transform: translateX(8px); /* More movement */
+    border: 1px solid rgba(80, 0, 202, 0.2); /* Subtle border */
+}
+
+.form-check-input:checked + .form-check-label .shift-none {
+    background-color: #dddddd; /* Darker when selected */
+    box-shadow: 0 6px 14px rgba(85, 85, 85, 0.25); /* Stronger shadow */
+    transform: translateX(8px); /* More movement */
+    border: 1px solid rgba(85, 85, 85, 0.2); /* Subtle border */
+}
+
+/* Button Styling */
+.btn-primary {
+    background-color: var(--primary-dark); /* Darker button color */
+    border-color: var(--primary-dark);
+    color: white;
+    font-weight: 700; /* Bolder text */
+    padding: 14px 30px; /* More padding */
+    border-radius: 8px;
+    transition: var(--transition);
+    box-shadow: 0 6px 12px rgba(42, 122, 158, 0.4); /* Stronger shadow */
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    font-size: 1.05rem; /* Larger text */
+    letter-spacing: 0.5px; /* Better letter spacing */
+}
+
+.btn-primary:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: #1a5a78; /* Even darker hover state */
+    transition: 0.5s ease;
+    z-index: -1;
+}
+
+.btn-primary:hover:before {
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-3px); /* More pronounced lift */
+    box-shadow: 0 8px 18px rgba(42, 122, 158, 0.5); /* Stronger shadow on hover */
+}
+
+.btn-primary:focus {
+    box-shadow: 0 0 0 0.3rem rgba(42, 122, 158, 0.3); /* Larger, more visible focus ring */
+}
+
+.btn-primary i {
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+    font-size: 1.1rem; /* Larger icon */
+}
+
+.btn-primary:hover i {
+    transform: translateX(5px); /* More movement */
+}
+
+/* Alert Messages */
+.alert-success {
+    background-color: rgba(25, 135, 84, 0.15); /* More visible background */
+    border-color: rgba(25, 135, 84, 0.3); /* Darker border */
+    color: var(--success-color);
+    border-radius: 8px;
+    padding: 18px 22px; /* More padding */
+    box-shadow: 0 5px 12px rgba(25, 135, 84, 0.15); /* Stronger shadow */
+    position: relative;
+    border-left: 5px solid var(--success-color); /* Thicker border */
+    font-weight: 500; /* Bolder text */
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center !important;
+    padding: 50px 20px; /* More padding */
+    color: var(--text-muted);
+    font-size: 1.2rem; /* Larger text */
+    font-weight: 500; /* Bolder text */
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    .table thead {
+        display: none;
+    }
+
+    .table,
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table tr {
+        margin-bottom: 25px; /* More space between rows */
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: white !important;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12); /* Stronger shadow */
+    }
+
+    .table td {
+        position: relative;
+        padding: 18px 50% 18px 15px; /* More padding */
+        text-align: right;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table td:before {
+        content: attr(data-label);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 15px;
+        width: 45%;
+        padding-right: 15px;
+        font-weight: 700; /* Bolder label */
+        color: var(--secondary-color);
+        text-align: left;
+        font-size: 1.05rem; /* Larger label */
+    }
+
+    .table td:last-child {
+        border-bottom: none;
+    }
+
+    .department-badge {
+        width: 100%;
+        text-align: center;
+    }
+
+    .shift-options {
+        width: 100%;
+    }
+
+    .btn-primary {
+        width: 100%;
+        margin-top: 20px; /* More space above button */
+        padding: 16px 30px; /* Larger button on mobile */
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 15px 12px;
+    }
+
+    .shift-type {
+        font-size: 0.85rem;
+        padding: 10px 16px;
+    }
+
+    .page-title h2 {
+        font-size: 1.7rem; /* Smaller on mobile but still prominent */
+    }
+}
+
+/* Animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(42, 122, 158, 0.5); /* More visible pulse */
+    }
+    70% {
+        box-shadow: 0 0 0 12px rgba(42, 122, 158, 0); /* Larger pulse */
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(42, 122, 158, 0);
+    }
+}
+
+/* Arkan Brand Elements */
+.card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px; /* Thicker top border */
+    background: linear-gradient(90deg, var(--primary-dark), var(--primary-color));
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+/* Add snowflake pattern inspired by Arkan logo */
+.page-title:before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 50px; /* Larger pattern */
+    height: 50px;
+    background-image: radial-gradient(var(--primary-light) 25%, transparent 25%),
+                      radial-gradient(var(--primary-light) 25%, transparent 25%);
+    background-position: 0 0, 12px 12px;
+    background-size: 24px 24px;
+    opacity: 0.6; /* More visible */
+}
+
+/* Search Form Styling */
+.search-form .input-group {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.search-form .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    padding-left: 15px;
+    height: 42px;
+}
+
+.search-form .form-control:focus {
+    box-shadow: none;
+    border-color: var(--border-color);
+}
+
+.search-form .btn {
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    transition: var(--transition);
+}
+
+.search-form .btn i {
+    font-size: 1rem;
+}
+
+.search-form .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.search-form .btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.search-form .btn-clear {
+    background-color: #fff;
+    border-color: var(--border-color);
+    color: var(--text-muted);
+    margin-left: 8px;
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.search-form .btn-clear:hover {
+    background-color: var(--light-gray);
+    color: var(--danger-color);
+}
+
+.search-form .btn-clear i {
+    margin-right: 6px;
+}
+
+/* Loading State Styling */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    z-index: 1;
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

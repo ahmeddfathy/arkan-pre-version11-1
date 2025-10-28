@@ -1,0 +1,494 @@
+/* Food Allowances System Styles */
+:root {
+    --primary-color: #0095B2;
+    --primary-dark: #007A94;
+    --primary-light: #33C5E6;
+    --secondary-color: #5A6577;
+    --success-color: #1D6540;
+    --danger-color: #CC2424;
+    --warning-color: #C85A10;
+    --info-color: #0095B2;
+    --food-color: #FF6B35; /* لون خاص ببدل الأكل */
+    --food-light: #FF8A65;
+}
+
+/* Custom Card Styles */
+.food-allowance-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.food-allowance-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Food Allowance Modal Styles */
+.food-allowance-modal .modal-content {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.food-allowance-modal .modal-header {
+    background: linear-gradient(135deg, var(--food-color), var(--food-light));
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.food-allowance-modal .modal-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.food-allowance-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.food-allowance-modal .modal-footer {
+    border-top: none;
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.food-allowance-modal .btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.food-allowance-modal .btn-warning:hover {
+    background-color: #B54E0E;
+    border-color: #B54E0E;
+    transform: translateY(-2px);
+}
+
+.food-allowance-modal .btn-secondary {
+    background-color: #E2E6EA;
+    border-color: #E2E6EA;
+    color: var(--secondary-color);
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.food-allowance-modal .btn-secondary:hover {
+    background-color: #D1D6DB;
+    border-color: #D1D6DB;
+    transform: translateY(-2px);
+}
+
+/* Header Styles */
+.food-allowance-header {
+    background: linear-gradient(135deg, var(--food-color), var(--food-light));
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-actions .btn-light {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--food-color);
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.header-actions .btn-light:hover {
+    background: white;
+    color: var(--food-color);
+    transform: translateY(-2px);
+}
+
+.food-allowance-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.food-allowance-title i {
+    font-size: 1.5rem;
+}
+
+/* Filter Controls */
+.filter-controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: end;
+}
+
+.filter-controls .form-control,
+.filter-controls .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.filter-controls .form-control:focus,
+.filter-controls .form-select:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+.filter-controls .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.filter-controls label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Button Styles */
+.btn-food {
+    background: var(--food-color);
+    color: white;
+    border: none;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-food:hover {
+    background: var(--food-light);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background: #155a32;
+    border-color: #155a32;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #a01e1e;
+    border-color: #a01e1e;
+    transform: translateY(-2px);
+}
+
+/* Form Styles */
+.food-allowance-form {
+    background: #f8f9fa;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.food-allowance-form .form-control,
+.food-allowance-form .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s ease;
+}
+
+.food-allowance-form .form-control:focus,
+.food-allowance-form .form-select:focus {
+    border-color: var(--food-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}
+
+/* Table Styles */
+.food-allowance-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.food-allowance-table th {
+    background: linear-gradient(135deg, var(--food-color), var(--food-light));
+    color: white;
+    font-weight: 600;
+    padding: 1rem;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    border: none;
+}
+
+.food-allowance-table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+    background: white;
+}
+
+.food-allowance-table tbody tr:hover {
+    background-color: rgba(255, 107, 53, 0.05);
+}
+
+/* Employee Card */
+.employee-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.employee-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--food-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+}
+
+.employee-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.employee-info h4 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.employee-info p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Amount Display */
+.amount-display {
+    font-weight: 600;
+    color: var(--food-color);
+    font-size: 1.1rem;
+}
+
+.total-amount {
+    background: linear-gradient(135deg, var(--success-color), #2d7d4f);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-added {
+    background-color: rgba(29, 101, 64, 0.1);
+    color: var(--success-color);
+}
+
+.status-edited {
+    background-color: rgba(255, 107, 53, 0.1);
+    color: var(--food-color);
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .food-allowance-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-controls {
+        flex-direction: column;
+    }
+
+    .filter-controls .form-control,
+    .filter-controls .form-select {
+        width: 100%;
+    }
+
+    .food-allowance-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .food-allowance-form .row {
+        flex-direction: column;
+    }
+
+    .food-allowance-form .col-md-3 {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+}
+
+/* RTL Support */
+[dir="rtl"] .employee-card {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .filter-controls .btn i {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+/* Print Styles */
+@media print {
+    .food-allowance-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .filter-controls {
+        display: none;
+    }
+
+    .food-allowance-table th {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+}
+
+/* Alert Styles */
+.alert-success {
+    background-color: rgba(29, 101, 64, 0.1);
+    border-color: var(--success-color);
+    color: var(--success-color);
+    border-radius: 0.5rem;
+}
+
+.alert-danger {
+    background-color: rgba(204, 36, 36, 0.1);
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+    border-radius: 0.5rem;
+}
+
+/* Summary Cards */
+.summary-card {
+    background: linear-gradient(135deg, var(--food-color), var(--food-light));
+    color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.summary-card .total {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.summary-card .period {
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+/* Food Type Badge */
+.food-type-badge {
+    background: var(--food-color);
+    color: white;
+    padding: 0.35rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.empty-state i {
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 0;
+}

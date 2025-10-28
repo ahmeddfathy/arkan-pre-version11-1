@@ -1,0 +1,850 @@
+/* App Layout Styles */
+
+/* Enhanced Navigation Bar Styles */
+.navbar-custom-enhanced {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fdff 50%, #e6f4ff 100%);
+    border-bottom: 3px solid #2196F3;
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    margin-bottom: 50px;
+    transition: all 0.3s ease;
+}
+
+.navbar-custom-enhanced:hover {
+    box-shadow: 0 12px 35px rgba(33, 150, 243, 0.2);
+}
+
+/* Enhanced Logo Container */
+.logo-container-enhanced {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-right: 1.5rem;
+    border-radius: 15px;
+    background: linear-gradient(45deg, rgba(33, 150, 243, 0.05), rgba(33, 150, 243, 0.1));
+    border: 2px solid rgba(33, 150, 243, 0.1);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-container-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.logo-container-enhanced:hover::before {
+    left: 100%;
+}
+
+.logo-container-enhanced:hover {
+    background: linear-gradient(45deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.15));
+    border-color: rgba(33, 150, 243, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
+}
+
+/* Enhanced Arkan Logo */
+.arkan-logo-enhanced {
+    height: 55px !important;
+    width: auto !important;
+    filter: drop-shadow(0 4px 8px rgba(33, 150, 243, 0.2));
+    transition: all 0.4s ease;
+    max-width: none !important;
+    object-fit: contain;
+}
+
+.arkan-logo-enhanced:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 6px 15px rgba(33, 150, 243, 0.35));
+}
+
+.navbar-brand img {
+    height: 80px !important;
+    width: auto !important;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand img:hover {
+    transform: scale(1.05);
+}
+
+/* Legacy styles for backward compatibility */
+.arkan-logo {
+    height: 45px !important;
+    width: auto !important;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+    transition: all 0.3s ease;
+    max-width: none !important;
+}
+
+.arkan-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.25));
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem;
+    margin-right: 0.75rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.3s ease;
+}
+
+.logo-container:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Guest Navigation Bar Styles */
+.navbar {
+    padding: 0.25rem 1.5rem;
+    font-family: "Tajawal", "Cairo", sans-serif;
+    direction: rtl;
+    min-height: auto;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary-color, #4FB3D9), var(--secondary-color, #2A91C3));
+    border: none;
+    box-shadow: 0 4px 10px rgba(79, 179, 217, 0.2);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(42, 145, 195, 0.3);
+}
+
+.btn-outline-primary {
+    color: var(--secondary-color, #2A91C3);
+    border: 1px solid var(--secondary-color, #2A91C3);
+    background: transparent;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+}
+
+.btn-outline-primary:hover {
+    background-color: rgba(79, 179, 217, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(79, 179, 217, 0.1);
+}
+
+/* Enhanced Navigation Links */
+.navbar-custom-enhanced .nav-link {
+    color: #333;
+    font-weight: 600;
+    padding: 0.75rem 1.25rem !important;
+    border-radius: 12px;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    background: transparent;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar-custom-enhanced .nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2196F3, #4FC3F7);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar-custom-enhanced .nav-link:hover {
+    color: #2196F3;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(79, 195, 247, 0.08));
+    border-color: rgba(33, 150, 243, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(33, 150, 243, 0.15);
+}
+
+.navbar-custom-enhanced .nav-link:hover::before {
+    width: 80%;
+}
+
+.navbar-custom-enhanced .nav-link.active {
+    color: #2196F3;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(79, 195, 247, 0.12));
+    border-color: rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.navbar-custom-enhanced .nav-link.active::before {
+    width: 100%;
+}
+
+/* Enhanced Dropdown Menus */
+.navbar-custom-enhanced .dropdown-menu {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+    border: 2px solid rgba(33, 150, 243, 0.15);
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(33, 150, 243, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 0.75rem 0;
+    margin-top: 0.5rem;
+}
+
+.navbar-custom-enhanced .dropdown-item {
+    color: #333;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    margin: 0.25rem 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.navbar-custom-enhanced .dropdown-item:hover {
+    color: #2196F3;
+    background: linear-gradient(90deg, rgba(33, 150, 243, 0.08), rgba(79, 195, 247, 0.05));
+    transform: translateX(5px);
+}
+
+/* Enhanced Notification Button */
+.navbar-custom-enhanced .notification-btn {
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(79, 195, 247, 0.15));
+    border: 2px solid rgba(33, 150, 243, 0.2);
+    border-radius: 50%;
+    padding: 0.75rem;
+    color: #2196F3;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: visible;
+    z-index: 10;
+}
+
+.navbar-custom-enhanced .notification-btn:hover {
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(79, 195, 247, 0.2));
+    border-color: rgba(33, 150, 243, 0.4);
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.25);
+}
+
+/* Fix for Tailwind's built-in size constraints */
+.h-16 {
+    height: 3.5rem !important; /* Reduced height */
+}
+
+.h-24 {
+    height: 6rem !important; /* Enhanced height for new design */
+}
+
+/* Ensure logo doesn't get constrained */
+img.arkan-logo,
+img.arkan-logo-enhanced {
+    max-height: none;
+    object-fit: contain;
+}
+
+/* Notification styles */
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+    background-color: #f0f7ff;
+}
+
+.notification-content {
+    margin-bottom: 5px;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.dropdown-menu {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Enhanced Notifications Dropdown */
+.navbar-custom-enhanced .notifications-dropdown {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+    border: 2px solid rgba(33, 150, 243, 0.15);
+    border-radius: 20px;
+    box-shadow: 0 20px 45px rgba(33, 150, 243, 0.25);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    overflow: hidden;
+}
+
+/* Circular Notification Badge (Legacy) */
+.navbar-custom-enhanced .notification-badge {
+    background: linear-gradient(45deg, #ff4757, #ff6b7a);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+    animation: pulse 2s infinite;
+}
+
+/* Box-style Notification Badge - Standalone */
+.navbar-custom-enhanced .notification-badge-box {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 6px 16px rgba(239, 68, 68, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(0, 0, 0, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+    animation: badgePulse 2s infinite;
+    border-radius: 6px !important;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.1px;
+    transition: all 0.3s ease;
+    min-width: 28px;
+    height: 22px;
+    padding: 3px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+    text-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.7),
+        0 0 6px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 15;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    text-align: center;
+    margin: 0;
+}
+
+/* Overlay Notification Badge - Inside Bell */
+.navbar-custom-enhanced .notification-badge-overlay {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    box-shadow:
+        0 8px 20px rgba(239, 68, 68, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 0 0 1px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    animation: overlayPulse 2s infinite;
+    border-radius: 50% !important;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0px;
+    transition: all 0.3s ease;
+    min-width: 20px;
+    height: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: white;
+    text-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.8),
+        0 0 6px rgba(0, 0, 0, 0.5);
+    position: absolute;
+    z-index: 99999 !important;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    text-align: center;
+    margin: 0;
+    pointer-events: none;
+}
+
+.navbar-custom-enhanced .notification-badge-box:hover {
+    transform: scale(1.08);
+    box-shadow:
+        0 8px 20px rgba(239, 68, 68, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 0 0 1px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+.navbar-custom-enhanced .notification-badge-overlay:hover {
+    transform: scale(1.15);
+    box-shadow:
+        0 12px 30px rgba(239, 68, 68, 1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 0 0 2px rgba(0, 0, 0, 0.3),
+        0 6px 15px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes badgePulse {
+    0% {
+        transform: scale(1);
+        box-shadow:
+            0 6px 16px rgba(239, 68, 68, 0.7),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            0 0 0 1px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow:
+            0 8px 20px rgba(239, 68, 68, 0.8),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            0 0 0 1px rgba(0, 0, 0, 0.2);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow:
+            0 6px 16px rgba(239, 68, 68, 0.7),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            0 0 0 1px rgba(0, 0, 0, 0.15);
+    }
+}
+
+@keyframes overlayPulse {
+    0% {
+        transform: scale(1);
+        box-shadow:
+            0 8px 20px rgba(239, 68, 68, 0.8),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            0 0 0 1px rgba(0, 0, 0, 0.2),
+            0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow:
+            0 10px 25px rgba(239, 68, 68, 0.9),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5),
+            0 0 0 1px rgba(0, 0, 0, 0.25),
+            0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow:
+            0 8px 20px rgba(239, 68, 68, 0.8),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            0 0 0 1px rgba(0, 0, 0, 0.2),
+            0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Enhanced Team Dropdown Button */
+.navbar-custom-enhanced .team-dropdown-btn {
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.08), rgba(79, 195, 247, 0.12));
+    border: 2px solid rgba(33, 150, 243, 0.15);
+    border-radius: 12px;
+    color: #333;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-custom-enhanced .team-dropdown-btn:hover {
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.12), rgba(79, 195, 247, 0.18));
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #2196F3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(33, 150, 243, 0.2);
+}
+
+/* Enhanced User Profile Button */
+.navbar-custom-enhanced .user-profile-btn {
+    border: 3px solid rgba(33, 150, 243, 0.2);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(79, 195, 247, 0.08));
+}
+
+.navbar-custom-enhanced .user-profile-btn:hover {
+    border-color: rgba(33, 150, 243, 0.4);
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+    /* إخفاء التبويبات الرئيسية في الموبايل والتابلت */
+    .navbar-custom-enhanced .nav-links-container {
+        display: none !important;
+    }
+
+    /* إخفاء العناصر الجانبية في الموبايل والتابلت */
+    .navbar-custom-enhanced .right-elements {
+        display: none !important;
+    }
+
+    /* إظهار زر الهامبرجر في الموبايل والتابلت */
+    .navbar-custom-enhanced .hamburger-container {
+        display: flex !important;
+    }
+
+    /* تحسين تصميم القائمة المنسدلة للموبايل */
+    .responsive-nav-menu {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+        border-top: 3px solid #2196F3;
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
+        margin-top: 0;
+    }
+
+    /* تحسين تصميم الروابط في القائمة المنسدلة */
+    .responsive-nav-menu .responsive-nav-link {
+        color: #333;
+        font-weight: 600;
+        padding: 1rem 1.5rem !important;
+        border-radius: 8px;
+        margin: 0.25rem 1rem;
+        transition: all 0.3s ease;
+        display: block;
+        text-decoration: none;
+    }
+
+    .responsive-nav-menu .responsive-nav-link:hover,
+    .responsive-nav-menu .responsive-nav-link.active {
+        color: #2196F3;
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.08), rgba(79, 195, 247, 0.05));
+        transform: translateX(5px);
+    }
+
+    /* تحسين تصميم زر الهامبرجر */
+    .hamburger-button {
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(79, 195, 247, 0.15));
+        border: 2px solid rgba(33, 150, 243, 0.2);
+        border-radius: 12px;
+        padding: 0.75rem;
+        color: #2196F3;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);
+    }
+
+    .hamburger-button:hover {
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(79, 195, 247, 0.2));
+        border-color: rgba(33, 150, 243, 0.4);
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.2);
+    }
+
+    .hamburger-button:focus {
+        outline: 3px solid rgba(33, 150, 243, 0.3);
+        outline-offset: 2px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-custom-enhanced {
+        padding: 0.5rem 1rem;
+    }
+
+    .h-24 {
+        height: 5rem !important;
+    }
+
+    .logo-container-enhanced {
+        padding: 0.5rem 0.75rem;
+        margin-right: 1rem;
+        border-radius: 12px;
+    }
+
+    .arkan-logo-enhanced {
+        height: 45px !important;
+    }
+
+    .navbar-custom-enhanced .notification-badge-box {
+        min-width: 24px;
+        height: 18px;
+        font-size: 10px;
+        border-radius: 4px !important;
+        padding: 2px 6px;
+        border-width: 2px;
+    }
+
+    .navbar-custom-enhanced .notification-badge-overlay {
+        min-width: 18px;
+        height: 18px;
+        font-size: 10px;
+        border-width: 1px;
+        z-index: 99999 !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .arkan-logo {
+        height: 50px !important;
+    }
+
+    .arkan-logo-enhanced {
+        height: 40px !important;
+    }
+
+    .navbar-brand img {
+        height: 60px !important;
+    }
+
+    .nav-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .navbar-custom-enhanced {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fdff 70%, #e6f4ff 100%);
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.1);
+    }
+
+    .h-24 {
+        height: 4.5rem !important;
+    }
+
+    .logo-container-enhanced {
+        padding: 0.4rem 0.6rem;
+        margin-right: 0.75rem;
+    }
+
+    /* تحسين الهامبرجر في الموبايل الصغير */
+    .hamburger-button {
+        padding: 0.6rem;
+        border-radius: 10px;
+    }
+
+    /* تحسين القائمة المنسدلة في الموبايل الصغير */
+    .responsive-nav-menu .responsive-nav-link {
+        padding: 0.8rem 1.2rem !important;
+        margin: 0.2rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .navbar-custom-enhanced .notification-badge-box {
+        min-width: 20px;
+        height: 16px;
+        font-size: 9px;
+        border-radius: 3px !important;
+        padding: 1px 4px;
+        border-width: 1px;
+    }
+
+    .navbar-custom-enhanced .notification-badge-overlay {
+        min-width: 16px;
+        height: 16px;
+        font-size: 8px;
+        border-width: 1px;
+        z-index: 99999 !important;
+    }
+}
+
+/* Fix for page transitions/flicker in Livewire/Jetstream */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Smooth page transitions */
+.page-transition {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Smoother Livewire updates */
+[wire\:loading], [wire\:loading\.delay], [wire\:loading\.inline-block], [wire\:loading\.inline], [wire\:loading\.block], [wire\:loading\.flex], [wire\:loading\.table], [wire\:loading\.grid], [wire\:loading\.inline-flex] {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Enhanced Navigation Glass Effect */
+.navbar-custom-enhanced::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+        rgba(33, 150, 243, 0.03) 0%,
+        rgba(79, 195, 247, 0.05) 25%,
+        rgba(33, 150, 243, 0.05) 50%,
+        rgba(79, 195, 247, 0.03) 75%,
+        rgba(33, 150, 243, 0.02) 100%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Fix للتأكد من عدم ظهور التبويبات في الموبايل */
+@media (max-width: 1023px) {
+    .nav-links-container {
+        display: none !important;
+    }
+
+    .right-elements {
+        display: none !important;
+    }
+}
+
+/* إظهار الهامبرجر فقط في الموبايل */
+.hamburger-container {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .hamburger-container {
+        display: flex !important;
+    }
+}
+
+/* Enhanced Nav Link Hover Effects */
+.navbar-custom-enhanced .nav-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar-custom-enhanced .nav-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(33, 150, 243, 0.1),
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.navbar-custom-enhanced .nav-link:hover::after {
+    left: 100%;
+}
+
+/* Enhanced Notification Button Ripple Effect */
+.navbar-custom-enhanced .notification-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(33, 150, 243, 0.3);
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+}
+
+.navbar-custom-enhanced .notification-btn:active::before {
+    width: 40px;
+    height: 40px;
+}
+
+/* Enhanced Smooth Scroll Behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Enhanced Focus States */
+.navbar-custom-enhanced .nav-link:focus,
+.navbar-custom-enhanced .notification-btn:focus,
+.navbar-custom-enhanced .team-dropdown-btn:focus,
+.navbar-custom-enhanced .user-profile-btn:focus {
+    outline: 3px solid rgba(33, 150, 243, 0.3);
+    outline-offset: 2px;
+}
+
+/* Enhanced Load Animation for Navigation */
+.navbar-custom-enhanced {
+    animation: navSlideDown 0.6s ease-out;
+}
+
+@keyframes navSlideDown {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Enhanced Typography for Navigation */
+.navbar-custom-enhanced {
+    font-family: 'Tajawal', 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 0.02em;
+}
+
+/* Enhanced Navigation Spacing */
+.navbar-custom-enhanced .nav-links-container {
+    gap: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Enhanced Brand Logo Area */
+.navbar-custom-enhanced .brand-area {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Enhanced Right Side Elements Spacing */
+.navbar-custom-enhanced .right-elements {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Enhanced Navigation Container Spacing */
+.navbar-custom-enhanced > div > div {
+    padding: 0 1rem;
+}
+
+/* Final Touch: Subtle Shadow on Scroll */
+.navbar-custom-enhanced.scrolled {
+    box-shadow: 0 15px 40px rgba(33, 150, 243, 0.25);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fdff 30%, #e6f4ff 100%);
+}
+
+/* Prevent content jump during page transitions */
+body {
+    overflow-x: hidden;
+    background-color: white;
+    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.04);
+}

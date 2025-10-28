@@ -1,0 +1,328 @@
+
+#teamSuggestionSidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.team-suggestion-sidebar.show {
+    right: 0 !important;
+}
+
+.team-suggestion-sidebar-overlay.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+
+.team-suggestion-sidebar .card {
+    border-radius: 16px;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+
+
+.team-suggestion-sidebar .card.recommended {
+    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.25);
+    position: relative;
+}
+
+.team-suggestion-sidebar .card.recommended::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #c084fc);
+    z-index: 1;
+}
+
+.team-suggestion-sidebar .card-header {
+    border: none;
+    padding: 1.25rem 1.5rem 1rem 1.5rem;
+    background: #fff;
+}
+
+.team-suggestion-sidebar .card-header.recommended {
+    background: linear-gradient(135deg, #fff9e6, #fff3cd);
+    position: relative;
+}
+
+.team-suggestion-sidebar .card-body {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+
+
+.team-suggestion-sidebar .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+
+.team-suggestion-sidebar .stat-item {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+
+
+.team-suggestion-sidebar .stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.team-suggestion-sidebar .stat-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+
+
+.team-suggestion-sidebar .team-info {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.team-suggestion-sidebar .team-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.team-suggestion-sidebar .team-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.team-suggestion-sidebar .team-info-icon {
+    width: 20px;
+    color: #6366f1;
+    margin-left: 0.5rem;
+}
+
+
+.team-suggestion-sidebar .alert {
+    border-radius: 10px;
+    border: none !important;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.team-suggestion-sidebar .alert-info {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+}
+
+.team-suggestion-sidebar .alert-warning {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+}
+
+.team-suggestion-sidebar .alert-success {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(100, 116, 139, 0.2);
+}
+
+.team-suggestion-sidebar .alert-success .alert-heading {
+    color: #475569;
+    font-size: 1.2rem;
+}
+
+.team-suggestion-sidebar .alert-success .badge {
+    background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+    color: white !important;
+    font-size: 1rem !important;
+    padding: 0.75rem 1.25rem !important;
+}
+
+
+
+.team-suggestion-sidebar .toggle-members {
+    background: linear-gradient(135deg, #475569, #334155);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+
+
+.team-suggestion-sidebar .members-details {
+    margin-top: 1rem;
+}
+
+.team-suggestion-sidebar .member-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+
+
+.team-suggestion-sidebar .member-name {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.team-suggestion-sidebar .member-stats {
+    font-size: 0.875rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+
+
+.team-suggestion-sidebar .points-badge {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+}
+
+.team-suggestion-sidebar .card.recommended .points-badge {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+}
+
+
+
+.team-suggestion-sidebar .team-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+.team-suggestion-sidebar .crown-icon {
+    color: #6366f1;
+    margin-left: 0.5rem;
+    font-size: 1.2rem;
+}
+
+
+
+.team-suggestion-sidebar .teams-list {
+    margin-top: 0;
+}
+
+
+
+.team-suggestion-sidebar .sidebar-footer {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    border-top: 2px solid #d1d5db;
+}
+
+.team-suggestion-sidebar .sidebar-footer .btn {
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+
+
+.team-suggestion-sidebar button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.team-suggestion-sidebar * {
+    transition: all 0.3s ease;
+}
+
+
+
+.team-suggestion-sidebar * {
+    border: none !important;
+}
+
+.team-suggestion-sidebar .card,
+.team-suggestion-sidebar .stat-item,
+.team-suggestion-sidebar .member-card,
+.team-suggestion-sidebar .team-info {
+    border: none !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+
+.team-suggestion-sidebar .text-success {
+    color: #6c757d !important;
+}
+
+.team-suggestion-sidebar .bg-success {
+    background: linear-gradient(135deg, #6c757d, #495057) !important;
+}
+
+
+.team-suggestion-sidebar .card.recommended::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899, #6366f1);
+    border-radius: 18px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+
+
+.team-suggestion-sidebar .sidebar-header {
+    position: relative;
+}
+
+.team-suggestion-sidebar .sidebar-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+
+@media (max-width: 768px) {
+    #teamSuggestionSidebar {
+        width: 100vw !important;
+        right: -100vw !important;
+    }
+
+    #teamSuggestionSidebar.show {
+        right: 0 !important;
+    }
+
+    .team-suggestion-sidebar .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

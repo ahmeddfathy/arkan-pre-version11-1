@@ -1,0 +1,448 @@
+
+
+
+/* Birthday Theme Styles - Arkan Colors */
+.birthday-container {
+    background: linear-gradient(135deg, #f5faff 0%, #ebf8ff 100%);
+    border-radius: 1.25rem;
+    box-shadow: 0 15px 30px rgba(77, 182, 226, 0.12);
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Arkan-inspired geometric pattern overlay */
+.birthday-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234db6e2' fill-opacity='0.06'%3E%3Cpath d='M40 40L20 20L0 40L20 60L40 40zM60 20L40 0L20 20L40 40L60 20zM80 40L60 20L40 40L60 60L80 40zM60 60L40 40L20 60L40 80L60 60z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.birthday-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #3a9cc7, #4db6e2, #70c4e6, #4db6e2, #3a9cc7);
+    background-size: 200% 200%;
+    animation: gradientBorder 3s ease infinite;
+    z-index: 1;
+}
+
+@keyframes gradientBorder {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.birthday-header {
+    position: relative;
+    padding: 2rem 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(77, 182, 226, 0.1);
+    z-index: 1;
+    animation: pulseHeader 5s infinite alternate;
+}
+
+@keyframes pulseHeader {
+    0% { box-shadow: 0 4px 12px rgba(77, 182, 226, 0.1); }
+    100% { box-shadow: 0 8px 20px rgba(77, 182, 226, 0.2); }
+}
+
+.birthday-header h1 {
+    color: #3a9cc7;
+    position: relative;
+    display: inline-block;
+    font-weight: 700;
+}
+
+.birthday-header h1::after {
+    content: "🎉";
+    position: absolute;
+    top: -15px;
+    right: -25px;
+    font-size: 0.8em;
+    animation: bounce 2s infinite;
+    opacity: 0.9;
+}
+
+/* Arkan logo styles */
+.arkan-logo-mini {
+    position: relative;
+    animation: pulse 2s infinite alternate;
+}
+
+.arkan-logo-mini img {
+    transition: transform 0.3s ease;
+}
+
+.arkan-logo-mini:hover img {
+    transform: scale(1.15);
+}
+
+.arkan-brand-element {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arkan-brand-element img {
+    filter: drop-shadow(0 0 5px rgba(77, 182, 226, 0.5));
+    animation: slowRotate 10s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes slowRotate {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+/* Confetti animation */
+.confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+    animation: confetti-fall 5s ease-in-out infinite;
+}
+
+@keyframes confetti-fall {
+    0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.confetti-1 { background-color: #4db6e2; left: 10%; animation-delay: 0s; border-radius: 50%; }
+.confetti-2 { background-color: #3a9cc7; left: 20%; animation-delay: 0.5s; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+.confetti-3 { background-color: #70c4e6; left: 30%; animation-delay: 1s; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+.confetti-4 { background-color: #4db6e2; left: 40%; animation-delay: 1.5s; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+.confetti-5 { background-color: #3a9cc7; left: 50%; animation-delay: 2s; border-radius: 50%; }
+.confetti-6 { background-color: #70c4e6; left: 60%; animation-delay: 2.5s; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+.confetti-7 { background-color: #4db6e2; left: 70%; animation-delay: 3s; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+.confetti-8 { background-color: #3a9cc7; left: 80%; animation-delay: 3.5s; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+.confetti-9 { background-color: #70c4e6; left: 90%; animation-delay: 4s; border-radius: 50%; }
+
+.birthday-table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(77, 182, 226, 0.08);
+    z-index: 1;
+    position: relative;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.birthday-table th {
+    background: linear-gradient(90deg, #3a9cc7, #4db6e2);
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: none !important;
+    position: relative;
+    overflow: hidden;
+    padding: 15px 10px;
+}
+
+.birthday-table th::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    20% { left: 100%; }
+    100% { left: 100%; }
+}
+
+.birthday-table tr:hover:not(.birthday-week) {
+    background-color: rgba(240, 249, 255, 0.7);
+    transition: background-color 0.2s;
+}
+
+.birthday-week {
+    background: linear-gradient(90deg, #e8f7fc, #d0eef8);
+    position: relative;
+    overflow: hidden;
+    animation: highlightRow 2s infinite alternate;
+}
+
+@keyframes highlightRow {
+    0% { background: linear-gradient(90deg, #e8f7fc, #d0eef8); }
+    100% { background: linear-gradient(90deg, #d0eef8, #c1e8f7); }
+}
+
+.birthday-week::after {
+    content: "🎂";
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    opacity: 0.3;
+    animation: wobble 2.5s infinite;
+}
+
+@keyframes wobble {
+    0%, 100% { transform: translateY(-50%) rotate(0deg); }
+    25% { transform: translateY(-50%) rotate(-5deg); }
+    75% { transform: translateY(-50%) rotate(5deg); }
+}
+
+.birthday-icon {
+    display: inline-block;
+    margin-right: 5px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0); }
+}
+
+.days-badge {
+    background: linear-gradient(45deg, #3a9cc7, #4db6e2);
+    color: white;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    font-weight: bold;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(77, 182, 226, 0.3);
+}
+
+.days-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(77, 182, 226, 0.6);
+}
+
+.days-badge::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.days-badge:hover::after {
+    opacity: 1;
+    animation: ripple 1s linear;
+}
+
+@keyframes ripple {
+    0% { transform: scale(0.5); opacity: 0.3; }
+    100% { transform: scale(1.2); opacity: 0; }
+}
+
+.upcoming-birthday {
+    color: #3a9cc7;
+    font-weight: bold;
+    position: relative;
+    display: inline-block;
+}
+
+.upcoming-birthday::before {
+    content: "🎉";
+    position: absolute;
+    right: -22px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    animation: popIn 0.6s ease-in-out;
+}
+
+@keyframes popIn {
+    0% { transform: translateY(-50%) scale(0); opacity: 0; }
+    70% { transform: translateY(-50%) scale(1.2); opacity: 1; }
+    100% { transform: translateY(-50%) scale(1); opacity: 1; }
+}
+
+/* Additional decorative elements inspired by Arkan logo */
+.birthday-decoration {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.1;
+    z-index: 1;
+    animation: float 6s ease-in-out infinite;
+}
+
+.birthday-decoration:hover {
+    opacity: 0.6;
+    transform: scale(1.5);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+@keyframes float {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* Bootstrap compatibility tweaks */
+.table-responsive {
+    position: relative;
+    z-index: 1;
+}
+
+/* Arabic RTL support */
+[dir="rtl"] .birthday-week::after {
+    left: auto;
+    right: 10px;
+}
+
+/* Snowflake animation inspired by Arkan logo design */
+@keyframes snowflake {
+    0% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(5px) rotate(15deg); }
+    50% { transform: translateY(0) rotate(45deg); }
+    75% { transform: translateY(-5px) rotate(30deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+.snowflake-decoration {
+    position: absolute;
+    font-size: 1.8rem;
+    color: #4db6e2;
+    opacity: 0.2;
+    z-index: 1;
+    animation: snowflake 8s ease-in-out infinite;
+}
+
+.snowflake-decoration:hover {
+    opacity: 0.7;
+    transform: scale(1.2);
+    transition: all 0.3s;
+}
+
+/* Balloon animation */
+.balloon {
+    position: absolute;
+    font-size: 2rem;
+    animation: balloonFloat 15s ease-in-out infinite;
+    opacity: 0.2;
+    z-index: 1;
+}
+
+@keyframes balloonFloat {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+.balloon:hover {
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+/* Gift box animation */
+.gift-box {
+    position: absolute;
+    font-size: 2rem;
+    animation: giftShake 3s ease-in-out infinite;
+    opacity: 0.2;
+    z-index: 1;
+}
+
+@keyframes giftShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.gift-box:hover {
+    opacity: 0.8;
+    transform: scale(1.2);
+    transition: all 0.3s;
+}
+
+/* Footer animation */
+.birthday-footer {
+    animation: pulseFooter 3s infinite alternate;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 0.75rem;
+    margin: 1rem 2rem;
+    padding: 0.75rem !important;
+    box-shadow: 0 4px 12px rgba(77, 182, 226, 0.08);
+}
+
+.birthday-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234db6e2' fill-opacity='0.08'%3E%3Cpath d='M30 30L15 15L0 30L15 45L30 30zM45 15L30 0L15 15L30 30L45 15zM60 30L45 15L30 30L45 45L60 30zM45 45L30 30L15 45L30 60L45 45z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    border-radius: 0.75rem;
+    opacity: 0.25;
+    z-index: -1;
+}
+
+@keyframes pulseFooter {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Cake animation */
+.cake-icon {
+    display: inline-block;
+    animation: cakeBounce 2s infinite;
+}
+
+@keyframes cakeBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}

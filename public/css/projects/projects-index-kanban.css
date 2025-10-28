@@ -1,0 +1,438 @@
+/* Projects Index Kanban Board - Enhanced Design */
+
+/* 🎨 Enhanced Projects Index Kanban Board Styles */
+.projects-index-kanban-board {
+    width: 100%;
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+.projects-index-kanban-columns {
+    display: flex;
+    gap: 20px;
+    min-width: 1200px;
+    justify-content: space-between;
+}
+
+.projects-index-kanban-column {
+    flex: 1;
+    min-width: 280px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 0;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.projects-index-kanban-header {
+    padding: 15px 20px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.projects-index-kanban-header h6 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.projects-index-kanban-header .project-count {
+    background: rgba(255,255,255,0.3);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Status Colors for Headers */
+.projects-index-kanban-header.new {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.projects-index-kanban-header.in-progress,
+.projects-index-kanban-header.in_progress {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white !important;
+}
+
+.projects-index-kanban-header.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.projects-index-kanban-header.cancelled {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.projects-index-kanban-cards {
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 520px;
+}
+
+.projects-index-kanban-cards::-webkit-scrollbar {
+    display: none; /* إخفاء الـ scrollbar في المتصفحات المبنية على WebKit */
+}
+
+.projects-index-kanban-cards {
+    -ms-overflow-style: none;  /* إخفاء الـ scrollbar في Internet Explorer و Edge */
+    scrollbar-width: none;     /* إخفاء الـ scrollbar في Firefox */
+}
+
+/* 🃏 Enhanced Project Card Design */
+.projects-index-kanban-card {
+    background: linear-gradient(145deg, #ffffff, #f8f9fc);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255,255,255,0.8);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.projects-index-kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.projects-index-kanban-card:last-child {
+    margin-bottom: 0;
+}
+
+/* 🏷️ Project Title */
+.projects-index-kanban-card-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1e293b;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.projects-index-kanban-card-title i.fa-project-diagram {
+    color: #6366f1 !important;
+    font-size: 14px !important;
+}
+
+.projects-index-kanban-card-title .badge {
+    margin-left: 8px;
+    padding: 4px 8px;
+    font-size: 9px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+/* 🔖 Meta Information */
+.projects-index-kanban-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+
+.projects-index-kanban-card-client {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.projects-index-kanban-card-client::before {
+    content: '👤';
+    font-size: 10px;
+}
+
+.projects-index-kanban-card-manager {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.projects-index-kanban-card-manager::before {
+    content: '👔';
+    font-size: 10px;
+}
+
+/* 📊 Progress Section */
+.projects-index-kanban-card-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.projects-index-kanban-card-progress .progress {
+    flex: 1;
+    height: 6px;
+    margin: 0 10px;
+    border-radius: 20px;
+    background-color: #e2e8f0;
+    min-width: 80px;
+}
+
+.projects-index-kanban-card-progress .progress-bar {
+    border-radius: 20px;
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.projects-index-kanban-card-progress-text {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.projects-index-kanban-card-progress-text::before {
+    content: "📊";
+    font-size: 10px;
+}
+
+/* 📅 Dates Section */
+.projects-index-kanban-card-dates {
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.projects-index-kanban-card-date {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.projects-index-kanban-card-date.start-date {
+    background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
+    border-color: #29b6f6;
+    color: #0277bd;
+}
+
+.projects-index-kanban-card-date.start-date::before {
+    content: "🚀";
+    font-size: 10px;
+}
+
+.projects-index-kanban-card-date.due-date {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: #fbbf24;
+    color: #d97706;
+}
+
+.projects-index-kanban-card-date.due-date::before {
+    content: "📅";
+    font-size: 10px;
+}
+
+/* 🌟 Points Badge */
+.projects-index-kanban-card-points {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.projects-index-kanban-card-points .badge {
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* 📝 Description */
+.projects-index-kanban-card-description {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* 🔧 Enhanced Actions */
+.projects-index-kanban-card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.projects-index-kanban-card-actions .btn {
+    padding: 8px 12px;
+    font-size: 11px;
+    border-radius: 12px;
+    font-weight: 600;
+    flex: 1;
+    min-width: 60px;
+}
+
+.projects-index-kanban-card-actions .btn-outline-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-color: #1d4ed8;
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.projects-index-kanban-card-actions .btn-outline-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-color: #b45309;
+    color: white;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.projects-index-kanban-card-actions .btn-outline-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: #b91c1c;
+    color: white;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* 🚨 Urgent & Unacknowledged Indicators */
+.projects-index-kanban-card.urgent-project {
+    border-left: 4px solid #ef4444;
+    position: relative;
+}
+
+.projects-index-kanban-card.urgent-project::before {
+    content: '🚨';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 14px;
+    animation: pulse 2s infinite;
+}
+
+.projects-index-kanban-card.unacknowledged-project {
+    border-left: 4px solid #f59e0b;
+    position: relative;
+}
+
+.projects-index-kanban-card.unacknowledged-project::after {
+    content: '⚠️';
+    position: absolute;
+    top: 30px;
+    right: 10px;
+    font-size: 12px;
+    animation: pulse 2s infinite;
+}
+
+/* 🔄 Drag & Drop Styles */
+.projects-index-kanban-card.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg);
+}
+
+.projects-index-kanban-cards.drag-over {
+    background-color: #e3f2fd;
+    border: 2px dashed #2196f3;
+    border-radius: 12px;
+}
+
+.projects-index-kanban-card[draggable="true"] {
+    cursor: move;
+}
+
+/* 📦 Empty State Styling */
+.projects-index-kanban-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.projects-index-kanban-empty-state i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.projects-index-kanban-empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 768px) {
+    .projects-index-kanban-columns {
+        min-width: 800px;
+    }
+
+    .projects-index-kanban-column {
+        min-width: 200px;
+    }
+
+    .projects-index-kanban-card {
+        padding: 12px;
+    }
+
+    .projects-index-kanban-card-actions .btn {
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+
+    .projects-index-kanban-card-progress {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .projects-index-kanban-card-progress .progress {
+        margin: 8px 0;
+        order: 2;
+    }
+
+    .projects-index-kanban-card-dates {
+        flex-direction: column;
+    }
+
+    .projects-index-kanban-card-date {
+        min-width: auto;
+    }
+}

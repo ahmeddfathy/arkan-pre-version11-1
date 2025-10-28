@@ -1,0 +1,310 @@
+/* ====================================
+   🎯 Revisions Kanban Board CSS
+   ==================================== */
+
+.kanban-view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.kanban-view-toggle .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#revisionsKanbanBoard {
+    display: none;
+    min-height: 500px;
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.kanban-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    direction: rtl;
+}
+
+.kanban-column {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+}
+
+.kanban-column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.kanban-column-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.kanban-column-count {
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.kanban-column-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar تنسيق */
+.kanban-column-cards::-webkit-scrollbar {
+    width: 6px;
+}
+
+.kanban-column-cards::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.kanban-column-cards::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.kanban-column-cards::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* البطاقات */
+.revision-kanban-card {
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+}
+
+.revision-kanban-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.revision-kanban-card-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.revision-kanban-card-source {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.revision-kanban-card-body {
+    margin-bottom: 0.75rem;
+}
+
+.revision-kanban-card-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.revision-kanban-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.813rem;
+}
+
+.revision-kanban-card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #6b7280;
+}
+
+.revision-kanban-card-users {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.revision-kanban-user-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 2px solid;
+    line-height: 1.4;
+    margin-bottom: 0.4rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.revision-kanban-user-badge.responsible {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+.revision-kanban-user-badge.executor {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #93c5fd;
+}
+
+.revision-kanban-user-badge.reviewer {
+    background: #f0fdf4;
+    color: #16a34a;
+    border-color: #86efac;
+}
+
+.revision-kanban-card-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #dcfce7;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: #059669;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.revision-kanban-card-timer.review-timer {
+    background: #d1e7dd;
+    color: #198754;
+}
+
+.revision-kanban-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.revision-kanban-card-date {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.revision-kanban-card-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.revision-kanban-card-actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+/* ألوان الأعمدة */
+.kanban-column.status-new .kanban-column-title {
+    color: #6366f1;
+}
+
+.kanban-column.status-in-progress .kanban-column-title {
+    color: #f59e0b;
+}
+
+.kanban-column.status-paused .kanban-column-title {
+    color: #8b5cf6;
+}
+
+.kanban-column.status-completed .kanban-column-title {
+    color: #10b981;
+}
+
+/* ألوان المصادر */
+.source-internal { background: #dbeafe; color: #1e40af; }
+.source-client { background: #fef3c7; color: #92400e; }
+.source-external { background: #f3e8ff; color: #6b21a8; }
+
+/* Empty state */
+.kanban-empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #9ca3af;
+}
+
+.kanban-empty-state i {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .kanban-columns {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .kanban-columns {
+        grid-template-columns: 1fr;
+    }
+
+    #revisionsKanbanBoard {
+        padding: 1rem;
+    }
+}
+
+/* Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.revision-kanban-card {
+    animation: slideIn 0.3s ease;
+}
+

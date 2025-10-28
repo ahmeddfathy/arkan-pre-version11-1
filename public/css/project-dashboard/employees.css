@@ -1,0 +1,858 @@
+/* Employee Performance Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+
+.employee-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+.employee-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.employee-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-right: 2rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.employee-avatar-large:hover {
+    transform: scale(1.05);
+}
+
+.employee-avatar-fallback {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-right: 2rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.employee-details h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.employee-meta {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.employee-department {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.performance-overview {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.performance-chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.chart-item {
+    text-align: center;
+}
+
+.chart-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-circle.completion {
+    background: conic-gradient(#23c277 0deg, #23c277 calc(var(--percentage) * 3.6deg), #e2e8f0 calc(var(--percentage) * 3.6deg));
+}
+
+.chart-circle.time-compliance {
+    background: conic-gradient(#4BAAD4 0deg, #4BAAD4 calc(var(--percentage) * 3.6deg), #e2e8f0 calc(var(--percentage) * 3.6deg));
+}
+
+.chart-circle::before {
+    content: '';
+    width: 90px;
+    height: 90px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.chart-value {
+    position: relative;
+    z-index: 1;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.chart-label {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.time-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.time-stat {
+    text-align: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.time-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #4BAAD4;
+}
+
+.time-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.projects-section {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.project-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #4BAAD4, #23c277);
+}
+
+.project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.project-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.project-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #4BAAD4, #23c277);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+}
+
+.project-info h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.project-client {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.project-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.status-جاري-التنفيذ {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-مكتمل {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-جديد {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.recent-activities {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.activity-list {
+    margin-top: 1.5rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    background: #4BAAD4;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.activity-project {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.activity-date {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.activity-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-completed {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-in_progress {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-new {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.status-paused {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item {
+    color: #666;
+}
+
+.breadcrumb-item.active {
+    color: #4BAAD4;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    color: #ccc;
+    margin: 0 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+/* Employee Analytics Styles */
+.employee-analytics {
+    margin: 2rem 0;
+}
+
+.analytics-section {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.analytics-section .section-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 1rem;
+}
+
+.analytics-section .section-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.analytics-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.chart-container {
+    height: 250px;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.chart-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-item.new .legend-color {
+    background: #f59e0b;
+}
+
+.legend-item.progress .legend-color {
+    background: #3b82f6;
+}
+
+.legend-item.completed .legend-color {
+    background: #10b981;
+}
+
+.legend-item.cancelled .legend-color {
+    background: #ef4444;
+}
+
+/* Overdue Projects */
+.overdue-projects {
+    background: linear-gradient(135deg, #fed7e2, #fbb6ce);
+}
+
+.overdue-projects .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.overdue-projects .card-header h4 {
+    color: #be185d;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.overdue-count {
+    background: #be185d;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.overdue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.overdue-item {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.project-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.overdue-days {
+    font-size: 0.85rem;
+    color: #be185d;
+    font-weight: 500;
+}
+
+.more-projects {
+    text-align: center;
+    color: #be185d;
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* Tasks Breakdown */
+.tasks-breakdown .card-header {
+    margin-bottom: 1.5rem;
+}
+
+.tasks-breakdown .card-header h4 {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.task-types {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.task-type {
+    padding: 1rem;
+    background: white;
+    border-radius: 10px;
+}
+
+.task-type-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.task-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.75rem;
+}
+
+.task-stat {
+    text-align: center;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.task-stat .count {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 0.25rem;
+}
+
+.task-stat .label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Efficiency Circle */
+.efficiency {
+    text-align: center;
+}
+
+.efficiency .card-header {
+    margin-bottom: 1.5rem;
+}
+
+.efficiency-circle {
+    margin-bottom: 1.5rem;
+}
+
+.circle-progress {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #10b981 0deg,
+        #10b981 calc(var(--percentage) * 3.6deg),
+        #e2e8f0 calc(var(--percentage) * 3.6deg)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+}
+
+.circle-progress::before {
+    content: '';
+    width: 90px;
+    height: 90px;
+    background: #f8fafc;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.circle-progress .percentage {
+    position: relative;
+    z-index: 1;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.efficiency-label {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.time-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.time-item {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+}
+
+.time-item.flexible {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.1));
+}
+
+.time-note {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 0.25rem;
+}
+
+.stat-sublabel {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+.time-stat.flexible {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.1));
+}
+
+/* Transfer Statistics Styles */
+.transferred-tasks-details {
+    margin-top: 2rem;
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.transferred-tasks-details h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.transferred-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.transferred-task-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.transferred-task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.task-type-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.task-type-badge.regular {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+}
+
+.task-type-badge.template {
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    color: #7b1fa2;
+}
+
+.transfer-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.transferred-to,
+.transfer-date,
+.project-name {
+    font-size: 0.85rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.transferred-to i,
+.transfer-date i,
+.project-name i {
+    width: 12px;
+    color: #4BAAD4;
+}
+
+.transfer-reason {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    background: #f1f5f9;
+    padding: 0.5rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.transfer-reason i {
+    margin-top: 2px;
+    color: #4BAAD4;
+}
+
+.task-status {
+    flex-shrink: 0;
+}
+
+.time-value {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.time-label {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Time Metrics */
+.time-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.time-metric {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 10px;
+}
+
+.metric-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.metric-icon.estimated {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.metric-icon.actual {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.metric-icon.avg {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.metric-info {
+    flex: 1;
+}
+
+.metric-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .employee-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .employee-avatar-large {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+
+    .employee-details h1 {
+        font-size: 2rem;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .task-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

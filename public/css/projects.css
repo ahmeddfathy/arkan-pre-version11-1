@@ -1,0 +1,15 @@
+
+@import url('./projects/variables.css');
+@import url('./projects/base.css');
+@import url('./projects/components.css');
+@import url('./projects/tables.css');
+@import url('./projects/progress.css');
+@import url('./projects/chat.css');
+@import url('./projects/attachments.css');
+@import url('./projects/projects-index-kanban.css');
+@import url('./projects/projects-kanban.css');
+@import url('./projects/project-show-calendar.css');
+@import url('./projects/sweetalert-custom.css');
+@import url('./projects/transfer-sidebar.css');
+@import url('./projects/share-sidebar.css');
+@import url('./projects/custom-fields.css');

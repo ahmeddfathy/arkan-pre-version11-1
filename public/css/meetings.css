@@ -1,0 +1,1023 @@
+/* =====================================================
+   MODERN MEETINGS PAGE DESIGN
+   تصميم حديث لصفحة الاجتماعات
+====================================================== */
+
+:root {
+    /* ألوان عصرية */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+
+    /* ألوان محايدة */
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+
+    /* تأثيرات */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+    /* انحناءات */
+    --rounded-sm: 0.125rem;
+    --rounded: 0.375rem;
+    --rounded-md: 0.5rem;
+    --rounded-lg: 0.75rem;
+    --rounded-xl: 1rem;
+    --rounded-2xl: 1.5rem;
+    --rounded-3xl: 2rem;
+
+    /* انتقالات */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* إعادة تعيين وإعدادات أساسية */
+.meetings-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    direction: rtl;
+    text-align: right;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.page-title {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 3rem;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* حاوي رئيسي */
+.arkan-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: var(--rounded-3xl);
+    padding: 3rem;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0 auto;
+    max-width: 1400px;
+}
+
+/* رأس الصفحة */
+.arkan-title {
+    color: var(--gray-800);
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.arkan-title::before {
+    content: '';
+    width: 4px;
+    height: 2rem;
+    background: var(--primary-gradient);
+    border-radius: var(--rounded);
+}
+
+/* أزرار حديثة */
+.arkan-btn-primary {
+    background: var(--primary-gradient);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--rounded-xl);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.arkan-btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.arkan-btn-primary:hover::before {
+    opacity: 1;
+}
+
+.arkan-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.arkan-btn-secondary {
+    background: var(--white);
+    color: var(--gray-700);
+    padding: 0.5rem 1rem;
+    border-radius: var(--rounded-lg);
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: var(--transition);
+    border: 1px solid var(--gray-200);
+    position: relative;
+    overflow: hidden;
+}
+
+.arkan-btn-secondary:hover {
+    background: var(--gray-50);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--gray-300);
+}
+
+.arkan-btn-danger {
+    background: var(--danger-gradient);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: var(--rounded-lg);
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.arkan-btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.1);
+}
+
+/* تنبيهات */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: var(--rounded-xl);
+    margin-bottom: 1.5rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+    color: #166534;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.alert-success::before {
+    background: var(--success-gradient);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(248, 113, 113, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+    color: #991b1b;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert-danger::before {
+    background: var(--danger-gradient);
+}
+
+/* تبويبات حديثة */
+.arkan-tabs {
+    display: flex;
+    background: var(--gray-100);
+    border-radius: var(--rounded-2xl);
+    padding: 0.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.arkan-tab {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border-radius: var(--rounded-xl);
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.arkan-tab:hover {
+    color: var(--gray-800);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.arkan-tab.active {
+    background: var(--white);
+    color: var(--gray-900);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.arkan-tab.active::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 3px;
+    background: var(--primary-gradient);
+    border-radius: var(--rounded);
+}
+
+/* جداول حديثة */
+.arkan-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--white);
+    border-radius: var(--rounded-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.arkan-table thead {
+    background: var(--primary-gradient);
+    color: var(--white);
+}
+
+.arkan-table th {
+    padding: 1.5rem 1rem;
+    font-weight: 700;
+    text-align: right;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+}
+
+.arkan-table tbody tr {
+    transition: var(--transition);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.arkan-table tbody tr:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    transform: scale(1.01);
+}
+
+.arkan-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.arkan-table td {
+    padding: 1.25rem 1rem;
+    color: var(--gray-700);
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+/* شارات */
+.arkan-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: var(--rounded-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.arkan-badge-primary {
+    background: var(--primary-gradient);
+    color: var(--white);
+}
+
+.arkan-badge-success {
+    background: var(--success-gradient);
+    color: var(--white);
+}
+
+.arkan-badge-warning {
+    background: var(--warning-gradient);
+    color: var(--gray-800);
+}
+
+/* نص ملون */
+.arkan-text-primary {
+    color: #667eea;
+    transition: var(--transition);
+}
+
+.arkan-text-primary:hover {
+    color: #764ba2;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+/* حالة فارغة */
+.arkan-table tbody tr td[colspan] {
+    text-align: center;
+    color: var(--gray-500);
+    font-style: italic;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+}
+
+/* تحسينات للأيقونات */
+.arkan-table svg,
+.arkan-btn svg,
+.arkan-tab svg {
+    transition: var(--transition);
+}
+
+.arkan-btn:hover svg,
+.arkan-tab.active svg {
+    transform: scale(1.1);
+}
+
+/* تأثيرات للروابط */
+a.arkan-text-primary {
+    position: relative;
+    text-decoration: none;
+}
+
+a.arkan-text-primary::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+    transition: var(--transition);
+}
+
+a.arkan-text-primary:hover::after {
+    width: 100%;
+}
+
+/* تحسينات للنماذج */
+form.inline {
+    display: inline-block;
+    margin: 0;
+}
+
+/* تأثيرات حركية للصفوف */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.arkan-table tbody tr {
+    animation: slideInUp 0.3s ease-out forwards;
+}
+
+.arkan-table tbody tr:nth-child(odd) {
+    animation-delay: 0.05s;
+}
+
+.arkan-table tbody tr:nth-child(even) {
+    animation-delay: 0.1s;
+}
+
+/* تصميم متجاوب */
+@media (max-width: 768px) {
+    .arkan-container {
+        padding: 1.5rem;
+        margin: 1rem;
+        border-radius: var(--rounded-2xl);
+    }
+
+    .page-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .arkan-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .arkan-tab {
+        width: 100%;
+    }
+
+    .arkan-table {
+        font-size: 0.875rem;
+    }
+
+    .arkan-table th,
+    .arkan-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .flex.gap-2 {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .arkan-table thead {
+        display: none;
+    }
+
+    .arkan-table tbody tr {
+        display: block;
+        background: var(--white);
+        border-radius: var(--rounded-xl);
+        margin-bottom: 1rem;
+        padding: 1rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .arkan-table tbody td {
+        display: block;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-100);
+        position: relative;
+        padding-right: 40%;
+    }
+
+    .arkan-table tbody td:last-child {
+        border-bottom: none;
+    }
+
+    .arkan-table tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        right: 0;
+        width: 35%;
+        font-weight: 700;
+        color: var(--gray-600);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+}
+
+/* تأثير تحميل */
+.meetings-tab {
+    transition: var(--transition);
+}
+
+.meetings-tab.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.meetings-tab:not(.hidden) {
+    opacity: 1;
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =====================================================
+   MODERN FORMS & DETAILS DESIGN
+   تصميم النماذج والتفاصيل الحديث
+====================================================== */
+
+/* نماذج حديثة */
+.arkan-form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.arkan-form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.arkan-form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--rounded-xl);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: var(--white);
+    color: var(--gray-700);
+    position: relative;
+}
+
+.arkan-form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+.arkan-form-control:hover {
+    border-color: var(--gray-300);
+}
+
+/* أقسام الاجتماع */
+.arkan-meeting-info {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.arkan-meeting-section {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+    border-radius: var(--rounded-2xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.arkan-meeting-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary-gradient);
+}
+
+.arkan-subtitle {
+    color: var(--gray-800);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.arkan-subtitle::before {
+    content: '';
+    width: 3px;
+    height: 1.5rem;
+    background: var(--primary-gradient);
+    border-radius: var(--rounded);
+}
+
+/* تفاصيل الاجتماع */
+.arkan-meeting-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: var(--rounded-lg);
+    transition: var(--transition);
+}
+
+.arkan-meeting-detail:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.arkan-detail-label {
+    font-weight: 600;
+    color: var(--gray-600);
+    min-width: 120px;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.arkan-detail-value {
+    flex: 1;
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+/* ملاحظات الاجتماع */
+.arkan-note {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+    border-radius: var(--rounded-xl);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    position: relative;
+    transition: var(--transition);
+}
+
+.arkan-note:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.arkan-note::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--success-gradient);
+    border-radius: 0 var(--rounded-xl) var(--rounded-xl) 0;
+}
+
+.arkan-note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.arkan-note-user {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 0.875rem;
+}
+
+.arkan-note-date {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.arkan-note-content {
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* أزرار النماذج */
+.arkan-btn-success {
+    background: var(--success-gradient);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--rounded-xl);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.arkan-btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.1);
+}
+
+.arkan-btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* بطاقات الموافقة */
+.card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--rounded-2xl);
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    color: var(--gray-800);
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-title::before {
+    content: '';
+    width: 3px;
+    height: 1.25rem;
+    background: var(--primary-gradient);
+    border-radius: var(--rounded);
+}
+
+/* حقول النماذج المحسنة */
+.form-control {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--rounded-xl);
+    padding: 0.875rem 1rem;
+    transition: var(--transition);
+    background: var(--white);
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* أزرار Bootstrap محسنة */
+.btn {
+    border-radius: var(--rounded-xl);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-success {
+    background: var(--success-gradient);
+    color: var(--white);
+}
+
+.btn-danger {
+    background: var(--danger-gradient);
+    color: var(--white);
+}
+
+.btn-warning {
+    background: var(--warning-gradient);
+    color: var(--gray-800);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* تنبيهات محسنة */
+.alert-info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+    color: #1e40af;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--rounded-xl);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%);
+}
+
+/* تحسينات للجداول في صفحة العرض */
+.table-responsive {
+    border-radius: var(--rounded-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+/* تحسينات للروابط */
+.text-primary {
+    color: #667eea !important;
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    position: relative;
+}
+
+.text-primary:hover {
+    color: #764ba2 !important;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.text-primary::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+    transition: var(--transition);
+}
+
+.text-primary:hover::after {
+    width: 100%;
+}
+
+/* تحسينات للحدود */
+.border-top {
+    border-top: 2px solid var(--gray-200) !important;
+    padding-top: 2rem;
+    margin-top: 2rem;
+}
+
+/* تحسينات للصفوف */
+.row {
+    margin: 0 -0.75rem;
+}
+
+.col-md-6,
+.col-md-12 {
+    padding: 0 0.75rem;
+}
+
+/* تحسينات للعناصر المخفية */
+.hidden {
+    display: none !important;
+}
+
+/* تحسينات للعناصر النصية */
+.text-muted {
+    color: var(--gray-500) !important;
+}
+
+.text-danger {
+    color: #dc2626 !important;
+}
+
+.text-success {
+    color: #059669 !important;
+}
+
+/* تحسينات للعناصر التفاعلية */
+.btn-link {
+    background: none;
+    border: none;
+    color: inherit;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--rounded);
+    transition: var(--transition);
+}
+
+.btn-link:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(1.05);
+}
+
+/* تحسينات للعناصر المخصصة */
+.d-inline-block {
+    display: inline-block;
+}
+
+.d-inline-flex {
+    display: inline-flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.text-end {
+    text-align: right;
+}
+
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.ms-2 { margin-left: 0.5rem; }
+.me-2 { margin-right: 0.5rem; }
+
+/* تحسينات إضافية */
+.overflow-x-auto {
+    border-radius: var(--rounded-2xl);
+    box-shadow: var(--shadow-lg);
+}
+
+/* تأثير للأزرار عند الضغط */
+.arkan-btn-primary:active,
+.arkan-btn-secondary:active,
+.arkan-btn-danger:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow);
+}
+
+/* تحسين المسافات */
+.flex.justify-between.items-center.mb-6 {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(249, 250, 251, 0.8) 100%);
+    padding: 2rem;
+    border-radius: var(--rounded-2xl);
+    margin-bottom: 2rem;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* تأثير للعناصر التفاعلية */
+.arkan-btn-primary,
+.arkan-btn-secondary,
+.arkan-btn-danger,
+.arkan-tab {
+    position: relative;
+    overflow: hidden;
+}
+
+.arkan-btn-primary::after,
+.arkan-btn-secondary::after,
+.arkan-btn-danger::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.arkan-btn-primary:hover::after,
+.arkan-btn-secondary:hover::after,
+.arkan-btn-danger:hover::after {
+    width: 300px;
+    height: 300px;
+}

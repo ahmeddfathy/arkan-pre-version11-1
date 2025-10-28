@@ -1,0 +1,261 @@
+/* Task Revisions Styles */
+
+.revisions-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+}
+
+.revisions-container {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.revisions-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.revisions-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.revisions-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.revisions-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.revision-item {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    border: 1px solid #e9ecef !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.revision-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.revision-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, #007bff, #6f42c1);
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.revision-item.approved::before {
+    background: linear-gradient(to bottom, #28a745, #20c997);
+}
+
+.revision-item.rejected::before {
+    background: linear-gradient(to bottom, #dc3545, #e74c3c);
+}
+
+.revision-item.pending::before {
+    background: linear-gradient(to bottom, #ffc107, #fd7e14);
+}
+
+.revision-attachment a {
+    background: linear-gradient(135deg, #007bff 0%, #6f42c1 100%);
+    color: white !important;
+    border: none !important;
+    border-radius: 6px;
+    padding: 6px 12px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.revision-attachment a:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.add-revision-form {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 10px;
+    border: 2px dashed #007bff;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.add-revision-form .form-control {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.add-revision-form .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.add-revision-form .btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.add-revision-form .btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.revision-status-badge {
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.revision-creator-info {
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 10px;
+    color: #495057;
+}
+
+.revision-reviewer-info {
+    background: rgba(40, 167, 69, 0.1);
+    border-left: 3px solid #28a745;
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 10px;
+    color: #495057;
+}
+
+.revision-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.revision-empty-state i {
+    font-size: 48px;
+    opacity: 0.5;
+    margin-bottom: 15px;
+}
+
+.revision-loading {
+    text-align: center;
+    padding: 30px 20px;
+    color: #6c757d;
+}
+
+.revision-error {
+    text-align: center;
+    padding: 30px 20px;
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+/* File Upload Styling */
+.add-revision-form input[type="file"] {
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+    padding: 10px;
+    background: rgba(0, 123, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.add-revision-form input[type="file"]:hover {
+    background: rgba(0, 123, 255, 0.1);
+    border-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .revisions-section {
+        padding: 10px;
+    }
+
+    .revision-item {
+        padding: 12px !important;
+    }
+
+    .revisions-container {
+        max-height: 300px;
+    }
+
+    .add-revision-form .d-flex {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .add-revision-form .btn {
+        width: 100%;
+    }
+}
+
+/* Animation for new revision */
+.revision-item.new-revision {
+    animation: slideInUp 0.5s ease;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hover effects for interactive elements */
+.revision-item .btn:hover {
+    transform: scale(1.05);
+}
+
+.revision-item .badge {
+    transition: all 0.3s ease;
+}
+
+.revision-item:hover .badge {
+    transform: scale(1.1);
+}
+
+/* Status-specific styling */
+.revision-item.status-approved {
+    border-left-color: #28a745 !important;
+}
+
+.revision-item.status-rejected {
+    border-left-color: #dc3545 !important;
+}
+
+.revision-item.status-pending {
+    border-left-color: #ffc107 !important;
+}

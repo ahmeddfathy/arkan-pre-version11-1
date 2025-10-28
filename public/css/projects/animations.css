@@ -1,0 +1,202 @@
+/* Animations and Special Effects */
+
+/* رسوم متحركة */
+@keyframes shimmer {
+    0% { transform: translateX(-100%) skewX(-20deg); }
+    100% { transform: translateX(200%) skewX(-20deg); }
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* تأثيرات الظهور */
+.modern-service-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.modern-service-card:nth-child(1) { animation-delay: 0.1s; }
+.modern-service-card:nth-child(2) { animation-delay: 0.2s; }
+.modern-service-card:nth-child(3) { animation-delay: 0.3s; }
+.modern-service-card:nth-child(4) { animation-delay: 0.4s; }
+.modern-service-card:nth-child(5) { animation-delay: 0.5s; }
+.modern-service-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* تحسينات الكاردات الأساسية */
+.modern-task-card {
+    background: var(--card-background);
+    border-radius: 20px;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+}
+
+.modern-task-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(76, 205, 196, 0.15);
+}
+
+/* تحسين تصميم المؤقت */
+.enhanced-timer {
+    font-family: 'Inter', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--arkan-primary);
+    background: linear-gradient(135deg, rgba(76, 205, 196, 0.1) 0%, rgba(76, 205, 196, 0.05) 100%);
+    padding: 8px 16px;
+    border-radius: 15px;
+    border: 2px solid rgba(76, 205, 196, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.enhanced-timer.active {
+    animation: timerPulse 2s infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% {
+        background: linear-gradient(135deg, rgba(76, 205, 196, 0.1) 0%, rgba(76, 205, 196, 0.05) 100%);
+        border-color: rgba(76, 205, 196, 0.2);
+    }
+    50% {
+        background: linear-gradient(135deg, rgba(76, 205, 196, 0.2) 0%, rgba(76, 205, 196, 0.1) 100%);
+        border-color: rgba(76, 205, 196, 0.4);
+    }
+}
+
+.enhanced-timer i {
+    color: var(--arkan-primary);
+    animation: timerIcon 2s infinite;
+}
+
+@keyframes timerIcon {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Urgent Project Styles */
+.urgent-project-indicator {
+    animation: urgentPulse 2s infinite;
+}
+
+@keyframes urgentPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+.project-row.urgent {
+    background-color: rgba(220, 53, 69, 0.05);
+    border-left: 4px solid var(--urgent-primary);
+}
+
+.project-row.urgent:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.urgent-badge {
+    animation: urgentBadgePulse 3s infinite;
+}
+
+@keyframes urgentBadgePulse {
+    0%, 100% {
+        background-color: #ffc107;
+        transform: scale(1);
+    }
+    50% {
+        background-color: #ff9800;
+        transform: scale(1.05);
+    }
+}
+
+.urgent-project-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.urgent-project-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: urgentShine 3s infinite;
+}
+
+@keyframes urgentShine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Enhanced timer states */
+.enhanced-timer.completed {
+    color: #198754;
+    background: linear-gradient(135deg, rgba(25, 135, 84, 0.1) 0%, rgba(25, 135, 84, 0.05) 100%);
+    border-color: rgba(25, 135, 84, 0.2);
+}
+
+.enhanced-timer.paused {
+    color: #ffc107;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+    border-color: rgba(255, 193, 7, 0.2);
+}
+
+/* تأثيرات الظهور للكاردات */
+.kanban-project-card {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.kanban-project-card:nth-child(1) { animation-delay: 0.1s; }
+.kanban-project-card:nth-child(2) { animation-delay: 0.2s; }
+.kanban-project-card:nth-child(3) { animation-delay: 0.3s; }
+.kanban-project-card:nth-child(4) { animation-delay: 0.4s; }
+.kanban-project-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* تأثيرات السحب والإفلات */
+.kanban-project-card[draggable="true"] {
+    cursor: move;
+}
+
+.kanban-project-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* تأثيرات حركية للأيقونات في الهيدر */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}

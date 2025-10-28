@@ -1,0 +1,444 @@
+/* ========================================
+   Project Limits - Modern Styles
+   ======================================== */
+
+/* Scrollbar Hide */
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    background-color: #ffffff;
+    font-family: 'Cairo', sans-serif;
+}
+
+/* Container */
+.limits-container {
+    padding: 2rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* Page Header */
+.page-header-limits {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.page-header-limits h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.page-header-limits p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+}
+
+/* Card Styling */
+.stat-card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Limit Status Cards */
+.limit-exceeded {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+    animation: pulse-danger 2s infinite;
+}
+
+.limit-warning {
+    background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%);
+}
+
+.limit-safe {
+    background: linear-gradient(135deg, #f0fff4 0%, #e8f5e9 100%);
+}
+
+@keyframes pulse-danger {
+    0%, 100% {
+        box-shadow: 0 10px 25px rgba(220, 53, 69, 0.2);
+    }
+    50% {
+        box-shadow: 0 10px 35px rgba(220, 53, 69, 0.4);
+    }
+}
+
+/* Header Card */
+.header-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Filter Card */
+.filter-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 2px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Section Headers */
+.section-header {
+    background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border-right: 4px solid #667eea;
+    margin-bottom: 20px;
+}
+
+.section-header h4 {
+    margin: 0;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Table Styling */
+.custom-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.custom-table thead {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.custom-table thead th {
+    color: white;
+    font-weight: 600;
+    padding: 15px;
+    border: none;
+    text-align: center;
+}
+
+.custom-table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.custom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Row Status Styling */
+.row-exceeded {
+    background: #fff5f5;
+    border-right: 4px solid #dc3545;
+}
+
+.row-warning {
+    background: #fff9f0;
+    border-right: 4px solid #ffc107;
+}
+
+.row-safe {
+    background: #f0fff4;
+    border-right: 4px solid #28a745;
+}
+
+/* Progress Bar */
+.custom-progress {
+    height: 22px;
+    border-radius: 11px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.custom-progress .progress-bar {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 22px;
+}
+
+/* Badges */
+.badge-custom {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.badge-month {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Stats Display */
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+/* Icon Containers */
+.icon-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.icon-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.icon-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+}
+
+.icon-success {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    color: white;
+}
+
+.icon-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 80px;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.empty-state h5 {
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #adb5bd;
+    margin-bottom: 25px;
+}
+
+/* Buttons */
+.btn-custom {
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-gradient-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.btn-gradient-light {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-gradient-light:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Modern Table Container */
+.limits-table-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.limits-table-header {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+
+.limits-table-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Modern Form Styling */
+.modern-form-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-label-modern {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label-modern i {
+    color: #667eea;
+}
+
+.form-control-modern {
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control-modern:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+/* Stats Row */
+.stats-row-limits {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card-modern {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.stat-number-modern {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label-modern {
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Entity Row Styling */
+.entity-row {
+    transition: all 0.3s ease;
+}
+
+.entity-row:hover {
+    background: #f9fafb !important;
+    transform: scale(1.01);
+}
+
+/* Cards for Company Stats */
+.company-stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Alert Modern */
+.alert-modern {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Badge Modern */
+.badge-modern {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stat-value {
+        font-size: 1.8rem;
+    }
+
+    .custom-table {
+        font-size: 14px;
+    }
+
+    .custom-table thead th,
+    .custom-table tbody td {
+        padding: 10px;
+    }
+
+    .page-header-limits h1 {
+        font-size: 1.8rem;
+    }
+
+    .modern-form-card {
+        padding: 1.5rem;
+    }
+
+    .stats-row-limits {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+

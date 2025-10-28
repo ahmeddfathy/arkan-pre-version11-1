@@ -1,0 +1,109 @@
+/* Absence and Permission Requests Styles */
+.permission-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.permission-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.badge-group .badge {
+    margin-right: 5px;
+}
+
+.border-left-warning {
+    border-left: 4px solid #f4a261 !important;
+}
+
+.permission-requests-section .permission-item:last-child {
+    margin-bottom: 0 !important;
+}
+
+.approval-badges .badge {
+    margin-bottom: 3px;
+    font-size: 0.7rem;
+}
+
+/* Animation for absence alert */
+.alert.border-left-warning {
+    animation: fadeInLeft 0.5s ease-out;
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Permission items animation */
+.permission-item {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.permission-item:nth-child(2) { animation-delay: 0.1s; }
+.permission-item:nth-child(3) { animation-delay: 0.2s; }
+.permission-item:nth-child(4) { animation-delay: 0.3s; }
+
+/* Revisions Section Styles */
+.revision-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.revision-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.revision-item {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.badge-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+/* Delivered Projects Approvals Styles */
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.delivered-project-badge {
+    margin-bottom: 5px;
+    margin-left: 5px;
+}
+
+.badge small {
+    font-size: 0.75em;
+    opacity: 0.9;
+}

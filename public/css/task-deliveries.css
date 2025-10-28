@@ -1,0 +1,1238 @@
+/* ===================================
+   Task Approval Page - Enhanced CSS
+   =================================== */
+
+/* Root Variables for consistent theming */
+:root {
+    --primary-color: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --success-color: #059669;
+    --success-light: #dcfce7;
+    --warning-color: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger-color: #dc2626;
+    --info-color: #0ea5e9;
+    --secondary-color: #6b7280;
+    --light-bg: #f8fafc;
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --border-radius: 12px;
+    --border-radius-lg: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Page Container Styling */
+.task-approval-container {
+    background: #f8fafc;
+    min-height: 100vh;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* Main Card Header Enhancement */
+.task-approval-header {
+    background: white;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.header-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-subtitle {
+    color: var(--secondary-color);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.header-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.header-btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.header-btn-primary:hover {
+    background: var(--primary-dark);
+    color: white;
+}
+
+.header-btn-secondary {
+    background: white;
+    border-color: #e5e7eb;
+    color: var(--secondary-color);
+}
+
+.header-btn-secondary:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Alert Enhancements */
+.alert-enhanced {
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid;
+    font-weight: 500;
+}
+
+.alert-success-enhanced {
+    background: #f0fdf4;
+    border-left-color: var(--success-color);
+    color: #065f46;
+}
+
+.alert-danger-enhanced {
+    background: #fef2f2;
+    border-left-color: var(--danger-color);
+    color: #991b1b;
+}
+
+.alert-info-enhanced {
+    background: #eff6ff;
+    border-left-color: var(--info-color);
+    color: #1e40af;
+}
+
+/* Statistics Section */
+.approval-stats {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #f1f5f9;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #f1f5f9;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.stat-card.warning::before {
+    background: var(--warning-color);
+}
+
+.stat-card.success::before {
+    background: var(--success-color);
+}
+
+.stat-card.info::before {
+    background: var(--info-color);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.stat-card.warning .stat-number {
+    color: var(--warning-color);
+}
+
+.stat-card.success .stat-number {
+    color: var(--success-color);
+}
+
+.stat-card.info .stat-number {
+    color: var(--info-color);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Enhanced Tabs */
+.nav-tabs-enhanced {
+    border: none;
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+.nav-tabs-enhanced .nav-link {
+    border: none;
+    border-radius: 8px;
+    margin: 0 0.25rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    transition: var(--transition);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-tabs-enhanced .nav-link:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary-color);
+}
+
+.nav-tabs-enhanced .nav-link.active {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.tab-badge {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-color);
+    border-radius: 12px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 24px;
+    text-align: center;
+}
+
+.nav-tabs-enhanced .nav-link.active .tab-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Task Cards */
+.approval-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #f1f5f9;
+    transition: var(--transition);
+    overflow: hidden;
+    position: relative;
+}
+
+.approval-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary-color);
+}
+
+.approval-card.regular-task::before {
+    background: var(--success-color);
+}
+
+.approval-card.template-task::before {
+    background: var(--warning-color);
+}
+
+.approval-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.approval-card .card-body {
+    padding: 2rem;
+}
+
+/* User Avatar and Info */
+.user-info-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.task-creator-info {
+    background: #f0f9ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+}
+
+.task-creator-info .text-success {
+    color: #059669 !important;
+}
+
+.task-creator-info .text-warning {
+    color: #d97706 !important;
+}
+
+.task-creator-info .text-info {
+    color: #0ea5e9 !important;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid #e5e7eb;
+    transition: var(--transition);
+    object-fit: cover;
+}
+
+.user-avatar:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.user-details h6 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.user-name {
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.project-info {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.project-info small {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+/* Task Meta Badge */
+.task-meta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-top: 0.5rem;
+}
+
+.task-meta-badge.regular {
+    background: var(--success-color);
+    color: white;
+}
+
+.task-meta-badge.template {
+    background: var(--warning-color);
+    color: white;
+}
+
+/* Points Display */
+.points-section {
+    text-align: center;
+    padding: 1rem;
+}
+
+.points-display {
+    background: var(--primary-color);
+    color: white;
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-align: center;
+    min-width: 120px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.points-label {
+    color: var(--secondary-color);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Task Timer */
+.task-timer {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: var(--success-light);
+    color: #065f46;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+/* Action Section */
+.action-section {
+    text-align: end;
+    padding: 1rem;
+}
+
+.completed-date {
+    color: var(--success-color);
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.approval-btn {
+    background: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.approval-btn:hover {
+    background: #047857;
+    color: white;
+}
+
+/* Approval Form */
+.approval-form {
+    background: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid #e2e8f0;
+    display: none;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.approval-form.show {
+    display: block;
+    transform: translateY(0);
+    opacity: 1;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.approval-form .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.approval-form .form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.approval-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.approval-form .form-text {
+    color: var(--secondary-color);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn-secondary-custom {
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-secondary-custom:hover {
+    background: #4b5563;
+    color: white;
+}
+
+.btn-success-custom {
+    background: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-success-custom:hover {
+    background: #047857;
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--secondary-color);
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--card-shadow);
+    margin: 2rem 0;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.6;
+    color: var(--secondary-color);
+}
+
+.empty-state h5 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: var(--secondary-color);
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Loading Animation */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .approval-stats {
+        padding: 1.5rem;
+    }
+
+    .stat-card {
+        height: 100px;
+        padding: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .task-approval-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .task-approval-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .header-title {
+        font-size: 1.5rem;
+        justify-content: center;
+    }
+
+    .header-actions {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .approval-stats {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        margin-bottom: 1rem;
+        height: 90px;
+        padding: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .nav-tabs-enhanced {
+        padding: 0.375rem;
+    }
+
+    .nav-tabs-enhanced .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .approval-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .user-info-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .points-section {
+        margin: 1rem 0;
+    }
+
+    .action-section {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .approval-form {
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .empty-state {
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+    }
+
+    .empty-state h5 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .header-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nav-tabs-enhanced .nav-link {
+        flex: 1;
+        text-align: center;
+    }
+
+    .points-display {
+        min-width: 100px;
+        padding: 0.75rem 1rem;
+        font-size: 1.125rem;
+    }
+
+    .approval-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .header-actions,
+    .approval-btn,
+    .approval-form {
+        display: none !important;
+    }
+
+    .approval-card {
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+
+    .task-approval-container {
+        background: white;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --light-bg: #1f2937;
+        --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.4);
+        --secondary-color: #9ca3af;
+    }
+
+    .approval-card,
+    .stat-card,
+    .approval-stats {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .header-title {
+        color: #f9fafb;
+    }
+
+    .approval-form {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+
+    .approval-form .form-control {
+        background: #4a5568;
+        border-color: #6b7280;
+        color: #f9fafb;
+    }
+}
+
+/* Accessibility Improvements */
+.approval-btn:focus,
+.header-btn:focus,
+.btn-secondary-custom:focus,
+.btn-success-custom:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.nav-tabs-enhanced .nav-link:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+}
+
+/* Custom Scrollbar */
+.tab-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* ===================================
+   New Approved Tasks Styles
+   =================================== */
+
+/* Filter Card Styling */
+.filter-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid #f1f5f9;
+    margin-bottom: 2rem;
+}
+
+.filter-card .card-body {
+    padding: 1.5rem;
+}
+
+.filter-card .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-card .form-select,
+.filter-card .form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.filter-card .form-select:focus,
+.filter-card .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+/* Small Stat Cards for Approved Tasks */
+.stat-card-small {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #f1f5f9;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-card-small::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-color);
+}
+
+.stat-card-small.success::before {
+    background: var(--success-color);
+}
+
+.stat-card-small.info::before {
+    background: var(--info-color);
+}
+
+.stat-card-small.primary::before {
+    background: var(--primary-color);
+}
+
+.stat-card-small:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.stat-card-small .stat-number {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.stat-card-small.success .stat-number {
+    color: var(--success-color);
+}
+
+.stat-card-small.info .stat-number {
+    color: var(--info-color);
+}
+
+.stat-card-small.primary .stat-number {
+    color: var(--primary-color);
+}
+
+.stat-card-small .stat-label {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Approved Task Cards */
+.approval-card.approved-task {
+    border-left: 4px solid var(--success-color);
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.approval-card.approved-task .card-body {
+    position: relative;
+}
+
+.approval-card.approved-task::after {
+    content: '✓';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+
+/* Task Meta Badge for Approved Tasks */
+.task-meta-badge.approved {
+    background: var(--success-color);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.task-meta-badge.approved::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Approved Points Display */
+.points-display.approved {
+    background: linear-gradient(135deg, var(--success-color) 0%, #10b981 100%);
+    color: white;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+}
+
+.points-display.approved::after {
+    content: '✓';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Approval Info Section */
+.approval-info {
+    padding: 1rem;
+    background: rgba(16, 185, 129, 0.05);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.approved-by,
+.approved-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.approved-by i,
+.approved-date i {
+    color: var(--success-color);
+}
+
+.approved-by small,
+.approved-date small {
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Pills Navigation for Sub-tabs */
+.nav-pills .nav-link {
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    background: rgba(59, 130, 246, 0.1);
+    margin-right: 0.5rem;
+    transition: var(--transition);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-pills .nav-link:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--primary-color);
+}
+
+.nav-pills .nav-link.active {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.nav-pills .nav-link .badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Action Buttons for Approved Tasks */
+.action-section .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-decoration: none;
+}
+
+.btn-outline-info:hover {
+    background: var(--info-color);
+    border-color: var(--info-color);
+    color: white;
+}
+
+.btn-outline-warning:hover {
+    background: var(--warning-color);
+    border-color: var(--warning-color);
+    color: white;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    flex-direction: column;
+    gap: 1rem;
+    color: var(--secondary-color);
+}
+
+.loading-state .spinner-border {
+    color: var(--primary-color);
+}
+
+/* Responsive Adjustments for New Elements */
+@media (max-width: 768px) {
+    .filter-card .row {
+        gap: 1rem;
+    }
+
+    .filter-card .col-md-3 {
+        margin-bottom: 1rem;
+    }
+
+    .nav-pills .nav-link {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card-small {
+        height: 80px;
+        padding: 1rem;
+    }
+
+    .stat-card-small .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-card-small .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .approval-info {
+        padding: 0.75rem;
+    }
+
+    .action-section .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .nav-pills {
+        flex-wrap: wrap;
+    }
+
+    .nav-pills .nav-link {
+        flex: 1;
+        text-align: center;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-card .btn {
+        width: 100%;
+        margin-top: 1rem;
+    }
+}
+
+/* Month/Year Selector Styling */
+#monthFromGroup .row,
+#monthToGroup .row {
+    --bs-gutter-x: 0.5rem;
+}
+
+#monthFromGroup .form-select,
+#monthToGroup .form-select {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.75rem;
+}
+
+/* Month selector specific styling */
+.month-year-selector {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.month-selector {
+    flex: 2;
+}
+
+.year-selector {
+    flex: 1;
+}
+
+/* Responsive adjustments for month selectors */
+@media (max-width: 768px) {
+    #monthFromGroup,
+    #monthToGroup {
+        margin-bottom: 1rem;
+    }
+
+    #monthFromGroup .row,
+    #monthToGroup .row {
+        --bs-gutter-x: 0.25rem;
+    }
+
+    #monthFromGroup .form-select,
+    #monthToGroup .form-select {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.5rem;
+    }
+}

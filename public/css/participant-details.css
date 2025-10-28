@@ -1,0 +1,334 @@
+/* Participant Details Sidebar Styles */
+
+.participant-full-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border-left: 3px solid #6366f1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.info-card i {
+    font-size: 1.25rem;
+    color: #6366f1;
+    min-width: 24px;
+}
+
+.info-card.delivered {
+    border-left-color: #10b981;
+}
+
+.info-card.delivered i {
+    color: #10b981;
+}
+
+.info-card strong {
+    color: #374151;
+    margin-left: 0.5rem;
+}
+
+/* Tasks Grid */
+.tasks-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.task-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 3px solid #e5e7eb;
+    transition: all 0.2s;
+}
+
+.task-card:hover {
+    transform: translateX(-3px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-card.completed {
+    border-left-color: #10b981;
+    background: linear-gradient(to right, #ecfdf5 0%, white 15%);
+}
+
+.task-card.in-progress {
+    border-left-color: #f59e0b;
+    background: linear-gradient(to right, #fffbeb 0%, white 15%);
+}
+
+.task-card.pending {
+    border-left-color: #9ca3af;
+    background: linear-gradient(to right, #f9fafb 0%, white 15%);
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.task-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.task-name i {
+    color: #6366f1;
+}
+
+.task-type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.task-type-badge.template {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.task-type-badge.regular {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.task-meta > div {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.task-status i {
+    font-size: 0.6rem;
+}
+
+/* Revisions Container */
+.revisions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.revision-group {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+}
+
+.revision-group.responsible-group {
+    border-color: #3b82f6;
+    background: linear-gradient(to right, #eff6ff 0%, white 10%);
+}
+
+.revision-group.executor-group {
+    border-color: #f59e0b;
+    background: linear-gradient(to right, #fffbeb 0%, white 10%);
+}
+
+.revision-group.reviewer-group {
+    border-color: #10b981;
+    background: linear-gradient(to right, #ecfdf5 0%, white 10%);
+}
+
+.group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.responsible-group .group-title {
+    color: #1e40af;
+}
+
+.executor-group .group-title {
+    color: #d97706;
+}
+
+.reviewer-group .group-title {
+    color: #059669;
+}
+
+.revisions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Revision Card */
+.revision-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    border-right: 4px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+}
+
+.revision-card:hover {
+    transform: translateX(3px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.revision-card.role-responsible {
+    border-right-color: #3b82f6;
+}
+
+.revision-card.role-executor {
+    border-right-color: #f59e0b;
+}
+
+.revision-card.role-reviewer {
+    border-right-color: #10b981;
+}
+
+.revision-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.revision-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.revision-role-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.revision-role-badge.role-responsible {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.revision-role-badge.role-executor {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.revision-role-badge.role-reviewer {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.revision-description {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+.revision-team {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.team-member {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    background: #f3f4f6;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: #4b5563;
+}
+
+.team-member i {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.revision-status {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background: #e0e7ff;
+    color: #4f46e5;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Empty Messages */
+.empty-message {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #9ca3af;
+}
+
+.empty-message i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-message p {
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
+/* Error Message */
+.error-message {
+    text-align: center;
+    padding: 2rem;
+    background: #fef2f2;
+    border-radius: 8px;
+    border: 1px solid #fca5a5;
+}
+
+.error-message i {
+    font-size: 2rem;
+    color: #ef4444;
+    margin-bottom: 0.5rem;
+}
+
+.error-message p {
+    color: #991b1b;
+    font-weight: 500;
+}

@@ -1,0 +1,456 @@
+/* ========================================
+   Attachment Confirmations - Clean CSS
+   ======================================== */
+
+/* ====== Container & Layout ====== */
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ====== Cards ====== */
+.card {
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+}
+
+.card-header {
+    padding: 20px 24px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* ====== Statistics Cards ====== */
+.card.bg-warning {
+    background: #fff3cd !important;
+}
+
+.card.bg-success {
+    background: #d1e7dd !important;
+}
+
+.card.bg-danger {
+    background: #f8d7da !important;
+}
+
+.card.bg-info {
+    background: #cff4fc !important;
+}
+
+/* ====== Form Elements ====== */
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-select,
+.form-control {
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+    box-shadow: none;
+}
+
+.form-select:focus,
+.form-control:focus {
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    outline: none;
+}
+
+/* ====== Buttons ====== */
+.btn {
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: none;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: #ffffff;
+}
+
+.btn-success {
+    background: #28a745;
+    color: #ffffff;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: #ffffff;
+}
+
+.btn-warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: #ffffff;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: #ffffff;
+}
+
+.btn-light {
+    background: #f8f9fa;
+    color: #212529;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #667eea;
+}
+
+.btn-outline-success {
+    background: transparent;
+    color: #28a745;
+}
+
+.btn-outline-info {
+    background: transparent;
+    color: #17a2b8;
+}
+
+/* ====== Button Groups ====== */
+.btn-group {
+    display: inline-flex;
+    gap: 0;
+}
+
+.btn-group .btn:first-child {
+    margin-left: 0;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* ====== Badges ====== */
+.badge {
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.badge.bg-warning {
+    background: #ffc107 !important;
+    color: #212529;
+}
+
+.badge.bg-success {
+    background: #28a745 !important;
+    color: #ffffff;
+}
+
+.badge.bg-danger {
+    background: #dc3545 !important;
+    color: #ffffff;
+}
+
+/* ====== Alerts ====== */
+.alert {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.alert-info {
+    background: #cff4fc;
+    color: #055160;
+}
+
+.alert-link {
+    color: #055160;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* ====== Table ====== */
+.table {
+    background: #ffffff;
+    margin-bottom: 0;
+}
+
+.table thead {
+    background: #f8f9fa;
+}
+
+.table thead th {
+    padding: 16px 12px;
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody td {
+    padding: 16px 12px;
+    vertical-align: middle;
+    color: #495057;
+    font-size: 14px;
+}
+
+.table tbody tr {
+    background: #ffffff;
+}
+
+/* ====== Table Row Highlights ====== */
+.table-warning-subtle {
+    background: #fff9e6 !important;
+}
+
+/* ====== Typography ====== */
+.fw-bold {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.text-muted {
+    color: #6c757d !important;
+    font-size: 13px;
+}
+
+.text-white {
+    color: #ffffff !important;
+}
+
+.text-primary {
+    color: #667eea !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.text-secondary {
+    color: #6c757d !important;
+}
+
+/* ====== Icons ====== */
+.fas,
+.far {
+    font-size: inherit;
+}
+
+.fa-3x {
+    font-size: 48px;
+}
+
+/* ====== Empty State ====== */
+.text-center.py-5 {
+    padding: 60px 0;
+}
+
+.text-center.py-5 i {
+    opacity: 0.3;
+}
+
+/* ====== Links ====== */
+a {
+    text-decoration: none;
+}
+
+a.text-decoration-none {
+    color: #667eea;
+}
+
+/* ====== Modal ====== */
+.modal-header {
+    background: #f8f9fa;
+    padding: 20px 24px;
+}
+
+.modal-title {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.modal-body {
+    padding: 24px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    background: #f8f9fa;
+}
+
+/* ====== Pagination ====== */
+.pagination {
+    gap: 4px;
+}
+
+.page-item .page-link {
+    color: #667eea;
+    background: #f8f9fa;
+    padding: 8px 16px;
+}
+
+.page-item.active .page-link {
+    background: #667eea;
+    color: #ffffff;
+}
+
+.page-item.disabled .page-link {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+/* ====== Spacing Utilities ====== */
+.mb-0 { margin-bottom: 0 !important; }
+.mb-2 { margin-bottom: 8px !important; }
+.mb-3 { margin-bottom: 16px !important; }
+.mb-4 { margin-bottom: 24px !important; }
+.mt-4 { margin-top: 24px !important; }
+.me-1 { margin-right: 4px !important; }
+.me-2 { margin-right: 8px !important; }
+.ms-1 { margin-left: 4px !important; }
+.py-4 { padding-top: 24px !important; padding-bottom: 24px !important; }
+.py-5 { padding-top: 48px !important; padding-bottom: 48px !important; }
+
+/* ====== Display & Flex ====== */
+.d-flex {
+    display: flex !important;
+}
+
+.d-inline-flex {
+    display: inline-flex !important;
+}
+
+.justify-content-between {
+    justify-content: space-between !important;
+}
+
+.justify-content-center {
+    justify-content: center !important;
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.align-items-end {
+    align-items: flex-end !important;
+}
+
+/* ====== Table Responsive ====== */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ====== Shadow ====== */
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ====== Rounded Corners ====== */
+.card,
+.btn,
+.form-select,
+.form-control,
+.badge,
+.alert {
+    border-radius: 8px;
+}
+
+/* ====== Row Gap ====== */
+.row.g-3 {
+    gap: 16px;
+}
+
+/* ====== Button Spacing ====== */
+td .btn,
+td .btn-group {
+    margin: 2px;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 16px;
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-md-3,
+    .col-md-4 {
+        margin-bottom: 12px;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+    }
+}
+
+/* ====== Print Styles ====== */
+@media print {
+    .btn,
+    .alert,
+    form {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+    }
+}
+

@@ -1,0 +1,458 @@
+/* Special Cases Module Styles */
+
+:root {
+    --primary-color: #0095B2;
+    --primary-dark: #007A94;
+    --primary-light: #33C5E6;
+    --secondary-color: #5A6577;
+    --success-color: #1D6540;
+    --danger-color: #CC2424;
+    --warning-color: #C85A10;
+    --info-color: #0095B2;
+    --gray-50: #FFFFFF;
+    --gray-100: #F0F2F5;
+    --gray-200: #DCE0E6;
+    --gray-300: #B8BFC9;
+    --gray-400: #8A94A3;
+    --gray-500: #5E6877;
+    --gray-600: #3D4654;
+    --gray-700: #2A3241;
+    --gray-800: #1A2231;
+    --gray-900: #0A1220;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    --shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.15), 0 2px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 12px 20px -3px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Main container styles */
+.special-cases-container {
+    background-color: white;
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+}
+
+/* Page header styles */
+.special-cases-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.special-cases-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.special-cases-header h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+    border-radius: 2px;
+}
+
+/* Card styles */
+.special-cases-card {
+    border: none !important;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border-radius: 0.75rem !important;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.special-cases-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.special-cases-card-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+    color: white !important;
+    font-weight: 600;
+    border-bottom: none !important;
+    padding: 1.5rem !important;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.special-cases-card-header:before {
+    content: '';
+    position: absolute;
+    right: -50px;
+    top: -50px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 0;
+}
+
+.special-cases-card-body {
+    padding: 1.75rem !important;
+    background-color: white;
+}
+
+/* Button styles */
+.special-cases-btn {
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+}
+
+.special-cases-btn i, .special-cases-btn .bi {
+    font-size: 1.1em;
+}
+
+.special-cases-btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+    border-color: var(--primary-color) !important;
+    color: white;
+}
+
+.special-cases-btn-primary:hover, .special-cases-btn-primary:focus {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color)) !important;
+    border-color: var(--primary-dark) !important;
+    box-shadow: 0 0 0 2px rgba(0, 149, 178, 0.25);
+}
+
+.special-cases-btn-success {
+    background-color: var(--success-color) !important;
+    border-color: var(--success-color) !important;
+    color: white;
+}
+
+.special-cases-btn-success:hover, .special-cases-btn-success:focus {
+    background-color: #27ae60 !important;
+    border-color: #27ae60 !important;
+    box-shadow: 0 0 0 2px rgba(29, 101, 64, 0.25);
+}
+
+.special-cases-btn-danger {
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color) !important;
+    color: white;
+}
+
+.special-cases-btn-danger:hover, .special-cases-btn-danger:focus {
+    background-color: #c0392b !important;
+    border-color: #c0392b !important;
+    box-shadow: 0 0 0 2px rgba(204, 36, 36, 0.25);
+}
+
+.special-cases-btn-sm {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8rem !important;
+}
+
+/* Form styles */
+.special-cases-form-group {
+    margin-bottom: 1.5rem !important;
+}
+
+.special-cases-form-group label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.special-cases-form-control {
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--gray-700);
+    background-color: #fff;
+    background-clip: padding-box;
+}
+
+.special-cases-form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(0, 149, 178, 0.25);
+    outline: none;
+}
+
+.special-cases-form-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Table styles */
+.special-cases-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0 !important;
+}
+
+.special-cases-table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    padding: 1rem !important;
+    border-top: none !important;
+    border-bottom: 2px solid var(--primary-light) !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.special-cases-table td {
+    padding: 1rem !important;
+    vertical-align: middle !important;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-200) !important;
+    transition: all 0.2s ease;
+}
+
+.special-cases-table tr:last-child td {
+    border-bottom: none !important;
+}
+
+.special-cases-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.special-cases-table tbody tr:hover {
+    background-color: rgba(0, 149, 178, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Action buttons in table */
+.special-cases-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Status indicators */
+.special-cases-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4em 0.65em;
+    border-radius: 0.375rem;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 60px;
+}
+
+.special-cases-status-pending {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: var(--warning-color);
+}
+
+.special-cases-status-approved {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: var(--success-color);
+}
+
+.special-cases-status-rejected {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .special-cases-card-body {
+        padding: 1.25rem !important;
+    }
+
+    .special-cases-btn {
+        padding: 0.6rem 1.2rem !important;
+    }
+
+    .special-cases-table th, .special-cases-table td {
+        padding: 0.75rem !important;
+    }
+
+    .special-cases-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .special-cases-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .special-cases-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* Import file section */
+.special-cases-import-section {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.special-cases-import-section:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.special-cases-import-title {
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-light);
+    display: inline-block;
+}
+
+/* File input styling */
+.special-cases-file-input {
+    position: relative;
+    overflow: hidden;
+}
+
+.special-cases-file-input input[type="file"] {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.special-cases-file-input-label {
+    display: inline-block;
+    background: #fff;
+    color: var(--primary-color);
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.special-cases-file-input-label:hover {
+    background: var(--gray-100);
+    border-color: var(--primary-light);
+}
+
+/* Animation effects */
+.fade-in {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+/* RTL specific styles */
+[dir="rtl"] .fas,
+[dir="rtl"] .far,
+[dir="rtl"] .fab,
+[dir="rtl"] .fa {
+    margin-right: 0;
+}
+
+[dir="rtl"] .me-1 {
+    margin-right: 0 !important;
+    margin-left: 0.25rem !important;
+}
+
+[dir="rtl"] .me-2 {
+    margin-right: 0 !important;
+    margin-left: 0.5rem !important;
+}
+
+[dir="rtl"] .special-cases-card-header:before {
+    right: auto;
+    left: -50px;
+}
+
+[dir="rtl"] .special-cases-header h2:after {
+    right: 0;
+    left: auto;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--gray-100);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-dark);
+}

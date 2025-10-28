@@ -1,0 +1,209 @@
+
+.project-calendar-fullwidth .container-fluid {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.project-calendar-fullwidth #calendarViewShow {
+    width: 100vw !important;
+    margin-left: calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    padding: 20px !important;
+    background: #f8f9fa;
+    border-radius: 0 !important;
+}
+
+.project-calendar-fullwidth .calendar-container {
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+.project-calendar-fullwidth .calendar-grid {
+    width: 100%;
+}
+
+.project-calendar-fullwidth .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    width: 100%;
+}
+
+.project-calendar-fullwidth .calendar-day {
+    min-height: 120px !important;
+    padding: 8px !important;
+}
+
+.project-calendar-fullwidth .calendar-tasks {
+    max-height: 80px !important;
+    overflow-y: auto;
+}
+
+.project-calendar-fullwidth .calendar-task.status-in_progress,
+#calendarViewShow .calendar-task.status-in_progress {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+    box-shadow: 0 2px 4px rgba(111, 66, 193, 0.3) !important;
+    border-left: 3px solid #563d7c !important;
+    color: white !important;
+}
+
+.project-calendar-fullwidth .calendar-task.status-in_progress:hover,
+#calendarViewShow .calendar-task.status-in_progress:hover {
+    background: linear-gradient(135deg, #563d7c 0%, #6b46c1 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(111, 66, 193, 0.4) !important;
+}
+
+/* المهام الجديدة - أزرق فاتح */
+.project-calendar-fullwidth .calendar-task.status-new,
+#calendarViewShow .calendar-task.status-new {
+    background: linear-gradient(135deg, #007bff 0%, #17a2b8 100%) !important;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3) !important;
+    border-left: 3px solid #0056b3 !important;
+    color: white !important;
+}
+
+.project-calendar-fullwidth .calendar-task.status-new:hover,
+#calendarViewShow .calendar-task.status-new:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #138496 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4) !important;
+}
+
+/* المهام المتوقفة - برتقالي */
+.project-calendar-fullwidth .calendar-task.status-paused,
+#calendarViewShow .calendar-task.status-paused {
+    background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%) !important;
+    box-shadow: 0 2px 4px rgba(253, 126, 20, 0.3) !important;
+    border-left: 3px solid #e65100 !important;
+    color: white !important;
+}
+
+.project-calendar-fullwidth .calendar-task.status-paused:hover,
+#calendarViewShow .calendar-task.status-paused:hover {
+    background: linear-gradient(135deg, #e65100 0%, #f57c00 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(253, 126, 20, 0.4) !important;
+}
+
+/* المهام المكتملة - أخضر غامق */
+.project-calendar-fullwidth .calendar-task.status-completed,
+#calendarViewShow .calendar-task.status-completed {
+    background: linear-gradient(135deg, #155724 0%, #28a745 100%) !important;
+    box-shadow: 0 2px 4px rgba(21, 87, 36, 0.3) !important;
+    border-left: 3px solid #0d4017 !important;
+    color: white !important;
+    opacity: 0.85;
+}
+
+.project-calendar-fullwidth .calendar-task.status-completed:hover,
+#calendarViewShow .calendar-task.status-completed:hover {
+    background: linear-gradient(135deg, #0d4017 0%, #1e7e34 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(21, 87, 36, 0.4) !important;
+    opacity: 1;
+}
+
+/* المهام الملغية - أحمر */
+.project-calendar-fullwidth .calendar-task.status-cancelled,
+#calendarViewShow .calendar-task.status-cancelled {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+    border-left: 3px solid #721c24 !important;
+    color: white !important;
+    opacity: 0.8;
+}
+
+.project-calendar-fullwidth .calendar-task.status-cancelled:hover,
+#calendarViewShow .calendar-task.status-cancelled:hover {
+    background: linear-gradient(135deg, #721c24 0%, #a71e2a 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4) !important;
+    opacity: 1;
+}
+
+/* دليل الألوان - Task Status Legend */
+.task-status-legend {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.task-status-legend h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-status-legend h6 i {
+    color: #6c757d;
+}
+
+.legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.legend-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.legend-color.new {
+    background: linear-gradient(135deg, #007bff 0%, #17a2b8 100%);
+}
+
+.legend-color.in_progress {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%);
+}
+
+.legend-color.paused {
+    background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+}
+
+.legend-color.completed {
+    background: linear-gradient(135deg, #155724 0%, #28a745 100%);
+}
+
+.legend-color.cancelled {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.legend-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #495057;
+    white-space: nowrap;
+}

@@ -1,0 +1,683 @@
+/* تحسين تصميم قسم المشاركين */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.service-row {
+    transition: all 0.3s ease;
+}
+
+/* تم إزالة تأثير hover للخدمات */
+
+.service-info {
+    padding: 10px 0;
+}
+
+/* Compact service badges */
+.service-info .badge {
+    border-radius: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: fit-content;
+}
+
+.service-info .badge i {
+    opacity: 0.8;
+}
+
+.participants-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 100%;
+    padding: 0;
+}
+
+.participant-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: visible;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* تموضع زرار الحذف في الأعلى على اليمين */
+.remove-participant-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* تم إزالة تأثير hover لأزرار الحذف */
+
+.remove-participant-btn i {
+    font-size: 12px;
+}
+
+/* تموضع زرار إضافة مهام القوالب */
+.template-tasks-btn {
+    position: absolute;
+    top: 8px;
+    right: 40px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* تم إزالة تأثير hover لأزرار القوالب */
+
+.template-tasks-btn i {
+    color: #17a2b8 !important;
+}
+
+.template-tasks-btn-badge i {
+    color: #17a2b8 !important;
+}
+
+/* تموضع الأزرار في البادجات */
+.remove-participant-btn-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border: 1px solid #dc3545;
+}
+
+/* تم إزالة تأثير hover لأزرار حذف البادجات */
+
+.remove-participant-btn-badge i {
+    font-size: 10px;
+}
+
+.template-tasks-btn-badge {
+    position: absolute;
+    top: -5px;
+    right: 20px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(23, 162, 184, 0.1);
+    transform: scale(1.1);
+}
+
+.participant-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.participant-avatar {
+    flex-shrink: 0;
+}
+
+.participant-info {
+    flex-grow: 1;
+}
+
+.participant-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+}
+
+.participant-name strong {
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.participant-name .badge {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.deadline-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.deadline-date {
+    font-weight: 500;
+    color: #495057;
+}
+
+.status-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.overdue {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-badge.due-soon {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status-badge.on-time {
+    background-color: #6c757d;
+    color: white;
+}
+
+.participant-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e9ecef;
+}
+
+.action-btn {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* تم إزالة تأثير hover لأزرار الإجراءات */
+
+.action-btn.tasks {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.action-btn.remove {
+    background-color: #dc3545;
+    color: white;
+}
+
+.action-btn.deadline {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.add-participants-container {
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+}
+
+.smart-suggestion-btn {
+    border-radius: 20px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+/* تم إزالة تأثير hover لزر الاقتراح الذكي */
+
+.btn-group .btn {
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.form-select {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.empty-participants {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.empty-participants i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* تحسين الجدول */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    padding: 15px 12px;
+}
+
+.table td {
+    padding: 15px 12px;
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+}
+
+/* تحسين الأزرار */
+.btn-sm {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+/* تم إزالة تأثير hover للأزرار الصغيرة */
+
+/* تحسين النوافذ المنبثقة */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* تحسين الأيقونات */
+.fas {
+    transition: all 0.2s ease;
+}
+
+/* تم إزالة تأثير hover لأيقونات الأزرار */
+
+/* ============================
+   Template Tasks Sidebar Styles
+   إزالة تأثيرات الهوفر للكروت
+   ============================ */
+
+/* إلغاء تأثيرات الهوفر للكروت في سايد بار المهام */
+#templateTasksSidebar .card {
+    transition: none !important;
+    transform: none !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+    overflow: visible !important;
+}
+
+#templateTasksSidebar .card:hover {
+    transform: none !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+    border-color: initial !important;
+}
+
+/* إلغاء تأثيرات الهوفر للكروت المحددة */
+#templateTasksSidebar .card.border-info:hover,
+#templateTasksSidebar .card.border-primary:hover {
+    border-color: #0dcaf0 !important;
+}
+
+#templateTasksSidebar .card.border-primary:hover {
+    border-color: #0d6efd !important;
+}
+
+/* إلغاء تأثيرات الهوفر للعناصر الداخلية */
+#templateTasksSidebar .card-body {
+    transition: none !important;
+    overflow: visible !important;
+    padding: 12px;
+}
+
+#templateTasksSidebar .card-body:hover {
+    background-color: initial !important;
+}
+
+/* إلغاء تأثيرات الهوفر للـ form-check */
+#templateTasksSidebar .form-check:hover {
+    background-color: initial !important;
+}
+
+/* إلغاء تأثيرات الهوفر للـ labels */
+#templateTasksSidebar .form-check-label:hover {
+    background-color: initial !important;
+    transform: none !important;
+}
+
+/* إصلاح الـ responsive للكاردات */
+#templateTasksSidebar .card-body .d-flex {
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+#templateTasksSidebar .card-body .d-flex > div:first-child {
+    flex: 1;
+    min-width: 0;
+    max-width: calc(100% - 80px);
+}
+
+#templateTasksSidebar .card-body .d-flex .badge {
+    flex-shrink: 0;
+    white-space: nowrap;
+    max-width: fit-content;
+}
+
+#templateTasksSidebar .card-body h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+#templateTasksSidebar .card-body small {
+    word-wrap: break-word;
+    display: block;
+}
+
+/* إصلاح الـ badges داخل الكاردات */
+#templateTasksSidebar .bg-light .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 2px;
+    max-width: 100%;
+    white-space: normal;
+    text-align: right;
+}
+
+#templateTasksSidebar .bg-light .badge .badge {
+    font-size: 9px !important;
+    padding: 2px 4px;
+    flex-shrink: 0;
+}
+
+/* التأكد من ثبات الكروت */
+#templateTasksSidebar .card,
+#templateTasksSidebar .card *,
+#templateTasksSidebar .card::before,
+#templateTasksSidebar .card::after {
+    transition: none !important;
+    transform: none !important;
+}
+
+/* إزالة أي تأثيرات إضافية محتملة */
+#templateTasksSidebar .card:hover::before,
+#templateTasksSidebar .card:hover::after {
+    opacity: 0 !important;
+}
+
+/* ============================
+   Responsive Design
+   ============================ */
+
+/* للشاشات الصغيرة جداً (أقل من 576px) */
+@media (max-width: 575.98px) {
+    .participant-card {
+        padding: 12px;
+        margin-right: 0;
+    }
+
+    .participant-name {
+        font-size: 0.9rem;
+        gap: 6px;
+    }
+
+    .participant-name .badge {
+        font-size: 9px !important;
+        padding: 2px 6px;
+    }
+
+    .participant-avatar i {
+        font-size: 1.5rem !important;
+    }
+
+    .participant-header {
+        gap: 8px;
+    }
+
+    .deadline-info {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .status-badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+
+    /* تصغير أزرار الحذف والقوالب */
+    .remove-participant-btn {
+        width: 20px;
+        height: 20px;
+        top: 6px;
+        right: 6px;
+    }
+
+    .template-tasks-btn {
+        width: 20px;
+        height: 20px;
+        top: 6px;
+        right: 32px;
+    }
+
+    .remove-participant-btn i,
+    .template-tasks-btn i {
+        font-size: 10px;
+    }
+}
+
+/* للشاشات المتوسطة (من 576px إلى 768px) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .participant-card {
+        padding: 13px;
+    }
+
+    .participant-name {
+        font-size: 0.95rem;
+    }
+
+    .participant-name .badge {
+        font-size: 9.5px !important;
+    }
+}
+
+/* للشاشات الكبيرة (أكبر من 768px) */
+@media (min-width: 768px) {
+    .participant-info {
+        min-width: 0; /* يسمح بـ text truncation إذا لزم الأمر */
+    }
+}
+
+/* إصلاح overflow للكارد على جميع الشاشات */
+.participant-header,
+.participant-info {
+    overflow: visible;
+    position: relative;
+}
+
+/* تحسينات الجدول للشاشات الصغيرة */
+@media (max-width: 767.98px) {
+    .table {
+        font-size: 0.875rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px 8px;
+    }
+
+    .service-info .badge {
+        font-size: 0.75rem;
+    }
+
+    .add-participants-container {
+        padding: 10px;
+    }
+
+    .smart-suggestion-btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .form-select {
+        font-size: 0.875rem;
+    }
+
+    /* تحسين عرض الـ badges في القسم الثاني */
+    .badge.bg-primary {
+        max-width: 100%;
+        word-wrap: break-word;
+        white-space: normal;
+        text-align: right;
+    }
+
+    .badge.bg-primary .badge {
+        font-size: 8px !important;
+        padding: 2px 4px;
+    }
+}
+
+/* Template Tasks Sidebar - Responsive للشاشات الصغيرة */
+@media (max-width: 767.98px) {
+    #templateTasksSidebar {
+        width: 100vw !important;
+        right: -100vw !important;
+    }
+
+    #templateTasksSidebar.active {
+        right: 0 !important;
+    }
+
+    #templateTasksSidebar .card-body {
+        padding: 10px;
+    }
+
+    #templateTasksSidebar .card-body h6 {
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
+
+    #templateTasksSidebar .card-body small {
+        font-size: 0.75rem;
+    }
+
+    #templateTasksSidebar .card-body .d-flex > div:first-child {
+        max-width: calc(100% - 60px);
+    }
+
+    #templateTasksSidebar .card-body .badge {
+        font-size: 0.7rem;
+        padding: 4px 6px;
+    }
+
+    #templateTasksSidebar .bg-light .badge {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
+
+    #templateTasksSidebar .bg-light .badge .badge {
+        font-size: 8px !important;
+        padding: 1px 3px;
+    }
+}
+
+/* Template Tasks Sidebar - Responsive للشاشات الصغيرة جداً */
+@media (max-width: 575.98px) {
+    #templateTasksSidebar .card-body {
+        padding: 8px;
+    }
+
+    #templateTasksSidebar .card-body h6 {
+        font-size: 0.85rem;
+    }
+
+    #templateTasksSidebar .card-body small {
+        font-size: 0.7rem;
+    }
+
+    #templateTasksSidebar .card-body .d-flex > div:first-child {
+        max-width: 100%;
+    }
+
+    #templateTasksSidebar .card-body .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #templateTasksSidebar .card-body .badge {
+        margin-top: 6px;
+        font-size: 0.65rem;
+        padding: 3px 5px;
+    }
+
+    /* جعل الكاردات عرض كامل في الشاشات الصغيرة */
+    #templateTasksSidebarContent .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* تحسينات إضافية لجميع الشاشات */
+#templateTasksSidebarContent .row {
+    margin-right: -8px;
+    margin-left: -8px;
+}
+
+#templateTasksSidebarContent .col-md-6 {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
+/* إصلاح الـ flex-wrap للبادجات داخل bg-light */
+#templateTasksSidebar .bg-light .d-flex {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+}
+
+#templateTasksSidebar .bg-light {
+    overflow: visible !important;
+    max-width: 100%;
+}

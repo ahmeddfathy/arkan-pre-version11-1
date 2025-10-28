@@ -1,0 +1,47 @@
+/* Modern Projects Variables - Based on Arkan Logo Colors */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Primary Colors */
+    --arkan-primary: #00B6A3;
+    --arkan-primary-dark: #00897B;
+    --arkan-primary-light: #A7FFF3;
+    --arkan-white: #FFFFFF;
+    --arkan-light-bg: #E3F6FF;
+
+    /* Text Colors */
+    --text-primary: #2C3E50;
+    --text-secondary: #5D6D7E;
+    --text-muted: #8995A8;
+
+    /* Background Colors */
+    --background-primary: #F8FBFF;
+    --card-background: var(--arkan-white);
+    --border-color: #E8F4F8;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(76, 205, 196, 0.08);
+    --shadow-md: 0 4px 12px rgba(76, 205, 196, 0.12);
+    --shadow-lg: 0 8px 24px rgba(76, 205, 196, 0.16);
+    --shadow-hover: 0 12px 32px rgba(76, 205, 196, 0.24);
+
+    /* Border Radius */
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 20px;
+
+    /* Transitions */
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--arkan-primary) 0%, var(--arkan-primary-dark) 100%);
+    --gradient-light: linear-gradient(135deg, var(--arkan-white) 0%, var(--arkan-light-bg) 100%);
+
+    /* Urgent project colors */
+    --urgent-primary: #dc3545;
+    --urgent-secondary: #f8d7da;
+    --urgent-accent: #ff6b6b;
+}

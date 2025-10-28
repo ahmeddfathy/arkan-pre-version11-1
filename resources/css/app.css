@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+/* Fix modal close button issue */
+.modal-header .btn-close {
+    position: relative;
+    z-index: 5;
+}
+
+.modal-header::before {
+    z-index: 0;
+}

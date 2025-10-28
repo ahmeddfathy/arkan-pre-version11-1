@@ -1,0 +1,452 @@
+/* ✨ Custom Fields - Modern Clean Design */
+
+:root {
+    --field-primary: #4f46e5;
+    --field-primary-light: #6366f1;
+    --field-primary-lighter: #e0e7ff;
+    --field-border: #e5e7eb;
+    --field-border-focus: #4f46e5;
+    --field-bg: #ffffff;
+    --field-text: #1f2937;
+    --field-text-light: #6b7280;
+    --field-bg-hover: #f9fafb;
+    --field-error: #dc2626;
+    --field-success: #10b981;
+    --field-label: #374151;
+    --field-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --field-shadow-focus: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* ================================
+   1️⃣ Custom Fields Form Section
+   ================================ */
+
+.custom-fields-section {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-radius: 12px;
+    border: 1px solid var(--field-border);
+}
+
+.custom-fields-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--field-text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.custom-fields-section h3::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(180deg, var(--field-primary) 0%, var(--field-primary-light) 100%);
+    border-radius: 2px;
+}
+
+.custom-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .custom-fields-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================
+   2️⃣ Form Group - Field Container
+   ================================ */
+
+.custom-field-group {
+    background: var(--field-bg);
+    padding: 1.25rem;
+    border-radius: 10px;
+    border: 1px solid var(--field-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-field-group:hover {
+    border-color: var(--field-primary-light);
+    box-shadow: var(--field-shadow), 0 4px 12px rgba(79, 70, 229, 0.08);
+}
+
+.custom-field-group:focus-within {
+    border-color: var(--field-border-focus);
+    box-shadow: var(--field-shadow), var(--field-shadow-focus);
+}
+
+/* ================================
+   3️⃣ Field Label & Description
+   ================================ */
+
+.custom-field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--field-label);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
+}
+
+.custom-field-label .required-indicator {
+    color: var(--field-error);
+    font-weight: 700;
+    margin-left: 0.25rem;
+}
+
+.custom-field-description {
+    font-size: 0.75rem;
+    color: var(--field-text-light);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* ================================
+   4️⃣ Input Fields - All Types
+   ================================ */
+
+.custom-field-input,
+.custom-field-textarea,
+.custom-field-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+    background-color: var(--field-bg);
+    color: var(--field-text);
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+/* Input Types */
+.custom-field-input[type="text"],
+.custom-field-input[type="number"],
+.custom-field-input[type="date"],
+.custom-field-input[type="email"] {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Focus State */
+.custom-field-input:focus,
+.custom-field-textarea:focus,
+.custom-field-select:focus {
+    outline: none;
+    border-color: var(--field-border-focus);
+    background-color: var(--field-bg);
+    box-shadow: var(--field-shadow-focus);
+}
+
+/* Placeholder */
+.custom-field-input::placeholder,
+.custom-field-textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* Hover State */
+.custom-field-input:hover:not(:focus),
+.custom-field-textarea:hover:not(:focus),
+.custom-field-select:hover:not(:focus) {
+    border-color: #d1d5db;
+    background-color: var(--field-bg-hover);
+}
+
+/* Disabled State */
+.custom-field-input:disabled,
+.custom-field-textarea:disabled,
+.custom-field-select:disabled {
+    background-color: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* ================================
+   5️⃣ Textarea Specific
+   ================================ */
+
+.custom-field-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.custom-field-textarea:focus {
+    resize: both;
+}
+
+/* ================================
+   6️⃣ Select Dropdown
+   ================================ */
+
+.custom-field-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234f46e5' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+}
+
+.custom-field-select option {
+    background: white;
+    color: var(--field-text);
+    padding: 0.5rem;
+}
+
+.custom-field-select option:checked {
+    background: linear-gradient(var(--field-primary), var(--field-primary));
+    color: white;
+}
+
+/* ================================
+   7️⃣ Error Messages
+   ================================ */
+
+.custom-field-error {
+    display: block;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--field-error);
+    background-color: rgba(220, 38, 38, 0.05);
+    border-left: 3px solid var(--field-error);
+    border-radius: 4px;
+    animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================
+   8️⃣ Custom Fields Display Section
+   ================================ */
+
+.custom-fields-display-section {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--field-border);
+    overflow: hidden;
+    box-shadow: var(--field-shadow);
+    margin-bottom: 1.5rem;
+    transition: box-shadow 0.3s ease;
+}
+
+.custom-fields-display-section:hover {
+    box-shadow: var(--field-shadow), 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.custom-fields-display-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-bottom: 1px solid var(--field-border);
+}
+
+.custom-fields-display-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--field-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+}
+
+.custom-fields-display-header svg {
+    width: 22px;
+    height: 22px;
+    color: var(--field-primary);
+}
+
+.custom-fields-display-content {
+    padding: 1.5rem;
+}
+
+.custom-fields-display-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .custom-fields-display-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================
+   9️⃣ Field Display Item
+   ================================ */
+
+.custom-field-display-item {
+    padding: 1rem;
+    border-left: 4px solid var(--field-primary);
+    background-color: var(--field-primary-lighter);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.custom-field-display-item:hover {
+    background-color: rgba(79, 70, 229, 0.15);
+    transform: translateX(4px);
+}
+
+.custom-field-display-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--field-text-light);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.custom-field-display-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--field-text);
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.custom-field-display-value.field-type-textarea {
+    white-space: pre-line;
+    font-family: 'Courier New', Courier, monospace;
+    background: white;
+    padding: 0.75rem;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.custom-field-display-value.field-type-date {
+    font-family: 'Monaco', 'Courier New', monospace;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    color: #047857;
+    font-weight: 600;
+}
+
+.custom-field-display-value.field-type-number {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* ================================
+   🔟 Empty State
+   ================================ */
+
+.custom-fields-empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: var(--field-text-light);
+}
+
+.custom-fields-empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.5;
+}
+
+.custom-fields-empty-state-text {
+    font-size: 0.9375rem;
+    font-style: italic;
+}
+
+/* ================================
+   RTL Support (Arabic/Hebrew)
+   ================================ */
+
+[dir="rtl"] .custom-field-group {
+    border-radius: 10px;
+}
+
+[dir="rtl"] .custom-field-display-item {
+    border-left: none;
+    border-right: 4px solid var(--field-primary);
+    padding-left: 1rem;
+    padding-right: 0.75rem;
+}
+
+[dir="rtl"] .custom-fields-display-header svg {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .custom-field-select {
+    background-position: left 0.75rem center;
+    padding-left: 2.5rem;
+    padding-right: 1rem;
+}
+
+/* ================================
+   Animation Effects
+   ================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom-field-group {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.custom-field-display-item {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* ================================
+   Accessibility
+   ================================ */
+
+.custom-field-input:focus-visible,
+.custom-field-textarea:focus-visible,
+.custom-field-select:focus-visible {
+    outline: 2px solid var(--field-primary);
+    outline-offset: 2px;
+}
+
+/* Responsive Typography */
+@media (max-width: 640px) {
+    .custom-fields-section h3 {
+        font-size: 1.1rem;
+    }
+
+    .custom-field-label {
+        font-size: 0.8125rem;
+    }
+
+    .custom-field-input,
+    .custom-field-textarea,
+    .custom-field-select {
+        font-size: 16px; /* Prevents zoom on mobile */
+        padding: 0.875rem 1rem;
+    }
+
+    .custom-field-display-value {
+        font-size: 0.875rem;
+    }
+}

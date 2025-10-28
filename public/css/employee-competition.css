@@ -1,0 +1,649 @@
+/* Employee Competition Dashboard - Arkan Inspired Modern Design */
+
+:root {
+    /* Color palette with enhanced contrast */
+    --primary-color: #006db3; /* Darker blue for better contrast */
+    --primary-dark: #00578f; /* Even darker blue */
+    --primary-light: #e0f4ff; /* Slightly darker light blue for better visibility */
+    --secondary-color: #16232d; /* Darker gray for better readability */
+    --success-color: #00802b; /* Darker green for better contrast */
+    --warning-color: #b36b00; /* Darker orange for better contrast */
+    --danger-color: #b30000; /* Darker red for better contrast */
+    --light-color: #ffffff;
+    --dark-color: #0d0d0d; /* Darker black */
+    --background-color: #eaf4fd; /* Slightly darker background for better contrast */
+    --card-shadow: 0 10px 20px rgba(0, 109, 179, 0.2); /* Stronger shadow */
+    --hover-shadow: 0 15px 30px rgba(0, 109, 179, 0.3); /* Stronger hover shadow */
+    --border-radius: 16px;
+    --border-radius-sm: 8px;
+    --text-size-base: 1.05rem; /* Slightly larger base text */
+    --text-size-heading: 1.8rem; /* Larger headings */
+    --text-size-subheading: 1.4rem; /* Larger subheadings */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+
+body {
+    background-color: var(--background-color);
+    font-family: 'Tajawal', sans-serif;
+    color: var(--secondary-color);
+    font-size: var(--text-size-base);
+    line-height: 1.6;
+}
+
+.container-fluid {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Snowflake pattern background inspired by Arkan logo */
+.bg-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23006db3' fill-opacity='0.09' d='M50 0 L60 30 L90 10 L70 40 L100 50 L70 60 L90 90 L60 70 L50 100 L40 70 L10 90 L30 60 L0 50 L30 40 L10 10 L40 30z'/%3E%3C/svg%3E");
+    z-index: -1;
+    opacity: 0.7; /* Increased opacity for better visibility */
+    pointer-events: none;
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    background-color: #fff;
+    position: relative;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px; /* Slightly thicker bar at top */
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Trophy Card */
+.trophy-card {
+    background: linear-gradient(135deg, #fff 0%, #f0faff 100%); /* Better gradient */
+    color: var(--secondary-color);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 109, 179, 0.1); /* Subtle border */
+}
+
+.trophy-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23006db3' fill-opacity='0.12' d='M50 0 L60 30 L90 10 L70 40 L100 50 L70 60 L90 90 L60 70 L50 100 L40 70 L10 90 L30 60 L0 50 L30 40 L10 10 L40 30z'/%3E%3C/svg%3E");
+    opacity: 0.85;
+    z-index: 0;
+}
+
+.trophy-card::before {
+    height: 0;
+}
+
+.trophy-card .card-body {
+    position: relative;
+    z-index: 1;
+    border-top: 4px solid var(--primary-color);
+}
+
+.trophy-card h3 {
+    color: var(--secondary-color);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: var(--text-size-heading);
+}
+
+/* Category Card */
+.rules-card {
+    background: linear-gradient(135deg, #f9fdff 0%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 109, 179, 0.1); /* Subtle border */
+}
+
+.rules-card::after {
+    content: "";
+    position: absolute;
+    bottom: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23006db3' fill-opacity='0.15' d='M50 0 L60 30 L90 10 L70 40 L100 50 L70 60 L90 90 L60 70 L50 100 L40 70 L10 90 L30 60 L0 50 L30 40 L10 10 L40 30z'/%3E%3C/svg%3E");
+    opacity: 0.6;
+    z-index: 0;
+    transform: rotate(30deg) scale(2);
+}
+
+.rule-item {
+    padding: 1.2rem;
+    margin-bottom: 1.2rem; /* Increased spacing */
+    border-radius: var(--border-radius-sm);
+    background-color: rgba(255, 255, 255, 0.95); /* More opaque background */
+    border-right: 5px solid var(--primary-color); /* Thicker border */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Stronger shadow */
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.rule-item::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background-color: var(--primary-light);
+    opacity: 0.2; /* Increased opacity */
+    transition: width 0.3s ease;
+    z-index: 0;
+}
+
+.rule-item:hover::after {
+    width: 100%;
+}
+
+.rule-item:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); /* Stronger hover shadow */
+}
+
+.rule-item strong {
+    color: var(--primary-dark);
+    position: relative;
+    z-index: 1;
+    font-weight: 700; /* Bolder font */
+    font-size: 1.1rem; /* Slightly larger */
+}
+
+.rule-item ul {
+    position: relative;
+    z-index: 1;
+    margin-top: 0.5rem; /* Add spacing after heading */
+}
+
+.rule-item li {
+    margin-bottom: 0.4rem; /* Add spacing between list items */
+}
+
+/* Employee Ranking */
+.employee-rank {
+    width: 42px; /* Slightly larger */
+    height: 42px; /* Slightly larger */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+    margin: 0 auto;
+}
+
+.rank-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #cc9900 100%);
+    color: #000000;
+    font-size: 1.25rem; /* Larger text */
+}
+
+.rank-2 {
+    background: linear-gradient(135deg, #e0e0e0 0%, #808080 100%);
+    color: #000000;
+    font-size: 1.15rem; /* Larger text */
+}
+
+.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+    color: #ffffff;
+    font-size: 1.15rem; /* Larger text */
+}
+
+/* Profile Photos */
+.profile-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 5px 15px rgba(0, 109, 179, 0.3); /* Stronger shadow */
+    transition: all 0.3s ease;
+}
+
+.profile-photo:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(0, 109, 179, 0.4); /* Stronger hover shadow */
+}
+
+/* Top performers profile photos */
+.trophy-card .profile-photo {
+    width: 110px;
+    height: 110px;
+    border: 4px solid #fff;
+    box-shadow: 0 8px 25px rgba(0, 109, 179, 0.35); /* Stronger shadow */
+    position: relative;
+}
+
+.trophy-card .profile-photo::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+    opacity: 0.5; /* Increased opacity */
+    z-index: -1;
+}
+
+/* Stats Badges */
+.stats-badge {
+    font-size: 0.95rem; /* Larger text */
+    padding: 0.5rem 0.9rem; /* Larger padding */
+    border-radius: 50px;
+    font-weight: 600; /* Bolder text */
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+}
+
+/* Sorting Buttons */
+.sort-button {
+    border-radius: 50px;
+    padding: 0.7rem 1.3rem; /* Larger padding */
+    background-color: #f0f4f8; /* Slightly darker background */
+    color: var(--secondary-color);
+    border: none;
+    font-weight: 600; /* Bolder text */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-size: 1rem; /* Slightly larger text */
+}
+
+.sort-button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: var(--primary-color);
+    opacity: 0.18; /* Increased opacity */
+    transition: width 0.3s ease;
+    z-index: 0;
+}
+
+.sort-button:hover::after {
+    width: 100%;
+}
+
+.sort-button:hover, .sort-button.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 5px 15px rgba(0, 109, 179, 0.4); /* Stronger shadow */
+    transform: translateY(-2px);
+}
+
+.sort-button.active::after {
+    width: 100%;
+    opacity: 0.4; /* Increased opacity */
+}
+
+/* Table Styling */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 12px; /* Increased spacing */
+}
+
+.table thead th {
+    border-bottom: none;
+    color: var(--secondary-color);
+    font-weight: 700; /* Bolder text */
+    padding: 1.2rem 1rem; /* Larger padding */
+    font-size: 1.05rem; /* Larger text */
+}
+
+.table tbody tr {
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07); /* Stronger shadow */
+    border-radius: var(--border-radius-sm);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.table tbody tr::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px; /* Thicker indicator */
+    height: 0;
+    background-color: var(--primary-color);
+    transition: height 0.3s ease;
+}
+
+.table tbody tr:hover::before {
+    height: 100%;
+}
+
+.table tbody tr:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Stronger hover shadow */
+}
+
+.table tbody td {
+    padding: 1.2rem 1rem; /* Larger padding */
+    vertical-align: middle;
+    border-top: none;
+    font-size: 1.02rem; /* Slightly larger text */
+}
+
+.table tbody td:first-child {
+    border-top-right-radius: var(--border-radius-sm);
+    border-bottom-right-radius: var(--border-radius-sm);
+}
+
+.table tbody td:last-child {
+    border-top-left-radius: var(--border-radius-sm);
+    border-bottom-left-radius: var(--border-radius-sm);
+}
+
+/* Progress bar */
+.progress {
+    height: 24px; /* Taller progress bar */
+    background-color: #e0e6ed; /* Darker background */
+    border-radius: 50px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 50px;
+    padding: 0 12px; /* Larger padding */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700; /* Bolder text */
+    font-size: 0.9rem; /* Larger text */
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.25) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.25) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+.progress-bar.bg-success {
+    background-color: var(--success-color);
+}
+
+.progress-bar.bg-warning {
+    background-color: var(--warning-color);
+}
+
+.progress-bar.bg-danger {
+    background-color: var(--danger-color);
+}
+
+@keyframes progress-bar-stripes {
+    0% { background-position: 1rem 0; }
+    100% { background-position: 0 0; }
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    border-radius: 50px;
+    padding: 0.6rem 1.6rem; /* Larger padding */
+    font-weight: 700; /* Bolder text */
+    box-shadow: 0 4px 15px rgba(0, 109, 179, 0.4); /* Stronger shadow */
+    transition: all 0.3s ease;
+    font-size: 1.05rem; /* Larger text */
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: 0 8px 25px rgba(0, 109, 179, 0.5); /* Stronger hover shadow */
+    transform: translateY(-2px);
+}
+
+/* Form controls */
+.form-control {
+    border-radius: 50px;
+    padding: 0.6rem 1.2rem; /* Larger padding */
+    border: 1px solid #c8d4e0; /* Darker border */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+    transition: all 0.3s ease;
+    font-size: 1.05rem; /* Larger text */
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(0, 109, 179, 0.25);
+}
+
+/* Header and title styling */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--secondary-color);
+}
+
+h1 {
+    font-size: calc(var(--text-size-heading) * 1.2);
+}
+
+h3 {
+    font-size: var(--text-size-heading);
+}
+
+h4 {
+    font-size: var(--text-size-subheading);
+}
+
+h5 {
+    font-size: calc(var(--text-size-subheading) * 0.85);
+    font-weight: 700;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Badges styling */
+.badge {
+    padding: 0.5rem 1.1rem; /* Larger padding */
+    border-radius: 50px;
+    font-weight: 600; /* Bolder text */
+    font-size: 0.95rem; /* Larger text */
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-color) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--primary-light) !important;
+    color: var(--primary-dark);
+}
+
+.badge.bg-secondary {
+    background-color: var(--secondary-color) !important;
+}
+
+/* Logo styling for the page header */
+.arkan-logo {
+    max-width: 160px; /* Larger logo */
+    margin-bottom: 1rem;
+}
+
+/* For RTL layout */
+[dir="rtl"] .rule-item {
+    border-right: 5px solid var(--primary-color); /* Thicker border */
+    border-left: none;
+}
+
+[dir="rtl"] .rule-item:hover {
+    transform: translateX(5px);
+}
+
+/* Special header design */
+.page-header {
+    text-align: center;
+    margin-bottom: 2.5rem; /* More spacing */
+    position: relative;
+}
+
+.page-header h1 {
+    font-weight: 800;
+    color: var(--secondary-color);
+    margin-bottom: 1.2rem; /* More spacing */
+    position: relative;
+    display: inline-block;
+}
+
+.page-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: -12px; /* Lower position */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px; /* Wider line */
+    height: 5px; /* Thicker line */
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+    border-radius: 4px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .container-fluid {
+        padding: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .trophy-card .profile-photo {
+        width: 95px; /* Larger */
+        height: 95px; /* Larger */
+    }
+
+    :root {
+        --text-size-heading: 1.6rem;
+        --text-size-subheading: 1.3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1.2rem;
+    }
+
+    .profile-photo {
+        width: 54px; /* Larger */
+        height: 54px; /* Larger */
+    }
+
+    .trophy-card .profile-photo {
+        width: 85px; /* Larger */
+        height: 85px; /* Larger */
+    }
+
+    .sort-button {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.92rem;
+        margin-bottom: 0.6rem; /* More spacing */
+    }
+
+    .rule-item {
+        padding: 1.1rem;
+    }
+
+    :root {
+        --text-size-heading: 1.5rem;
+        --text-size-subheading: 1.2rem;
+        --text-size-base: 1rem;
+    }
+
+    .table tbody td {
+        padding: 1rem 0.8rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Snowflake animation for loading or special effects */
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.snowflake-icon {
+    display: inline-block;
+    color: var(--primary-color);
+    animation: rotate 20s linear infinite;
+}
+
+/* Custom Arabic font styling */
+.arabic-text {
+    font-family: 'Tajawal', sans-serif;
+    letter-spacing: 0;
+}
+
+/* Badge special styling */
+.badge-pill {
+    padding-right: 0.7em; /* Larger padding */
+    padding-left: 0.7em; /* Larger padding */
+    border-radius: 10rem;
+}
+
+/* Improve text readability overall */
+.text-muted {
+    color: #526273 !important; /* Darker muted text */
+}
+
+/* Highlighting active elements more */
+.active, .selected {
+    font-weight: 700;
+    color: var(--primary-dark);
+}

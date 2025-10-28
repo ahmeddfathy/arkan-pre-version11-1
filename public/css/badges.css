@@ -1,0 +1,395 @@
+/*
+ * Badges CSS
+ * Modern design based on Arkan logo colors
+ */
+
+:root {
+  --arkan-primary: #54B4E5;    /* Light blue from logo */
+  --arkan-primary-light: #9AD2F2;
+  --arkan-primary-dark: #3A8CBF;
+  --arkan-secondary: #333333;  /* Dark gray/black from logo */
+  --arkan-secondary-light: #666666;
+  --arkan-text: #2D2D2D;
+  --arkan-light-gray: #F8F9FA;
+  --arkan-border: #E9ECEF;
+  --arkan-success: #28A745;
+  --arkan-warning: #FFC107;
+  --arkan-danger: #DC3545;
+}
+
+/* General Styles */
+.badges-container {
+  font-family: 'Cairo', sans-serif;
+  color: var(--arkan-text);
+}
+
+/* Card Styling */
+.badges-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badges-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.badges-card-header {
+  background-color: var(--arkan-primary);
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+}
+
+.badges-card-body {
+  padding: 1.5rem;
+}
+
+/* Badge Item Styling */
+.badge-item {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100%;
+  border: 1px solid var(--arkan-border);
+}
+
+.badge-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(84, 180, 229, 0.15);
+}
+
+.badge-item.current {
+  background-color: rgba(84, 180, 229, 0.08);
+  border: 2px solid var(--arkan-primary);
+}
+
+.badge-item .badge-image {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-item .badge-image img {
+  max-width: 100%;
+  max-height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.badge-item:hover .badge-image img {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.badge-item .badge-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.badge-item .badge-points {
+  color: var(--arkan-secondary-light);
+  font-size: 0.9rem;
+}
+
+.badge-item .badge-status {
+  margin-top: 0.75rem;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  background-color: var(--arkan-success);
+  color: white;
+}
+
+/* Progress Bar */
+.badge-progress {
+  height: 12px;
+  border-radius: 6px;
+  margin: 1rem 0;
+  background-color: var(--arkan-border);
+  overflow: hidden;
+}
+
+.badge-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--arkan-primary-light), var(--arkan-primary));
+  border-radius: 6px;
+  transition: width 0.8s ease;
+}
+
+/* User Badge Display */
+.user-badge-display {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.user-badge-display .badge-image {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
+}
+
+.user-badge-display .badge-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.user-badge-display .badge-description {
+  margin-bottom: 1.5rem;
+  color: var(--arkan-secondary-light);
+}
+
+.user-badge-display .badge-stats {
+  background-color: var(--arkan-light-gray);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.user-badge-display .badge-stat {
+  margin-bottom: 0.5rem;
+}
+
+.user-badge-display .badge-stat i {
+  color: var(--arkan-primary);
+  margin-right: 0.5rem;
+}
+
+/* Timeline */
+.badges-timeline {
+  position: relative;
+  padding: 20px 0;
+}
+
+.badges-timeline:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--arkan-primary-light), var(--arkan-primary));
+  left: 30px;
+  margin-left: -2px;
+  border-radius: 2px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.timeline-badge {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  left: 30px;
+  margin-left: -20px;
+  border-radius: 50%;
+  text-align: center;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.timeline-badge-icon {
+  max-width: 60px;
+  max-height: 60px;
+  border-radius: 50%;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-content {
+  margin-left: 70px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.timeline-content:hover {
+  transform: translateY(-3px);
+}
+
+/* Statistics */
+.stats-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stats-table thead th {
+  background-color: var(--arkan-primary);
+  color: white;
+  padding: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.stats-table tbody td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--arkan-border);
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.stats-table tbody tr:hover td {
+  background-color: rgba(84, 180, 229, 0.05);
+}
+
+.stats-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Buttons */
+.badge-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.badge-btn-primary {
+  background-color: var(--arkan-primary);
+  color: white;
+}
+
+.badge-btn-primary:hover {
+  background-color: var(--arkan-primary-dark);
+  box-shadow: 0 4px 12px rgba(84, 180, 229, 0.3);
+}
+
+.badge-btn-secondary {
+  background-color: var(--arkan-secondary);
+  color: white;
+}
+
+.badge-btn-secondary:hover {
+  background-color: var(--arkan-secondary-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.badge-btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--arkan-primary);
+  color: var(--arkan-primary);
+}
+
+.badge-btn-outline:hover {
+  background-color: var(--arkan-primary);
+  color: white;
+}
+
+/* Alerts */
+.badge-alert {
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: none;
+}
+
+.badge-alert i {
+  font-size: 1.5rem;
+}
+
+.badge-alert-info {
+  background-color: rgba(84, 180, 229, 0.1);
+  color: var(--arkan-primary-dark);
+  border-left: 4px solid var(--arkan-primary);
+}
+
+.badge-alert-warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #856404;
+  border-left: 4px solid var(--arkan-warning);
+}
+
+/* Chart Containers */
+.chart-container {
+  position: relative;
+  margin: 20px auto;
+  height: 300px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timeline-content {
+    margin-left: 60px;
+  }
+
+  .user-badge-display .badge-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .badge-item {
+    margin-bottom: 1rem;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .timeline-badge {
+  right: 30px;
+  left: auto;
+  margin-right: -20px;
+  margin-left: 0;
+}
+
+[dir="rtl"] .timeline-content {
+  margin-right: 70px;
+  margin-left: 0;
+}
+
+[dir="rtl"] .badges-timeline:before {
+  right: 30px;
+  left: auto;
+  margin-right: -2px;
+  margin-left: 0;
+}
+
+[dir="rtl"] .badge-alert {
+  border-right: 4px solid;
+  border-left: none;
+}
+
+[dir="rtl"] .badge-alert-info {
+  border-right-color: var(--arkan-primary);
+}
+
+[dir="rtl"] .badge-alert-warning {
+  border-right-color: var(--arkan-warning);
+}
+
+[dir="rtl"] .user-badge-display .badge-stat i {
+  margin-left: 0.5rem;
+  margin-right: 0;
+}

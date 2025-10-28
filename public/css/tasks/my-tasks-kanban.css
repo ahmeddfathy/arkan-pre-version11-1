@@ -1,0 +1,751 @@
+/* Kanban Board Styles for My Tasks */
+.kanban-board {
+    width: 100%;
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+.kanban-columns {
+    display: flex;
+    gap: 20px;
+    min-width: 1200px;
+    justify-content: space-between;
+}
+
+.kanban-column {
+    flex: 1;
+    min-width: 280px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 0;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-header {
+    padding: 15px 20px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.kanban-header h6 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.kanban-header .task-count {
+    background: rgba(255,255,255,0.3);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.kanban-header.new {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.kanban-header.in-progress,
+.kanban-header.in_progress {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white !important;
+}
+
+.kanban-header.paused {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.kanban-header.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.kanban-header.cancelled {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.kanban-cards {
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 520px;
+}
+
+.kanban-cards::-webkit-scrollbar {
+    display: none; /* إخفاء الـ scrollbar في المتصفحات المبنية على WebKit */
+}
+
+.kanban-cards {
+    -ms-overflow-style: none;  /* إخفاء الـ scrollbar في Internet Explorer و Edge */
+    scrollbar-width: none;     /* إخفاء الـ scrollbar في Firefox */
+}
+
+/* دعم للكلاسات الجديدة */
+.kanban-card {
+    background: linear-gradient(145deg, #ffffff, #f8f9fc);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255,255,255,0.8);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.12), 0 5px 10px rgba(0,0,0,0.08);
+}
+
+.my-kanban-card {
+    background: linear-gradient(145deg, #ffffff, #f8f9fc);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255,255,255,0.8);
+    cursor: pointer;
+}
+
+.my-kanban-card:last-child {
+    margin-bottom: 0;
+}
+
+.kanban-card-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1e293b;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.my-kanban-card-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1e293b;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.kanban-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+
+.my-kanban-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+
+.kanban-card-project {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.my-kanban-card-project {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kanban-card-service {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kanban-card-role {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kanban-card-time {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.kanban-card-time span {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kanban-card-points {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.kanban-card-points .badge {
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.kanban-card-timer {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-weight: 700;
+    color: #065f46;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border: 2px solid #10b981;
+    border-radius: 20px;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 12px;
+    animation: pulse 2s infinite;
+}
+
+.kanban-card-due-date {
+    font-size: 11px;
+    color: #ef4444;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.kanban-card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.kanban-card-actions .btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+.kanban-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.kanban-card-badges .badge {
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.task-notes-indicator {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.task-revisions-badge {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kanban-card-assignees {
+    margin-bottom: 12px;
+}
+
+.kanban-card-assignees .avatar-group {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.kanban-card-assignees .avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.kanban-card-assignees .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.kanban-card-creator {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kanban-card-creator::before {
+    content: '👤';
+    font-size: 10px;
+}
+
+.kanban-card-service::before {
+    content: '⚙️';
+    font-size: 10px;
+}
+
+.kanban-card-project::before {
+    content: '🏢';
+    font-size: 10px;
+}
+
+.kanban-card-role::before {
+    content: '👤';
+    font-size: 10px;
+}
+
+.kanban-card-time span:first-child::before {
+    content: "⏱️";
+    font-size: 10px;
+}
+
+.kanban-card-time span:last-child::before {
+    content: "✅";
+    font-size: 10px;
+}
+
+.kanban-card-timer::before {
+    content: '⏰';
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.kanban-card-due-date::before {
+    content: '📅';
+    margin-right: 4px;
+    font-size: 10px;
+}
+
+.my-kanban-card-project::before {
+    content: '🏢';
+    font-size: 10px;
+}
+
+.my-kanban-card-role {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.my-kanban-card-role::before {
+    content: '👤';
+    font-size: 10px;
+}
+
+.my-kanban-card-time {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.my-kanban-card-time span {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.my-kanban-card-time span:first-child::before {
+    content: "⏱️";
+    font-size: 10px;
+}
+
+.my-kanban-card-time span:last-child::before {
+    content: "✅";
+    font-size: 10px;
+}
+
+.my-kanban-card-points {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.my-kanban-card-points .badge {
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.my-kanban-card-timer {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-weight: 700;
+    color: #065f46;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border: 2px solid #10b981;
+    border-radius: 20px;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    animation: pulse 2s infinite;
+    position: relative;
+}
+
+.my-kanban-card-timer::before {
+    content: '⏰';
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+    50% { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+    100% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+}
+
+.my-kanban-card-due-date {
+    font-size: 11px;
+    color: #ef4444;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.my-kanban-card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.my-kanban-card-actions .btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+/* Template Task Styling - Now using normal colors */
+.template-task-card {
+    /* Use same styling as regular cards */
+    background: white;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.template-task-card .my-kanban-card-title {
+    /* Normal title coloring */
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.template-task-card .badge.bg-info {
+    /* Keep normal info badge styling */
+    background: #0dcaf0 !important;
+}
+
+/* Drag & Drop Styles */
+.kanban-card[draggable="true"],
+.my-kanban-card[draggable="true"] {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.kanban-card[draggable="true"]:active,
+.my-kanban-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.kanban-card.dragging,
+.my-kanban-card.dragging {
+    opacity: 0.6;
+    transform: rotate(3deg) scale(0.95);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: all 0.2s ease;
+    cursor: grabbing;
+}
+
+.kanban-drop-zone.drag-over {
+    background-color: #e3f2fd;
+    border: 2px dashed #2196f3;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+
+
+/* 🎯 Additional Card Elements - العناصر المفقودة */
+
+/* Status Bar - شريط الحالة العلوي */
+.my-card-status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
+    z-index: 1;
+}
+
+/* Card Header - رأس الكارد */
+.my-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-top: 8px;
+}
+
+/* Status Indicator - مؤشر الحالة */
+.my-card-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.my-card-status-indicator .status-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Template Badge - شعار القالب */
+.my-task-template-badge {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 10px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(6, 182, 212, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Meta Items - عناصر البيانات */
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.meta-item i {
+    font-size: 12px;
+    width: 14px;
+    text-align: center;
+}
+
+/* Due Date Enhancement - تحسين تاريخ الاستحقاق */
+.my-kanban-card-due-date {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+}
+
+.my-kanban-card-due-date i {
+    font-size: 10px;
+}
+
+/* Due Date Priority Classes - فئات الأولوية */
+.my-kanban-card-due-date.overdue {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-color: #ef4444;
+    color: #b91c1c;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+}
+
+.my-kanban-card-due-date.due-soon {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border-color: #f59e0b;
+    color: #d97706;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.my-kanban-card-due-date.due-today {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-color: #10b981;
+    color: #059669;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+/* Card Actions - أزرار الإجراءات */
+.my-kanban-card-actions {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.my-kanban-card-actions .btn {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 11px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.my-kanban-card-actions .btn:first-child {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-color: #1d4ed8;
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.my-kanban-card-actions .btn:last-child {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: #047857;
+    color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Enhanced Icons in Title */
+.my-kanban-card-title i.fa-tasks {
+    color: #6366f1 !important;
+    margin-right: 8px !important;
+    font-size: 14px !important;
+}
+
+/* Enhanced Badge in Title */
+.my-kanban-card-title .badge {
+    margin-left: 8px;
+    padding: 4px 8px;
+    font-size: 9px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+
+
+/* Kanban Responsive Design */
+@media (max-width: 768px) {
+    .kanban-columns {
+        min-width: 800px;
+    }
+
+    .kanban-column {
+        min-width: 200px;
+    }
+
+    .my-kanban-card {
+        padding: 12px;
+    }
+
+    .my-kanban-card-actions .btn {
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+}

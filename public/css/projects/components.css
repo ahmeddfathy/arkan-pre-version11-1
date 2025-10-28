@@ -1,0 +1,183 @@
+/* Components - Buttons, Badges, Forms */
+
+/* شارات عامة */
+.badge {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    border-radius: 50px !important;
+    box-shadow: var(--shadow-sm);
+    letter-spacing: 0.5px;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: all var(--transition-medium);
+}
+
+.badge:hover::before {
+    left: 100%;
+}
+
+.badge:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+/* ألوان الشارات العامة */
+.bg-primary,
+.bg-success,
+.bg-warning,
+.bg-danger,
+.bg-info,
+.bg-secondary,
+.bg-purple {
+    background: var(--arkan-primary) !important;
+    color: var(--arkan-white) !important;
+}
+
+/* أزرار موحدة */
+.btn {
+    border-radius: var(--border-radius-md) !important;
+    font-weight: 600 !important;
+    padding: 12px 24px !important;
+    transition: all var(--transition-medium) !important;
+    border: none !important;
+    box-shadow: var(--shadow-sm);
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: all var(--transition-slow);
+    z-index: 1;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-primary,
+.btn-success,
+.btn-warning,
+.btn-danger,
+.btn-info {
+    background: var(--arkan-primary) !important;
+    color: var(--arkan-white) !important;
+    box-shadow: 0 4px 12px rgba(76, 205, 196, 0.3);
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+.btn-warning:hover,
+.btn-danger:hover,
+.btn-info:hover {
+    background: var(--arkan-primary-dark) !important;
+    box-shadow: 0 8px 20px rgba(76, 205, 196, 0.4);
+}
+
+.btn-light {
+    background: var(--arkan-white) !important;
+    color: var(--arkan-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-outline-light {
+    border: 2px solid var(--arkan-white) !important;
+    color: var(--arkan-white) !important;
+    background: transparent !important;
+}
+
+.btn-outline-light:hover {
+    background: var(--arkan-white) !important;
+    color: var(--arkan-primary) !important;
+}
+
+/* نماذج وحقول الإدخال */
+.form-control {
+    border-radius: var(--border-radius-md) !important;
+    padding: 14px 18px !important;
+    border: 2px solid var(--border-color) !important;
+    background: var(--card-background) !important;
+    color: var(--text-primary) !important;
+    transition: all var(--transition-fast) !important;
+    box-shadow: none !important;
+    font-weight: 500;
+}
+
+.form-control:focus {
+    border-color: var(--arkan-primary) !important;
+    box-shadow: 0 0 0 4px rgba(76, 205, 196, 0.15) !important;
+    background: var(--arkan-white) !important;
+}
+
+.input-group-text {
+    background: rgba(76, 205, 196, 0.1) !important;
+    border: 2px solid var(--border-color) !important;
+    color: var(--arkan-primary) !important;
+    font-weight: 600;
+}
+
+/* ترقيم الصفحات */
+.pagination {
+    gap: 8px;
+    padding: 20px;
+    background: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-top: 40px;
+}
+
+.page-item .page-link {
+    border-radius: var(--border-radius-md) !important;
+    color: var(--arkan-primary);
+    border: 1px solid var(--border-color);
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    background: var(--card-background);
+}
+
+.page-item.active .page-link {
+    background: var(--arkan-primary) !important;
+    color: var(--arkan-white);
+    border-color: var(--arkan-primary);
+    box-shadow: 0 4px 12px rgba(76, 205, 196, 0.3);
+}
+
+.page-item .page-link:hover {
+    background: rgba(76, 205, 196, 0.1);
+    border-color: var(--arkan-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}

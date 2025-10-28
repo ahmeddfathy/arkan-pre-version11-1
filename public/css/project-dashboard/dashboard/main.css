@@ -1,0 +1,1431 @@
+/* ========================================
+   DASHBOARD MAIN STYLES - ORGANIZED
+   ======================================== */
+
+/* ========================================
+   1. REVISION OVERVIEW STYLES
+   ======================================== */
+.revisions-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.revision-summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Remove before element and hover effects */
+
+.revision-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 20px;
+}
+
+.revision-icon.all { background: linear-gradient(135deg, #4BAAD4, #5bc0de); color: white; }
+.revision-icon.pending { background: linear-gradient(135deg, #ffad46, #ffc107); color: white; }
+.revision-icon.approved { background: linear-gradient(135deg, #23c277, #28a745); color: white; }
+.revision-icon.rejected { background: linear-gradient(135deg, #e74c3c, #dc3545); color: white; }
+.revision-icon.internal { background: linear-gradient(135deg, #17a2b8, #138496); color: white; }
+.revision-icon.external { background: linear-gradient(135deg, #fd7e14, #e76f00); color: white; }
+.revision-icon.recent { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; }
+
+.revision-info {
+    text-align: center;
+}
+
+.revision-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.revision-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* ========================================
+   2. APPROVAL RATE CIRCLE
+   ======================================== */
+.approval-rate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.approval-circle {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+}
+
+.circular-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #e9ecef;
+    stroke-width: 2.8;
+}
+
+.circle {
+    fill: none;
+    stroke: #23c277;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    animation: progress 1s ease-out forwards;
+}
+
+.percentage {
+    fill: #2c3e50;
+    font-family: Cairo, sans-serif;
+    font-size: 0.5em;
+    text-anchor: middle;
+    font-weight: 600;
+}
+
+@keyframes progress {
+    0% {
+        stroke-dasharray: 0 100;
+    }
+}
+
+/* ========================================
+   3. REVISION ALERTS
+   ======================================== */
+.revision-alerts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.alert-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+
+
+
+
+.alert-header {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-header i {
+    font-size: 1.2rem;
+    color: #495057;
+}
+
+.alert-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    flex: 1;
+}
+
+.alert-header .count {
+    background: #495057;
+    color: white;
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.alert-list {
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.alert-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.alert-item:last-child {
+    border-bottom: none;
+}
+
+.item-icon {
+    font-size: 1.1rem;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.item-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.status {
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-approved { background: #d4edda; color: #155724; }
+.status-rejected { background: #f8d7da; color: #721c24; }
+.status-pending { background: #fff3cd; color: #856404; }
+
+.alert-footer {
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.view-all-btn {
+    color: #4BAAD4;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.view-all-btn:hover {
+    color: #357abd;
+    text-decoration: none;
+}
+
+/* ========================================
+   4. ANALYTICS GRID
+   ======================================== */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+/* Remove hover effects */
+
+.analytics-header h4 {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.analytics-value {
+    margin-bottom: 0.5rem;
+}
+
+.big-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.big-number.success {
+    color: #28a745;
+}
+
+.unit {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-left: 0.5rem;
+}
+
+.analytics-description {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* ========================================
+   5. REVISION CATEGORIES BREAKDOWN
+   ======================================== */
+.revision-categories-breakdown {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.breakdown-section-header h4 {
+    color: #2c3e50;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.2rem;
+}
+
+.breakdown-section-header i {
+    color: #4BAAD4;
+}
+
+.dashboard-categories-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.dashboard-category-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Remove hover effects */
+
+.dashboard-category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dashboard-category-header i {
+    font-size: 1.2rem;
+}
+
+.dashboard-category-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.dashboard-stat {
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+/* Remove hover effects */
+
+.dashboard-stat .stat-num {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-stat .stat-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.dashboard-stat.pending {
+    background: linear-gradient(135deg, #fff8e1, #fffbf0);
+    border-color: #ffc107;
+}
+
+.dashboard-stat.pending .stat-num {
+    color: #b45309;
+}
+
+.dashboard-stat.approved {
+    background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+    border-color: #28a745;
+}
+
+.dashboard-stat.approved .stat-num {
+    color: #155724;
+}
+
+.dashboard-stat.rejected {
+    background: linear-gradient(135deg, #ffeaea, #fff2f2);
+    border-color: #dc3545;
+}
+
+.dashboard-stat.rejected .stat-num {
+    color: #721c24;
+}
+
+/* ========================================
+   6. DATE FILTERS STYLES
+   ======================================== */
+.filters-section {
+    margin-bottom: 2rem;
+}
+
+.filters-container {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.filters-header {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e3e6ef;
+}
+
+.filters-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filters-header h3 i {
+    color: #4BAAD4;
+}
+
+.toggle-filters-btn {
+    background: #4BAAD4;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toggle-filters-btn:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+}
+
+.filters-content {
+    padding: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.filters-content.collapsed {
+    display: none;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-group label i {
+    color: #4BAAD4;
+}
+
+.form-select, .form-input {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-select:focus, .form-input:focus {
+    outline: none;
+    border-color: #4BAAD4;
+    box-shadow: 0 0 0 3px rgba(75, 170, 212, 0.1);
+}
+
+.date-filter-options {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.date-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-option input[type="radio"] {
+    accent-color: #4BAAD4;
+}
+
+.date-option label {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-apply-filters, .btn-reset-filters {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-apply-filters {
+    background: linear-gradient(135deg, #4BAAD4, #357abd);
+    color: white;
+}
+
+.btn-apply-filters:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(75, 170, 212, 0.3);
+}
+
+.btn-reset-filters {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-reset-filters:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+/* ========================================
+   7. FILTER ANIMATIONS
+   ======================================== */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 400px;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        max-height: 400px;
+    }
+    to {
+        opacity: 0;
+        max-height: 0;
+    }
+}
+
+.filters-content:not(.collapsed) {
+    animation: slideDown 0.3s ease-out;
+}
+
+.filters-content.collapsed {
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Filter indicator */
+.filter-indicator {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+    border-radius: 20px;
+    border: 1px solid #4BAAD4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.filter-indicator i {
+    color: #4BAAD4;
+}
+
+.filter-text {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* ========================================
+   8. TASK TRANSFER STATISTICS
+   ======================================== */
+.transfer-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.transfer-stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Remove before element and hover effects */
+
+.transfer-stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.transfer-stat-card.total .transfer-stat-icon {
+    background: linear-gradient(135deg, #4BAAD4, #357abd);
+}
+
+.transfer-stat-card.additional .transfer-stat-icon {
+    background: linear-gradient(135deg, #23c277, #1ea568);
+}
+
+.transfer-stat-card.history .transfer-stat-icon {
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+}
+
+.transfer-stat-content {
+    flex: 1;
+}
+
+.transfer-stat-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    line-height: 1;
+}
+
+.transfer-stat-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.transfer-stat-breakdown {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.transfer-stat-breakdown span {
+    background: rgba(75, 170, 212, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* ========================================
+   9. RECENT TRANSFERS
+   ======================================== */
+.recent-transfers-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.recent-transfers-section h3 {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.recent-transfers-section h3 i {
+    color: #4BAAD4;
+}
+
+.recent-transfers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.recent-transfer-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+/* Remove hover effects */
+
+.transfer-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.transfer-icon.regular {
+    background: linear-gradient(135deg, #4BAAD4, #357abd);
+}
+
+.transfer-icon.template {
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+}
+
+.transfer-content {
+    flex: 1;
+}
+
+.transfer-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.task-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.task-type-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.task-type-badge.regular {
+    background: linear-gradient(135deg, rgba(75, 170, 212, 0.1), rgba(75, 170, 212, 0.2));
+    color: #4BAAD4;
+}
+
+.task-type-badge.template {
+    background: linear-gradient(135deg, rgba(142, 68, 173, 0.1), rgba(142, 68, 173, 0.2));
+    color: #8e44ad;
+}
+
+.transfer-type-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.transfer-type-badge.positive {
+    background: linear-gradient(135deg, rgba(35, 194, 119, 0.1), rgba(35, 194, 119, 0.2));
+    color: #23c277;
+}
+
+.transfer-type-badge.negative {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(231, 76, 60, 0.2));
+    color: #e74c3c;
+}
+
+.transfer-details {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+    flex-wrap: wrap;
+}
+
+.transfer-users {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.transfer-users i {
+    color: #4BAAD4;
+}
+
+.transfer-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.transfer-time i {
+    color: #ffad46;
+}
+
+.transfer-reason {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-style: italic;
+    background: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.transfer-reason i {
+    color: #4BAAD4;
+    margin-top: 2px;
+}
+
+.transfer-status {
+    text-align: right;
+}
+
+/* ========================================
+   10. TRANSFER HISTORY LINK
+   ======================================== */
+.transfer-history-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
+}
+
+.transfer-history-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.transfer-history-link i {
+    font-size: 0.8rem;
+}
+
+.transfer-stat-card.history .transfer-stat-number {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60px;
+}
+
+/* ========================================
+   11. TASK TYPE BADGES
+   ======================================== */
+.task-type-badge {
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+}
+
+.task-type-badge.regular {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.task-type-badge.template {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.text-purple {
+    color: #8b5cf6 !important;
+}
+
+.activity-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* ========================================
+   12. RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+    .revisions-overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .revision-alerts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-categories-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-category-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+    }
+
+    .date-filter-options {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .transfer-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .transfer-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .transfer-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .revisions-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-category-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filters-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .toggle-filters-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   OVERDUE STATISTICS STYLES - ENHANCED
+   ======================================== */
+.overdue-main-section {
+    margin-top: var(--space-8);
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--white) 0%, #f8f9ff 100%);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+.overdue-section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 2px solid var(--gray-100);
+}
+
+.overdue-section-title i {
+    color: var(--arkan-danger);
+    font-size: 1.3rem;
+}
+
+.overdue-category-section {
+    margin-bottom: var(--space-8);
+    padding: var(--space-6);
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+}
+
+.overdue-category-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.overdue-category-title i {
+    color: var(--arkan-primary);
+    font-size: 1.3rem;
+}
+
+/* Same as tasks-overview-grid */
+.overdue-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+}
+
+/* Same as task-summary-card */
+.overdue-card {
+    background: linear-gradient(135deg, var(--white) 0%, #f8f9ff 100%);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+
+.overdue-card.warning::before {
+    background: linear-gradient(90deg, var(--arkan-warning), #e69c41);
+}
+
+.overdue-card.info::before {
+    background: linear-gradient(90deg, var(--arkan-info), var(--arkan-primary-dark));
+}
+
+.overdue-card.danger::before {
+    background: linear-gradient(90deg, var(--arkan-danger), #e63946);
+}
+
+/* Same as task-icon */
+.overdue-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--white);
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.overdue-card.warning .overdue-icon {
+    background: linear-gradient(135deg, var(--arkan-warning), #e69c41);
+    box-shadow: 0 8px 20px rgba(255, 173, 70, 0.3);
+}
+
+.overdue-card.info .overdue-icon {
+    background: linear-gradient(135deg, var(--arkan-info), var(--arkan-primary-dark));
+    box-shadow: 0 8px 20px rgba(75, 170, 212, 0.3);
+}
+
+.overdue-card.danger .overdue-icon {
+    background: linear-gradient(135deg, var(--arkan-danger), #e63946);
+    box-shadow: 0 8px 20px rgba(245, 83, 109, 0.3);
+}
+
+.overdue-content {
+    flex: 1;
+    position: relative;
+}
+
+/* Same as task-number */
+.overdue-number {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: var(--space-2);
+    background: linear-gradient(135deg, var(--text-primary), var(--arkan-primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+}
+
+/* Same as task-label */
+.overdue-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.overdue-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Overdue Details Section */
+.overdue-details-section {
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 2px solid var(--gray-100);
+}
+
+.overdue-details-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.overdue-details-title i {
+    color: var(--arkan-danger);
+}
+
+.overdue-projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.overdue-project-item {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow);
+    transition: var(--transition-normal);
+    border: 1px solid var(--gray-200);
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+.overdue-project-item:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-md);
+}
+
+
+
+.overdue-project-item.completed {
+    background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%);
+}
+
+.overdue-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.overdue-project-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.overdue-project-name i {
+    color: var(--arkan-primary);
+}
+
+.overdue-badge {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    box-shadow: var(--shadow);
+}
+
+.overdue-badge.danger {
+    background: linear-gradient(135deg, var(--arkan-danger), #e63946);
+    color: var(--white);
+}
+
+.overdue-badge.info {
+    background: linear-gradient(135deg, var(--arkan-info), var(--arkan-primary-dark));
+    color: var(--white);
+}
+
+.overdue-project-participants {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--gray-200);
+}
+
+.overdue-project-participants strong {
+    display: block;
+    margin-bottom: var(--space-3);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.participants-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.participant-badge {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: var(--transition-fast);
+}
+
+.participant-badge:hover {
+    background: var(--arkan-primary-lighter);
+    border-color: var(--arkan-primary-light);
+    transform: translateY(-2px);
+}
+
+.participant-badge i {
+    color: var(--arkan-primary);
+    font-size: 0.85rem;
+}
+
+.participant-badge small {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Responsive Overdue */
+@media (max-width: 768px) {
+    .overdue-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .overdue-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .overdue-icon {
+        margin-bottom: var(--space-3);
+    }
+
+    .overdue-project-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .participants-list {
+        flex-direction: column;
+    }
+
+    .participant-badge {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .overdue-main-section {
+        padding: var(--space-5);
+    }
+
+    .overdue-section-title {
+        font-size: 1.3rem;
+    }
+
+    .overdue-category-title {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .overdue-main-section {
+        padding: var(--space-4);
+    }
+
+    .overdue-category-section {
+        padding: var(--space-4);
+    }
+
+    .overdue-card {
+        padding: var(--space-4);
+    }
+
+    .overdue-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .overdue-number {
+        font-size: 2rem;
+    }
+}
+
+/* ========================================
+   ERROR & TRANSFER STATISTICS - Same as Tasks Overview
+   ======================================== */
+
+/* Error Statistics - stat-big-number same as task-number */
+.stat-big-number {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: var(--space-2);
+    background: linear-gradient(135deg, var(--text-primary), var(--arkan-primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+}
+
+.stat-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.stat-item i {
+    font-size: 1rem;
+}

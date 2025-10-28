@@ -1,0 +1,929 @@
+/* Date Filters Styles */
+.filters-section {
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+    border-top: 1px solid #e3e6ef;
+    border-bottom: 1px solid #e3e6ef;
+}
+
+.filters-container {
+    background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+    border-radius: 16px;
+    border: 1px solid #e3e6ef;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.filters-header {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e3e6ef;
+}
+
+.filters-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filters-header h3 i {
+    color: #4BAAD4;
+}
+
+.toggle-filters-btn {
+    background: #4BAAD4;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toggle-filters-btn:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+}
+
+.filters-content {
+    padding: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.filters-content.collapsed {
+    display: none;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-group label i {
+    color: #4BAAD4;
+}
+
+.form-select, .form-input {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-select:focus, .form-input:focus {
+    outline: none;
+    border-color: #4BAAD4;
+    box-shadow: 0 0 0 3px rgba(75, 170, 212, 0.1);
+}
+
+.date-filter-options {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.date-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-option input[type="radio"] {
+    accent-color: #4BAAD4;
+}
+
+.date-option label {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-apply-filters, .btn-reset-filters {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-apply-filters {
+    background: linear-gradient(135deg, #4BAAD4, #357abd);
+    color: white;
+}
+
+.btn-apply-filters:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(75, 170, 212, 0.3);
+}
+
+.btn-reset-filters {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-reset-filters:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+/* Filter indicator */
+.filter-indicator-team {
+    margin: 1rem 0;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+    border-radius: 20px;
+    border: 1px solid #4BAAD4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.filter-indicator-team i {
+    color: #4BAAD4;
+}
+
+.filter-text {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Responsive filters */
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+    }
+
+    .date-filter-options {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .filters-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .toggle-filters-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Revisions Analytics Styles */
+.revisions-summary {
+    padding: 1.5rem;
+}
+
+.revisions-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+
+/* Revision Approval Circle */
+.revision-approval {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.approval-circle {
+    margin-bottom: 1.5rem;
+}
+
+.approval-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.approval-details {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.approval-item {
+    text-align: center;
+    flex: 1;
+}
+
+.approval-number {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 0.3rem;
+}
+
+.approval-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Urgent Revisions */
+.urgent-revisions {
+    padding: 1.5rem;
+}
+
+.urgent-count {
+    background: #dc3545;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.urgent-list {
+    margin-top: 1rem;
+}
+
+.urgent-item {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.urgent-item:last-child {
+    border-bottom: none;
+}
+
+.revision-title {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.revision-days {
+    font-size: 0.8rem;
+    color: #dc3545;
+    font-weight: 600;
+    background: rgba(220, 53, 69, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.more-revisions {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Revision Categories Breakdown */
+.revision-breakdown {
+    background: linear-gradient(135deg, #f8fffe 0%, #f0f9ff 100%);
+    border: 1px solid #e0f2fe;
+    padding: 1.5rem;
+}
+
+.revision-types-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.revision-type-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.revision-type-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.type-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.type-header i {
+    font-size: 1.2rem;
+}
+
+/* ===== Overdue Stats Section ===== */
+.overdue-stats-section {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+    border-radius: 16px;
+    border: 2px solid #ff6b6b;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.1);
+}
+
+.overdue-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #ff6b6b;
+}
+
+.overdue-header i {
+    font-size: 1.5rem;
+    color: #ff6b6b;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.overdue-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #d63031;
+}
+
+.overdue-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.overdue-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8e8e8;
+}
+
+.overdue-card.warning {
+    border-color: #fde68a;
+}
+
+.overdue-card.info {
+    border-color: #bfdbfe;
+}
+
+.overdue-card.danger {
+    border-color: #fecaca;
+}
+
+.overdue-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.overdue-card.warning .overdue-icon {
+    background: #fbbf24;
+}
+
+.overdue-card.info .overdue-icon {
+    background: #60a5fa;
+}
+
+.overdue-card.danger .overdue-icon {
+    background: #f87171;
+}
+
+.overdue-content {
+    flex: 1;
+}
+
+.overdue-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #1e293b;
+}
+
+.overdue-label {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.overdue-description {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+/* Responsive Overdue Cards */
+@media (max-width: 768px) {
+    .overdue-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .overdue-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .overdue-icon {
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* ===== Overdue Details Section ===== */
+.overdue-details-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px dashed #ffcccb;
+}
+
+.overdue-details-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.overdue-details-title i {
+    color: #e74c3c;
+}
+
+.overdue-projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.overdue-project-item {
+    background: white;
+    border-radius: 10px;
+    padding: 1.15rem;
+    border-right: 3px solid #f87171;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8e8e8;
+    border-right-width: 3px;
+    border-right-color: #f87171;
+}
+
+.overdue-project-item.completed {
+    border-right-color: #60a5fa;
+}
+
+.overdue-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.overdue-project-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.overdue-project-name i {
+    color: #4BAAD4;
+}
+
+.overdue-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.overdue-badge.danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.overdue-badge.info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+.overdue-project-participants {
+    padding-top: 0.75rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.overdue-project-participants strong {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.participants-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.participant-badge {
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.participant-badge i {
+    color: #4BAAD4;
+    font-size: 0.7rem;
+}
+
+.participant-badge small {
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Transfer Statistics Styles */
+.transfer-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.transfer-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8e8e8;
+}
+
+.transfer-stat-card.total {
+    border-color: #bfdbfe;
+}
+
+.transfer-stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.transfer-stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.transfer-stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.transfer-stat-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.transfer-stat-breakdown {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.transfer-stat-breakdown span {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.75rem;
+    background: #f0fdf4;
+    color: #047857;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 1px solid #d1fae5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.transfer-stat-breakdown span i {
+    font-size: 0.7rem;
+}
+
+/* Recent Transfers Card */
+.recent-transfers-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8e8e8;
+    overflow: hidden;
+}
+
+.card-header-transfers {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.card-header-transfers h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-header-transfers h4 i {
+    color: #4BAAD4;
+    font-size: 0.9rem;
+}
+
+.recent-transfers-list {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.recent-transfer-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.85rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e8e8e8;
+}
+
+.transfer-icon-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.transfer-icon-small.regular {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.transfer-icon-small.template {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+.transfer-details-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.transfer-task-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.transfer-task-info .task-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.task-type-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.task-type-badge.regular {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+.task-type-badge.template {
+    background: #fce7f3;
+    color: #be185d;
+    border: 1px solid #fbcfe8;
+}
+
+.transfer-user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.transfer-user-info .from-user,
+.transfer-user-info .to-user {
+    font-weight: 600;
+    color: #475569;
+}
+
+.transfer-arrow {
+    color: #4BAAD4;
+    font-size: 0.75rem;
+}
+
+.transfer-date {
+    font-size: 0.8rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.transfer-date i {
+    color: #4BAAD4;
+    font-size: 0.7rem;
+}
+
+.more-transfers {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+    background: #f1f5f9;
+    border-radius: 6px;
+}
+
+/* Responsive Details */
+@media (max-width: 768px) {
+    .overdue-project-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .participants-list {
+        flex-direction: column;
+    }
+
+    .participant-badge {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .transfer-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .transfer-stat-card {
+        padding: 1rem;
+    }
+
+    .transfer-stat-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+
+    .transfer-stat-number {
+        font-size: 1.75rem;
+    }
+
+    .recent-transfer-item {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .transfer-icon-small {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .transfer-task-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .transfer-user-info {
+        flex-wrap: wrap;
+    }
+}
+
+

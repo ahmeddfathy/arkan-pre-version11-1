@@ -1,0 +1,800 @@
+/*
+=======================================================
+    🎨 Modern Evaluation Criteria Styles
+    التصميم الحديث لنظام بنود التقييم
+=======================================================
+*/
+
+:root {
+    /* 🎨 Modern Color Palette */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --danger-gradient: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+    --info-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+
+    /* 🌟 Glass Morphism */
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+
+    /* 📱 Spacing & Sizes */
+    --border-radius-lg: 20px;
+    --border-radius-md: 16px;
+    --border-radius-sm: 12px;
+    --shadow-elegant: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
+
+    /* 🎭 Animations - Removed */
+}
+
+/* 🌍 Global Improvements */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* 🎯 Page Container */
+.evaluation-container {
+    padding: 2rem 0;
+    min-height: 100vh;
+}
+
+/* 💎 Modern Cards */
+.modern-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.modern-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-bottom: none;
+}
+
+/* Removed hover effects */
+
+.modern-card-body {
+    padding: 2rem;
+    background: white;
+}
+
+/* 🌟 Role Selection Cards */
+.role-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.role-card-modern {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    border: 1px solid #e9ecef;
+}
+
+.role-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+}
+
+/* 🚀 Modern Buttons */
+.btn-modern {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.btn-primary-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-success-modern {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.btn-warning-modern {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+/* 📝 Modern Forms - Enhanced */
+.form-floating-modern {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.form-control-modern, .form-select-modern {
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+    min-height: 38px;
+}
+
+.form-control-modern:focus, .form-select-modern:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background: white;
+    outline: none;
+}
+
+/* 🎨 Special Input States */
+.form-control-modern::placeholder {
+    color: rgba(108, 117, 125, 0.6);
+    font-weight: 400;
+}
+
+/* 🎯 Textarea Enhancement */
+textarea.form-control-modern {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* 📱 Select Enhancement */
+.form-select-modern {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.5rem;
+}
+
+/* 🎯 Modern Toast */
+.toast-modern {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-left: 4px solid #28a745;
+}
+
+.toast-modern .toast-header {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+}
+
+/* 🏷️ Modern Badges */
+.badge-modern {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.badge-success-modern {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.badge-primary-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.badge-warning-modern {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+/* Removed pulse animation */
+
+/* 📊 Progress & Stats */
+.stats-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 🔥 Animations - Removed */
+
+/* 🎨 Workflow Steps */
+.workflow-step-modern {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-top: 4px solid transparent;
+}
+
+.workflow-step-modern:nth-child(1) { border-top-color: #667eea; }
+.workflow-step-modern:nth-child(2) { border-top-color: #4facfe; }
+.workflow-step-modern:nth-child(3) { border-top-color: #fa709a; }
+
+.step-number-modern {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto 1.5rem;
+}
+
+/* Removed pulse animation */
+
+/* 📱 Responsive Design */
+@media (max-width: 768px) {
+    .modern-card-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .modern-card-body {
+        padding: 1.5rem;
+    }
+
+    .role-selection-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .role-card-modern {
+        padding: 1.5rem;
+    }
+
+    .role-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+    }
+}
+
+/* 🌙 Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --glass-bg: rgba(0, 0, 0, 0.25);
+        --glass-border: rgba(255, 255, 255, 0.18);
+    }
+
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #fff;
+    }
+
+    .modern-card-body {
+        background: rgba(0, 0, 0, 0.2);
+        color: #fff;
+    }
+
+    .role-card-modern {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+
+    .form-control-modern,
+    .form-select-modern {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stats-card {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+
+    .workflow-step-modern {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+}
+
+/* 🎯 Loading States - Removed animations */
+
+/* 🎊 Special Effects - Removed */
+
+/* 💫 Floating Elements - Removed */
+
+/* 🎨 Color Variants for Cards */
+.card-variant-1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card-variant-2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.card-variant-3 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.card-variant-4 {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+/* ✨ Ripple Effect - Removed */
+
+/* 🔄 Enhanced Floating Labels */
+.form-floating-modern label {
+    position: absolute;
+    top: 1.2rem;
+    left: 1.5rem;
+    padding: 0 0.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 3;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.form-floating-modern .form-control-modern:focus + label,
+.form-floating-modern .form-control-modern:not(:placeholder-shown) + label,
+.form-floating-modern .form-select-modern:focus + label,
+.form-floating-modern .form-select-modern:not([value=""]) + label {
+    top: -0.7rem;
+    left: 1.2rem;
+    font-size: 0.8rem;
+    color: #667eea;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* 🎨 Form Group Enhancement - Removed hover effects */
+
+/* 🔥 Enhanced Form Validation States */
+.form-control-modern.is-invalid,
+.form-select-modern.is-invalid {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+}
+
+.form-control-modern.is-invalid:focus,
+.form-select-modern.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow:
+        0 0 0 4px rgba(220, 53, 69, 0.15),
+        0 8px 25px rgba(220, 53, 69, 0.15);
+}
+
+.invalid-feedback {
+    display: block;
+    font-size: 0.875rem;
+    color: #dc3545;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+/* 🎨 Enhanced Form Sections */
+.form-section-modern {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 255, 0.9) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+}
+
+.form-section-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 20px 20px 0 0;
+}
+
+.form-section-modern h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-section-modern h6 i {
+    margin-right: 0.5rem;
+    color: #667eea;
+}
+
+/* 🎯 Enhanced Checkbox */
+.form-check-modern {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(32, 201, 151, 0.1));
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 2px solid rgba(40, 167, 69, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.form-check-modern .form-check-input {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 8px;
+    border: 2px solid #28a745;
+    background: white;
+}
+
+.form-check-modern .form-check-input:checked {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-color: #28a745;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.form-check-modern .form-check-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-left: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+/* 🚀 Enhanced Action Buttons Area */
+.action-buttons-modern {
+    background: linear-gradient(135deg, rgba(248, 249, 255, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: 2rem;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    backdrop-filter: blur(20px);
+}
+
+/* 🎨 Form Row Enhancements */
+.form-row-modern {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(248, 249, 255, 0.05) 100%);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(102, 126, 234, 0.08);
+}
+
+.form-row-modern .col-md-6:first-child .form-floating-modern {
+    margin-right: 0.75rem;
+}
+
+.form-row-modern .col-md-6:last-child .form-floating-modern {
+    margin-left: 0.75rem;
+}
+
+/* 🎯 Special Role Display Enhancement */
+.role-display-modern {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 2px solid rgba(102, 126, 234, 0.15);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.role-display-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.role-display-modern h6 {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.role-display-modern .role-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* 📱 Responsive Form Improvements */
+@media (max-width: 768px) {
+    .form-floating-modern {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-row-modern .col-md-6:first-child .form-floating-modern,
+    .form-row-modern .col-md-6:last-child .form-floating-modern {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .role-display-modern {
+        padding: 1.5rem;
+    }
+
+    .action-buttons-modern {
+        padding: 1.5rem;
+    }
+}
+
+/* 🎯 Enhanced Hover Effects - Removed */
+
+/* 📱 Enhanced Mobile Responsiveness */
+@media (max-width: 576px) {
+    .evaluation-container {
+        padding: 1rem 0;
+    }
+
+    .modern-card-header {
+        padding: 1rem;
+    }
+
+    .modern-card-body {
+        padding: 1rem;
+    }
+
+    .role-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+
+    .step-number-modern {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+
+    .display-4 {
+        font-size: 2rem;
+    }
+
+    .display-5 {
+        font-size: 1.75rem;
+    }
+
+    .display-6 {
+        font-size: 1.5rem;
+    }
+}
+
+/* 🎨 Gradient Text */
+.gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 🌈 Colorful Borders */
+.border-gradient {
+    border: 2px solid;
+    border-image: var(--primary-gradient) 1;
+    border-radius: var(--border-radius-md);
+}
+
+/* 💫 Enhanced Floating Animation - Removed */
+
+/* 🎊 Confetti Effect - Removed */
+
+/* 📄 CV Style Cards */
+.cv-style-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.cv-card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.cv-number-badge {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.cv-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.cv-subtitle {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin: 0.25rem 0 0;
+    line-height: 1.4;
+}
+
+.cv-type-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cv-positive {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+}
+
+.cv-negative {
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    color: white;
+}
+
+.cv-bonus {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+}
+
+.cv-card-body {
+    padding: 1rem 1.5rem;
+    background: white;
+}
+
+.cv-stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.cv-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.cv-stat-value {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.cv-stat-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.cv-card-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    border-top: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.cv-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.cv-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.cv-view {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+}
+
+.cv-edit {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+}
+
+.cv-delete {
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    color: white;
+}
+
+/* 📱 Responsive CV Cards */
+@media (max-width: 768px) {
+    .cv-style-card {
+        margin-bottom: 1rem;
+    }
+
+    .cv-card-header {
+        padding: 1rem;
+    }
+
+    .cv-card-body {
+        padding: 0.75rem 1rem;
+    }
+
+    .cv-card-footer {
+        padding: 0.75rem 1rem 1rem;
+    }
+
+    .cv-stats-row {
+        gap: 0.5rem;
+    }
+
+    .cv-stat-item {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .cv-actions {
+        gap: 0.25rem;
+    }
+
+    .cv-action-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}

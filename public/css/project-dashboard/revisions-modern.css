@@ -1,0 +1,458 @@
+/* ===================================
+   Modern Revisions Statistics Design
+   =================================== */
+
+/* Main Grid */
+.revision-stats-modern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Stat Card */
+.revision-stat-modern {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.revision-stat-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon Styling */
+.stat-icon-modern {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.revision-stat-modern:hover .stat-icon-modern {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Total Card */
+.revision-stat-modern.total {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.revision-stat-modern.total .stat-icon-modern {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.revision-stat-modern.total .stat-badge-modern {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Pending Card */
+.revision-stat-modern.pending {
+    border-right: 4px solid #ffc107;
+}
+
+.revision-stat-modern.pending .stat-icon-modern {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: white;
+}
+
+/* Approved Card */
+.revision-stat-modern.approved {
+    border-right: 4px solid #28a745;
+}
+
+.revision-stat-modern.approved .stat-icon-modern {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+/* Rejected Card */
+.revision-stat-modern.rejected {
+    border-right: 4px solid #dc3545;
+}
+
+.revision-stat-modern.rejected .stat-icon-modern {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+/* Approval Rate Card */
+.revision-stat-modern.approval-rate {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.approval-circle-modern {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0.5rem;
+}
+
+.approval-circle-modern svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.approval-circle-modern .circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 3;
+}
+
+.approval-circle-modern .circle-progress {
+    fill: none;
+    stroke: white;
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.6s ease;
+}
+
+.approval-circle-modern .percentage {
+    fill: white;
+    font-size: 8px;
+    font-weight: bold;
+    text-anchor: middle;
+    transform: rotate(90deg);
+    transform-origin: center;
+}
+
+/* Internal/External Cards */
+.revision-stat-modern.internal .stat-icon-modern {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+}
+
+.revision-stat-modern.external .stat-icon-modern {
+    background: linear-gradient(135deg, #6610f2 0%, #5a0fc7 100%);
+    color: white;
+}
+
+.revision-stat-modern.attachments .stat-icon-modern {
+    background: linear-gradient(135deg, #fd7e14 0%, #e96500 100%);
+    color: white;
+}
+
+/* Content */
+.stat-content-modern {
+    flex: 1;
+}
+
+.stat-number-modern {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.revision-stat-modern.total .stat-number-modern,
+.revision-stat-modern.approval-rate .stat-number-modern {
+    color: white;
+}
+
+.stat-label-modern {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.revision-stat-modern.total .stat-label-modern,
+.revision-stat-modern.approval-rate .stat-label-modern {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Progress Bar */
+.stat-progress-modern {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #e9ecef;
+}
+
+.stat-progress-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--progress, 0%);
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.6s ease;
+}
+
+.revision-stat-modern.pending .stat-progress-modern::before {
+    background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+}
+
+.revision-stat-modern.approved .stat-progress-modern::before {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.revision-stat-modern.rejected .stat-progress-modern::before {
+    background: linear-gradient(90deg, #dc3545 0%, #c82333 100%);
+}
+
+/* Section Badge */
+.section-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* ===================================
+   Categories Section
+   =================================== */
+
+.revision-categories-modern {
+    margin-top: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.categories-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.categories-title i {
+    color: #667eea;
+    font-size: 1.4rem;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.category-card-modern {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.category-card-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.category-header-modern {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.category-icon-modern {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+}
+
+.category-card-modern.task .category-icon-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.category-card-modern.project .category-icon-modern {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+.category-header-modern h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.category-stats-modern {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.category-stat {
+    text-align: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.category-stat:hover {
+    background: #e9ecef;
+    transform: scale(1.05);
+}
+
+.category-stat .number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.category-stat .label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.category-stat.pending .number {
+    color: #ffc107;
+}
+
+.category-stat.approved .number {
+    color: #28a745;
+}
+
+.category-stat.rejected .number {
+    color: #dc3545;
+}
+
+/* ===================================
+   Responsive Design
+   =================================== */
+
+@media (max-width: 768px) {
+    .revision-stats-modern-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-stats-modern {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .category-stats-modern {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-number-modern {
+        font-size: 1.5rem;
+    }
+
+    .approval-circle-modern {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* ===================================
+   ✅ Role-Based Cards (مسؤول/منفذ/مراجع)
+   =================================== */
+
+/* Responsible Card (مرتكب الخطأ) */
+.revision-stat-modern.responsible {
+    border-right: 4px solid #e74c3c;
+}
+
+.revision-stat-modern.responsible .stat-icon-modern {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+}
+
+.revision-stat-modern.responsible .stat-badge-modern {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Executor Card (منفذ) */
+.revision-stat-modern.executor {
+    border-right: 4px solid #3498db;
+}
+
+.revision-stat-modern.executor .stat-icon-modern {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+}
+
+.revision-stat-modern.executor .stat-badge-modern {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(52, 152, 219, 0.15);
+    color: #3498db;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Reviewer Card (مراجع) */
+.revision-stat-modern.reviewer {
+    border-right: 4px solid #9b59b6;
+}
+
+.revision-stat-modern.reviewer .stat-icon-modern {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    color: white;
+}
+
+.revision-stat-modern.reviewer .stat-badge-modern {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(155, 89, 182, 0.15);
+    color: #9b59b6;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+

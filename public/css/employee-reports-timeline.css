@@ -1,0 +1,551 @@
+/**
+ * 🌟 Employee Reports Timeline - Ultra Modern Design
+ * Advanced Timeline with 3D Effects & Micro-interactions
+ */
+
+/* ===========================================
+   🎯 Advanced Timeline Containers
+   =========================================== */
+.real-time-timeline-container {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-3xl);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    padding: var(--space-8);
+    position: relative;
+    overflow: hidden;
+    will-change: auto;
+}
+
+.real-time-timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+        var(--primary-400) 0%,
+        var(--success-400) 33%,
+        var(--warning-400) 66%,
+        var(--primary-400) 100%);
+    background-size: 300% 100%;
+    animation: gradientShift 6s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+
+/* ===========================================
+   ⏰ Hour Rows - 3D Card Design
+   =========================================== */
+.hour-row {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--space-8);
+    padding: 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: hidden;
+    will-change: auto;
+}
+
+
+
+
+.hour-header {
+    padding: var(--space-6);
+    background: linear-gradient(135deg,
+        rgba(59, 130, 246, 0.08) 0%,
+        rgba(139, 92, 246, 0.04) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    position: relative;
+}
+
+.hour-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--space-6);
+    right: var(--space-6);
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--primary-300) 25%,
+        var(--primary-400) 50%,
+        var(--primary-300) 75%,
+        transparent 100%);
+}
+
+.hour-header h6 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gray-800);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.hour-header .fa-clock {
+    color: var(--primary-600);
+    font-size: 18px;
+    background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ===========================================
+   📊 Minutes Grid - Advanced Glass Morphism
+   =========================================== */
+.minutes-row {
+    padding: var(--space-6);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+    gap: var(--space-2);
+    position: relative;
+    min-height: 120px;
+}
+
+.minutes-row::before {
+    content: '';
+    position: absolute;
+    inset: var(--space-3);
+    border: 1px dashed rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-xl);
+    pointer-events: none;
+}
+
+/* ===========================================
+   ⏱️ Minute Boxes - Ultra Modern 3D Design
+   =========================================== */
+.minute-box {
+    aspect-ratio: 1;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+/* Active minute box with special animation */
+.minute-box.active-pulse {
+    animation: ultraPulse 2s ease-in-out infinite;
+    z-index: 15;
+}
+
+@keyframes ultraPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow:
+            0 4px 12px rgba(251, 146, 60, 0.3),
+            0 2px 6px rgba(251, 146, 60, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        transform: scale(1.08);
+        box-shadow:
+            0 8px 24px rgba(251, 146, 60, 0.5),
+            0 4px 12px rgba(251, 146, 60, 0.3),
+            0 0 20px rgba(251, 146, 60, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+}
+
+/* ===========================================
+   🎨 Status Colors - Modern Gradients
+   =========================================== */
+.minute-box[data-status="working"] {
+    background: linear-gradient(135deg,
+        var(--success-400) 0%,
+        var(--success-500) 50%,
+        var(--success-600) 100%);
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow:
+        0 4px 12px rgba(34, 197, 94, 0.3),
+        0 1px 3px rgba(34, 197, 94, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+
+.minute-box[data-status="idle"] {
+    background: linear-gradient(135deg,
+        var(--danger-400) 0%,
+        var(--danger-500) 50%,
+        var(--danger-600) 100%);
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow:
+        0 4px 12px rgba(239, 68, 68, 0.3),
+        0 1px 3px rgba(239, 68, 68, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+
+.minute-box[data-status="future"] {
+    background: linear-gradient(135deg,
+        var(--gray-300) 0%,
+        var(--gray-400) 50%,
+        var(--gray-500) 100%);
+    border-color: rgba(107, 114, 128, 0.3);
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow:
+        0 2px 8px rgba(107, 114, 128, 0.2),
+        0 1px 3px rgba(107, 114, 128, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+
+/* ===========================================
+   🕐 Current Time Pointer - Futuristic
+   =========================================== */
+.current-time-pointer {
+    position: absolute;
+    top: -40px;
+    z-index: 50;
+    animation: timePointerGlow 3s ease-in-out infinite;
+}
+
+.current-time-pointer > div {
+    background: linear-gradient(135deg,
+        var(--warning-400) 0%,
+        var(--warning-500) 50%,
+        var(--warning-600) 100%);
+    color: white;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-xl);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow:
+        0 8px 32px rgba(251, 146, 60, 0.4),
+        0 4px 16px rgba(251, 146, 60, 0.3),
+        0 0 20px rgba(251, 146, 60, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    position: relative;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+.current-time-pointer .fa-clock {
+    margin-left: var(--space-2);
+    animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes timePointerGlow {
+    0%, 100% {
+        transform: translateY(0);
+        filter: brightness(1);
+    }
+    50% {
+        transform: translateY(-4px);
+        filter: brightness(1.1);
+    }
+}
+
+/* Arrow pointer */
+.current-time-pointer > div::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 12px solid var(--warning-500);
+    filter: drop-shadow(0 2px 4px rgba(251, 146, 60, 0.3));
+}
+
+/* ===========================================
+   📈 Timeline Legend - Ultra Modern
+   =========================================== */
+.timeline-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin: var(--space-8) 0;
+    padding: var(--space-6);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    will-change: auto;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-xl);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-md);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.legend-color::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.3) 0%,
+        transparent 100%);
+    border-radius: inherit;
+}
+
+/* ===========================================
+   🚀 Performance Optimizations
+   =========================================== */
+/* Optimize minute boxes for better scrolling */
+.minute-box {
+    will-change: auto;
+    contain: layout;
+}
+
+/* Optimize hour rows */
+.hour-row {
+    contain: layout style;
+}
+
+/* ===========================================
+   🎭 Advanced Animations & Micro-interactions
+   =========================================== */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* Animation classes */
+.animate-slide-in-right {
+    animation: slideInFromRight 0.6s ease-out;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* ===========================================
+   📱 Advanced Responsive Design
+   =========================================== */
+@media (max-width: 1200px) {
+    .minutes-row {
+        grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+        gap: var(--space-1);
+    }
+}
+
+@media (max-width: 768px) {
+    .real-time-timeline-container {
+        padding: var(--space-6);
+        margin: var(--space-4);
+    }
+
+    .hour-row {
+        margin-bottom: var(--space-6);
+    }
+
+    .hour-header {
+        padding: var(--space-4);
+    }
+
+    .hour-header h6 {
+        font-size: 16px;
+    }
+
+    .minutes-row {
+        grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
+        padding: var(--space-4);
+        min-height: 100px;
+    }
+
+    .minute-box {
+        font-size: 10px;
+    }
+
+    .timeline-legend {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+        margin: var(--space-6) 0;
+        padding: var(--space-4);
+    }
+
+    .legend-item {
+        padding: var(--space-2) var(--space-3);
+        font-size: 13px;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .real-time-timeline-container {
+        padding: var(--space-4);
+        margin: var(--space-2);
+    }
+
+    .minutes-row {
+        grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+        gap: 1px;
+        padding: var(--space-3);
+        min-height: 80px;
+    }
+
+    .minute-box {
+        font-size: 8px;
+        border-radius: var(--radius-md);
+    }
+
+
+    .timeline-legend {
+        grid-template-columns: 1fr;
+    }
+
+    .current-time-pointer {
+        top: -35px;
+    }
+
+    .current-time-pointer > div {
+        font-size: 11px;
+        padding: var(--space-2) var(--space-3);
+    }
+}
+
+/* ===========================================
+   🌟 Special Effects - Loading & Skeleton
+   =========================================== */
+.minute-box-skeleton {
+    background: linear-gradient(90deg,
+        rgba(203, 213, 225, 0.4) 0%,
+        rgba(203, 213, 225, 0.6) 50%,
+        rgba(203, 213, 225, 0.4) 100%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+}
+
+@keyframes skeletonShimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.loading-state .minute-box {
+    pointer-events: none;
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion: reduce) {
+    .minute-box,
+    .hour-row,
+    .legend-item,
+    .current-time-pointer {
+        transition: none;
+        animation: none;
+    }
+
+    .minute-box.active-pulse {
+        animation: none;
+        box-shadow: 0 0 20px rgba(251, 146, 60, 0.4);
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .minute-box {
+        border-width: 3px;
+        font-weight: 900;
+    }
+
+    .hour-row {
+        border-width: 2px;
+        border-color: var(--gray-600);
+    }
+
+    .legend-item {
+        border-width: 2px;
+        font-weight: 700;
+    }
+}

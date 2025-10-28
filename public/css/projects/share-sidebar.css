@@ -1,0 +1,511 @@
+/* File Sharing Sidebar Styles */
+
+.share-sidebar {
+    position: fixed;
+    top: 0;
+    right: -550px;
+    width: 550px;
+    height: 100vh;
+    z-index: 1060;
+    transition: all 0.3s ease-in-out;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.share-sidebar.show {
+    right: 0;
+}
+
+.share-sidebar .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    z-index: -1;
+}
+
+.share-sidebar .sidebar-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.share-sidebar .sidebar-content {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+}
+
+.share-sidebar .sidebar-header {
+    padding: 24px;
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%);
+    border-bottom: 1px solid #563d7c;
+    flex-shrink: 0;
+    color: white;
+}
+
+.share-sidebar .sidebar-header h5 {
+    color: white !important;
+}
+
+.share-sidebar .sidebar-header small {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.share-sidebar .sidebar-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.share-sidebar .sidebar-icon.bg-primary {
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.share-sidebar .sidebar-body {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+.share-sidebar .sidebar-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.share-sidebar .sidebar-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.share-sidebar .sidebar-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.share-sidebar .sidebar-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Form Enhancements */
+.share-sidebar .form-control {
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.share-sidebar .form-control:focus {
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+
+.share-sidebar .form-label {
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.share-sidebar .form-text {
+    color: #6c757d;
+    font-size: 11px;
+}
+
+
+
+/* Selected Users */
+.share-sidebar .selected-users-list .badge {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.share-sidebar .selected-users-list .badge.bg-primary {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+}
+
+.share-sidebar .selected-users-list .badge .btn-close {
+    font-size: 8px;
+    filter: invert(1);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+}
+
+.share-sidebar .selected-users-list .badge .btn-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Selected Files List */
+.share-sidebar .selected-files-list {
+    min-height: 60px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.share-sidebar .selected-files-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.share-sidebar .selected-files-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+.share-sidebar .selected-files-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+/* File Item in Selection */
+.share-sidebar .file-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.share-sidebar .file-item i {
+    margin-right: 8px;
+    color: #6f42c1;
+}
+
+.share-sidebar .file-item .file-name {
+    flex: 1;
+    font-weight: 500;
+    color: #495057;
+}
+
+.share-sidebar .file-item .file-size {
+    color: #6c757d;
+    font-size: 11px;
+}
+
+/* Button Styles */
+.share-sidebar .btn {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.share-sidebar .btn-primary {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3) !important;
+}
+
+.share-sidebar .btn-primary:hover {
+    background: linear-gradient(135deg, #563d7c 0%, #6f42c1 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(111, 66, 193, 0.4) !important;
+}
+
+.share-sidebar .btn-primary:disabled {
+    background: #6c757d;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.share-sidebar .btn-outline-secondary {
+    border: 1px solid #6c757d;
+    color: #6c757d;
+}
+
+.share-sidebar .btn-outline-secondary:hover {
+    background: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    transform: translateY(-1px);
+}
+
+
+
+/* Animation for showing sidebar */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.share-sidebar.show .sidebar-content {
+    animation: slideInRight 0.3s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .share-sidebar {
+        width: 100vw;
+        right: -100vw;
+    }
+
+    .share-sidebar .sidebar-header {
+        padding: 20px;
+    }
+
+    .share-sidebar .sidebar-body {
+        padding: 20px;
+    }
+
+    .share-sidebar .sidebar-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}
+
+/* Hide elements when sidebar is visible */
+body.share-sidebar-open {
+    overflow: hidden;
+}
+
+/* Multi-share toolbar */
+.multi-share-toolbar.bg-primary {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+}
+
+/* Override any bg-primary within share sidebar with maximum specificity */
+.share-sidebar .bg-primary,
+#shareSidebar .bg-primary,
+div#shareSidebar .sidebar-header .bg-primary,
+div.share-sidebar .sidebar-icon.bg-primary {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+    background-color: #6f42c1 !important;
+}
+
+/* Loading states */
+.share-sidebar .btn .fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Search Input Enhancement */
+.share-sidebar #userSearchInput {
+    background: white;
+    border: 1px solid #e9ecef;
+    padding: 12px 16px 12px 40px;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3e%3cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: 12px center;
+}
+
+.share-sidebar #userSearchInput:focus {
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236f42c1' viewBox='0 0 16 16'%3e%3cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3e%3c/svg%3e");
+}
+
+/* FINAL OVERRIDE - Maximum priority for purple header */
+#shareSidebar .sidebar-icon.bg-primary,
+.share-sidebar .sidebar-header .sidebar-icon.bg-primary,
+div#shareSidebar div.sidebar-header div.sidebar-icon.bg-primary {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+    background-color: #6f42c1 !important;
+    border: none !important;
+}
+
+/* Force purple on any bg-primary in share sidebar - NUCLEAR OPTION */
+#shareSidebar .bg-primary,
+#shareSidebar *[class*="bg-primary"],
+div[id="shareSidebar"] .bg-primary {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+    background-color: #6f42c1 !important;
+}
+
+/* Clear any potential interference */
+#shareSidebar .sidebar-icon {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%) !important;
+}
+
+/* CSS Styles to replace inline styles */
+.share-sidebar .form-label.fw-semibold.text-muted {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.share-sidebar .selected-files-list {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    min-height: 50px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.share-sidebar #userSearchInput {
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.share-sidebar #userSearchInput:focus {
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25), 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.share-sidebar .users-selection-container {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.share-sidebar .selected-users-container h6 {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.share-sidebar .form-label:not(.fw-semibold) {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.share-sidebar #shareExpiration,
+.share-sidebar #shareDescription {
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.share-sidebar .d-flex.gap-2.pt-3 {
+    border-top: 1px solid #e9ecef;
+}
+
+.share-sidebar .btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.share-sidebar #confirmShareBtn {
+    flex: 1;
+}
+
+/* Search Results Styling */
+.share-sidebar .search-results {
+    border-radius: 8px;
+    background: transparent;
+    display: none; /* مخفي افتراضياً */
+    max-height: none;
+    overflow: visible;
+}
+
+.share-sidebar .search-user-item {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 8px;
+}
+
+.share-sidebar .search-user-item:hover {
+    background: #f8f9fa;
+    border-color: #6f42c1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.15);
+}
+
+.share-sidebar .search-user-item.selected {
+    background: linear-gradient(135deg, rgba(111, 66, 193, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+    border-color: #6f42c1;
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.25);
+    transform: translateY(-1px);
+}
+
+.share-sidebar .search-user-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Add User Button */
+.share-sidebar #addUserBtn {
+    min-width: 80px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.share-sidebar #addUserBtn:not(:disabled) {
+    background: linear-gradient(135deg, #6f42c1 0%, #8a2be2 100%);
+    border-color: #6f42c1;
+    color: white;
+}
+
+.share-sidebar #addUserBtn:not(:disabled):hover {
+    background: linear-gradient(135deg, #563d7c 0%, #6f42c1 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+}
+
+.share-sidebar #addUserBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Selected Users Container Animation */
+.share-sidebar .selected-users-container {
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.share-sidebar .selected-users-container:not(.d-none) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.share-sidebar .selected-users-list .badge {
+    animation: fadeInBadge 0.3s ease;
+}
+
+@keyframes fadeInBadge {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

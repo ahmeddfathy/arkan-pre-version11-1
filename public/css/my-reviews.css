@@ -1,0 +1,319 @@
+/* My Reviews styles */
+:root {
+    --primary-color: #3f9edc; /* Darker blue from Arkan logo for better contrast */
+    --primary-dark: #2d7fb6;
+    --secondary-color: #333333; /* Darker gray for better contrast */
+    --success-color: #2bb36a; /* Darker green */
+    --danger-color: #e74a45; /* Slightly darker red */
+    --warning-color: #f6b517; /* Deeper yellow */
+    --info-color: #64b5e6; /* Slightly darker info blue */
+    --dark-color: #333333;
+    --light-color: #ffffff; /* Pure white for maximum contrast */
+    --border-color: #d9e6f2;
+    --body-bg: #f2f7fc;
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Container */
+.my-reviews-container {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(90, 185, 234, 0.12);
+    margin-bottom: 30px;
+    overflow: hidden;
+    border: 1px solid rgba(90, 185, 234, 0.15);
+}
+
+/* Header */
+.my-reviews-header {
+    padding: 25px 30px;
+    background: linear-gradient(
+        to right,
+        #3f9edc,
+        #2d7fb6
+    ); /* Darker gradient for better contrast */
+    color: white;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.my-reviews-header h2 {
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Card */
+.my-reviews-card {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.my-reviews-card-header {
+    padding: 18px 25px;
+    background-color: #edf6fd; /* Lighter background to contrast with darker text */
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.my-reviews-card-header span {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #222222; /* Darker text for better readability */
+}
+
+.my-reviews-card-body {
+    padding: 25px;
+}
+
+/* Form styling */
+.my-reviews-form-group {
+    margin-bottom: 1.2rem;
+}
+
+.my-reviews-form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600; /* Bolder font for better contrast */
+    color: #222222; /* Darker text */
+}
+
+.my-reviews-form-control {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #444444; /* Darker text in forms */
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #d9e6f2;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.my-reviews-form-control:focus {
+    color: #333333;
+    background-color: #fff;
+    border-color: #3f9edc;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(63, 158, 220, 0.25);
+}
+
+/* Button styling */
+.my-reviews-btn {
+    display: inline-block;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.my-reviews-btn-primary {
+    color: white;
+    background-color: #3f9edc; /* Darker blue for better contrast */
+    border-color: #3f9edc;
+}
+
+.my-reviews-btn-primary:hover {
+    color: white;
+    background-color: #2d7fb6; /* Even darker on hover */
+    border-color: #2d7fb6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(45, 127, 182, 0.25);
+}
+
+.my-reviews-btn-secondary {
+    color: white;
+    background-color: #333333; /* Darker gray for better contrast */
+    border-color: #333333;
+}
+
+.my-reviews-btn-secondary:hover {
+    color: white;
+    background-color: #222222;
+    border-color: #222222;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(34, 34, 34, 0.25);
+}
+
+.my-reviews-btn-info {
+    color: white;
+    background-color: #64b5e6; /* Slightly darker info */
+    border-color: #64b5e6;
+}
+
+.my-reviews-btn-info:hover {
+    color: white;
+    background-color: #4b9bd1;
+    border-color: #4b9bd1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(75, 155, 209, 0.25);
+}
+
+.my-reviews-btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 6px;
+}
+
+/* Table styling */
+.my-reviews-table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #222222; /* Darker text in table */
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.my-reviews-table th,
+.my-reviews-table td {
+    padding: 0.9rem 1.2rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #e6eef5;
+    text-align: center;
+}
+
+.my-reviews-table thead th {
+    vertical-align: middle;
+    background-color: #edf6fd; /* Lighter blue background */
+    color: #222222; /* Darker text for headings */
+    font-weight: 700; /* Bolder headings */
+    border-bottom: 2px solid #3f9edc; /* Darker border */
+    white-space: nowrap;
+}
+
+.my-reviews-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.my-reviews-table tbody tr:hover {
+    background-color: rgba(
+        63,
+        158,
+        220,
+        0.06
+    ); /* Slightly stronger hover effect */
+}
+
+/* Badges for review types */
+.badge-technical,
+.badge-marketing,
+.badge-customer_service,
+.badge-coordination {
+    display: inline-block;
+    padding: 0.35rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.badge-technical {
+    background-color: #3f9edc; /* Match primary color */
+    color: white;
+}
+
+.badge-marketing {
+    background-color: #e74a45; /* Darker red */
+    color: white;
+}
+
+.badge-customer_service {
+    background-color: #2bb36a; /* Darker green */
+    color: white;
+}
+
+.badge-coordination {
+    background-color: #f6b517; /* Darker yellow */
+    color: white;
+}
+
+/* Percentage badges */
+.percentage-badge {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.percentage-high {
+    background-color: rgba(43, 179, 106, 0.18); /* Slightly more opaque */
+    color: #218a52; /* Darker green text */
+}
+
+.percentage-medium {
+    background-color: rgba(246, 181, 23, 0.18); /* Slightly more opaque */
+    color: #c08b10; /* Darker yellow text */
+}
+
+.percentage-low {
+    background-color: rgba(231, 74, 69, 0.18); /* Slightly more opaque */
+    color: #c13732; /* Darker red text */
+}
+
+/* Action buttons */
+.my-reviews-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.my-reviews-actions .my-reviews-btn {
+    transition: all 0.2s ease;
+}
+
+.my-reviews-actions .my-reviews-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .my-reviews-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        box-shadow: none;
+        border: 1px solid #edf2f9;
+    }
+
+    .col-md-4 {
+        margin-bottom: 15px;
+    }
+
+    .my-reviews-header h2 {
+        font-size: 1.4rem;
+    }
+}
