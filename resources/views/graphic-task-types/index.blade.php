@@ -3,167 +3,172 @@
 @section('title', 'إدارة أنواع المهام الجرافيكية')
 
 @push('styles')
-<link href="{{ asset('css/graphic-task-types.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/graphic-task-types.css') }}">
 @endpush
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-lg">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">
-                        <i class="fas fa-palette me-2"></i>
-                        إدارة أنواع المهام الجرافيكية
-                    </h3>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-                        <i class="fas fa-plus me-1"></i>
-                        إضافة نوع جديد
-                    </button>
+<div class="simple-container">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <h1>🎨 إدارة أنواع المهام الجرافيكية</h1>
+                    <p>إدارة وتنظيم أنواع المهام الجرافيكية المختلفة</p>
                 </div>
-
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle me-2"></i>
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover align-middle">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>اسم النوع</th>
-                                    <th>الوصف</th>
-                                    <th>النقاط</th>
-                                    <th>نطاق الوقت (دقيقة)</th>
-                                    <th>الوقت المتوسط</th>
-                                    <th>القسم</th>
-                                    <th>الحالة</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($graphicTaskTypes as $type)
-                                    <tr>
-                                        <td>
-                                            <strong>{{ $type->name }}</strong>
-                                        </td>
-                                        <td>
-                                            {{ Str::limit($type->description, 50) ?? 'لا يوجد وصف' }}
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary fs-6">
-                                                {{ $type->points }} نقطة
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">
-                                                {{ $type->min_minutes }} - {{ $type->max_minutes }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-secondary">
-                                                {{ $type->average_time_formatted }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-dark">{{ $type->department }}</span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm toggle-status-btn {{ $type->is_active ? 'btn-success' : 'btn-danger' }}"
-                                                    data-id="{{ $type->id }}"
-                                                    title="{{ $type->is_active ? 'نشط' : 'غير نشط' }}">
-                                                <i class="fas {{ $type->is_active ? 'fa-check' : 'fa-times' }}"></i>
-                                                {{ $type->is_active ? 'نشط' : 'غير نشط' }}
-                                            </button>
-                                        </td>
-                                        <td>
-                                                                                        <div class="btn-group">
-                                                <button class="btn btn-outline-info btn-sm show-btn"
-                                                        data-id="{{ $type->id }}"
-                                                        title="عرض">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-outline-warning btn-sm edit-btn"
-                                                        data-id="{{ $type->id }}"
-                                                        title="تعديل">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-outline-danger btn-sm delete-btn"
-                                                        data-id="{{ $type->id }}"
-                                                        data-name="{{ $type->name }}"
-                                                        title="حذف">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="text-center py-4">
-                                            <div class="text-muted">
-                                                <i class="fas fa-inbox fa-2x mb-3"></i>
-                                                <p>لا توجد أنواع مهام جرافيكية مضافة بعد</p>
-                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-                                                    <i class="fas fa-plus me-1"></i>
-                                                    إضافة النوع الأول
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    @if($graphicTaskTypes->hasPages())
-                        <div class="d-flex justify-content-center mt-4">
-                            {{ $graphicTaskTypes->links() }}
-                        </div>
-                    @endif
-                </div>
+                <button type="button"
+                        class="services-btn"
+                        style="background: linear-gradient(135deg, #10b981, #059669); color: white; height: fit-content;"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createModal">
+                    <i class="fas fa-plus"></i>
+                    إضافة نوع جديد
+                </button>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">تأكيد الحذف</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <!-- Success/Error Messages -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px; margin-bottom: 20px;">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            <div class="modal-body">
-                <p>هل أنت متأكد من حذف نوع المهمة: <strong id="deleteItemName"></strong>؟</p>
-                <p class="text-warning">
-                    <i class="fas fa-exclamation-triangle me-1"></i>
-                    لا يمكن التراجع عن هذا الإجراء
-                </p>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 12px; margin-bottom: 20px;">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash me-1"></i>
-                        حذف
-                    </button>
-                </form>
+        @endif
+
+        <!-- Table -->
+        <div class="projects-table-container">
+            <div class="table-header">
+                <h2>📋 قائمة أنواع المهام الجرافيكية</h2>
             </div>
+
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th>اسم النوع</th>
+                        <th>الوصف</th>
+                        <th>النقاط</th>
+                        <th>نطاق الوقت</th>
+                        <th>الوقت المتوسط</th>
+                        <th>القسم</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($graphicTaskTypes as $type)
+                    <tr class="project-row">
+                        <td>
+                            <div class="project-info">
+                                <div class="project-avatar">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <div class="project-details">
+                                    <h4>{{ $type->name }}</h4>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="client-info">
+                                {{ Str::limit($type->description, 50) ?? 'لا يوجد وصف' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center;">
+                                <span style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 6px 12px; border-radius: 15px; font-weight: 700; font-size: 0.85rem; display: inline-block;">
+                                    {{ $type->points }} نقطة
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center; color: #6b7280; font-size: 0.9rem;">
+                                {{ $type->min_minutes }} - {{ $type->max_minutes }} دقيقة
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center; font-weight: 600; color: #374151;">
+                                {{ $type->average_time_formatted }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center;">
+                                <span style="background: linear-gradient(135deg, #6b7280, #4b5563); color: white; padding: 6px 12px; border-radius: 15px; font-weight: 600; font-size: 0.85rem; display: inline-block;">
+                                    {{ $type->department }}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center;">
+                                <button class="toggle-status-btn"
+                                        data-id="{{ $type->id }}"
+                                        style="border: none; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; {{ $type->is_active ? 'background: linear-gradient(135deg, #10b981, #059669); color: white;' : 'background: linear-gradient(135deg, #ef4444, #dc2626); color: white;' }}"
+                                        title="{{ $type->is_active ? 'نشط' : 'غير نشط' }}">
+                                    <i class="fas {{ $type->is_active ? 'fa-check' : 'fa-times' }}"></i>
+                                    {{ $type->is_active ? 'نشط' : 'غير نشط' }}
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                                <button class="services-btn show-btn"
+                                        data-id="{{ $type->id }}"
+                                        style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;"
+                                        title="عرض">
+                                    <i class="fas fa-eye"></i>
+                                    عرض
+                                </button>
+                                <button class="services-btn edit-btn"
+                                        data-id="{{ $type->id }}"
+                                        style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;"
+                                        title="تعديل">
+                                    <i class="fas fa-edit"></i>
+                                    تعديل
+                                </button>
+                                <button class="services-btn delete-btn"
+                                        data-id="{{ $type->id }}"
+                                        data-name="{{ $type->name }}"
+                                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;"
+                                        title="حذف">
+                                    <i class="fas fa-trash"></i>
+                                    حذف
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h4>لا توجد أنواع مهام جرافيكية</h4>
+                            <p>لم يتم إضافة أي أنواع مهام جرافيكية بعد</p>
+                            <button type="button"
+                                    class="services-btn"
+                                    style="background: linear-gradient(135deg, #10b981, #059669); color: white;"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#createModal">
+                                <i class="fas fa-plus"></i>
+                                إضافة النوع الأول
+                            </button>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            @if($graphicTaskTypes->hasPages())
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $graphicTaskTypes->links() }}
+                </div>
+            @endif
         </div>
     </div>
 </div>
@@ -440,6 +445,7 @@
 </div>
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Handle delete button clicks
@@ -448,10 +454,45 @@ document.addEventListener('DOMContentLoaded', function() {
             const id = this.dataset.id;
             const name = this.dataset.name;
 
-            document.getElementById('deleteItemName').textContent = name;
-            document.getElementById('deleteForm').action = `/graphic-task-types/${id}`;
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                html: `هل تريد حذف نوع المهمة: <strong>${name}</strong>؟<br><span style="color: #f59e0b;"><i class="fas fa-exclamation-triangle me-1"></i>لا يمكن التراجع عن هذا الإجراء</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'جاري الحذف...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/graphic-task-types/${id}`;
+
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
+
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'DELETE';
+
+                    form.appendChild(csrfToken);
+                    form.appendChild(methodField);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
         });
     });
 
@@ -460,9 +501,18 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const id = this.dataset.id;
 
+            Swal.fire({
+                title: 'جاري التحميل...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             fetch(`/graphic-task-types/${id}`)
                 .then(response => response.json())
                 .then(data => {
+                    Swal.close();
                     if (data.success) {
                         const item = data.data;
 
@@ -485,7 +535,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('حدث خطأ أثناء تحميل البيانات');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'حدث خطأ أثناء تحميل البيانات'
+                    });
                 });
         });
     });
@@ -495,9 +549,18 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const id = this.dataset.id;
 
+            Swal.fire({
+                title: 'جاري التحميل...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             fetch(`/graphic-task-types/${id}`)
                 .then(response => response.json())
                 .then(data => {
+                    Swal.close();
                     if (data.success) {
                         const item = data.data;
 
@@ -529,7 +592,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('حدث خطأ أثناء تحميل البيانات');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'حدث خطأ أثناء تحميل البيانات'
+                    });
                 });
         });
     });
@@ -539,6 +606,15 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const id = this.dataset.id;
             const currentBtn = this;
+            const isActive = currentBtn.textContent.includes('نشط');
+
+            Swal.fire({
+                title: 'جاري التحديث...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
             fetch(`/graphic-task-types/${id}/toggle-status`, {
                 method: 'POST',
@@ -553,22 +629,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     // Update button appearance
                     if (data.is_active) {
-                        currentBtn.className = 'btn btn-sm toggle-status-btn btn-success';
+                        currentBtn.style.cssText = 'border: none; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(135deg, #10b981, #059669); color: white;';
                         currentBtn.innerHTML = '<i class="fas fa-check"></i> نشط';
                         currentBtn.title = 'نشط';
                     } else {
-                        currentBtn.className = 'btn btn-sm toggle-status-btn btn-danger';
+                        currentBtn.style.cssText = 'border: none; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(135deg, #ef4444, #dc2626); color: white;';
                         currentBtn.innerHTML = '<i class="fas fa-times"></i> غير نشط';
                         currentBtn.title = 'غير نشط';
                     }
 
                     // Show success message
-                    showAlert('success', data.message);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم بنجاح',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('حدث خطأ أثناء تحديث الحالة');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'حدث خطأ أثناء تحديث الحالة'
+                });
             });
         });
     });
@@ -593,23 +679,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateAverage('create');
     updateAverage('edit');
-
-    // Helper function to show alerts
-    function showAlert(type, message) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.innerHTML = `
-            <i class="fas fa-check-circle me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        document.querySelector('.card-body').insertBefore(alertDiv, document.querySelector('.table-responsive'));
-
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 5000);
-    }
 });
 </script>
 @endpush

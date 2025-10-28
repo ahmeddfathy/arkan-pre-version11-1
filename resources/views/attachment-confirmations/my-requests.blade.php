@@ -148,8 +148,8 @@
                                                         <i class="fas fa-file"></i>
                                                     </div>
                                                     <div>
-                                                        <div class="fw-bold" style="font-size: 0.95rem;">{{ $confirmation->attachment->file_name }}</div>
-                                                        @if($confirmation->attachment->description)
+                                                        <div class="fw-bold" style="font-size: 0.95rem;">{{ $confirmation->attachment?->file_name ?? 'ملف محذوف' }}</div>
+                                                        @if($confirmation->attachment?->description)
                                                             <small class="text-muted">{{ Str::limit($confirmation->attachment->description, 50) }}</small>
                                                         @endif
                                                     </div>
@@ -166,6 +166,7 @@
                                                 @endif
                                             </td>
                                             <td>
+                                                @if($confirmation->project)
                                                 <a href="{{ route('projects.show', $confirmation->project->id) }}" class="text-decoration-none">
                                                     <div style="display: inline-block; padding: 0.5rem 1rem; background: #f8f9fa; border-radius: 8px;">
                                                         <div class="fw-bold text-dark" style="font-size: 0.9rem;">{{ $confirmation->project->name }}</div>
@@ -177,8 +178,12 @@
                                                         @endif
                                                     </div>
                                                 </a>
+                                                @else
+                                                <span class="text-muted">مشروع محذوف</span>
+                                                @endif
                                             </td>
                                             <td>
+                                                @if($confirmation->manager)
                                                 <div class="user-info">
                                                     <div class="user-avatar" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
                                                         <i class="fas fa-user-tie"></i>
@@ -188,6 +193,9 @@
                                                         <small class="text-muted">مسؤول المشروع</small>
                                                     </div>
                                                 </div>
+                                                @else
+                                                <span class="text-muted">مستخدم محذوف</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($confirmation->confirmedBy)
@@ -270,6 +278,7 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex flex-wrap justify-content-center gap-1">
+                                                    @if($confirmation->attachment)
                                                     <a href="{{ route('projects.attachments.view', $confirmation->attachment->id) }}"
                                                        target="_blank"
                                                        class="btn btn-sm btn-outline-primary"
@@ -283,6 +292,9 @@
                                                         <i class="fas fa-download"></i>
                                                         تحميل
                                                     </a>
+                                                    @else
+                                                    <span class="badge bg-secondary">ملف محذوف</span>
+                                                    @endif
                                                     @if($confirmation->notes)
                                                         <button type="button"
                                                                 class="btn btn-sm btn-outline-info"
@@ -301,7 +313,7 @@
                                                         <button type="button"
                                                                 class="btn btn-sm btn-action btn-warning reset-confirmation-btn"
                                                                 data-confirmation-id="{{ $confirmation->id }}"
-                                                                data-attachment-name="{{ $confirmation->attachment->file_name }}">
+                                                                data-attachment-name="{{ $confirmation->attachment?->file_name ?? 'ملف محذوف' }}">
                                                             <i class="fas fa-undo"></i>
                                                             إلغاء الطلب
                                                         </button>
