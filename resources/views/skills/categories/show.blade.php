@@ -3,273 +3,442 @@
 @section('title', 'تفاصيل تصنيف المهارات')
 
 @push('styles')
-<link href="{{ asset('css/skills.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/skills.css') }}">
+<style>
+    .details-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .details-header {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .details-header h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .details-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .details-body {
+        padding: 2rem;
+    }
+
+    .detail-row {
+        padding: 1.5rem;
+        border-bottom: 2px solid #f3f4f6;
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        min-width: 180px;
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-label i {
+        color: #667eea;
+        font-size: 1.1rem;
+    }
+
+    .detail-value {
+        flex: 1;
+        color: #1f2937;
+    }
+
+    .description-box {
+        background: #f9fafb;
+        border-right: 4px solid #667eea;
+        padding: 1rem;
+        border-radius: 8px;
+        line-height: 1.6;
+    }
+
+    .no-description {
+        color: #9ca3af;
+        font-style: italic;
+    }
+
+    .actions-footer {
+        background: #f9fafb;
+        padding: 1.5rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border-top: 2px solid #e5e7eb;
+    }
+
+    .skills-table-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .quick-action-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        text-decoration: none;
+        display: block;
+    }
+
+    .quick-action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .quick-action-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .quick-action-title {
+        color: #1f2937;
+        font-weight: 600;
+        margin: 0;
+    }
+</style>
 @endpush
 
 @section('content')
-<div class="skills-container">
+<div class="simple-container">
     <div class="container">
-        <div class="row justify-content-center fade-in">
-            <div class="col-md-8">
-                <div class="card skill-details">
-                    <div class="card-header skills-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-list-alt ml-2"></i>
-                            تفاصيل التصنيف: <span class="font-weight-normal">{{ $skillCategory->name }}</span>
-                        </h5>
-                        <div class="d-flex flex-wrap">
-                            <a href="{{ route('skill-categories.edit', $skillCategory) }}" class="btn btn-light btn-sm ml-2 mb-1">
-                                <i class="fas fa-edit ml-1"></i>
-                                تعديل
-                            </a>
-                            <a href="{{ route('skill-categories.index') }}" class="btn btn-light btn-sm mb-1">
-                                <i class="fas fa-arrow-right ml-1"></i>
-                                العودة للقائمة
-                            </a>
-                        </div>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📖 تفاصيل التصنيف</h1>
+            <p>معلومات تفصيلية عن تصنيف المهارات</p>
+        </div>
+
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <!-- Statistics Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">{{ $skillCategory->skills->count() }}</div>
+                <div class="stat-label">عدد المهارات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    {{ $skillCategory->created_at->diffInDays(now()) }}
+                </div>
+                <div class="stat-label">عمر التصنيف (أيام)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    @if($skillCategory->skills->count() > 0)
+                        مستخدم
+                    @else
+                        فارغ
+                    @endif
+                </div>
+                <div class="stat-label">الحالة</div>
+            </div>
+        </div>
+
+        <!-- Details Container -->
+        <div class="details-container">
+            <div class="details-header">
+                <h2>{{ $skillCategory->name }}</h2>
+                <p>معلومات كاملة عن التصنيف</p>
+            </div>
+
+            <div class="details-body">
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <i class="fas fa-tag"></i>
+                        اسم التصنيف:
                     </div>
+                    <div class="detail-value">
+                        <h4 style="margin: 0; color: #667eea;">{{ $skillCategory->name }}</h4>
+                    </div>
+                </div>
 
-                    <div class="card-body">
-                        @if (session('success'))
-                            <div class="alert alert-success slide-up">
-                                <i class="fas fa-check-circle ml-2"></i>
-                                {{ session('success') }}
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <i class="fas fa-align-left"></i>
+                        الوصف:
+                    </div>
+                    <div class="detail-value">
+                        @if($skillCategory->description)
+                            <div class="description-box">
+                                {{ $skillCategory->description }}
                             </div>
+                        @else
+                            <span class="no-description">
+                                <i class="fas fa-minus-circle ml-1"></i>
+                                لا يوجد وصف متاح لهذا التصنيف
+                            </span>
                         @endif
+                    </div>
+                </div>
 
-                        @if (session('error'))
-                            <div class="alert alert-danger slide-up">
-                                <i class="fas fa-exclamation-triangle ml-2"></i>
-                                {{ session('error') }}
-                            </div>
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <i class="fas fa-star"></i>
+                        عدد المهارات:
+                    </div>
+                    <div class="detail-value">
+                        @if($skillCategory->skills->count() > 0)
+                            <span class="status-badge status-completed">
+                                <i class="fas fa-trophy ml-1"></i>
+                                {{ $skillCategory->skills->count() }} مهارة
+                            </span>
+                        @else
+                            <span class="status-badge status-cancelled">
+                                <i class="fas fa-inbox ml-1"></i>
+                                لا توجد مهارات
+                            </span>
                         @endif
+                    </div>
+                </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-4 font-weight-bold text-md-right">
-                                <i class="fas fa-tag text-info ml-1"></i>
-                                اسم التصنيف:
-                            </div>
-                            <div class="col-md-8">
-                                <h6 class="text-primary mb-0">{{ $skillCategory->name }}</h6>
-                            </div>
-                        </div>
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <i class="fas fa-toggle-on"></i>
+                        حالة التصنيف:
+                    </div>
+                    <div class="detail-value">
+                        @if($skillCategory->skills->count() > 0)
+                            <span class="status-badge status-in-progress">
+                                <i class="fas fa-check-circle ml-1"></i>
+                                مستخدم
+                            </span>
+                        @else
+                            <span class="status-badge status-new">
+                                <i class="fas fa-times-circle ml-1"></i>
+                                غير مستخدم
+                            </span>
+                            <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle ml-1"></i>
+                                لم يتم إضافة أي مهارات لهذا التصنيف بعد
+                            </small>
+                        @endif
+                    </div>
+                </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-4 font-weight-bold text-md-right">
-                                <i class="fas fa-align-left text-secondary ml-1"></i>
-                                الوصف:
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <i class="fas fa-calendar-plus"></i>
+                        تاريخ الإنشاء:
+                    </div>
+                    <div class="detail-value">
+                        <span class="status-badge status-new">
+                            <i class="fas fa-clock ml-1"></i>
+                            {{ $skillCategory->created_at->format('d/m/Y') }} في {{ $skillCategory->created_at->format('H:i') }}
+                        </span>
+                        <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
+                            منذ {{ $skillCategory->created_at->diffForHumans() }}
+                        </small>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <i class="fas fa-calendar-check"></i>
+                        آخر تحديث:
+                    </div>
+                    <div class="detail-value">
+                        <span class="status-badge status-in-progress">
+                            <i class="fas fa-clock ml-1"></i>
+                            {{ $skillCategory->updated_at->format('d/m/Y') }} في {{ $skillCategory->updated_at->format('H:i') }}
+                        </span>
+                        <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
+                            منذ {{ $skillCategory->updated_at->diffForHumans() }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-footer">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <form action="{{ route('skill-categories.destroy', $skillCategory) }}"
+                          method="POST"
+                          id="deleteForm"
+                          data-category-name="{{ $skillCategory->name }}"
+                          data-skills-count="{{ $skillCategory->skills->count() }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="services-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                            <i class="fas fa-trash-alt ml-1"></i>
+                            حذف التصنيف
+                        </button>
+                    </form>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="{{ route('skill-categories.edit', $skillCategory) }}" class="services-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                        <i class="fas fa-edit ml-1"></i>
+                        تعديل التصنيف
+                    </a>
+                    <a href="{{ route('skills.create') }}?category_id={{ $skillCategory->id }}" class="services-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        <i class="fas fa-plus-circle ml-1"></i>
+                        إضافة مهارة جديدة
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills Table -->
+        @if($skillCategory->skills->count() > 0)
+        <div class="skills-table-section">
+            <div class="table-header">
+                <h2>⭐ المهارات في هذا التصنيف ({{ $skillCategory->skills->count() }})</h2>
+            </div>
+
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th>المهارة</th>
+                        <th>النقاط القصوى</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($skillCategory->skills as $skill)
+                    <tr class="project-row">
+                        <td>
+                            <div class="project-info">
+                                <div class="project-avatar">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="project-details">
+                                    <h4>{{ $skill->name }}</h4>
+                                    @if($skill->description)
+                                        <p>{{ Str::limit($skill->description, 60) }}</p>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="col-md-8">
-                                @if($skillCategory->description)
-                                    <div class="alert alert-light border-left border-primary">
-                                        {{ $skillCategory->description }}
-                                    </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center;">
+                                <span class="status-badge status-in-progress">
+                                    <i class="fas fa-trophy ml-1"></i>
+                                    {{ $skill->max_points }} نقطة
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center;">
+                                @if($skill->is_active)
+                                    <span class="status-badge status-completed">
+                                        <i class="fas fa-check-circle ml-1"></i>
+                                        نشط
+                                    </span>
                                 @else
-                                    <span class="text-muted">
-                                        <i class="fas fa-minus-circle ml-1"></i>
-                                        لا يوجد وصف متاح لهذا التصنيف
+                                    <span class="status-badge status-cancelled">
+                                        <i class="fas fa-times-circle ml-1"></i>
+                                        غير نشط
                                     </span>
                                 @endif
                             </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-md-4 font-weight-bold text-md-right">
-                                <i class="fas fa-star text-warning ml-1"></i>
-                                عدد المهارات:
-                            </div>
-                            <div class="col-md-8">
-                                <span class="points-badge">
-                                    <i class="fas fa-trophy ml-1"></i>
-                                    {{ $skillCategory->skills->count() }} مهارة
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-md-4 font-weight-bold text-md-right">
-                                <i class="fas fa-toggle-on text-success ml-1"></i>
-                                حالة التصنيف:
-                            </div>
-                            <div class="col-md-8">
-                                <span class="status-badge {{ $skillCategory->skills->count() > 0 ? 'active' : 'inactive' }}">
-                                    <i class="fas fa-{{ $skillCategory->skills->count() > 0 ? 'check-circle' : 'times-circle' }} ml-1"></i>
-                                    {{ $skillCategory->skills->count() > 0 ? 'مستخدم' : 'غير مستخدم' }}
-                                </span>
-                                @if($skillCategory->skills->count() == 0)
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="fas fa-info-circle ml-1"></i>
-                                        لم يتم إضافة أي مهارات لهذا التصنيف بعد
-                                    </small>
-                                @endif
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <div class="row mb-4">
-                            <div class="col-md-4 font-weight-bold text-md-right">
-                                <i class="fas fa-calendar-plus text-info ml-1"></i>
-                                تاريخ الإنشاء:
-                            </div>
-                            <div class="col-md-8">
-                                <span class="badge badge-light">
-                                    <i class="fas fa-clock ml-1"></i>
-                                    {{ $skillCategory->created_at->format('d/m/Y') }} في {{ $skillCategory->created_at->format('H:i') }}
-                                </span>
-                                <small class="text-muted d-block mt-1">
-                                    منذ {{ $skillCategory->created_at->diffForHumans() }}
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-md-4 font-weight-bold text-md-right">
-                                <i class="fas fa-calendar-check text-success ml-1"></i>
-                                آخر تحديث:
-                            </div>
-                            <div class="col-md-8">
-                                <span class="badge badge-light">
-                                    <i class="fas fa-clock ml-1"></i>
-                                    {{ $skillCategory->updated_at->format('d/m/Y') }} في {{ $skillCategory->updated_at->format('H:i') }}
-                                </span>
-                                <small class="text-muted d-block mt-1">
-                                    منذ {{ $skillCategory->updated_at->diffForHumans() }}
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-footer bg-light">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <form action="{{ route('skill-categories.destroy', $skillCategory) }}" method="POST" class="d-inline" id="deleteForm"
-                                      data-category-name="{{ $skillCategory->name }}" data-skills-count="{{ $skillCategory->skills->count() }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" id="deleteBtn">
-                                        <i class="fas fa-trash-alt ml-1"></i>
-                                        حذف التصنيف
-                                    </button>
-                                </form>
-                            </div>
-                            <div>
-                                <a href="{{ route('skill-categories.edit', $skillCategory) }}" class="btn btn-primary ml-2">
-                                    <i class="fas fa-edit ml-1"></i>
-                                    تعديل التصنيف
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <a href="{{ route('skills.show', $skill) }}" class="services-btn" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                                    <i class="fas fa-eye"></i>
+                                    عرض
                                 </a>
-                                <a href="{{ route('skills.create') }}?category_id={{ $skillCategory->id }}" class="btn btn-success">
-                                    <i class="fas fa-plus-circle ml-1"></i>
-                                    إضافة مهارة جديدة
+                                <a href="{{ route('skills.edit', $skill) }}" class="services-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                    <i class="fas fa-edit"></i>
+                                    تعديل
                                 </a>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
 
-                @if($skillCategory->skills->count() > 0)
-                <!-- Skills Table Card -->
-                <div class="card mt-4 slide-up" style="animation-delay: 0.2s;">
-                    <div class="card-header">
-                        <h6 class="mb-0 text-white">
-                            <i class="fas fa-star ml-1"></i>
-                            المهارات في هذا التصنيف ({{ $skillCategory->skills->count() }})
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <i class="fas fa-star ml-1"></i>
-                                            المهارة
-                                        </th>
-                                        <th>
-                                            <i class="fas fa-trophy ml-1"></i>
-                                            النقاط القصوى
-                                        </th>
-                                        <th>
-                                            <i class="fas fa-toggle-on ml-1"></i>
-                                            الحالة
-                                        </th>
-                                        <th>
-                                            <i class="fas fa-cogs ml-1"></i>
-                                            الإجراءات
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($skillCategory->skills as $skill)
-                                        <tr>
-                                            <td>
-                                                <strong class="text-primary">{{ $skill->name }}</strong>
-                                                @if($skill->description)
-                                                    <br>
-                                                    <small class="text-muted">{{ \Illuminate\Support\Str::limit($skill->description, 60) }}</small>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <span class="points-badge">
-                                                    <i class="fas fa-star ml-1"></i>
-                                                    {{ $skill->max_points }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge {{ $skill->is_active ? 'active' : 'inactive' }}">
-                                                    <i class="fas fa-{{ $skill->is_active ? 'check-circle' : 'times-circle' }} ml-1"></i>
-                                                    {{ $skill->is_active ? 'نشط' : 'غير نشط' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ route('skills.show', $skill) }}" class="btn btn-sm btn-info">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="{{ route('skills.edit', $skill) }}" class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+        <!-- Quick Actions -->
+        <div class="projects-table-container">
+            <div class="table-header">
+                <h2>⚡ إجراءات سريعة</h2>
+            </div>
+            <div style="padding: 2rem;">
+                <div class="quick-actions-grid">
+                    <a href="{{ route('skill-categories.edit', $skillCategory) }}" class="quick-action-card">
+                        <div class="quick-action-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white;">
+                            <i class="fas fa-edit"></i>
                         </div>
-                    </div>
-                </div>
-                @endif
+                        <h4 class="quick-action-title">تعديل التصنيف</h4>
+                    </a>
 
-                <!-- Quick Actions Card -->
-                <div class="card mt-3 slide-up" style="animation-delay: 0.4s;">
-                    <div class="card-header">
-                        <h6 class="mb-0 text-white">
-                            <i class="fas fa-bolt ml-1"></i>
-                            إجراءات سريعة
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4 mb-2">
-                                <a href="{{ route('skill-categories.edit', $skillCategory) }}" class="btn btn-outline-primary btn-block">
-                                    <i class="fas fa-edit ml-1"></i>
-                                    تعديل التصنيف
-                                </a>
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <a href="{{ route('skills.create') }}?category_id={{ $skillCategory->id }}" class="btn btn-outline-success btn-block">
-                                    <i class="fas fa-plus-circle ml-1"></i>
-                                    إضافة مهارة جديدة
-                                </a>
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <a href="{{ route('skills.index') }}" class="btn btn-outline-info btn-block">
-                                    <i class="fas fa-list ml-1"></i>
-                                    عرض جميع المهارات
-                                </a>
-                            </div>
+                    <a href="{{ route('skills.create') }}?category_id={{ $skillCategory->id }}" class="quick-action-card">
+                        <div class="quick-action-icon" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                            <i class="fas fa-plus-circle"></i>
                         </div>
-                    </div>
+                        <h4 class="quick-action-title">إضافة مهارة جديدة</h4>
+                    </a>
+
+                    <a href="{{ route('skills.index') }}" class="quick-action-card">
+                        <div class="quick-action-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <h4 class="quick-action-title">عرض جميع المهارات</h4>
+                    </a>
+
+                    <a href="{{ route('skill-categories.index') }}" class="quick-action-card">
+                        <div class="quick-action-icon" style="background: linear-gradient(135deg, #6b7280, #4b5563); color: white;">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <h4 class="quick-action-title">العودة للتصنيفات</h4>
+                    </a>
                 </div>
             </div>
         </div>
@@ -278,12 +447,11 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const deleteForm = document.getElementById('deleteForm');
-    const deleteBtn = document.getElementById('deleteBtn');
 
-    // Enhanced delete confirmation
     deleteForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -291,32 +459,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const skillsCount = parseInt(deleteForm.dataset.skillsCount);
 
         if (skillsCount > 0) {
-            alert('لا يمكن حذف تصنيف "' + categoryName + '" لأنه يحتوي على ' + skillsCount + ' مهارة.\n\nيجب حذف أو نقل جميع المهارات أولاً.');
+            Swal.fire({
+                icon: 'error',
+                title: 'لا يمكن الحذف',
+                html: 'لا يمكن حذف تصنيف "<strong>' + categoryName + '</strong>" لأنه يحتوي على <strong>' + skillsCount + '</strong> مهارة.<br><br>يجب حذف أو نقل جميع المهارات أولاً.',
+                confirmButtonColor: '#ef4444'
+            });
             return false;
         }
 
-        let confirmMessage = 'هل أنت متأكد من رغبتك في حذف تصنيف "' + categoryName + '"?\n\n';
-        confirmMessage += 'تحذير: هذا الإجراء لا يمكن التراجع عنه!\n\n';
-        confirmMessage += 'سيتم حذف:\n';
-        confirmMessage += '• بيانات التصنيف\n';
-        confirmMessage += '• جميع المراجع المرتبطة به\n\n';
-        confirmMessage += 'اكتب "حذف" للتأكيد:';
-
-        const userInput = prompt(confirmMessage);
-
-        if (userInput === 'حذف') {
-            // Add loading state
-            deleteBtn.classList.add('loading');
-            deleteBtn.disabled = true;
-
-            // Submit the form
-            this.submit();
-        } else if (userInput !== null) {
-            alert('لم يتم حذف التصنيف. يجب كتابة "حذف" للتأكيد.');
-        }
+        Swal.fire({
+            title: 'هل أنت متأكد؟',
+            html: 'هل تريد حذف تصنيف "<strong>' + categoryName + '</strong>"؟<br><br>' +
+                  '<span style="color: #dc2626;">تحذير: هذا الإجراء لا يمكن التراجع عنه!</span><br><br>' +
+                  'سيتم حذف:<br>' +
+                  '• بيانات التصنيف<br>' +
+                  '• جميع المراجع المرتبطة به',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'نعم، احذف',
+            cancelButtonText: 'إلغاء',
+            input: 'text',
+            inputPlaceholder: 'اكتب "حذف" للتأكيد',
+            inputValidator: (value) => {
+                if (value !== 'حذف') {
+                    return 'يجب كتابة "حذف" للتأكيد'
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteForm.submit();
+            }
+        });
     });
-
-
 });
 </script>
 @endpush

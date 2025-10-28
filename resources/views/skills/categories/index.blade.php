@@ -3,237 +3,183 @@
 @section('title', 'تصنيفات المهارات')
 
 @push('styles')
-<link href="{{ asset('css/skills.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/skills.css') }}">
 @endpush
 
 @section('content')
-<div class="skills-container">
+<div class="simple-container">
     <div class="container">
-        <div class="row justify-content-center fade-in">
-            <div class="col-md-12">
-                <div class="card skills-table">
-                    <div class="card-header skills-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-list-alt ml-2"></i>
-                            تصنيفات المهارات
-                        </h5>
-                        <div class="d-flex flex-wrap">
-                            <a href="{{ route('skills.index') }}" class="btn btn-light btn-sm ml-2 mb-1">
-                                <i class="fas fa-star ml-1"></i>
-                                المهارات
-                            </a>
-                            <a href="{{ route('skill-categories.create') }}" class="btn btn-light btn-sm mb-1">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📚 تصنيفات المهارات</h1>
+            <p>إدارة وتنظيم تصنيفات المهارات بسهولة</p>
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <!-- Quick Actions Section -->
+        <div class="filters-section">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <a href="{{ route('skill-categories.create') }}" class="search-btn" style="width: 100%; text-decoration: none; text-align: center;">
+                        <i class="fas fa-plus-circle ml-1"></i>
+                        إضافة تصنيف جديد
+                    </a>
+                </div>
+                <div class="filter-group">
+                    <a href="{{ route('skills.index') }}" class="clear-filters-btn" style="width: 100%; text-decoration: none; text-align: center; background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="fas fa-star ml-1"></i>
+                        المهارات
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Row -->
+        @if($categories->count() > 0)
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">{{ $categories->count() }}</div>
+                <div class="stat-label">إجمالي التصنيفات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ $categories->sum('skills_count') }}</div>
+                <div class="stat-label">إجمالي المهارات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ $categories->where('skills_count', '>', 0)->count() }}</div>
+                <div class="stat-label">التصنيفات المستخدمة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ $categories->where('skills_count', 0)->count() }}</div>
+                <div class="stat-label">تصنيفات فارغة</div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Categories Table -->
+        <div class="projects-table-container">
+            <div class="table-header">
+                <h2>📋 قائمة التصنيفات</h2>
+            </div>
+
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>التصنيف</th>
+                        <th>عدد المهارات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($categories as $index => $category)
+                    <tr class="project-row">
+                        <td>
+                            <div class="project-avatar">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="project-info">
+                                <div class="project-details" style="width: 100%;">
+                                    <h4>{{ $category->name }}</h4>
+                                    @if($category->description)
+                                        <p>{{ Str::limit($category->description, 100) }}</p>
+                                    @else
+                                        <p style="color: #9ca3af; font-style: italic;">لا يوجد وصف متاح</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center;">
+                                @if($category->skills_count > 0)
+                                    <span class="status-badge status-completed">
+                                        <i class="fas fa-star ml-1"></i>
+                                        {{ $category->skills_count }} مهارة
+                                    </span>
+                                @else
+                                    <span class="status-badge status-cancelled">
+                                        <i class="fas fa-inbox ml-1"></i>
+                                        فارغ
+                                    </span>
+                                @endif
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                                <a href="{{ route('skill-categories.show', $category) }}"
+                                   class="services-btn"
+                                   style="background: linear-gradient(135deg, #3b82f6, #2563eb);"
+                                   title="عرض التفاصيل">
+                                    <i class="fas fa-eye"></i>
+                                    عرض
+                                </a>
+                                <a href="{{ route('skill-categories.edit', $category) }}"
+                                   class="services-btn"
+                                   style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"
+                                   title="تعديل">
+                                    <i class="fas fa-edit"></i>
+                                    تعديل
+                                </a>
+                                <form action="{{ route('skill-categories.destroy', $category) }}"
+                                      method="POST"
+                                      class="d-inline"
+                                      data-category-name="{{ $category->name }}"
+                                      data-skills-count="{{ $category->skills_count }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="services-btn"
+                                            style="background: linear-gradient(135deg, #ef4444, #dc2626);"
+                                            title="حذف">
+                                        <i class="fas fa-trash"></i>
+                                        حذف
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h4>لا توجد تصنيفات مهارات</h4>
+                            <p>لم يتم إضافة أي تصنيفات للمهارات حتى الآن. ابدأ بإضافة أول تصنيف!</p>
+                            <a href="{{ route('skill-categories.create') }}" class="services-btn" style="margin-top: 1rem;">
                                 <i class="fas fa-plus-circle ml-1"></i>
                                 إضافة تصنيف جديد
                             </a>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        @if (session('success'))
-                            <div class="alert alert-success slide-up">
-                                <i class="fas fa-check-circle ml-2"></i>
-                                {{ session('success') }}
-                            </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="alert alert-danger slide-up">
-                                <i class="fas fa-exclamation-triangle ml-2"></i>
-                                {{ session('error') }}
-                            </div>
-                        @endif
-
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th width="5%">
-                                            <i class="fas fa-hashtag ml-1"></i>
-                                            #
-                                        </th>
-                                        <th width="20%">
-                                            <i class="fas fa-tag ml-1"></i>
-                                            الاسم
-                                        </th>
-                                        <th width="45%">
-                                            <i class="fas fa-align-left ml-1"></i>
-                                            الوصف
-                                        </th>
-                                        <th width="10%">
-                                            <i class="fas fa-star ml-1"></i>
-                                            عدد المهارات
-                                        </th>
-                                        <th width="20%">
-                                            <i class="fas fa-cogs ml-1"></i>
-                                            الإجراءات
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($categories as $index => $category)
-                                        <tr class="slide-up" style="animation-delay: {{ $index * 100 }}ms;">
-                                            <td>
-                                                <span class="badge badge-light">{{ $index + 1 }}</span>
-                                            </td>
-                                            <td>
-                                                <strong class="text-primary">{{ $category->name }}</strong>
-                                            </td>
-                                            <td>
-                                                <span class="text-muted">
-                                                    {{ $category->description ? \Illuminate\Support\Str::limit($category->description, 100) : 'بدون وصف متاح' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="points-badge">
-                                                    <i class="fas fa-star ml-1"></i>
-                                                    {{ $category->skills_count }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ route('skill-categories.show', $category) }}"
-                                                       class="btn btn-sm btn-info"
-                                                       title="عرض التفاصيل">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="{{ route('skill-categories.edit', $category) }}"
-                                                       class="btn btn-sm btn-primary"
-                                                       title="تعديل">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <form action="{{ route('skill-categories.destroy', $category) }}"
-                                                          method="POST"
-                                                          class="d-inline"
-                                                           data-category-name="{{ $category->name }}" data-skills-count="{{ $category->skills_count }}">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit"
-                                                                class="btn btn-sm btn-danger"
-                                                                title="حذف">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center py-5">
-                                                <div class="empty-state">
-                                                    <i class="fas fa-list-alt"></i>
-                                                    <h4 class="mt-3 mb-2">لا توجد تصنيفات مهارات</h4>
-                                                    <p class="text-muted mb-4">لم يتم إضافة أي تصنيفات للمهارات حتى الآن. ابدأ بإضافة أول تصنيف!</p>
-                                                    <a href="{{ route('skill-categories.create') }}" class="btn btn-primary">
-                                                        <i class="fas fa-plus-circle ml-1"></i>
-                                                        إضافة تصنيف جديد
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        @if($categories->count() > 0)
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-chart-bar ml-2"></i>
-                                            إحصائيات التصنيفات
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row text-center">
-                                            <div class="col-md-4">
-                                                <div class="alert alert-primary mb-0">
-                                                    <strong style="font-size: 1.5rem;">{{ $categories->count() }}</strong>
-                                                    <br>
-                                                    <small>إجمالي التصنيفات</small>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="alert alert-success mb-0">
-                                                    <strong style="font-size: 1.5rem;">{{ $categories->sum('skills_count') }}</strong>
-                                                    <br>
-                                                    <small>إجمالي المهارات</small>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="alert alert-info mb-0">
-                                                    <strong style="font-size: 1.5rem;">{{ $categories->where('skills_count', '>', 0)->count() }}</strong>
-                                                    <br>
-                                                    <small>التصنيفات المستخدمة</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Help Card -->
-                <div class="card mt-4 slide-up" style="animation-delay: 0.3s;">
-                    <div class="card-header">
-                        <h6 class="mb-0 text-white">
-                            <i class="fas fa-question-circle ml-1"></i>
-                            نصائح لإدارة تصنيفات المهارات
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <ul class="list-unstyled">
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success ml-1"></i>
-                                        قم بتنظيم المهارات في تصنيفات منطقية
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success ml-1"></i>
-                                        استخدم أسماء واضحة ومفهومة للتصنيفات
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success ml-1"></i>
-                                        اكتب وصفاً مفيداً لكل تصنيف
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="list-unstyled">
-                                    <li class="mb-2">
-                                        <i class="fas fa-exclamation-triangle text-warning ml-1"></i>
-                                        لا يمكن حذف التصنيفات التي تحتوي على مهارات
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-info-circle text-info ml-1"></i>
-                                        يمكنك تعديل التصنيفات في أي وقت
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-star text-warning ml-1"></i>
-                                        التصنيفات تساعد في تنظيم عملية التقييم
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
-
     // Handle delete forms
     document.addEventListener('submit', function(e) {
         const form = e.target;
@@ -244,21 +190,36 @@ document.addEventListener('DOMContentLoaded', function() {
             const skillsCount = parseInt(form.dataset.skillsCount);
 
             if (skillsCount > 0) {
-                alert('لا يمكن حذف تصنيف "' + categoryName + '" لأنه يحتوي على ' + skillsCount + ' مهارة.\n\nيجب حذف أو نقل جميع المهارات أولاً.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'لا يمكن الحذف',
+                    text: 'لا يمكن حذف تصنيف "' + categoryName + '" لأنه يحتوي على ' + skillsCount + ' مهارة. يجب حذف أو نقل جميع المهارات أولاً.',
+                    confirmButtonColor: '#ef4444'
+                });
                 return false;
             }
 
-            let confirmMessage = 'هل أنت متأكد من رغبتك في حذف تصنيف "' + categoryName + '"?\n\n';
-            confirmMessage += 'تحذير: هذا الإجراء لا يمكن التراجع عنه!\n\n';
-            confirmMessage += 'اكتب "حذف" للتأكيد:';
-
-            const userInput = prompt(confirmMessage);
-
-            if (userInput === 'حذف') {
-                form.submit();
-            } else if (userInput !== null) {
-                alert('لم يتم حذف التصنيف. يجب كتابة "حذف" للتأكيد.');
-            }
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                html: 'هل تريد حذف تصنيف "<strong>' + categoryName + '</strong>"؟<br><br><span style="color: #dc2626;">تحذير: هذا الإجراء لا يمكن التراجع عنه!</span>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء',
+                input: 'text',
+                inputPlaceholder: 'اكتب "حذف" للتأكيد',
+                inputValidator: (value) => {
+                    if (value !== 'حذف') {
+                        return 'يجب كتابة "حذف" للتأكيد'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         }
     });
 });
