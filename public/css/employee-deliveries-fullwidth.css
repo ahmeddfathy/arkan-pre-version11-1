@@ -1,0 +1,68 @@
+/* Full Width Override for Employee Deliveries Page */
+
+/* Override Bootstrap container */
+.employee-deliveries-page .container,
+.employee-deliveries-page .container-fluid {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+
+/* Ensure all main sections take full width */
+.employee-deliveries-page .simple-container {
+    max-width: 100%;
+    width: 100%;
+    padding: 1.5rem;
+}
+
+/* Full width for header */
+.employee-deliveries-page .page-header {
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    border-radius: 0;
+}
+
+/* Full width tables */
+.employee-deliveries-page .projects-table-container,
+.employee-deliveries-page .filters-section,
+.employee-deliveries-page .stats-row {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .employee-deliveries-page .container,
+    .employee-deliveries-page .container-fluid {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    .employee-deliveries-page .simple-container {
+        padding: 0.75rem;
+    }
+
+    .employee-deliveries-page .page-header {
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .employee-deliveries-page .container,
+    .employee-deliveries-page .container-fluid {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .employee-deliveries-page .simple-container {
+        padding: 0.5rem;
+    }
+
+    .employee-deliveries-page .page-header {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+    }
+}
+

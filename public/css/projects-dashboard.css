@@ -214,12 +214,12 @@ body {
     background: var(--white);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     border: 1px solid var(--gray-200);
     display: flex;
     align-items: center;
     gap: var(--space-5);
-    transition: var(--transition-normal);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
 }
@@ -230,39 +230,57 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 5px;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transition: height 0.3s ease;
+}
+
+.stat-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-modern:hover::before {
+    height: 100%;
+    opacity: 0.05;
 }
 
 .stat-card-modern.primary::before {
-    background: linear-gradient(90deg, var(--arkan-primary), var(--arkan-primary-dark));
+    background: linear-gradient(135deg, var(--arkan-primary), var(--arkan-primary-dark));
 }
 
 .stat-card-modern.success::before {
-    background: linear-gradient(90deg, var(--arkan-success), #1ea568);
+    background: linear-gradient(135deg, var(--arkan-success), #1ea568);
 }
 
 .stat-card-modern.info::before {
-    background: linear-gradient(90deg, var(--arkan-info), var(--arkan-primary-dark));
+    background: linear-gradient(135deg, var(--arkan-info), var(--arkan-primary-dark));
 }
 
 .stat-card-modern.warning::before {
-    background: linear-gradient(90deg, var(--arkan-warning), #e69c41);
+    background: linear-gradient(135deg, var(--arkan-warning), #e69c41);
 }
 
 
 
 .stat-icon {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 2rem;
     color: var(--white);
     flex-shrink: 0;
     position: relative;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.stat-card-modern:hover .stat-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .stat-card-modern.primary .stat-icon {
@@ -271,8 +289,7 @@ body {
 
 .stat-card-modern.success .stat-icon {
     background: linear-gradient(135deg, var(--arkan-success), #1ea568);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .stat-card-modern.info .stat-icon {
@@ -288,35 +305,98 @@ body {
 }
 
 .stat-number {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     font-weight: 900;
     color: var(--text-primary);
     line-height: 1;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--arkan-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+}
+
+.stat-card-modern:hover .stat-number {
+    transform: scale(1.05);
 }
 
 .stat-label {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: var(--text-secondary);
     margin-bottom: var(--space-3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .stat-trend {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: var(--text-muted);
+    padding: var(--space-2) var(--space-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    width: fit-content;
 }
 
 .stat-trend.positive {
     color: var(--arkan-success);
+    background: rgba(35, 194, 119, 0.1);
 }
 
 .stat-trend i {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+}
+
+/* 🎨 Delivery Cards - Special Styling */
+.stat-card-modern.delivery-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-modern.delivery-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.stat-card-modern.delivery-card:hover::after {
+    opacity: 1;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.stat-card-modern.delivery-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
+}
+
+.stat-card-modern.delivery-card .stat-icon {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-card-modern.delivery-card .stat-content {
+    position: relative;
+    z-index: 2;
 }
 
 /* 🎯 Section Modern */
@@ -1078,6 +1158,30 @@ body {
 
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+
+    .stat-card-modern {
+        padding: var(--space-5);
+    }
+
+    .stat-icon {
+        width: 65px;
+        height: 65px;
+        font-size: 1.6rem;
+    }
+
+    .stat-number {
+        font-size: 2.2rem;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+    }
+
+    .stat-trend {
+        font-size: 0.8rem;
+        padding: var(--space-1) var(--space-2);
     }
 
     .tasks-overview-grid {
@@ -1166,6 +1270,36 @@ body {
     .action-btn {
         padding: var(--space-2) var(--space-3);
         font-size: 0.85rem;
+    }
+
+    .stat-card-modern {
+        padding: var(--space-4);
+        gap: var(--space-3);
+    }
+
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        margin-bottom: var(--space-2);
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        margin-bottom: var(--space-2);
+    }
+
+    .stat-trend {
+        font-size: 0.75rem;
+        padding: var(--space-1);
+    }
+
+    .stat-card-modern.delivery-card:hover {
+        transform: translateY(-3px) scale(1.01);
     }
 
     .modern-table th,

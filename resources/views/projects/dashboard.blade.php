@@ -178,14 +178,14 @@
             </div>
         </div>
 
-        <div class="stat-card-modern" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
-            <div class="stat-icon">
+        <div class="stat-card-modern delivery-card" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); border: none; box-shadow: 0 6px 25px rgba(231, 76, 60, 0.4);">
+            <div class="stat-icon" style="background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
                 <i class="fas fa-pause-circle"></i>
             </div>
             <div class="stat-content">
-                <div class="stat-number">{{ $pausedProjects ?? 0 }}</div>
-                <div class="stat-label">موقوفة</div>
-                <div class="stat-trend">
+                <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">{{ $pausedProjects ?? 0 }}</div>
+                <div class="stat-label" style="color: rgba(255, 255, 255, 0.95);">موقوفة</div>
+                <div class="stat-trend" style="background: rgba(255, 255, 255, 0.2); color: white; backdrop-filter: blur(10px);">
                     <i class="fas fa-pause"></i>
                     {{ $pausedProjects > 0 ? round(($pausedProjects / max($totalProjects, 1)) * 100) : 0 }}% من الإجمالي
                 </div>
@@ -203,61 +203,61 @@
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card-modern" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <div class="stat-icon">
+            <div class="stat-card-modern delivery-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; box-shadow: 0 6px 25px rgba(240, 147, 251, 0.4);">
+                <div class="stat-icon" style="background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
                     <i class="fas fa-file-alt"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $projectsWithDraft ?? 0 }}</div>
-                    <div class="stat-label">مشاريع بمسودة</div>
-                    <div class="stat-trend">
+                    <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">{{ $projectsWithDraft ?? 0 }}</div>
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.95); font-size: 1rem;">مشاريع بمسودة</div>
+                    <div class="stat-trend" style="background: rgba(255, 255, 255, 0.2); color: white; backdrop-filter: blur(10px);">
                         <i class="fas fa-file"></i>
                         {{ $projectsWithDraft > 0 ? round(($projectsWithDraft / max($totalProjects, 1)) * 100) : 0 }}% من الإجمالي
                     </div>
                 </div>
             </div>
 
-            <div class="stat-card-modern" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <div class="stat-icon">
+            <div class="stat-card-modern delivery-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border: none; box-shadow: 0 6px 25px rgba(79, 172, 254, 0.4);">
+                <div class="stat-icon" style="background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
                     <i class="fas fa-check-double"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $projectsWithFinal ?? 0 }}</div>
-                    <div class="stat-label">مشاريع بتسليم نهائي</div>
-                    <div class="stat-trend">
+                    <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">{{ $projectsWithFinal ?? 0 }}</div>
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.95); font-size: 1rem;">مشاريع بتسليم نهائي</div>
+                    <div class="stat-trend" style="background: rgba(255, 255, 255, 0.2); color: white; backdrop-filter: blur(10px);">
                         <i class="fas fa-trophy"></i>
                         {{ $projectsWithFinal > 0 ? round(($projectsWithFinal / max($totalProjects, 1)) * 100) : 0 }}% من الإجمالي
                     </div>
                 </div>
             </div>
 
-            <div class="stat-card-modern" style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); color: #2d3436;">
-                <div class="stat-icon">
+            <div class="stat-card-modern delivery-card" style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); border: none; box-shadow: 0 6px 25px rgba(253, 203, 110, 0.4);">
+                <div class="stat-icon" style="background: rgba(45, 52, 54, 0.2); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);">
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $projectsWithoutDelivery ?? 0 }}</div>
-                    <div class="stat-label">بدون تسليم</div>
-                    <div class="stat-trend">
+                    <div class="stat-number" style="color: #2d3436; -webkit-text-fill-color: #2d3436; background: none;">{{ $projectsWithoutDelivery ?? 0 }}</div>
+                    <div class="stat-label" style="color: #2d3436; font-size: 1rem;">بدون تسليم</div>
+                    <div class="stat-trend" style="background: rgba(45, 52, 54, 0.15); color: #2d3436; backdrop-filter: blur(10px);">
                         <i class="fas fa-hourglass-half"></i>
                         تحتاج تسليم
                     </div>
                 </div>
             </div>
 
-            <div class="stat-card-modern" style="background: linear-gradient(135deg, #a8e6cf 0%, #56ab2f 100%);">
-                <div class="stat-icon">
+            <div class="stat-card-modern delivery-card" style="background: linear-gradient(135deg, #a8e6cf 0%, #56ab2f 100%); border: none; box-shadow: 0 6px 25px rgba(168, 230, 207, 0.4);">
+                <div class="stat-icon" style="background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
                     <i class="fas fa-clipboard-check"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number">
+                    <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">
                         @php
                             $totalDelivered = ($projectsWithDraft ?? 0) + ($projectsWithFinal ?? 0);
                         @endphp
                         {{ $totalDelivered }}
                     </div>
-                    <div class="stat-label">إجمالي المسلمة</div>
-                    <div class="stat-trend">
+                    <div class="stat-label" style="color: rgba(255, 255, 255, 0.95); font-size: 1rem;">إجمالي المسلمة</div>
+                    <div class="stat-trend" style="background: rgba(255, 255, 255, 0.2); color: white; backdrop-filter: blur(10px);">
                         <i class="fas fa-check"></i>
                         {{ $totalDelivered > 0 ? round(($totalDelivered / max($totalProjects, 1)) * 100) : 0 }}% معدل التسليم
                     </div>

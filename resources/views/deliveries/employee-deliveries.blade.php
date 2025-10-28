@@ -1,243 +1,229 @@
 @extends('layouts.app')
 
+@section('title', 'تسليمات الموظفين')
+
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
 <link rel="stylesheet" href="{{ asset('css/employee-deliveries.css') }}">
+<style>
+    /* Full Width Layout for Employee Deliveries */
+    .employee-deliveries-page .container {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Ensure proper spacing on smaller screens */
+    @media (max-width: 1200px) {
+        .employee-deliveries-page .simple-container {
+            padding: 1.5rem 1rem;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .employee-deliveries-page .simple-container {
+            padding: 1rem 0.75rem;
+        }
+    }
+</style>
 @endpush
 
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-truck-loading text-primary"></i>
-            تسليمات الموظفين
-        </h1>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-success btn-sm" onclick="refreshData()">
-                <i class="fas fa-sync-alt"></i> تحديث
-            </button>
+<div class="employee-deliveries-page">
+<div class="simple-container">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📦 تسليمات الموظفين</h1>
+            <p>عرض وإدارة جميع التسليمات مع المواعيد النهائية والاعتمادات</p>
         </div>
-    </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                إجمالي التسليمات
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-deliveries">
-                                {{ $deliveries->count() }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <!-- Success/Error Messages -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <!-- Statistics Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number" id="total-deliveries">{{ $deliveries->count() }}</div>
+                <div class="stat-label">إجمالي التسليمات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="administrative-approved-deliveries">{{ $deliveries->where('administrative_approval', true)->count() }}</div>
+                <div class="stat-label">معتمدة إدارياً</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="technical-approved-deliveries">{{ $deliveries->where('technical_approval', true)->count() }}</div>
+                <div class="stat-label">معتمدة فنياً</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="overdue-deliveries">{{ $deliveries->filter(function($d) { return $d->deadline && $d->deadline->isPast(); })->count() }}</div>
+                <div class="stat-label">متأخرة</div>
             </div>
         </div>
 
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                معتمدة إدارياً
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="administrative-approved-deliveries">
-                                {{ $deliveries->where('administrative_approval', true)->count() }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
-                        </div>
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <form id="filtersForm" method="GET">
+                <div class="filters-row">
+                    <!-- Date Type Filter -->
+                    <div class="filter-group">
+                        <label for="dateTypeFilter" class="filter-label">
+                            <i class="fas fa-calendar"></i>
+                            نوع التاريخ
+                        </label>
+                        <select name="date_type" id="dateTypeFilter" class="filter-select">
+                            <option value="team" {{ request('date_type') == 'team' || !request('date_type') ? 'selected' : '' }}>المتفق مع الفريق</option>
+                            <option value="client" {{ request('date_type') == 'client' ? 'selected' : '' }}>المتفق مع العميل</option>
+                        </select>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                معتمدة فنياً
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="technical-approved-deliveries">
-                                {{ $deliveries->where('technical_approval', true)->count() }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-cogs fa-2x text-gray-300"></i>
-                        </div>
+                    <!-- Date Filter -->
+                    <div class="filter-group">
+                        <label for="date_filter" class="filter-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            فلتر التاريخ
+                        </label>
+                        <select name="date_filter" id="date_filter" class="filter-select" onchange="toggleCustomDateRange()">
+                            <option value="">كل الفترات</option>
+                            <option value="current_week" {{ request('date_filter') == 'current_week' ? 'selected' : '' }}>الأسبوع الحالي</option>
+                            <option value="last_week" {{ request('date_filter') == 'last_week' ? 'selected' : '' }}>الأسبوع الماضي</option>
+                            <option value="current_month" {{ request('date_filter') == 'current_month' ? 'selected' : '' }}>الشهر الحالي</option>
+                            <option value="last_month" {{ request('date_filter') == 'last_month' ? 'selected' : '' }}>الشهر الماضي</option>
+                            <option value="custom" {{ request('date_filter') == 'custom' ? 'selected' : '' }}>فترة مخصصة</option>
+                        </select>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                متأخرة
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="overdue-deliveries">
-                                {{ $deliveries->filter(function($d) { return $d->deadline && $d->deadline->isPast(); })->count() }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                        </div>
+                    <!-- Employee Filter -->
+                    <div class="filter-group">
+                        <label for="userFilter" class="filter-label">
+                            <i class="fas fa-user"></i>
+                            الموظف
+                        </label>
+                        <select name="user_id" id="userFilter" class="filter-select">
+                            <option value="">جميع الموظفين</option>
+                            @foreach($allowedUsers as $user)
+                                <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Filters Card -->
-    <div class="card filters-card">
-        <form id="filtersForm" method="GET">
-            <div class="row">
-                <div class="col-md-2">
-                    <label class="form-label">نوع التاريخ</label>
-                    <select name="date_type" class="form-select">
-                        <option value="team" {{ request('date_type') == 'team' || !request('date_type') ? 'selected' : '' }}>
-                            <i class="fas fa-users"></i> المتفق مع الفريق
-                        </option>
-                        <option value="client" {{ request('date_type') == 'client' ? 'selected' : '' }}>
-                            <i class="fas fa-user-tie"></i> المتفق مع العميل
-                        </option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">فلتر التاريخ</label>
-                    <select name="date_filter" id="date_filter" class="form-select">
-                        <option value="">كل الفترات</option>
-                        <option value="current_week" {{ request('date_filter') == 'current_week' ? 'selected' : '' }}>
-                            الأسبوع الحالي
-                        </option>
-                        <option value="last_week" {{ request('date_filter') == 'last_week' ? 'selected' : '' }}>
-                            الأسبوع الماضي
-                        </option>
-                        <option value="current_month" {{ request('date_filter') == 'current_month' ? 'selected' : '' }}>
-                            الشهر الحالي
-                        </option>
-                        <option value="last_month" {{ request('date_filter') == 'last_month' ? 'selected' : '' }}>
-                            الشهر الماضي
-                        </option>
-                        <option value="custom" {{ request('date_filter') == 'custom' ? 'selected' : '' }}>
-                            فترة مخصصة
-                        </option>
-                    </select>
-                </div>
-
-                <div class="col-md-3" id="custom-date-range" style="display: none;">
-                    <label class="form-label">من - إلى</label>
-                    <div class="d-flex gap-2">
-                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
-                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                    <!-- Project Filter -->
+                    <div class="filter-group">
+                        <label for="projectFilter" class="filter-label">
+                            <i class="fas fa-project-diagram"></i>
+                            المشروع
+                        </label>
+                        <select name="project_id" id="projectFilter" class="filter-select">
+                            <option value="">جميع المشاريع</option>
+                            @foreach($allowedProjects as $project)
+                                <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>{{ $project->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">الموظف</label>
-                    <select name="user_id" class="form-select">
-                        <option value="">جميع الموظفين</option>
-                        @foreach($allowedUsers as $user)
-                            <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                    <!-- Service Filter -->
+                    <div class="filter-group">
+                        <label for="serviceFilter" class="filter-label">
+                            <i class="fas fa-cogs"></i>
+                            الخدمة
+                        </label>
+                        <select name="service_id" id="serviceFilter" class="filter-select">
+                            <option value="">جميع الخدمات</option>
+                            @foreach($allowedServices as $service)
+                                <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>{{ $service->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">المشروع</label>
-                    <select name="project_id" class="form-select">
-                        <option value="">جميع المشاريع</option>
-                        @foreach($allowedProjects as $project)
-                            <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
-                                {{ $project->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="row mt-3">
-                <div class="col-md-3">
-                    <label class="form-label">الخدمة</label>
-                    <select name="service_id" class="form-select">
-                        <option value="">جميع الخدمات</option>
-                        @foreach($allowedServices as $service)
-                            <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
-                                {{ $service->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-md-3 d-flex align-items-end">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-filter"></i> فلترة
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="clearFilters()">
-                            <i class="fas fa-times"></i> مسح الفلاتر
+                    <!-- Search Button -->
+                    <div class="filter-group">
+                        <label class="filter-label" style="opacity: 0;">بحث</label>
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-filter"></i>
+                            فلترة
                         </button>
                     </div>
-                </div>
-            </div>
-        </form>
-    </div>
 
-    <!-- Tabs Navigation -->
-    <div class="card shadow">
-        <div class="card-header py-3">
-            <ul class="nav nav-tabs card-header-tabs" id="deliveriesTabs" role="tablist">
-                @if($userHierarchyLevel >= 3)
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $userHierarchyLevel >= 3 ? 'active' : '' }}" id="projects-deadlines-tab" data-bs-toggle="tab" data-bs-target="#projects-deadlines" type="button" role="tab">
-                        <i class="fas fa-project-diagram"></i>
-                        المشاريع والديدلاينز
-                        <span class="badge badge-info ms-2">{{ $projects->count() }}</span>
-                    </button>
-                </li>
-                @endif
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $userHierarchyLevel < 3 ? 'active' : '' }}" id="my-deliveries-tab" data-bs-toggle="tab" data-bs-target="#my-deliveries" type="button" role="tab">
-                        <i class="fas fa-user-check"></i>
-                        تسليماتي الشخصية
-                        <span class="badge badge-success ms-2">{{ $myDeliveries->count() }}</span>
-                    </button>
-                </li>
-                @if($showAllDeliveriesTab)
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="all-deliveries-tab" data-bs-toggle="tab" data-bs-target="#all-deliveries" type="button" role="tab">
-                        <i class="fas fa-list"></i>
-                        جميع التسليمات
-                        <span class="badge badge-primary ms-2">{{ $deliveries->count() }}</span>
-                    </button>
-                </li>
-                @endif
-            </ul>
+                    <!-- Clear Filters -->
+                    @if(request()->hasAny(['date_type', 'date_filter', 'user_id', 'project_id', 'service_id', 'start_date', 'end_date']))
+                        <div class="filter-group">
+                            <label class="filter-label" style="opacity: 0;">مسح</label>
+                            <button type="button" class="clear-filters-btn" onclick="clearFilters()">
+                                <i class="fas fa-times"></i>
+                                مسح الفلاتر
+                            </button>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Custom Date Range (Initially Hidden) -->
+                <div id="custom-date-range" class="filters-row mt-3" style="display: {{ request('date_filter') == 'custom' ? 'flex' : 'none' }};">
+                    <div class="filter-group">
+                        <label for="start_date" class="filter-label">
+                            <i class="fas fa-calendar-day"></i>
+                            من تاريخ
+                        </label>
+                        <input type="date" name="start_date" id="start_date" class="filter-select" value="{{ request('start_date') }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="end_date" class="filter-label">
+                            <i class="fas fa-calendar-day"></i>
+                            إلى تاريخ
+                        </label>
+                        <input type="date" name="end_date" id="end_date" class="filter-select" value="{{ request('end_date') }}">
+                    </div>
+                </div>
+            </form>
         </div>
 
-        <div class="card-body">
+        <!-- Tabs Navigation -->
+        <div class="projects-table-container">
+            <div class="table-header">
+                <ul class="nav nav-tabs" id="deliveriesTabs" role="tablist" style="border: none; margin: 0;">
+                    @if($userHierarchyLevel >= 3)
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ $userHierarchyLevel >= 3 ? 'active' : '' }}" id="projects-deadlines-tab" data-bs-toggle="tab" data-bs-target="#projects-deadlines" type="button" role="tab" style="color: white; border: none; padding: 0.75rem 1.5rem; margin: 0 0.25rem; border-radius: 8px; background: rgba(255, 255, 255, 0.2);">
+                            <i class="fas fa-project-diagram"></i>
+                            المشاريع والديدلاينز
+                            <span class="badge bg-light text-dark ms-2">{{ $projects->count() }}</span>
+                        </button>
+                    </li>
+                    @endif
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ $userHierarchyLevel < 3 ? 'active' : '' }}" id="my-deliveries-tab" data-bs-toggle="tab" data-bs-target="#my-deliveries" type="button" role="tab" style="color: white; border: none; padding: 0.75rem 1.5rem; margin: 0 0.25rem; border-radius: 8px; background: rgba(255, 255, 255, 0.2);">
+                            <i class="fas fa-user-check"></i>
+                            تسليماتي الشخصية
+                            <span class="badge bg-light text-dark ms-2">{{ $myDeliveries->count() }}</span>
+                        </button>
+                    </li>
+                    @if($showAllDeliveriesTab)
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="all-deliveries-tab" data-bs-toggle="tab" data-bs-target="#all-deliveries" type="button" role="tab" style="color: white; border: none; padding: 0.75rem 1.5rem; margin: 0 0.25rem; border-radius: 8px; background: rgba(255, 255, 255, 0.2);">
+                            <i class="fas fa-list"></i>
+                            جميع التسليمات
+                            <span class="badge bg-light text-dark ms-2">{{ $deliveries->count() }}</span>
+                        </button>
+                    </li>
+                    @endif
+                </ul>
+            </div>
+
+            <div style="padding: 2rem;">
             <div class="tab-content" id="deliveriesTabsContent">
                 @if($userHierarchyLevel >= 3)
                 <!-- Projects and Deadlines Tab -->
@@ -271,8 +257,8 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="projectsTable" width="100%" cellspacing="0">
-                            <thead class="table-info">
+                        <table class="projects-table" id="projectsTable" width="100%" cellspacing="0">
+                            <thead>
                                 <tr>
                                     <th>المشروع</th>
                                     <th>العميل</th>
@@ -369,10 +355,13 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-wrap gap-1">
-                                                <button type="button" class="btn btn-primary btn-action"
-                                                        onclick="viewProjectDeliveries({{ $project->id }})">
-                                                    <i class="fas fa-eye"></i> عرض التسليمات
+                                            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                                                <button type="button" class="services-btn"
+                                                        style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;"
+                                                        onclick="viewProjectDeliveries({{ $project->id }})"
+                                                        title="عرض التسليمات">
+                                                    <i class="fas fa-eye"></i>
+                                                    عرض التسليمات
                                                 </button>
                                             </div>
                                         </td>
@@ -411,8 +400,8 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="myDeliveriesTable" width="100%" cellspacing="0">
-                            <thead class="table-success">
+                        <table class="projects-table" id="myDeliveriesTable" width="100%" cellspacing="0">
+                            <thead>
                                 <tr>
                                     <th>المشروع</th>
                                     <th>الخدمة</th>
@@ -565,40 +554,55 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-wrap gap-1">
+                                            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
                                                 {{-- أزرار الاعتماد الإداري --}}
                                                 @if(isset($delivery->can_approve_administrative) && $delivery->can_approve_administrative && !$delivery->hasAdministrativeApproval())
-                                                    <button type="button" class="btn btn-outline-primary btn-action"
-                                                            onclick="grantAdministrativeApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-user-check"></i> اعتماد إداري
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;"
+                                                            onclick="grantAdministrativeApproval({{ $delivery->id }})"
+                                                            title="اعتماد إداري">
+                                                        <i class="fas fa-user-check"></i>
+                                                        اعتماد إداري
                                                     </button>
                                                 @endif
 
                                                 @if(isset($delivery->can_approve_administrative) && $delivery->can_approve_administrative && $delivery->hasAdministrativeApproval())
-                                                    <button type="button" class="btn btn-outline-warning btn-action"
-                                                            onclick="revokeAdministrativeApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-user-times"></i> إلغاء اعتماد إداري
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;"
+                                                            onclick="revokeAdministrativeApproval({{ $delivery->id }})"
+                                                            title="إلغاء اعتماد إداري">
+                                                        <i class="fas fa-user-times"></i>
+                                                        إلغاء اعتماد إداري
                                                     </button>
                                                 @endif
 
                                                 {{-- أزرار الاعتماد الفني --}}
                                                 @if(isset($delivery->can_approve_technical) && $delivery->can_approve_technical && !$delivery->hasTechnicalApproval())
-                                                    <button type="button" class="btn btn-outline-success btn-action"
-                                                            onclick="grantTechnicalApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-cogs"></i> اعتماد فني
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #10b981, #059669); color: white;"
+                                                            onclick="grantTechnicalApproval({{ $delivery->id }})"
+                                                            title="اعتماد فني">
+                                                        <i class="fas fa-cogs"></i>
+                                                        اعتماد فني
                                                     </button>
                                                 @endif
 
                                                 @if(isset($delivery->can_approve_technical) && $delivery->can_approve_technical && $delivery->hasTechnicalApproval())
-                                                    <button type="button" class="btn btn-outline-danger btn-action"
-                                                            onclick="revokeTechnicalApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-times-circle"></i> إلغاء اعتماد فني
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;"
+                                                            onclick="revokeTechnicalApproval({{ $delivery->id }})"
+                                                            title="إلغاء اعتماد فني">
+                                                        <i class="fas fa-times-circle"></i>
+                                                        إلغاء اعتماد فني
                                                     </button>
                                                 @endif
 
-                                                <button type="button" class="btn btn-info btn-action"
-                                                        onclick="viewDeliveryDetails({{ $delivery->id }})">
-                                                    <i class="fas fa-eye"></i> عرض
+                                                <button type="button" class="services-btn"
+                                                        style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;"
+                                                        onclick="viewDeliveryDetails({{ $delivery->id }})"
+                                                        title="عرض التفاصيل">
+                                                    <i class="fas fa-eye"></i>
+                                                    عرض
                                                 </button>
                                             </div>
                                         </td>
@@ -637,8 +641,8 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="deliveriesTable" width="100%" cellspacing="0">
-                            <thead class="table-dark">
+                        <table class="projects-table" id="deliveriesTable" width="100%" cellspacing="0">
+                            <thead>
                                 <tr>
                                     <th>المشروع</th>
                                     <th>الخدمة</th>
@@ -792,40 +796,55 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-wrap gap-1">
+                                            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
                                                 {{-- أزرار الاعتماد الإداري --}}
                                                 @if(isset($delivery->can_approve_administrative) && $delivery->can_approve_administrative && !$delivery->hasAdministrativeApproval())
-                                                    <button type="button" class="btn btn-outline-primary btn-action"
-                                                            onclick="grantAdministrativeApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-user-check"></i> اعتماد إداري
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;"
+                                                            onclick="grantAdministrativeApproval({{ $delivery->id }})"
+                                                            title="اعتماد إداري">
+                                                        <i class="fas fa-user-check"></i>
+                                                        اعتماد إداري
                                                     </button>
                                                 @endif
 
                                                 @if(isset($delivery->can_approve_administrative) && $delivery->can_approve_administrative && $delivery->hasAdministrativeApproval())
-                                                    <button type="button" class="btn btn-outline-warning btn-action"
-                                                            onclick="revokeAdministrativeApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-user-times"></i> إلغاء اعتماد إداري
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;"
+                                                            onclick="revokeAdministrativeApproval({{ $delivery->id }})"
+                                                            title="إلغاء اعتماد إداري">
+                                                        <i class="fas fa-user-times"></i>
+                                                        إلغاء اعتماد إداري
                                                     </button>
                                                 @endif
 
                                                 {{-- أزرار الاعتماد الفني --}}
                                                 @if(isset($delivery->can_approve_technical) && $delivery->can_approve_technical && !$delivery->hasTechnicalApproval())
-                                                    <button type="button" class="btn btn-outline-success btn-action"
-                                                            onclick="grantTechnicalApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-cogs"></i> اعتماد فني
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #10b981, #059669); color: white;"
+                                                            onclick="grantTechnicalApproval({{ $delivery->id }})"
+                                                            title="اعتماد فني">
+                                                        <i class="fas fa-cogs"></i>
+                                                        اعتماد فني
                                                     </button>
                                                 @endif
 
                                                 @if(isset($delivery->can_approve_technical) && $delivery->can_approve_technical && $delivery->hasTechnicalApproval())
-                                                    <button type="button" class="btn btn-outline-danger btn-action"
-                                                            onclick="revokeTechnicalApproval({{ $delivery->id }})">
-                                                        <i class="fas fa-times-circle"></i> إلغاء اعتماد فني
+                                                    <button type="button" class="services-btn"
+                                                            style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;"
+                                                            onclick="revokeTechnicalApproval({{ $delivery->id }})"
+                                                            title="إلغاء اعتماد فني">
+                                                        <i class="fas fa-times-circle"></i>
+                                                        إلغاء اعتماد فني
                                                     </button>
                                                 @endif
 
-                                                <button type="button" class="btn btn-info btn-action"
-                                                        onclick="viewDeliveryDetails({{ $delivery->id }})">
-                                                    <i class="fas fa-eye"></i> عرض
+                                                <button type="button" class="services-btn"
+                                                        style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;"
+                                                        onclick="viewDeliveryDetails({{ $delivery->id }})"
+                                                        title="عرض التفاصيل">
+                                                    <i class="fas fa-eye"></i>
+                                                    عرض
                                                 </button>
                                             </div>
                                         </td>
@@ -848,6 +867,8 @@
             </div>
         </div>
     </div>
+</div>
+</div>
 </div>
 
 <!-- Delivery Details Modal -->
@@ -886,7 +907,94 @@
 <script src="{{ asset('js/employee-deliveries/actions.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/employee-deliveries.js') }}?v={{ time() }}"></script>
 
+<style>
+    /* Tab Styles */
+    #deliveriesTabs .nav-link {
+        transition: all 0.3s ease;
+    }
+
+    #deliveriesTabs .nav-link:hover {
+        background: rgba(255, 255, 255, 0.3) !important;
+        transform: translateY(-2px);
+    }
+
+    #deliveriesTabs .nav-link.active {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #4f46e5 !important;
+        font-weight: 600;
+    }
+
+    #deliveriesTabs .nav-link.active .badge {
+        background: #4f46e5 !important;
+        color: white !important;
+    }
+
+    /* Custom Date Range Toggle */
+    .filter-select[type="date"] {
+        cursor: pointer;
+    }
+
+    /* Empty State Styling */
+    .text-muted {
+        color: #6b7280 !important;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem !important;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Services Button Styles from Projects Page */
+    .services-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .services-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .services-btn i {
+        font-size: 0.9rem;
+    }
+</style>
+
 <script>
+// Toggle custom date range visibility
+function toggleCustomDateRange() {
+    const dateFilter = document.getElementById('date_filter');
+    const customDateRange = document.getElementById('custom-date-range');
+
+    if (dateFilter.value === 'custom') {
+        customDateRange.style.display = 'flex';
+    } else {
+        customDateRange.style.display = 'none';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleCustomDateRange();
+});
+
 // حفظ واستعادة التاب النشط
 $(document).ready(function() {
     // استعادة التاب المحفوظ عند تحميل الصفحة

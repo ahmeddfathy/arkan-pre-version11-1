@@ -3,113 +3,148 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="{{ asset('css/task-deliveries.css') }}">
+
+<style>
+    /* تحسينات للتبويبات */
+    #approvalTabs .nav-link {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        margin: 0 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    #approvalTabs .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    #approvalTabs .nav-link.active {
+        background: white;
+        color: #4f46e5 !important;
+        border-color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    #approvalTabs .nav-link.active .badge {
+        background: #4f46e5 !important;
+        color: white !important;
+    }
+
+    /* تحسينات للجداول */
+    .table-hover tbody tr:hover {
+        background: #f9fafb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
+        transition: all 0.2s;
+    }
+
+    .projects-table-container .table thead th {
+        background: #f8fafc;
+        border-bottom: 2px solid #e5e7eb;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* تحسينات للبطاقات الإحصائية */
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+</style>
 @endpush
 
 @section('content')
-<div class="task-deliveries-container">
+<div class="simple-container">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4">
-                    <div class="task-deliveries-header">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap">
-                            <div>
-                                <h1 class="header-title">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    تسليمات التاسكات
-                                </h1>
-                                <p class="header-subtitle">مراجعة وموافقة المهام المكتملة</p>
-                            </div>
-                            <div class="header-actions">
-                                <a href="{{ route('task-deliveries.index') }}" class="header-btn header-btn-primary">
-                                    <i class="fas fa-sync-alt"></i> تحديث
-                                </a>
-                                <a href="{{ route('tasks.index') }}" class="header-btn header-btn-secondary">
-                                    <i class="fas fa-arrow-left"></i> العودة للمهام
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>✅ تسليمات التاسكات</h1>
+            <p>مراجعة وموافقة المهام المكتملة</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <a href="{{ route('task-deliveries.index') }}" class="btn btn-light">
+                    <i class="fas fa-sync-alt me-1"></i> تحديث
+                </a>
+                <a href="{{ route('tasks.index') }}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-1"></i> العودة للمهام
+                </a>
+            </div>
+        </div>
 
-                <div class="card-body">
-                    <!-- عرض رسائل النجاح والخطأ -->
-                    @if(session('success'))
-                        <div class="alert-enhanced alert-success-enhanced alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle me-2"></i>
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+        <!-- عرض رسائل النجاح والخطأ -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="background: #d1fae5; border: 1px solid #86efac; color: #065f46; border-radius: 12px;">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>نجح!</strong> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-                    @if(session('error'))
-                        <div class="alert-enhanced alert-danger-enhanced alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 12px;">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong>خطأ!</strong> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-                    <!-- تنبيه للـ HR -->
-                    @if(isset($pendingTasks['is_hr_or_admin']) && $pendingTasks['is_hr_or_admin'])
-                        <div class="alert-enhanced alert-info-enhanced alert-dismissible fade show" role="alert">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>أنت ترى جميع المهام في النظام</strong> - كونك HR أو Admin، يمكنك رؤية واعتماد جميع المهام من جميع المشاريع ومديري المشاريع.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+        <!-- تنبيه للـ HR -->
+        @if(isset($pendingTasks['is_hr_or_admin']) && $pendingTasks['is_hr_or_admin'])
+            <div class="alert alert-info alert-dismissible fade show" role="alert" style="background: #dbeafe; border: 1px solid #93c5fd; color: #1e40af; border-radius: 12px;">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>أنت ترى جميع المهام في النظام</strong> - كونك HR أو Admin، يمكنك رؤية واعتماد جميع المهام من جميع المشاريع ومديري المشاريع.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-                    <!-- إحصائيات سريعة -->
-                    <div class="approval-stats">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="stat-card warning">
-                                    <div class="stat-number">{{ $stats['pending_approval'] }}</div>
-                                    <div class="stat-label">منتظرة للموافقة</div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="stat-card success">
-                                    <div class="stat-number">{{ $stats['approved_today'] }}</div>
-                                    <div class="stat-label">تم اعتمادها اليوم</div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="stat-card info">
-                                    <div class="stat-number">{{ $stats['approved_this_week'] }}</div>
-                                    <div class="stat-label">تم اعتمادها هذا الأسبوع</div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="stat-card primary">
-                                    <div class="stat-number">{{ $stats['approved_regular_tasks'] + $stats['approved_template_tasks'] }}</div>
-                                    <div class="stat-label">إجمالي المهام المعتمدة</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- إحصائيات سريعة -->
+        <div class="stats-row">
+            <div class="stat-card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b;">
+                <div class="stat-number" style="color: #d97706;">{{ $stats['pending_approval'] }}</div>
+                <div class="stat-label">منتظرة للموافقة</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left: 4px solid #10b981;">
+                <div class="stat-number" style="color: #059669;">{{ $stats['approved_today'] }}</div>
+                <div class="stat-label">تم اعتمادها اليوم</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-left: 4px solid #3b82f6;">
+                <div class="stat-number" style="color: #2563eb;">{{ $stats['approved_this_week'] }}</div>
+                <div class="stat-label">تم اعتمادها هذا الأسبوع</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-left: 4px solid #6366f1;">
+                <div class="stat-number" style="color: #4f46e5;">{{ $stats['approved_regular_tasks'] + $stats['approved_template_tasks'] }}</div>
+                <div class="stat-label">إجمالي المهام المعتمدة</div>
+            </div>
+        </div>
 
-                    <!-- التبويبات -->
-                    <ul class="nav nav-tabs-enhanced mb-4" id="approvalTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="all-tasks-tab" data-bs-toggle="tab"
-                                    data-bs-target="#all-tasks" type="button" role="tab">
-                                <i class="fas fa-list text-primary"></i>
-                                جميع المهام
-                                <span class="tab-badge">{{ $allTasksData['total_tasks'] }}</span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="projects-tab" data-bs-toggle="tab"
-                                    data-bs-target="#projects" type="button" role="tab">
-                                <i class="fas fa-building text-info"></i>
-                                المشاريع
-                                <span class="tab-badge">{{ $projectsData['projects']->count() }}</span>
-                            </button>
-                        </li>
-                    </ul>
+        <!-- التبويبات -->
+        <div class="projects-table-container">
+            <ul class="nav nav-pills mb-0" id="approvalTabs" role="tablist" style="padding: 1rem; background: linear-gradient(135deg, #4f46e5, #7c3aed); border-radius: 20px 20px 0 0;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tasks-tab" data-bs-toggle="tab"
+                            data-bs-target="#all-tasks" type="button" role="tab"
+                            style="border-radius: 10px; font-weight: 600; color: white;">
+                        <i class="fas fa-list me-1"></i>
+                        جميع المهام
+                        <span class="badge bg-light text-dark ms-2">{{ $allTasksData['total_tasks'] }}</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="projects-tab" data-bs-toggle="tab"
+                            data-bs-target="#projects" type="button" role="tab"
+                            style="border-radius: 10px; font-weight: 600; color: white;">
+                        <i class="fas fa-building me-1"></i>
+                        المشاريع
+                        <span class="badge bg-light text-dark ms-2">{{ $projectsData['projects']->count() }}</span>
+                    </button>
+                </li>
+            </ul>
 
-                    <!-- محتوى التبويبات -->
-                    <div class="tab-content" id="approvalTabsContent">
+            <!-- محتوى التبويبات -->
+            <div class="tab-content" id="approvalTabsContent" style="padding: 1.5rem;">
                         <!-- جميع المهام -->
                         <div class="tab-pane fade show active" id="all-tasks" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -500,10 +535,10 @@
                                 </table>
                             </div>
                             @else
-                                <div class="empty-state">
-                                <i class="fas fa-tasks"></i>
-                                <h5>لا توجد مهام</h5>
-                                <p class="text-muted">لا توجد مهام مُعيَّنة أو منشأة بواسطتك.</p>
+                                <div class="empty-state" style="padding: 4rem 2rem;">
+                                    <i class="fas fa-tasks" style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                                    <h5 style="color: #6b7280; font-weight: 600;">لا توجد مهام</h5>
+                                    <p style="color: #9ca3af;">لا توجد مهام مُعيَّنة أو منشأة بواسطتك.</p>
                                 </div>
                             @endif
                         </div>
@@ -636,27 +671,28 @@
                                         </table>
                                     </div>
                             @else
-                                <div class="empty-state">
-                                        <i class="fas fa-building"></i>
-                                        <h5>لا توجد مشاريع</h5>
-                                        <p class="text-muted">لا توجد مشاريع تحتوي على مهام مُنشأة بواسطتك.</p>
+                                <div class="empty-state" style="padding: 4rem 2rem;">
+                                    <i class="fas fa-building" style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                                    <h5 style="color: #6b7280; font-weight: 600;">لا توجد مشاريع</h5>
+                                    <p style="color: #9ca3af;">لا توجد مشاريع تحتوي على مهام مُنشأة بواسطتك.</p>
                                 </div>
                             @endif
                         </div>
 
                             <!-- عرض مهام المشروع المختار -->
                             <div id="project-tasks-container" style="display: none;">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4 class="fw-bold text-dark">
-                                        <button class="btn btn-outline-secondary btn-sm me-2" onclick="backToProjects()">
-                                            <i class="fas fa-arrow-right"></i>
-                                            </button>
+                                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded" style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); border: 2px solid #c7d2fe;">
+                                    <h4 class="fw-bold text-dark mb-0">
+                                        <button class="btn btn-outline-primary btn-sm me-2" onclick="backToProjects()" style="border-radius: 8px;">
+                                            <i class="fas fa-arrow-right"></i> رجوع
+                                        </button>
+                                        <i class="fas fa-folder-open text-primary me-2"></i>
                                         <span id="project-tasks-title">مهام المشروع</span>
                                     </h4>
-                                    <div class="d-flex align-items-center gap-3" id="project-tasks-stats">
+                                    <div class="d-flex align-items-center gap-2" id="project-tasks-stats">
                                         <!-- سيتم تحديث الإحصائيات هنا -->
+                                    </div>
                                 </div>
-                            </div>
 
                                 <div id="project-tasks-table">
                                     <!-- سيتم تحميل جدول المهام هنا -->
@@ -664,10 +700,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
-    </div>
     </div>
 </div>
 
@@ -849,9 +883,9 @@ document.getElementById('applyFilter').addEventListener('click', function() {
             }
         } else {
             container.innerHTML = `
-                <div class="alert alert-danger" role="alert">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    حدث خطأ في تحميل البيانات: ${data.message || 'خطأ غير معروف'}
+                <div class="alert alert-danger" role="alert" style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 12px;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>خطأ!</strong> حدث خطأ في تحميل البيانات: ${data.message || 'خطأ غير معروف'}
                 </div>
             `;
         }
@@ -859,9 +893,9 @@ document.getElementById('applyFilter').addEventListener('click', function() {
     .catch(error => {
         console.error('Error:', error);
         container.innerHTML = `
-            <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
-                حدث خطأ في الاتصال بالخادم
+            <div class="alert alert-danger" role="alert" style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 12px;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>خطأ!</strong> حدث خطأ في الاتصال بالخادم
             </div>
         `;
     });
@@ -1328,18 +1362,18 @@ function loadProjectTasks(projectId, projectName) {
                 projectTasksTable.innerHTML = generateTasksTable(data.tasks, data.is_hr_or_admin);
             } else {
                 projectTasksTable.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-tasks"></i>
-                        <h5>لا توجد مهام في هذا المشروع</h5>
-                        <p class="text-muted">لا توجد مهام مُعيَّنة في هذا المشروع أو لا تملك صلاحية لعرضها.</p>
+                    <div class="empty-state" style="padding: 4rem 2rem;">
+                        <i class="fas fa-tasks" style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                        <h5 style="color: #6b7280; font-weight: 600;">لا توجد مهام في هذا المشروع</h5>
+                        <p style="color: #9ca3af;">لا توجد مهام مُعيَّنة في هذا المشروع أو لا تملك صلاحية لعرضها.</p>
                     </div>
                 `;
             }
         } else {
             projectTasksTable.innerHTML = `
-                <div class="alert alert-danger" role="alert">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    حدث خطأ في تحميل مهام المشروع: ${data.message || 'خطأ غير معروف'}
+                <div class="alert alert-danger" role="alert" style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 12px;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>خطأ!</strong> حدث خطأ في تحميل مهام المشروع: ${data.message || 'خطأ غير معروف'}
                 </div>
             `;
         }
@@ -1347,9 +1381,9 @@ function loadProjectTasks(projectId, projectName) {
     .catch(error => {
         console.error('Error:', error);
         projectTasksTable.innerHTML = `
-            <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
-                حدث خطأ في الاتصال بالخادم
+            <div class="alert alert-danger" role="alert" style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 12px;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>خطأ!</strong> حدث خطأ في الاتصال بالخادم
             </div>
         `;
     });
