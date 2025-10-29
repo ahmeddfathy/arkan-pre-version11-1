@@ -112,24 +112,34 @@
                                 </div>
 
                                 <div class="create-form-group">
-                                    <label for="client_id" class="create-form-label">
+                                    <label for="client_search" class="create-form-label">
                                         <i class="fas fa-user-tie"></i>
                                         العميل *
                                     </label>
-                                    <select class="create-form-control @error('client_id') is-invalid @enderror"
-                                            id="client_id"
-                                            name="client_id"
-                                            required>
-                                        <option value="">🏢 اختر العميل المناسب</option>
+                                    <input
+                                        type="text"
+                                        id="client_search"
+                                        class="create-form-control @error('client_id') is-invalid @enderror"
+                                        list="clients_list"
+                                        placeholder="ابحث بالاسم أو الكود أو اختر من القائمة..."
+                                        autocomplete="off"
+                                        required
+                                        value="{{ old('client_id') ? $clients->firstWhere('id', old('client_id'))?->name . ' - ' . ($clients->firstWhere('id', old('client_id'))?->code ?? $clients->firstWhere('id', old('client_id'))?->client_code) : '' }}"
+                                    />
+                                    <input type="hidden" id="client_id" name="client_id" value="{{ old('client_id') }}" />
+                                    <datalist id="clients_list">
                                         @foreach($clients as $client)
-                                            <option value="{{ $client->id }}"
-                                                    {{ old('client_id') == $client->id ? 'selected' : '' }}>
-                                                {{ $client->name }} - {{ $client->code }}
+                                            <option value="{{ $client->name }} - {{ $client->code ?? $client->client_code }}" data-id="{{ $client->id }}">
+                                                {{ $client->name }} - {{ $client->code ?? $client->client_code }}
                                             </option>
                                         @endforeach
-                                    </select>
+                                    </datalist>
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        ابحث باسم العميل أو الكود للاختيار السريع
+                                    </small>
                                     @error('client_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -468,6 +478,48 @@
 <script>
 // تمرير بيانات الخدمات لـ JavaScript
 const allServices = @json($services);
+
+// Build client map for datalist
+const projectClientsMap = new Map();
+const projectClientData = {!! json_encode($clients->map(function($c) {
+    return ['display' => $c->name . ' - ' . ($c->code ?? $c->client_code), 'id' => (string)$c->id];
+})->values()) !!};
+
+projectClientData.forEach(client => {
+    projectClientsMap.set(client.display, client.id);
+});
+
+// Handle client search input
+document.addEventListener('DOMContentLoaded', function() {
+    const clientSearchInput = document.getElementById('client_search');
+    const clientIdInput = document.getElementById('client_id');
+
+    if (clientSearchInput) {
+        clientSearchInput.addEventListener('input', function() {
+            const selectedValue = this.value.trim();
+
+            // Check if the value matches a client in our map
+            if (projectClientsMap.has(selectedValue)) {
+                clientIdInput.value = projectClientsMap.get(selectedValue);
+            } else {
+                clientIdInput.value = '';
+            }
+        });
+
+        // Event listener for blur (when user leaves the input)
+        clientSearchInput.addEventListener('blur', function() {
+            // If the value doesn't match any client, clear the input
+            if (!projectClientsMap.has(this.value.trim()) && this.value.trim() !== '') {
+                setTimeout(() => {
+                    if (!projectClientsMap.has(this.value.trim())) {
+                        this.value = '';
+                        clientIdInput.value = '';
+                    }
+                }, 200);
+            }
+        });
+    }
+});
 
 // توليد كود المشروع بناءً على نوع الشركة
 document.getElementById('generate-code').addEventListener('click', function() {

@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="{{ asset('css/projects/projects-kanban.css') }}">
 <!-- Tasks Calendar CSS -->
 <link rel="stylesheet" href="{{ asset('css/tasks/my-tasks-calendar.css') }}">
+<!-- Tasks Statistics CSS -->
+<link rel="stylesheet" href="{{ asset('css/tasks/my-tasks-stats.css') }}">
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <!-- Transfer Sidebar CSS -->
@@ -28,6 +30,8 @@
                 @include('tasks.partials-index.header')
 
                 <div class="card-body">
+                    @include('tasks.partials-index.statistics')
+
                     @include('tasks.partials-index.filters')
 
                     @include('tasks.partials-index.table-view')

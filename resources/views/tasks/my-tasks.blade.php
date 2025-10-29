@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="{{ asset('css/projects/projects-kanban.css') }}">
 <!-- My Tasks Calendar CSS -->
 <link rel="stylesheet" href="{{ asset('css/tasks/my-tasks-calendar.css') }}">
+<!-- My Tasks Statistics CSS -->
+<link rel="stylesheet" href="{{ asset('css/tasks/my-tasks-stats.css') }}">
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <!-- Task Revisions CSS -->
@@ -254,6 +256,229 @@
                     </div>
                 </div>
                 <div class="card-body my-tasks-loading" data-current-user-id="{{ auth()->id() }}">
+                    @php
+                        // حساب الإحصائيات
+                        $statsData = [
+                            'total' => 0,
+                            'new' => 0,
+                            'in_progress' => 0,
+                            'paused' => 0,
+                            'completed' => 0,
+                            'cancelled' => 0,
+                            'transferred' => 0,
+                            'estimated_hours' => 0,
+                            'actual_hours' => 0,
+                            'total_points' => 0
+                        ];
+
+                        foreach($allTasks as $task) {
+                            if (is_array($task)) {
+                                $task = (object) $task;
+                                if (isset($task->pivot) && is_array($task->pivot)) {
+                                    $task->pivot = (object) $task->pivot;
+                                }
+                            }
+
+                            $isTemplate = isset($task->is_template) && $task->is_template;
+                            $status = $isTemplate ? ($task->pivot->status ?? $task->status ?? 'new') : (isset($task->pivot->status) ? $task->pivot->status : 'new');
+
+                            $statsData['total']++;
+
+                            // عد المهام حسب الحالة
+                            if (isset($task->is_transferred) && $task->is_transferred) {
+                                $statsData['transferred']++;
+                            } elseif (isset($statsData[$status])) {
+                                $statsData[$status]++;
+                            }
+
+                            // حساب الوقت
+                            $estimatedHours = $isTemplate ? ($task->pivot->estimated_hours ?? 0) : (isset($task->pivot->estimated_hours) ? $task->pivot->estimated_hours : 0);
+                            $estimatedMinutes = $isTemplate ? ($task->pivot->estimated_minutes ?? 0) : (isset($task->pivot->estimated_minutes) ? $task->pivot->estimated_minutes : 0);
+                            $actualHours = $isTemplate ? ($task->pivot->actual_hours ?? 0) : (isset($task->pivot->actual_hours) ? $task->pivot->actual_hours : 0);
+                            $actualMinutes = $isTemplate ? ($task->pivot->actual_minutes ?? 0) : (isset($task->pivot->actual_minutes) ? $task->pivot->actual_minutes : 0);
+
+                            // تحويل لساعات عشرية
+                            $statsData['estimated_hours'] += $estimatedHours + ($estimatedMinutes / 60);
+                            $statsData['actual_hours'] += $actualHours + ($actualMinutes / 60);
+
+                            // حساب النقاط
+                            $statsData['total_points'] += $task->points ?? 10;
+                        }
+
+                        // حساب النسب المئوية
+                        $completionPercentage = $statsData['total'] > 0 ? round(($statsData['completed'] / $statsData['total']) * 100) : 0;
+                        $inProgressPercentage = $statsData['total'] > 0 ? round(($statsData['in_progress'] / $statsData['total']) * 100) : 0;
+                        $timeEfficiencyPercentage = $statsData['estimated_hours'] > 0 ? round(($statsData['actual_hours'] / $statsData['estimated_hours']) * 100) : 0;
+                    @endphp
+
+                    <!-- Statistics Cards -->
+                    <div class="stats-cards-container">
+                        <!-- Total Tasks Card -->
+                        <div class="stats-card total-tasks" data-filter="all">
+                            <div class="stats-card-header">
+                                <div class="stats-card-icon">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                                <div class="stats-card-badge">الكل</div>
+                            </div>
+                            <div class="stats-card-body">
+                                <div class="stats-card-title">إجمالي المهام</div>
+                                <div class="stats-card-value" id="stat-total">{{ $statsData['total'] }}</div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <div class="stats-progress">
+                                    <div class="stats-progress-bar">
+                                        <div class="stats-progress-fill" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <span class="stats-percentage">100%</span>
+                            </div>
+                        </div>
+
+                        <!-- New Tasks Card -->
+                        <div class="stats-card new-tasks" data-filter="new">
+                            <div class="stats-card-header">
+                                <div class="stats-card-icon">
+                                    <i class="fas fa-circle-plus"></i>
+                                </div>
+                                <div class="stats-card-badge">جديدة</div>
+                            </div>
+                            <div class="stats-card-body">
+                                <div class="stats-card-title">مهام جديدة</div>
+                                <div class="stats-card-value" id="stat-new">{{ $statsData['new'] }}</div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <div class="stats-progress">
+                                    <div class="stats-progress-bar">
+                                        <div class="stats-progress-fill" style="width: {{ $statsData['total'] > 0 ? round(($statsData['new'] / $statsData['total']) * 100) : 0 }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="stats-percentage">{{ $statsData['total'] > 0 ? round(($statsData['new'] / $statsData['total']) * 100) : 0 }}%</span>
+                            </div>
+                        </div>
+
+                        <!-- In Progress Tasks Card -->
+                        <div class="stats-card in-progress-tasks" data-filter="in_progress">
+                            <div class="stats-card-header">
+                                <div class="stats-card-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="stats-card-badge">قيد التنفيذ</div>
+                            </div>
+                            <div class="stats-card-body">
+                                <div class="stats-card-title">قيد التنفيذ</div>
+                                <div class="stats-card-value" id="stat-in-progress">{{ $statsData['in_progress'] }}</div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <div class="stats-progress">
+                                    <div class="stats-progress-bar">
+                                        <div class="stats-progress-fill" style="width: {{ $inProgressPercentage }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="stats-percentage">{{ $inProgressPercentage }}%</span>
+                            </div>
+                        </div>
+
+                        <!-- Completed Tasks Card -->
+                        <div class="stats-card completed-tasks" data-filter="completed">
+                            <div class="stats-card-header">
+                                <div class="stats-card-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stats-card-badge">مكتملة</div>
+                            </div>
+                            <div class="stats-card-body">
+                                <div class="stats-card-title">مهام مكتملة</div>
+                                <div class="stats-card-value" id="stat-completed">{{ $statsData['completed'] }}</div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <div class="stats-progress">
+                                    <div class="stats-progress-bar">
+                                        <div class="stats-progress-fill" style="width: {{ $completionPercentage }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="stats-percentage">{{ $completionPercentage }}%</span>
+                            </div>
+                        </div>
+
+                        <!-- Paused Tasks Card -->
+                        <div class="stats-card paused-tasks" data-filter="paused">
+                            <div class="stats-card-header">
+                                <div class="stats-card-icon">
+                                    <i class="fas fa-pause-circle"></i>
+                                </div>
+                                <div class="stats-card-badge">متوقفة</div>
+                            </div>
+                            <div class="stats-card-body">
+                                <div class="stats-card-title">مهام متوقفة</div>
+                                <div class="stats-card-value" id="stat-paused">{{ $statsData['paused'] }}</div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <div class="stats-progress">
+                                    <div class="stats-progress-bar">
+                                        <div class="stats-progress-fill" style="width: {{ $statsData['total'] > 0 ? round(($statsData['paused'] / $statsData['total']) * 100) : 0 }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="stats-percentage">{{ $statsData['total'] > 0 ? round(($statsData['paused'] / $statsData['total']) * 100) : 0 }}%</span>
+                            </div>
+                        </div>
+
+                        <!-- Time Tracking Card -->
+                        <div class="stats-card time-tracking">
+                            <div class="stats-card-header">
+                                <div class="stats-card-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stats-card-badge">الوقت</div>
+                            </div>
+                            <div class="stats-card-body">
+                                <div class="stats-card-title">متابعة الوقت</div>
+                                <div class="time-comparison">
+                                    <div class="time-item">
+                                        <span class="time-label">مقدر:</span>
+                                        <span class="time-value">{{ floor($statsData['estimated_hours']) }}س {{ round(($statsData['estimated_hours'] - floor($statsData['estimated_hours'])) * 60) }}د</span>
+                                    </div>
+                                    <div class="time-item">
+                                        <span class="time-label">فعلي:</span>
+                                        <span class="time-value">{{ floor($statsData['actual_hours']) }}س {{ round(($statsData['actual_hours'] - floor($statsData['actual_hours'])) * 60) }}د</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <div class="stats-progress">
+                                    <div class="stats-progress-bar">
+                                        <div class="stats-progress-fill" style="width: {{ min($timeEfficiencyPercentage, 100) }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="stats-percentage">{{ $timeEfficiencyPercentage }}%</span>
+                            </div>
+                        </div>
+
+                        <!-- Transferred Tasks Card (إذا كان هناك مهام منقولة) -->
+                        @if($statsData['transferred'] > 0)
+                        <div class="stats-card transferred-tasks" data-filter="transferred">
+                            <div class="stats-card-header">
+                                <div class="stats-card-icon">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <div class="stats-card-badge">منقولة</div>
+                            </div>
+                            <div class="stats-card-body">
+                                <div class="stats-card-title">مهام منقولة</div>
+                                <div class="stats-card-value" id="stat-transferred">{{ $statsData['transferred'] }}</div>
+                            </div>
+                            <div class="stats-card-footer">
+                                <div class="stats-progress">
+                                    <div class="stats-progress-bar">
+                                        <div class="stats-progress-fill" style="width: {{ $statsData['total'] > 0 ? round(($statsData['transferred'] / $statsData['total']) * 100) : 0 }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="stats-percentage">{{ $statsData['total'] > 0 ? round(($statsData['transferred'] / $statsData['total']) * 100) : 0 }}%</span>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+
                     <div class="row mb-4">
                         <div class="col-md-2">
                             <div class="form-group">
@@ -310,10 +535,49 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label for="searchInput">بحث</label>
                                 <input type="text" class="form-control" id="searchInput" placeholder="ابحث...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ✅ صف جديد لفلترة التاريخ -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="dateTypeFilter">
+                                    <i class="fas fa-filter"></i> نوع التاريخ
+                                </label>
+                                <select class="form-control" id="dateTypeFilter">
+                                    <option value="deadline">Deadline</option>
+                                    <option value="created_at">تاريخ الإنشاء</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="dateFrom" id="dateFromLabel">
+                                    <i class="fas fa-calendar-alt"></i> من Deadline
+                                </label>
+                                <input type="date" class="form-control" id="dateFrom">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="dateTo" id="dateToLabel">
+                                    <i class="fas fa-calendar-alt"></i> إلى Deadline
+                                </label>
+                                <input type="date" class="form-control" id="dateTo">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button type="button" class="btn btn-outline-secondary btn-block w-100" id="clearDateFilter">
+                                    <i class="fas fa-times"></i> مسح التاريخ
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -508,6 +772,22 @@
                                             $dueDate = $deadlineValue->toDateString();
                                         }
                                     }
+
+                                    // ✅ تحضير تاريخ الإنشاء
+                                    $createdAt = 'غير محدد';
+                                    if (isset($task->created_at) && $task->created_at) {
+                                        if (is_string($task->created_at)) {
+                                            try {
+                                                $createdAt = date('Y-m-d', strtotime($task->created_at));
+                                            } catch (Exception $e) {
+                                                $createdAt = $task->created_at;
+                                            }
+                                        } elseif (is_object($task->created_at) && method_exists($task->created_at, 'format')) {
+                                            $createdAt = $task->created_at->format('Y-m-d');
+                                        } elseif (is_object($task->created_at) && method_exists($task->created_at, 'toDateString')) {
+                                            $createdAt = $task->created_at->toDateString();
+                                        }
+                                    }
                                 @endphp
                                 <tr data-project-id="{{ $task->project_id ?? 0 }}"
                                     data-status="{{ $status }}"
@@ -521,6 +801,7 @@
                                     data-estimated-time="{{ (isset($task->is_flexible_time) && $task->is_flexible_time) ? 'مرن' : $estimatedHours . ':' . str_pad($estimatedMinutes, 2, '0', STR_PAD_LEFT) }}"
                                     data-actual-time="{{ $actualHours }}:{{ str_pad($actualMinutes, 2, '0', STR_PAD_LEFT) }}"
                                     data-due-date="{{ $dueDate }}"
+                                    data-created-at="{{ $createdAt }}"
                                     data-is-template="{{ $isTemplate ? 'true' : 'false' }}"
                                     data-is-flexible="{{ (isset($task->is_flexible_time) && $task->is_flexible_time) ? 'true' : 'false' }}"
                                     data-points="{{ $task->points ?? 10 }}"
@@ -1043,6 +1324,165 @@
 
 <script src="{{ asset('js/tasks/my-tasks-calendar.js') }}?v={{ time() }}"></script>
 
+<!-- My Tasks Statistics JavaScript -->
+<script src="{{ asset('js/tasks/my-tasks-stats.js') }}?v={{ time() }}"></script>
+
+<script>
+// ✅ فلترة المهام حسب التاريخ (deadline أو created_at)
+$(document).ready(function() {
+    // تحديث التسميات عند تغيير نوع التاريخ
+    $('#dateTypeFilter').on('change', function() {
+        updateDateLabels();
+        filterMyTasksByDate();
+    });
+
+    // Event listeners لحقول التاريخ
+    $('#dateFrom, #dateTo').on('change', function() {
+        filterMyTasksByDate();
+    });
+
+    // زر مسح فلتر التاريخ
+    $('#clearDateFilter').on('click', function() {
+        $('#dateFrom').val('');
+        $('#dateTo').val('');
+        filterMyTasksByDate();
+    });
+
+    // تحديث التسميات عند التحميل
+    updateDateLabels();
+});
+
+function updateDateLabels() {
+    const dateType = $('#dateTypeFilter').val();
+    if (dateType === 'deadline') {
+        $('#dateFromLabel').html('<i class="fas fa-calendar-alt"></i> من Deadline');
+        $('#dateToLabel').html('<i class="fas fa-calendar-alt"></i> إلى Deadline');
+    } else if (dateType === 'created_at') {
+        $('#dateFromLabel').html('<i class="fas fa-calendar-plus"></i> من تاريخ الإنشاء');
+        $('#dateToLabel').html('<i class="fas fa-calendar-plus"></i> إلى تاريخ الإنشاء');
+    }
+}
+
+function filterMyTasksByDate() {
+    const dateFrom = $('#dateFrom').val();
+    const dateTo = $('#dateTo').val();
+    const dateType = $('#dateTypeFilter').val();
+    const projectId = $('#projectFilter').val();
+    const status = $('#statusFilter').val();
+    const searchText = $('#searchInput').val().toLowerCase();
+
+    // فلترة العرض الجدولي
+    filterMyTasksTableView(dateFrom, dateTo, dateType, projectId, status, searchText);
+
+    // فلترة عرض الكانبان
+    if (window.myTasksCurrentView === 'kanban') {
+        filterMyTasksKanbanView(dateFrom, dateTo, dateType, projectId, status, searchText);
+    }
+}
+
+function filterMyTasksTableView(dateFrom, dateTo, dateType, projectId, status, searchText) {
+    $('#myTasksTable tbody tr').each(function() {
+        const $row = $(this);
+        let show = true;
+
+        // فلتر المشروع
+        if (projectId && $row.data('project-id') != projectId) {
+            show = false;
+        }
+
+        // فلتر الحالة
+        if (status && $row.data('status') != status) {
+            show = false;
+        }
+
+        // فلتر البحث
+        if (searchText && $row.text().toLowerCase().indexOf(searchText) === -1) {
+            show = false;
+        }
+
+        // ✅ فلتر التاريخ (deadline أو created_at)
+        if (show && (dateFrom || dateTo)) {
+            const taskDate = dateType === 'deadline' ? $row.data('due-date') : $row.data('created-at');
+
+            // فقط فلتر المهام التي لها تاريخ
+            if (taskDate && taskDate !== 'غير محدد') {
+                if (dateFrom && taskDate < dateFrom) {
+                    show = false;
+                }
+                if (dateTo && taskDate > dateTo) {
+                    show = false;
+                }
+            }
+        }
+
+        $row.toggle(show);
+    });
+}
+
+function filterMyTasksKanbanView(dateFrom, dateTo, dateType, projectId, status, searchText) {
+    $('.kanban-card').each(function() {
+        const $card = $(this);
+        let show = true;
+
+        // الحصول على البيانات من الكارد
+        const taskId = $card.data('task-id');
+        const $tableRow = $(`#myTasksTable tbody tr[data-task-id="${taskId}"]`);
+
+        if ($tableRow.length > 0) {
+            const cardProjectId = $tableRow.data('project-id');
+            const cardStatus = $tableRow.data('status');
+            const taskDate = dateType === 'deadline' ? $tableRow.data('due-date') : $tableRow.data('created-at');
+            const cardText = $card.text().toLowerCase();
+
+            // فلتر المشروع
+            if (projectId && cardProjectId != projectId) {
+                show = false;
+            }
+
+            // فلتر الحالة
+            if (status && cardStatus != status) {
+                show = false;
+            }
+
+            // فلتر البحث
+            if (searchText && cardText.indexOf(searchText) === -1) {
+                show = false;
+            }
+
+            // ✅ فلتر التاريخ (deadline أو created_at)
+            if (show && (dateFrom || dateTo)) {
+                if (taskDate && taskDate !== 'غير محدد') {
+                    if (dateFrom && taskDate < dateFrom) {
+                        show = false;
+                    }
+                    if (dateTo && taskDate > dateTo) {
+                        show = false;
+                    }
+                }
+            }
+        }
+
+        $card.toggle(show);
+    });
+
+    // تحديث عدادات الكانبان
+    updateMyTasksKanbanCounters();
+}
+
+function updateMyTasksKanbanCounters() {
+    $('.kanban-column').each(function() {
+        const $column = $(this);
+        const visibleCount = $column.find('.kanban-card:visible').length;
+        $column.find('.task-count').text(visibleCount);
+    });
+}
+
+// ✅ دمج فلترة التاريخ مع الفلاتر الأخرى
+$('#projectFilter, #statusFilter, #searchInput').on('change keyup', function() {
+    filterMyTasksByDate();
+});
+</script>
+
 <script>
 
 const oldFunctionsToRemove = [
@@ -1099,6 +1539,26 @@ window.NEW_MY_TASKS_SYSTEM = true;
 
 
 window.currentUserId = {{ Auth::id() }};
+
+// ⚡ Performance Optimization: Detect scrolling and disable animations
+(function() {
+    let scrollTimer;
+    const body = document.body;
+
+    window.addEventListener('scroll', function() {
+        clearTimeout(scrollTimer);
+
+        // Add scrolling class to disable animations
+        if (!body.classList.contains('scrolling')) {
+            body.classList.add('scrolling');
+        }
+
+        // Remove scrolling class after scroll stops
+        scrollTimer = setTimeout(function() {
+            body.classList.remove('scrolling');
+        }, 150);
+    }, { passive: true });
+})();
 
 document.addEventListener('DOMContentLoaded', function() {
     const tableViewBtn = document.getElementById('myTasksTableViewBtn');
@@ -1254,6 +1714,46 @@ document.addEventListener('click', function(e) {
 .task-sidebar {
     -ms-overflow-style: none;  /* إخفاء شريط التمرير في Internet Explorer and Edge */
     scrollbar-width: none;     /* إخفاء شريط التمرير في Firefox */
+}
+
+/* ⚡ Performance Optimization: Smooth Scrolling */
+* {
+    scroll-behavior: smooth;
+}
+
+html, body {
+    /* Enable GPU Acceleration */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.card-body {
+    /* Optimize large content scrolling */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+}
+
+.table-responsive {
+    /* Enable GPU acceleration for table scrolling */
+    transform: translateZ(0);
+    will-change: scroll-position;
+    -webkit-overflow-scrolling: touch;
+}
+
+.kanban-board, .calendar-view {
+    /* Optimize alternative views */
+    content-visibility: auto;
+    contain: layout style paint;
+}
+
+/* Disable animations during scroll for better performance */
+@media (prefers-reduced-motion: no-preference) {
+    body.scrolling * {
+        animation-duration: 0.01s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01s !important;
+    }
 }
 </style>
 

@@ -4,6 +4,104 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/projects-preparation-period.css') }}?v={{ time() }}">
+<style>
+/* Statistics Cards - Simple White Design */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-icon-primary {
+    background-color: #667eea;
+}
+
+.stat-icon-warning {
+    background-color: #f093fb;
+}
+
+.stat-icon-success {
+    background-color: #4facfe;
+}
+
+.stat-icon-info {
+    background-color: #43e97b;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.stat-footer {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.stat-footer i {
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+    }
+}
+</style>
 @endpush
 
 @section('content')
@@ -30,6 +128,77 @@
                         <div class="badge bg-white text-primary p-3" style="font-size: 1.1rem;">
                             <i class="fas fa-project-diagram me-2"></i>
                             {{ $projects->total() }} مشروع
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row g-3 mb-4">
+                <!-- إجمالي المشاريع -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-primary">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">إجمالي المشاريع</div>
+                            <div class="stat-value">{{ $projects->total() }}</div>
+                            <div class="stat-footer">
+                                <i class="fas fa-info-circle me-1"></i>
+                                في فترة التحضير
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المشاريع الجارية -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-warning">
+                            <i class="fas fa-spinner fa-pulse"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">جارية حالياً</div>
+                            <div class="stat-value">{{ $projects->where('preparation_status', 'active')->count() }}</div>
+                            <div class="stat-footer">
+                                <i class="fas fa-clock me-1"></i>
+                                قيد التنفيذ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المشاريع المنتهية -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">انتهت فترة التحضير</div>
+                            <div class="stat-value">{{ $projects->where('preparation_status', 'completed')->count() }}</div>
+                            <div class="stat-footer">
+                                <i class="fas fa-calendar-check me-1"></i>
+                                مكتملة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المشاريع المعلقة -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-info">
+                            <i class="fas fa-hourglass-start"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">لم تبدأ بعد</div>
+                            <div class="stat-value">{{ $projects->where('preparation_status', 'pending')->count() }}</div>
+                            <div class="stat-footer">
+                                <i class="fas fa-pause-circle me-1"></i>
+                                معلقة
+                            </div>
                         </div>
                     </div>
                 </div>

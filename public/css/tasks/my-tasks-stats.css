@@ -1,0 +1,354 @@
+/* ========================================
+   My Tasks Statistics Cards Styles
+   ======================================== */
+
+/* Statistics Cards Container */
+.stats-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    direction: rtl;
+    /* Optimize scrolling performance */
+    contain: layout style;
+    content-visibility: auto;
+}
+
+/* Individual Stats Card */
+.stats-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    /* GPU Acceleration for smooth scrolling */
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    contain: layout style paint;
+}
+
+
+/* Card Header */
+.stats-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.stats-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    background: var(--icon-bg, rgba(102, 126, 234, 0.1));
+    color: var(--icon-color, #667eea);
+    transition: transform 0.3s ease;
+    /* GPU Acceleration */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.stats-card-badge {
+    background: var(--badge-bg, rgba(102, 126, 234, 0.15));
+    color: var(--badge-color, #667eea);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Card Body */
+.stats-card-body {
+    margin-bottom: 0.75rem;
+}
+
+.stats-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    text-align: right;
+}
+
+.stats-card-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--value-color, #2c3e50);
+    line-height: 1.2;
+    text-align: right;
+    background: var(--value-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+}
+
+/* Card Footer */
+.stats-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6c757d;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stats-progress {
+    flex: 1;
+    margin-right: 0.5rem;
+}
+
+.stats-progress-bar {
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.stats-progress-fill {
+    height: 100%;
+    background: var(--progress-gradient, linear-gradient(90deg, #667eea 0%, #764ba2 100%));
+    border-radius: 10px;
+    transition: width 0.4s ease-out;
+    /* GPU Acceleration */
+    transform: translateZ(0);
+    will-change: width;
+}
+
+.stats-percentage {
+    font-weight: 600;
+    color: var(--percentage-color, #667eea);
+    white-space: nowrap;
+}
+
+/* Specific Card Styles */
+
+/* Total Tasks Card - Blue/Purple Gradient */
+.stats-card.total-tasks {
+    --card-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --icon-bg: rgba(102, 126, 234, 0.15);
+    --icon-color: #667eea;
+    --badge-bg: rgba(102, 126, 234, 0.15);
+    --badge-color: #667eea;
+    --value-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --progress-gradient: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    --percentage-color: #667eea;
+}
+
+/* New Tasks Card - Cyan/Blue */
+.stats-card.new-tasks {
+    --card-gradient: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    --icon-bg: rgba(23, 162, 184, 0.15);
+    --icon-color: #17a2b8;
+    --badge-bg: rgba(23, 162, 184, 0.15);
+    --badge-color: #17a2b8;
+    --value-gradient: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    --progress-gradient: linear-gradient(90deg, #17a2b8 0%, #138496 100%);
+    --percentage-color: #17a2b8;
+}
+
+/* In Progress Tasks Card - Blue */
+.stats-card.in-progress-tasks {
+    --card-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --icon-bg: rgba(59, 130, 246, 0.15);
+    --icon-color: #3b82f6;
+    --badge-bg: rgba(59, 130, 246, 0.15);
+    --badge-color: #3b82f6;
+    --value-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --progress-gradient: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    --percentage-color: #3b82f6;
+}
+
+/* Completed Tasks Card - Green */
+.stats-card.completed-tasks {
+    --card-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --icon-bg: rgba(16, 185, 129, 0.15);
+    --icon-color: #10b981;
+    --badge-bg: rgba(16, 185, 129, 0.15);
+    --badge-color: #10b981;
+    --value-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --progress-gradient: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    --percentage-color: #10b981;
+}
+
+/* Paused Tasks Card - Orange/Yellow */
+.stats-card.paused-tasks {
+    --card-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --icon-bg: rgba(245, 158, 11, 0.15);
+    --icon-color: #f59e0b;
+    --badge-bg: rgba(245, 158, 11, 0.15);
+    --badge-color: #f59e0b;
+    --value-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --progress-gradient: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+    --percentage-color: #f59e0b;
+}
+
+/* Time Tracking Card - Indigo */
+.stats-card.time-tracking {
+    --card-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --icon-bg: rgba(99, 102, 241, 0.15);
+    --icon-color: #6366f1;
+    --badge-bg: rgba(99, 102, 241, 0.15);
+    --badge-color: #6366f1;
+    --value-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --progress-gradient: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+    --percentage-color: #6366f1;
+}
+
+/* Points Card - Pink/Purple */
+.stats-card.points-card {
+    --card-gradient: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+    --icon-bg: rgba(236, 72, 153, 0.15);
+    --icon-color: #ec4899;
+    --badge-bg: rgba(236, 72, 153, 0.15);
+    --badge-color: #ec4899;
+    --value-gradient: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+    --progress-gradient: linear-gradient(90deg, #ec4899 0%, #be185d 100%);
+    --percentage-color: #ec4899;
+}
+
+/* Transferred Tasks Card - Amber */
+.stats-card.transferred-tasks {
+    --card-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    --icon-bg: rgba(251, 191, 36, 0.15);
+    --icon-color: #fbbf24;
+    --badge-bg: rgba(251, 191, 36, 0.15);
+    --badge-color: #fbbf24;
+    --value-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    --progress-gradient: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+    --percentage-color: #fbbf24;
+}
+
+/* Time Comparison Layout */
+.time-comparison {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.time-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.time-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.time-value {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+    .stats-cards-container {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .stats-cards-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .stats-card-value {
+        font-size: 1.85rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-cards-container {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+
+    .stats-card {
+        padding: 1.25rem;
+    }
+
+    .stats-card-value {
+        font-size: 1.75rem;
+    }
+
+    .stats-card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+}
+
+/* Animation for counting effect - Optimized */
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 10px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.stats-card-value {
+    animation: countUp 0.6s ease-out;
+    /* Prevent animation from affecting scroll performance */
+    animation-fill-mode: both;
+    will-change: transform, opacity;
+}
+
+/* Skeleton Loading State */
+.stats-card.loading {
+    pointer-events: none;
+}
+
+.stats-card.loading .stats-card-value,
+.stats-card.loading .stats-card-title {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    color: transparent;
+    -webkit-background-clip: initial;
+    -webkit-text-fill-color: initial;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Clickable effect */
+.stats-card[data-filter] {
+    cursor: pointer;
+}
+
+/* Active filter state */
+.stats-card.active-filter {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    border-color: var(--icon-color);
+}
+

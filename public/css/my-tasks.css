@@ -59,10 +59,15 @@ body {
     border: none;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
     background: var(--arkan-white);
     position: relative;
+    /* GPU Acceleration */
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 .card::before {
@@ -76,8 +81,9 @@ body {
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-xl);
+    /* Reduce hover effect for better performance */
+    transform: translate3d(0, -2px, 0);
+    box-shadow: var(--shadow-lg);
 }
 
 .card-header {
@@ -110,7 +116,10 @@ body {
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, #5DC4E5 0%, #A8E2F0 50%, #5DC4E5 100%);
-    animation: headerGlow 3s ease-in-out infinite;
+    /* Disable glow animation for better scroll performance */
+    /* animation: headerGlow 3s ease-in-out infinite; */
+    opacity: 0.9;
+    will-change: auto;
 }
 
 @keyframes headerGlow {
@@ -157,11 +166,14 @@ body {
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
+    /* Disable shimmer effect for better scroll performance */
+    /* transition: left 0.5s; */
+    will-change: auto;
+    display: none;
 }
 
 .btn:hover::before {
-    left: 100%;
+    /* left: 100%; */
 }
 
 .btn:hover {
@@ -242,9 +254,13 @@ body {
 }
 
 .table tbody tr {
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
     border-bottom: 1px solid rgba(106, 174, 217, 0.1);
     position: relative;
+    /* GPU Acceleration */
+    transform: translateZ(0);
+    will-change: transform;
+    contain: layout style;
 }
 
 .table tbody tr:last-child {
@@ -253,7 +269,9 @@ body {
 
 .table tbody tr:hover {
     background: linear-gradient(135deg, rgba(106, 174, 217, 0.05) 0%, rgba(106, 174, 217, 0.02) 100%);
-    transform: scale(1.01);
+    /* Disable scale transform for better scroll performance */
+    /* transform: scale(1.01); */
+    transform: translate3d(0, 0, 0);
     box-shadow: var(--shadow-sm);
 }
 
@@ -277,7 +295,11 @@ body {
     text-align: center;
     font-family: 'Courier New', monospace;
     box-shadow: var(--shadow-sm);
-    animation: pulse 2s infinite;
+    /* Disable pulse animation for better performance */
+    /* animation: pulse 2s infinite; */
+    /* GPU Acceleration */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 @keyframes pulse {
@@ -297,6 +319,9 @@ body {
     font-size: 0.75rem;
     position: relative;
     overflow: hidden;
+    /* GPU Acceleration */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .badge::before {
@@ -308,11 +333,12 @@ body {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
     animation: shimmer 3s infinite;
+    will-change: transform;
 }
 
 @keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(200%); }
 }
 
 .bg-info {
@@ -412,6 +438,7 @@ select.form-control {
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, #5DC4E5 0%, #A8E2F0 50%, #5DC4E5 100%);
+    opacity: 0.9;
 }
 
 .modal-header .modal-title {
@@ -542,20 +569,23 @@ select.form-control {
     font-style: italic;
 }
 
-/* Loading Animation */
+/* Loading Animation - Optimized */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translate3d(0, 20px, 0);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0);
     }
 }
 
 .card, .table tbody tr {
-    animation: fadeInUp 0.6s ease forwards;
+    /* Remove animation for better scroll performance */
+    /* animation: fadeInUp 0.6s ease forwards; */
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
 }
 
 /* RTL Support */

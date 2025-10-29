@@ -1,240 +1,377 @@
 @extends('layouts.app')
 
+@section('title', 'تعديل الاجتماع')
+
 @push('styles')
-<link href="{{ asset('css/meetings.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/meetings/meetings-modern.css') }}">
 @endpush
 
 @section('content')
-<div class="container">
-    <h2 class="page-title">{{ __('تعديل الاجتماع') }}</h2>
+<div class="simple-container">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>✏️ تعديل الاجتماع</h1>
+            <p>قم بتحديث بيانات الاجتماع</p>
+        </div>
 
-    <div class="meetings-page">
-        <div class="arkan-container">
+        <!-- Form Container -->
+        <div class="form-container">
+            <div class="form-header">
+                <h2>📝 تعديل تفاصيل الاجتماع</h2>
+            </div>
 
-            <form method="POST" action="{{ route('meetings.update', $meeting) }}">
-                @csrf
-                @method('PUT')
+            <div class="form-body">
+                <form method="POST" action="{{ route('meetings.update', $meeting) }}">
+                    @csrf
+                    @method('PUT')
 
-                <div class="arkan-form-group">
-                    <label for="title" class="arkan-form-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                        </svg>
-                        {{ __('عنوان الاجتماع') }}
-                    </label>
-                    <input id="title" class="arkan-form-control" type="text" name="title" value="{{ old('title', $meeting->title) }}" required autofocus placeholder="أدخل عنوان الاجتماع..." />
-                    @error('title')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading"></i>
+                            عنوان الاجتماع
+                        </label>
+                        <input id="title" class="form-control" type="text" name="title" value="{{ old('title', $meeting->title) }}" required autofocus placeholder="أدخل عنوان الاجتماع..." />
+                        @error('title')
+                            <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <div class="arkan-form-group">
-                    <label for="description" class="arkan-form-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                        </svg>
-                        {{ __('وصف الاجتماع') }}
-                    </label>
-                    <textarea id="description" name="description" class="arkan-form-control" rows="3" placeholder="أدخل وصف الاجتماع (اختياري)...">{{ old('description', $meeting->description) }}</textarea>
-                    @error('description')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            وصف الاجتماع
+                        </label>
+                        <textarea id="description" name="description" class="form-textarea" rows="3" placeholder="أدخل وصف الاجتماع (اختياري)...">{{ old('description', $meeting->description) }}</textarea>
+                        @error('description')
+                            <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <div class="arkan-form-group">
-                    <label for="type" class="arkan-form-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-                        </svg>
-                        {{ __('نوع الاجتماع') }}
-                    </label>
-                    <select id="type" name="type" class="arkan-form-control" required>
-                        <option value="internal" {{ old('type', $meeting->type) == 'internal' ? 'selected' : '' }}>اجتماع داخلي</option>
-                        <option value="client" {{ old('type', $meeting->type) == 'client' ? 'selected' : '' }}>اجتماع مع عميل</option>
-                    </select>
-                    @error('type')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <!-- Type -->
+                    <div class="form-group">
+                        <label for="type" class="form-label">
+                            <i class="fas fa-tag"></i>
+                            نوع الاجتماع
+                        </label>
+                        <select id="type" name="type" class="form-select" required>
+                            <option value="internal" {{ old('type', $meeting->type) == 'internal' ? 'selected' : '' }}>اجتماع داخلي</option>
+                            <option value="client" {{ old('type', $meeting->type) == 'client' ? 'selected' : '' }}>اجتماع مع عميل</option>
+                        </select>
+                        @error('type')
+                            <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                @if($canViewClients)
-                <div class="arkan-form-group client-field {{ $meeting->type == 'client' ? '' : 'hidden' }}">
-                    <label for="client_id" class="arkan-form-label">{{ __('العميل') }}</label>
-                    <select id="client_id" name="client_id" class="arkan-form-control">
-                        <option value="">اختر العميل (اختياري)</option>
-                        @foreach($clients as $client)
-                            <option value="{{ $client->id }}" {{ old('client_id', $meeting->client_id) == $client->id ? 'selected' : '' }}>{{ $client->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('client_id')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                @endif
+                    <!-- Client -->
+                    @if($canViewClients)
+                    <div class="form-group client-field {{ $meeting->type == 'client' ? '' : 'hidden' }}">
+                        <label for="client_search" class="form-label">
+                            <i class="fas fa-user-tie"></i>
+                            العميل
+                        </label>
+                        <input
+                            type="text"
+                            id="client_search"
+                            class="form-control"
+                            list="clients_list"
+                            placeholder="ابحث بالاسم أو الكود أو اختر من القائمة..."
+                            autocomplete="off"
+                            value="{{ old('client_id') ? $clients->firstWhere('id', old('client_id'))?->name . ' - ' . $clients->firstWhere('id', old('client_id'))?->client_code : ($meeting->client ? $meeting->client->name . ' - ' . $meeting->client->client_code : '') }}"
+                        />
+                        <input type="hidden" id="client_id" name="client_id" value="{{ old('client_id', $meeting->client_id) }}" />
+                        <datalist id="clients_list">
+                            @foreach($clients as $client)
+                                <option value="{{ $client->name }} - {{ $client->client_code }}" data-id="{{ $client->id }}">
+                                    {{ $client->name }} - {{ $client->client_code }}
+                                </option>
+                            @endforeach
+                        </datalist>
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> اختر العميل لعرض مشاريعه فقط
+                        </p>
+                        @error('client_id')
+                            <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    @endif
 
-                <div class="arkan-form-group project-field {{ $meeting->type == 'client' ? '' : 'hidden' }}">
-                    <label for="project_id" class="arkan-form-label">{{ __('المشروع') }}</label>
-                    <select id="project_id" name="project_id" class="arkan-form-control">
-                        <option value="">اختر المشروع (اختياري)</option>
-                        @foreach($projects as $project)
-                            <option value="{{ $project->id }}" data-client-id="{{ $project->client_id }}" {{ old('project_id', $meeting->project_id) == $project->id ? 'selected' : '' }}>
-                                {{ $project->name }}
-                                @if($canViewClients && $project->client) - {{ $project->client->name }} @endif
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('project_id')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <!-- Project -->
+                    <div class="form-group project-field {{ $meeting->type == 'client' ? '' : 'hidden' }}">
+                        <label for="project_search" class="form-label">
+                            <i class="fas fa-project-diagram"></i>
+                            المشروع
+                        </label>
+                        <input
+                            type="text"
+                            id="project_search"
+                            class="form-control"
+                            list="projects_list"
+                            placeholder="ابحث بالاسم أو الكود أو اختر من القائمة..."
+                            autocomplete="off"
+                            value="{{ old('project_id') ? $projects->firstWhere('id', old('project_id'))?->name . ' - ' . $projects->firstWhere('id', old('project_id'))?->code : ($meeting->project ? $meeting->project->name . ' - ' . $meeting->project->code : '') }}"
+                        />
+                        <input type="hidden" id="project_id" name="project_id" value="{{ old('project_id', $meeting->project_id) }}" />
+                        <datalist id="projects_list">
+                            @foreach($projects as $project)
+                                <option value="{{ $project->name }} - {{ $project->code }}" data-id="{{ $project->id }}" data-client-id="{{ $project->client_id }}">
+                                    {{ $project->name }} - {{ $project->code }}
+                                    @if($canViewClients && $project->client) ({{ $project->client->name }}) @endif
+                                </option>
+                            @endforeach
+                        </datalist>
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> اختر المشروع ليتم تحديد العميل تلقائياً
+                        </p>
+                        @error('project_id')
+                            <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="arkan-form-group">
-                            <label for="start_time" class="arkan-form-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                </svg>
-                                {{ __('وقت البدء') }}
-                            </label>
-                            <input id="start_time" class="arkan-form-control" type="datetime-local" name="start_time" value="{{ old('start_time', $meeting->start_time->format('Y-m-d\TH:i')) }}" required />
-                            @error('start_time')
-                                <p class="text-danger mt-1">{{ $message }}</p>
-                            @enderror
+                    <!-- Time -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="start_time" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    وقت البدء
+                                </label>
+                                <input id="start_time" class="form-control" type="datetime-local" name="start_time" value="{{ old('start_time', $meeting->start_time->format('Y-m-d\TH:i')) }}" required />
+                                @error('start_time')
+                                    <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="end_time" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    وقت الانتهاء
+                                </label>
+                                <input id="end_time" class="form-control" type="datetime-local" name="end_time" value="{{ old('end_time', $meeting->end_time->format('Y-m-d\TH:i')) }}" required />
+                                @error('end_time')
+                                    <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="arkan-form-group">
-                            <label for="end_time" class="arkan-form-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                </svg>
-                                {{ __('وقت الانتهاء') }}
-                            </label>
-                            <input id="end_time" class="arkan-form-control" type="datetime-local" name="end_time" value="{{ old('end_time', $meeting->end_time->format('Y-m-d\TH:i')) }}" required />
-                            @error('end_time')
-                                <p class="text-danger mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label for="location" class="form-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            المكان
+                        </label>
+                        <input id="location" class="form-control" type="text" name="location" value="{{ old('location', $meeting->location) }}" placeholder="أدخل مكان الاجتماع (اختياري)..." />
+                        @error('location')
+                            <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
                     </div>
-                </div>
 
-                <div class="arkan-form-group">
-                    <label for="location" class="arkan-form-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                        </svg>
-                        {{ __('المكان') }}
-                    </label>
-                    <input id="location" class="arkan-form-control" type="text" name="location" value="{{ old('location', $meeting->location) }}" placeholder="أدخل مكان الاجتماع (اختياري)..." />
-                    @error('location')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <!-- Participants -->
+                    <div class="form-group">
+                        <label for="participants" class="form-label">
+                            <i class="fas fa-users"></i>
+                            المشاركين
+                        </label>
+                        <select id="participants" name="participants[]" class="form-select select2" multiple required style="height: auto; min-height: 120px;">
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}" {{ (is_array(old('participants')) && in_array($user->id, old('participants'))) || (empty(old('participants')) && in_array($user->id, $selectedParticipants)) ? 'selected' : '' }}>
+                                    {{ $user->name }} ({{ $user->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">اضغط مع CTRL أو CMD لاختيار متعدد</p>
+                        @error('participants')
+                            <p style="color: #dc2626; font-size: 0.85rem; margin-top: 0.5rem;">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <div class="arkan-form-group">
-                    <label for="participants" class="arkan-form-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-                        </svg>
-                        {{ __('المشاركين') }}
-                    </label>
-                    <select id="participants" name="participants[]" class="arkan-form-control select2" multiple required>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ (is_array(old('participants')) && in_array($user->id, old('participants'))) || (empty(old('participants')) && in_array($user->id, $selectedParticipants)) ? 'selected' : '' }}>
-                                {{ $user->name }} ({{ $user->email }})
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="text-muted mt-1">اضغط مع CTRL أو CMD لاختيار متعدد</p>
-                    @error('participants')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                    @error('participants.*')
-                        <p class="text-danger mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="text-end mt-4">
-                    <a href="{{ route('meetings.show', $meeting) }}" class="arkan-btn-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                        </svg>
-                        {{ __('إلغاء') }}
-                    </a>
-                    <button type="submit" class="arkan-btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        {{ __('تحديث الاجتماع') }}
-                    </button>
-                </div>
-            </form>
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <a href="{{ route('meetings.show', $meeting) }}" class="meetings-btn btn-delete">
+                            <i class="fas fa-times"></i>
+                            إلغاء
+                        </a>
+                        <button type="submit" class="meetings-btn">
+                            <i class="fas fa-save"></i>
+                            تحديث الاجتماع
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
+<script>
+    // Define data outside DOMContentLoaded
+    const editMeetingClientData = {!! json_encode($clients->map(function($c) {
+        return ['display' => $c->name . ' - ' . $c->client_code, 'id' => (string)$c->id];
+    })->values()) !!};
+    const editMeetingProjectData = {!! json_encode($projects->map(function($p) {
+        return [
+            'display' => $p->name . ' - ' . $p->code,
+            'id' => (string)$p->id,
+            'client_id' => (string)$p->client_id
+        ];
+    })->values()) !!};
+    const editCanViewClientsData = {!! json_encode($canViewClients) !!};
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const typeSelect = document.getElementById('type');
         const clientField = document.querySelector('.client-field');
         const projectField = document.querySelector('.project-field');
-        const clientSelect = document.getElementById('client_id');
-        const projectSelect = document.getElementById('project_id');
+        const clientSearchInput = document.getElementById('client_search');
+        const clientIdInput = document.getElementById('client_id');
+        const projectSearchInput = document.getElementById('project_search');
+        const projectIdInput = document.getElementById('project_id');
 
-        const canViewClients = {{ $canViewClients ? 'true' : 'false' }};
+        const canViewClients = editCanViewClientsData;
 
-        // Event listener
+        // Build client map: "name - code" => id
+        const clientsMap = new Map();
+        editMeetingClientData.forEach(client => {
+            clientsMap.set(client.display, client.id);
+        });
+
+        // Build project map: "name - code" => {id, client_id}
+        const projectsMap = new Map();
+        editMeetingProjectData.forEach(project => {
+            projectsMap.set(project.display, {id: project.id, client_id: project.client_id});
+        });
+
+        // Initial setup: if there's a pre-selected client, filter projects on load
+        if (typeSelect.value === 'client' && clientIdInput && clientIdInput.value) {
+            updateProjectsList(clientIdInput.value);
+        }
+
+        // Event listener for meeting type
         typeSelect.addEventListener('change', function() {
             if (this.value === 'client') {
                 if (canViewClients && clientField) clientField.classList.remove('hidden');
-                projectField.classList.remove('hidden');
+                if (projectField) projectField.classList.remove('hidden');
             } else {
                 if (canViewClients && clientField) clientField.classList.add('hidden');
-                projectField.classList.add('hidden');
-                if (clientSelect) clientSelect.value = '';
-                projectSelect.value = '';
+                if (projectField) projectField.classList.add('hidden');
+                if (clientSearchInput) {
+                    clientSearchInput.value = '';
+                    clientIdInput.value = '';
+                }
+                if (projectSearchInput) {
+                    projectSearchInput.value = '';
+                    projectIdInput.value = '';
+                }
             }
         });
 
-        // Event listener for client selection (filter projects) - only if client select exists
-        if (clientSelect) {
-            clientSelect.addEventListener('change', function() {
-                const selectedClientId = this.value;
-                const projectOptions = projectSelect.querySelectorAll('option');
+        // Event listener for client search input
+        if (clientSearchInput) {
+            clientSearchInput.addEventListener('input', function() {
+                const selectedValue = this.value.trim();
 
-                // Reset project selection
-                projectSelect.value = '';
+                // Check if the value matches a client in our map
+                if (clientsMap.has(selectedValue)) {
+                    const selectedClientId = clientsMap.get(selectedValue);
+                    clientIdInput.value = selectedClientId;
 
-                // Show/hide project options based on selected client
-                projectOptions.forEach(option => {
-                    if (option.value === '') {
-                        // Always show the default option
-                        option.style.display = 'block';
-                    } else if (selectedClientId === '') {
-                        // Show all projects if no client selected
-                        option.style.display = 'block';
-                    } else {
-                        // Show only projects for selected client
-                        const optionClientId = option.getAttribute('data-client-id');
-                        option.style.display = (optionClientId === selectedClientId) ? 'block' : 'none';
-                    }
-                });
-            });
-
-            // Event listener for project selection (auto-select client)
-            projectSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                if (selectedOption.value && selectedOption.hasAttribute('data-client-id')) {
-                    const clientId = selectedOption.getAttribute('data-client-id');
-                    if (clientId && clientSelect) {
-                        clientSelect.value = clientId;
-                    }
+                    // Update available projects based on selected client
+                    updateProjectsList(selectedClientId);
+                } else {
+                    clientIdInput.value = '';
+                    // Show all projects if no client is selected
+                    updateProjectsList('');
                 }
             });
+
+            // Event listener for blur (when user leaves the input)
+            clientSearchInput.addEventListener('blur', function() {
+                // If the value doesn't match any client, clear the input
+                if (!clientsMap.has(this.value.trim()) && this.value.trim() !== '') {
+                    setTimeout(() => {
+                        if (!clientsMap.has(this.value.trim())) {
+                            this.value = '';
+                            clientIdInput.value = '';
+                            updateProjectsList('');
+                        }
+                    }, 200);
+                }
+            });
+        }
+
+        // Event listener for project search input
+        if (projectSearchInput) {
+            projectSearchInput.addEventListener('input', function() {
+                const selectedValue = this.value.trim();
+
+                // Check if the value matches a project in our map
+                if (projectsMap.has(selectedValue)) {
+                    const projectData = projectsMap.get(selectedValue);
+                    projectIdInput.value = projectData.id;
+
+                    // Auto-select the client if project has one
+                    if (projectData.client_id && clientSearchInput) {
+                        for (let [clientDisplay, clientId] of clientsMap) {
+                            if (clientId === projectData.client_id) {
+                                clientSearchInput.value = clientDisplay;
+                                clientIdInput.value = clientId;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    projectIdInput.value = '';
+                }
+            });
+
+            // Event listener for blur
+            projectSearchInput.addEventListener('blur', function() {
+                if (!projectsMap.has(this.value.trim()) && this.value.trim() !== '') {
+                    setTimeout(() => {
+                        if (!projectsMap.has(this.value.trim())) {
+                            this.value = '';
+                            projectIdInput.value = '';
+                        }
+                    }, 200);
+                }
+            });
+        }
+
+        // Function to update projects datalist based on selected client
+        function updateProjectsList(selectedClientId) {
+            if (!projectSearchInput) return;
+
+            const projectsList = document.getElementById('projects_list');
+            if (!projectsList) return;
+
+            // Clear existing options
+            projectsList.innerHTML = '';
+
+            // Add filtered projects
+            editMeetingProjectData.forEach(project => {
+                if (selectedClientId === '' || project.client_id === selectedClientId) {
+                    const option = document.createElement('option');
+                    option.value = project.display;
+                    option.setAttribute('data-id', project.id);
+                    option.setAttribute('data-client-id', project.client_id);
+                    projectsList.appendChild(option);
+                }
+            });
+
+            // Clear project selection if current project doesn't match filter
+            if (projectIdInput.value) {
+                const currentProjectData = Array.from(projectsMap.values()).find(p => p.id === projectIdInput.value);
+                if (currentProjectData && selectedClientId && currentProjectData.client_id !== selectedClientId) {
+                    projectSearchInput.value = '';
+                    projectIdInput.value = '';
+                }
+            }
         }
     });
 </script>
 @endpush
+@endsection

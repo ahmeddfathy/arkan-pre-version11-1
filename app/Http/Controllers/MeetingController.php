@@ -73,7 +73,28 @@ class MeetingController extends BaseController
             ->orderBy('start_time', 'desc')
             ->get();
 
-        return view('meetings.index', compact('meetings'));
+        // Calculate Statistics
+        $stats = [
+            'total' => $meetings->count(),
+            'upcoming' => $meetings->filter(function($meeting) {
+                return $meeting->start_time > now();
+            })->count(),
+            'current' => $meetings->filter(function($meeting) {
+                return $meeting->start_time <= now() && $meeting->end_time >= now();
+            })->count(),
+            'completed' => $meetings->filter(function($meeting) {
+                return $meeting->is_completed || $meeting->status === 'completed';
+            })->count(),
+            'past' => $meetings->filter(function($meeting) {
+                return $meeting->end_time < now();
+            })->count(),
+            'client_meetings' => $meetings->where('type', 'client')->count(),
+            'internal_meetings' => $meetings->where('type', 'internal')->count(),
+            'pending_approval' => $meetings->where('approval_status', 'pending')->count(),
+            'cancelled' => $meetings->where('status', 'cancelled')->count(),
+        ];
+
+        return view('meetings.index', compact('meetings', 'stats'));
     }
 
     /**
@@ -87,7 +108,7 @@ class MeetingController extends BaseController
 
         // فقط موظفو المبيعات يمكنهم رؤية العملاء
         $canViewClients = $this->roleCheckService->userHasRole('sales_employee');
-        $clients = $canViewClients ? Client::all() : collect();
+        $clients = $canViewClients ? Client::latest()->get() : collect();
 
         // المشاريع - إخفاء أسماء العملاء للموظفين العاديين
         if ($canViewClients) {
@@ -217,7 +238,7 @@ class MeetingController extends BaseController
 
         // فقط موظفو المبيعات يمكنهم رؤية العملاء
         $canViewClients = $this->roleCheckService->userHasRole('sales_employee');
-        $clients = $canViewClients ? Client::all() : collect();
+        $clients = $canViewClients ? Client::latest()->get() : collect();
 
         // المشاريع - إخفاء أسماء العملاء للموظفين العاديين
         if ($canViewClients) {

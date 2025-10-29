@@ -193,11 +193,12 @@ class TaskManagementService
                 );
             }
 
+            // ✅ ترتيب المهام من الأحدث إلى الأقدم
             if ($paginate) {
-                $result = $query->orderBy('due_date')->paginate(10);
+                $result = $query->orderBy('created_at', 'desc')->paginate(10);
             } else {
                 // إرجاع كل المهام بدون pagination لصفحة My Tasks
-                $result = $query->orderBy('due_date')->get();
+                $result = $query->orderBy('created_at', 'desc')->get();
             }
 
             // إضافة pivot data للمهام العادية للتوافق مع الـ view

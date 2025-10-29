@@ -177,19 +177,31 @@ class ProjectPauseService
      */
     public function getPausedProjectsStats(): array
     {
-        $pausedProjects = Project::where('status', 'موقوف')
-            ->with('activePause')
+        // المشاريع الموقوفة حالياً
+        $currentlyPausedProjects = Project::where('status', 'موقوف')->count();
+
+        // المشاريع النشطة
+        $activeProjects = Project::whereIn('status', ['جديد', 'جاري'])->count();
+
+        // إجمالي المشاريع
+        $totalProjects = Project::count();
+
+        // جلب كل سجلات التوقيف (النشطة والمنتهية)
+        $allPauses = \App\Models\ProjectPause::with(['project', 'pausedBy', 'resumedBy'])
+            ->orderBy('paused_at', 'desc')
             ->get();
 
         $stats = [
-            'total_paused' => $pausedProjects->count(),
-            'by_reason' => []
+            'total_paused' => $currentlyPausedProjects,
+            'total_active' => $activeProjects,
+            'pause_percentage' => $totalProjects > 0 ? round(($currentlyPausedProjects / $totalProjects) * 100, 1) : 0,
+            'by_reason' => [],
+            'recent_pauses' => []
         ];
 
+        // توزيع أسباب التوقيف (جميع السجلات - نشطة ومنتهية)
         foreach (Project::getPauseReasons() as $key => $label) {
-            $count = $pausedProjects->filter(function($project) use ($key) {
-                return $project->activePause && $project->activePause->pause_reason === $key;
-            })->count();
+            $count = $allPauses->where('pause_reason', $key)->count();
 
             if ($count > 0) {
                 $stats['by_reason'][$key] = [
@@ -198,6 +210,9 @@ class ProjectPauseService
                 ];
             }
         }
+
+        // آخر 10 سجلات توقيف (سواء نشطة أو منتهية)
+        $stats['recent_pauses'] = $allPauses->take(10);
 
         return $stats;
     }

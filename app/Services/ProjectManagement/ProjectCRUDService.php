@@ -45,7 +45,7 @@ class ProjectCRUDService
         });
 
         return [
-            'clients' => Client::all(),
+            'clients' => Client::latest()->get(),
             'services' => CompanyService::all(),
             'packages' => $packages
         ];

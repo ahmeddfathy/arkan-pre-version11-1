@@ -117,15 +117,12 @@ class ProjectPauseController extends Controller
     }
 
     /**
-     * API للحصول على إحصائيات المشاريع الموقوفة
+     * عرض صفحة إحصائيات المشاريع الموقوفة
      */
     public function stats()
     {
         $stats = $this->projectPauseService->getPausedProjectsStats();
 
-        return response()->json([
-            'success' => true,
-            'data' => $stats
-        ]);
+        return view('projects.pause.stats', compact('stats'));
     }
 }
