@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TaskRevision;
 use App\Services\Tasks\TaskRevisionService;
 use App\Services\Tasks\TaskRevisionStatusService;
+use App\Services\Tasks\RevisionStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -15,13 +16,16 @@ class TaskRevisionController extends Controller
 {
     protected $revisionService;
     protected $statusService;
+    protected $storageService;
 
     public function __construct(
         TaskRevisionService $revisionService,
-        TaskRevisionStatusService $statusService
+        TaskRevisionStatusService $statusService,
+        RevisionStorageService $storageService
     ) {
         $this->revisionService = $revisionService;
         $this->statusService = $statusService;
+        $this->storageService = $storageService;
         $this->middleware('auth');
     }
 
@@ -264,13 +268,6 @@ class TaskRevisionController extends Controller
                 ], 404);
             }
 
-            if (!Storage::disk('public')->exists($revision->attachment_path)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'الملف المرفق غير موجود'
-                ], 404);
-            }
-
             // تسجيل نشاط التحميل
             activity()
                 ->performedOn($revision)
@@ -283,21 +280,105 @@ class TaskRevisionController extends Controller
                 ])
                 ->log('تم تحميل مرفق التعديل');
 
-            return Storage::disk('public')->download(
-                $revision->attachment_path,
-                $revision->attachment_name
-            );
+            // التحقق: هل الملف في storage المحلي (ملفات قديمة) أم على Wasabi (ملفات جديدة)
+            if (Storage::disk('public')->exists($revision->attachment_path)) {
+                // ملف قديم على السيرفر المحلي
+                $filePath = storage_path('app/public/' . $revision->attachment_path);
+                return response()->download($filePath, $revision->attachment_name);
+            } else {
+                // ملف جديد على Wasabi - التحقق من وجوده
+                if (!$this->storageService->fileExists($revision->attachment_path)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'الملف المرفق غير موجود في التخزين'
+                    ], 404);
+                }
+
+                // الحصول على presigned URL من Wasabi والتوجيه إليه
+                $downloadUrl = $this->storageService->getPresignedUrl($revision->attachment_path, 5); // صالح لمدة 5 دقائق
+
+                return redirect($downloadUrl);
+            }
 
         } catch (\Exception $e) {
             Log::error('Error downloading revision attachment', [
                 'revision_id' => $revision->id,
                 'attachment_path' => $revision->attachment_path,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ في تحميل الملف'
+            ], 500);
+        }
+    }
+
+    /**
+     * عرض الملف المرفق في المتصفح
+     */
+    public function viewAttachment(TaskRevision $revision)
+    {
+        try {
+            if (!$revision->attachment_path) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يوجد ملف مرفق مع هذا التعديل'
+                ], 404);
+            }
+
+            // تسجيل نشاط العرض
+            activity()
+                ->performedOn($revision)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'action' => 'view_attachment',
+                    'file_name' => $revision->attachment_name,
+                    'file_path' => $revision->attachment_path,
+                    'viewed_at' => now()->toDateTimeString()
+                ])
+                ->log('تم عرض مرفق التعديل');
+
+            // التحقق: هل الملف في storage المحلي (ملفات قديمة) أم على Wasabi (ملفات جديدة)
+            if (Storage::disk('public')->exists($revision->attachment_path)) {
+                // ملف قديم على السيرفر المحلي
+                $filePath = storage_path('app/public/' . $revision->attachment_path);
+
+                // تحديد MIME type الصحيح
+                $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+
+                // إرجاع الملف مع headers للعرض inline
+                return response()->file($filePath, [
+                    'Content-Type' => $mimeType,
+                    'Content-Disposition' => 'inline; filename="' . $revision->attachment_name . '"'
+                ]);
+            } else {
+                // ملف جديد على Wasabi - التحقق من وجوده
+                if (!$this->storageService->fileExists($revision->attachment_path)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'الملف المرفق غير موجود في التخزين'
+                    ], 404);
+                }
+
+                // الحصول على presigned URL من Wasabi للعرض (مدة أطول)
+                $viewUrl = $this->storageService->getPresignedUrl($revision->attachment_path, 30); // صالح لمدة 30 دقيقة
+
+                return redirect($viewUrl);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error viewing revision attachment', [
+                'revision_id' => $revision->id,
+                'attachment_path' => $revision->attachment_path,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ في عرض الملف: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -700,7 +781,7 @@ class TaskRevisionController extends Controller
             $hasRestrictedRole = !empty(array_intersect($restrictedRoles, $userRoleNames));
 
             if ($hasRestrictedRole) {
-    
+
                 $reviewerRoleIds = \App\Models\RoleHierarchy::getReviewerRoleIds();
 
 
@@ -738,7 +819,7 @@ class TaskRevisionController extends Controller
                     $userRoleIds = $reviewer->roles->pluck('id')->toArray();
                     $matchingRoleIds = array_intersect($userRoleIds, $reviewerRoleIds);
                     $isInProject = in_array($reviewer->id, $participantIds);
-                    
+
                     return [
                         'id' => $reviewer->id,
                         'name' => $reviewer->name,

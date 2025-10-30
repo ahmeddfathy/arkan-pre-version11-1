@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="additional-tasks-container">
-    <div class="container">
+    <div style="width: 100%; padding: 0 2rem;">
         <!-- Page Header -->
         <div class="page-header-tasks">
             <h1>📋 إدارة المهام الإضافية</h1>
@@ -59,8 +59,8 @@
         @php
             $activeCount = $tasks->where('status', 'active')->count();
             $expiredCount = $tasks->where('status', 'expired')->count();
-            $autoAssignCount = $tasks->where('assignment_type', 'auto_assign')->count();
-            $applicationCount = $tasks->where('assignment_type', 'application_required')->count();
+            $completedTasksCount = $tasks->where('status', 'completed')->count();
+            $cancelledCount = $tasks->where('status', 'cancelled')->count();
         @endphp
         <div class="stats-row-tasks">
             <div class="stat-card-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
@@ -73,15 +73,15 @@
                 <div class="stat-number-modern">{{ $activeCount }}</div>
                 <div class="stat-label-modern" style="color: rgba(255,255,255,0.9);">مهام نشطة</div>
             </div>
-            <div class="stat-card-modern" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;">
-                <i class="fas fa-magic fa-2x mb-3" style="opacity: 0.9;"></i>
-                <div class="stat-number-modern">{{ $autoAssignCount }}</div>
-                <div class="stat-label-modern" style="color: rgba(255,255,255,0.9);">تخصيص تلقائي</div>
-            </div>
             <div class="stat-card-modern" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white;">
-                <i class="fas fa-hand-paper fa-2x mb-3" style="opacity: 0.9;"></i>
-                <div class="stat-number-modern">{{ $applicationCount }}</div>
-                <div class="stat-label-modern" style="color: rgba(255,255,255,0.9);">بالتقديم</div>
+                <i class="fas fa-check-circle fa-2x mb-3" style="opacity: 0.9;"></i>
+                <div class="stat-number-modern">{{ $completedTasksCount }}</div>
+                <div class="stat-label-modern" style="color: rgba(255,255,255,0.9);">مكتملة</div>
+            </div>
+            <div class="stat-card-modern" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;">
+                <i class="fas fa-times-circle fa-2x mb-3" style="opacity: 0.9;"></i>
+                <div class="stat-number-modern">{{ $expiredCount }}</div>
+                <div class="stat-label-modern" style="color: rgba(255,255,255,0.9);">منتهية</div>
             </div>
         </div>
 
@@ -122,26 +122,16 @@
                                             <div>
                                                 <div style="font-weight: 600; color: #374151; margin-bottom: 0.25rem;">{{ $task->title }}</div>
                                                 <div style="font-size: 0.875rem; color: #6b7280;">
-                                                    @if($task->assignment_type === 'auto_assign')
-                                                        <i class="fas fa-magic" style="color: #667eea;"></i> تلقائي
-                                                    @else
-                                                        <i class="fas fa-hand-paper" style="color: #ffc107;"></i> يتطلب تقديم
-                                                    @endif
+                                                    <i class="fas fa-hand-paper" style="color: #ffc107;"></i> يتطلب تقديم
                                                     {{ $task->target_type === 'all' ? ' - للجميع' : ' - ' . $task->target_department }}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td style="padding: 1.5rem;">
-                                        @if($task->assignment_type === 'auto_assign')
-                                            <span class="badge-modern badge-primary">
-                                                <i class="fas fa-magic"></i> تلقائي
-                                            </span>
-                                        @else
-                                            <span class="badge-modern badge-warning">
-                                                <i class="fas fa-hand-paper"></i> بالتقديم
-                                            </span>
-                                        @endif
+                                        <span class="badge-modern badge-warning">
+                                            <i class="fas fa-hand-paper"></i> بالتقديم
+                                        </span>
                                     </td>
                                     <td style="padding: 1.5rem; text-align: center;">
                                         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">

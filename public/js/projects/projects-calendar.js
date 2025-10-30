@@ -1,5 +1,5 @@
 /**
- * Projects Calendar View
+ * Projects Calendar View - OPTIMIZED FOR PERFORMANCE
  * Displays projects on their delivery dates in a calendar format
  */
 class ProjectsCalendar {
@@ -7,6 +7,7 @@ class ProjectsCalendar {
         this.currentDate = new Date();
         this.projects = [];
         this.filteredProjects = [];
+        this.buildTimeout = null;
         this.init();
     }
 
@@ -189,7 +190,11 @@ class ProjectsCalendar {
             return matches;
         });
 
-        this.buildCalendar();
+        // Debounce calendar rebuild for better performance
+        clearTimeout(this.buildTimeout);
+        this.buildTimeout = setTimeout(() => {
+            this.buildCalendar();
+        }, 100);
     }
 
     buildCalendar() {

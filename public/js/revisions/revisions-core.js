@@ -1433,24 +1433,46 @@ function renderSidebarContent(revision) {
             </div>
         ` : ''}
 
-        ${revision.attachment_path ? `
+        ${revision.attachment_path || revision.attachment_link ? `
             <div class="detail-section">
-                <h6><i class="fas fa-paperclip me-2"></i>الملف المرفق</h6>
-                <div class="d-flex align-items-center gap-3">
-                    <div>
-                        <i class="${getAttachmentIcon(revision.attachment_type)} fa-2x text-primary"></i>
+                <h6><i class="fas fa-paperclip me-2"></i>المرفق</h6>
+                ${revision.attachment_type === 'link' && revision.attachment_link ? `
+                    <div class="d-flex align-items-center gap-3">
+                        <div>
+                            <i class="fas fa-link fa-2x text-info"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-1"><strong>رابط خارجي</strong></p>
+                            <small class="text-muted text-truncate d-block" style="max-width: 300px;" title="${revision.attachment_link}">${revision.attachment_link}</small>
+                        </div>
+                        <div>
+                            <a href="${revision.attachment_link}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>
+                                فتح الرابط
+                            </a>
+                        </div>
                     </div>
-                    <div class="flex-grow-1">
-                        <p class="mb-1"><strong>${revision.attachment_name}</strong></p>
-                        <small class="text-muted">${formatFileSize(revision.attachment_size)}</small>
+                ` : revision.attachment_path ? `
+                    <div class="d-flex align-items-center gap-3">
+                        <div>
+                            <i class="${getAttachmentIcon(revision.attachment_type)} fa-2x text-primary"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-1"><strong>${revision.attachment_name}</strong></p>
+                            <small class="text-muted">${formatFileSize(revision.attachment_size)}</small>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <a href="/task-revisions/${revision.id}/view" target="_blank" class="btn btn-outline-info btn-sm" title="عرض">
+                                <i class="fas fa-eye me-1"></i>
+                                عرض
+                            </a>
+                            <a href="/task-revisions/${revision.id}/download" class="btn btn-outline-primary btn-sm" title="تنزيل">
+                                <i class="fas fa-download me-1"></i>
+                                تحميل
+                            </a>
+                        </div>
                     </div>
-                    <div>
-                        <a href="/task-revisions/${revision.id}/download" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-download me-1"></i>
-                            تحميل
-                        </a>
-                    </div>
-                </div>
+                ` : ''}
             </div>
         ` : ''}
 

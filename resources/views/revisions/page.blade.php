@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <!-- Revisions Kanban CSS -->
 <link rel="stylesheet" href="{{ asset('css/revisions/revisions-kanban.css') }}">
+<!-- Revisions Modern CSS -->
+<link rel="stylesheet" href="{{ asset('css/revisions/revisions-modern.css') }}?v={{ time() }}">
 <style>
     /* إخفاء scrollbar من الصفحة الرئيسية */
     html, body {
@@ -518,19 +520,18 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="revisions-modern-container">
     <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-0 text-gray-800">
-                        <i class="fas fa-edit me-2"></i>
-                        التعديلات
-                    </h1>
-                    <p class="text-muted mb-0">إدارة ومتابعة جميع التعديلات</p>
-                </div>
-                <div class="d-flex gap-2">
+    <div class="revisions-page-header slide-up">
+        <i class="fas fa-edit header-icon"></i>
+        <h1>
+            <i class="fas fa-edit"></i>
+            التعديلات
+        </h1>
+        <p>إدارة ومتابعة جميع التعديلات</p>
+
+        <!-- Header Actions -->
+        <div class="d-flex gap-2 mt-3" style="position: relative; z-index: 5;">
                     <!-- أزرار التبديل بين Table و Kanban -->
                     <div class="btn-group kanban-view-toggle" role="group">
                         <button type="button" class="btn btn-outline-primary active" id="tableViewBtn">
@@ -555,18 +556,16 @@
                         <i class="fas fa-sync-alt me-1"></i>
                         تحديث
                     </button>
-                </div>
-            </div>
         </div>
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4" id="statsContainer">
+    <div class="row stats-row fade-in mb-4" id="statsContainer">
         <!-- Will be populated by JavaScript -->
     </div>
 
     {{-- إحصائيات نقل التعديلات --}}
-    <div class="row mb-4" id="transferStatsContainer" style="display: none;">
+    <div class="row stats-row fade-in mb-4" id="transferStatsContainer" style="display: none;">
         <!-- Will be populated by JavaScript if user has transfers -->
     </div>
 
@@ -1077,11 +1076,21 @@
                         <span class="text-danger">⚠️ المسؤول</span>
                         <span class="text-muted" style="font-size: 11px;">(اللي هيتحاسب)</span>
                     </label>
-                    <select id="newResponsibleUserId" class="form-control">
-                        <option value="">-- اختر الشخص المسؤول --</option>
-                    </select>
+                    <input type="text"
+                           id="newResponsibleUserSearch"
+                           class="form-control datalist-input"
+                           list="responsibleUsersList"
+                           placeholder="ابحث عن المسؤول..."
+                           autocomplete="off"
+                           oninput="handleResponsibleSelection()">
+                    <datalist id="responsibleUsersList">
+                        <!-- Will be populated by JavaScript -->
+                    </datalist>
+                    <input type="hidden" id="newResponsibleUserId">
                     <small class="text-muted">
-                        القائمة تعتمد على دورك: المراجعين فقط لبعض الأدوار، أو كل المشاركين للأدوار الأخرى
+                        <i class="fas fa-search me-1"></i>
+                        ابدأ بكتابة اسم الموظف - الموجودون في المشروع معلمون بـ
+                        <span class="badge bg-success" style="font-size: 10px;">من المشروع</span>
                     </small>
             </div>
 

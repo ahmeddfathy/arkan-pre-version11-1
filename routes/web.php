@@ -442,6 +442,16 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('company-services/{companyService}/roles/{roleId}', [App\Http\Controllers\CompanyServiceController::class, 'detachRole'])
         ->name('company-services.detach-role');
 
+    // Service Dependencies Routes
+    Route::get('company-services-dependencies/all', [App\Http\Controllers\CompanyServiceController::class, 'getAllDependencies'])
+        ->name('company-services.dependencies.all');
+    Route::post('company-services/dependencies', [App\Http\Controllers\CompanyServiceController::class, 'addDependency'])
+        ->name('company-services.dependencies.add');
+    Route::delete('company-services/{serviceId}/dependencies/{dependsOnServiceId}', [App\Http\Controllers\CompanyServiceController::class, 'removeDependency'])
+        ->name('company-services.dependencies.remove');
+    Route::patch('company-services/{companyService}/execution-order', [App\Http\Controllers\CompanyServiceController::class, 'updateExecutionOrder'])
+        ->name('company-services.execution-order.update');
+
     // CRM Routes
     Route::resource('clients', App\Http\Controllers\ClientController::class);
     Route::get('/clients-crm/dashboard', [App\Http\Controllers\ClientController::class, 'crmDashboard'])->name('clients.crm-dashboard');
@@ -749,11 +759,15 @@ Route::prefix('task-notes')->middleware('auth')->group(function () {
 
 // Task revisions endpoints
 Route::prefix('task-revisions')->middleware('auth')->group(function () {
+    // ✅ Routes الثابتة أولاً قبل الديناميكية (لتجنب التعارض)
+    Route::get('/{revision}/download', [App\Http\Controllers\TaskRevisionController::class, 'downloadAttachment'])->name('task-revisions.download');
+    Route::get('/{revision}/view', [App\Http\Controllers\TaskRevisionController::class, 'viewAttachment'])->name('task-revisions.view');
+
+    // Routes الديناميكية
     Route::get('/{taskType}/{taskId}', [App\Http\Controllers\TaskRevisionController::class, 'index'])->name('task-revisions.index');
     Route::post('/', [App\Http\Controllers\TaskRevisionController::class, 'store'])->name('task-revisions.store');
     Route::put('/{revision}/status', [App\Http\Controllers\TaskRevisionController::class, 'updateStatus'])->name('task-revisions.update-status');
     Route::delete('/{revision}', [App\Http\Controllers\TaskRevisionController::class, 'destroy'])->name('task-revisions.destroy');
-    Route::get('/{revision}/download', [App\Http\Controllers\TaskRevisionController::class, 'downloadAttachment'])->name('task-revisions.download');
 
     // إدارة حالة التعديلات والوقت
     Route::post('/{revision}/start', [App\Http\Controllers\TaskRevisionController::class, 'startRevision'])->name('task-revisions.start');

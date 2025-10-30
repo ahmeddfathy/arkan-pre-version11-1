@@ -3,6 +3,7 @@ let currentTaskType = null;
 let currentTaskUserId = null;
 let currentTaskTaskUserId = null;
 let isLoadingRevisions = false;
+let isSavingRevision = false; // منع التنفيذ المتعدد
 
 async function loadTaskRevisions(taskType, taskId, taskUserId = null) {
     if (isLoadingRevisions) {
@@ -96,9 +97,19 @@ function displayRevisions(revisions) {
                                 <i class="fas fa-external-link-alt me-1"></i>فتح الرابط
                             </a>
                         ` : revision.attachment_path ? `
-                            <a href="/task-revisions/${revision.id}/download" class="btn btn-sm btn-outline-primary" style="font-size: 11px;">
-                                <i class="fas fa-download me-1"></i>${revision.attachment_name}
-                            </a>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="text-truncate flex-grow-1" style="font-size: 11px; max-width: 150px;" title="${revision.attachment_name}">
+                                    <i class="fas fa-file me-1"></i>${revision.attachment_name}
+                                </span>
+                                <div class="btn-group" role="group">
+                                    <a href="/task-revisions/${revision.id}/view" target="_blank" class="btn btn-sm btn-outline-info" style="font-size: 10px; padding: 3px 8px;" title="عرض">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/task-revisions/${revision.id}/download" class="btn btn-sm btn-outline-primary" style="font-size: 10px; padding: 3px 8px;" title="تنزيل">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </div>
+                            </div>
                         ` : ''}
                     </div>
                 ` : ''}
@@ -243,6 +254,14 @@ function toggleRevisionAttachmentType(type) {
 }
 
 async function saveRevision() {
+    // منع التنفيذ المتعدد للدالة
+    if (isSavingRevision) {
+        console.warn('⚠️ Revision save already in progress, skipping duplicate call');
+        return;
+    }
+
+    isSavingRevision = true;
+
     const revisionSourceElement = document.getElementById('revisionSource');
     const revisionSource = revisionSourceElement ? revisionSourceElement.value : 'internal';
 
@@ -253,11 +272,13 @@ async function saveRevision() {
 
     if (!title) {
         alert('عنوان التعديل مطلوب');
+        isSavingRevision = false;
         return;
     }
 
     if (!description) {
         alert('وصف التعديل مطلوب');
+        isSavingRevision = false;
         return;
     }
 
@@ -265,7 +286,16 @@ async function saveRevision() {
     if (!currentTaskType || !currentTaskUserId) {
         console.error('Missing task data:', { currentTaskType, currentTaskUserId });
         alert('خطأ: بيانات المهمة غير مكتملة. يرجى إغلاق النموذج وإعادة فتحه.');
+        isSavingRevision = false;
         return;
+    }
+
+    // تعطيل زر الحفظ أثناء العملية
+    const saveBtn = document.querySelector('button[onclick="saveRevision()"]');
+    const originalBtnText = saveBtn ? saveBtn.innerHTML : '';
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>جاري الحفظ...';
     }
 
     // Get responsibility fields
@@ -317,6 +347,12 @@ async function saveRevision() {
                 formData.append('attachment_type', 'link');
             } catch (e) {
                 alert('الرجاء إدخال رابط صحيح يبدأ بـ http:// أو https://');
+                // إعادة تفعيل الزر
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalBtnText;
+                }
+                isSavingRevision = false;
                 return;
             }
         }
@@ -343,6 +379,13 @@ async function saveRevision() {
             hideAddRevisionForm();
             loadTaskRevisions(currentTaskType, currentTaskUserId, currentTaskTaskUserId);
 
+            // إعادة تفعيل الزر
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalBtnText;
+            }
+            isSavingRevision = false;
+
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: 'تم!',
@@ -355,6 +398,13 @@ async function saveRevision() {
         } else {
             console.error('Error saving revision:', result.message);
             console.error('Validation errors:', result.errors);
+
+            // إعادة تفعيل الزر
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalBtnText;
+            }
+            isSavingRevision = false;
 
             // عرض تفاصيل أكثر للأخطاء
             let errorMessage = result.message || 'حدث خطأ في حفظ التعديل';
@@ -377,6 +427,13 @@ async function saveRevision() {
 
     } catch (error) {
         console.error('Error saving revision:', error);
+
+        // إعادة تفعيل الزر
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalBtnText;
+        }
+        isSavingRevision = false;
 
         if (typeof Swal !== 'undefined') {
             Swal.fire({

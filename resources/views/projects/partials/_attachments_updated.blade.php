@@ -1086,13 +1086,20 @@ function waitForJQuery(callback) {
 waitForJQuery(function() {
     $(document).ready(function() {
 
-        $('.attachment-upload-form').on('submit', function(e) {
+        // 🔒 إزالة أي event handlers سابقة لمنع التسجيل المكرر
+        $('.attachment-upload-form').off('submit').on('submit', function(e) {
             e.preventDefault();
 
             const form = $(this);
             const fileInput = form.find('input[type="file"]')[0];
             const submitBtn = form.find('button[type="submit"]');
             const originalText = submitBtn.html();
+
+            // 🚫 منع الرفع المتعدد - إذا الزر معطل أو الفورم بيرفع حالياً، لا ترسل
+            if (submitBtn.prop('disabled') || form.data('uploading') === true) {
+                console.log('Upload already in progress, ignoring duplicate request');
+                return false;
+            }
 
             // التحقق من وجود ملف
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -1141,7 +1148,9 @@ waitForJQuery(function() {
                 }
             }
 
+            // 🔒 تعطيل الزر وإضافة flag لمنع الإرسال المكرر
             submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>جاري الرفع...');
+            form.data('uploading', true); // flag إضافي
 
             form.find('.alert').remove();
 
@@ -1157,23 +1166,33 @@ waitForJQuery(function() {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
-                    if (response.success) {
-                        form.prepend('<div class="alert alert-success alert-sm">' + (response.message || 'تم رفع الملف بنجاح') + '</div>');
-                        form[0].reset();
-                        // إعادة تعيين الشكل الافتراضي للنموذج
-                        form.find('.reply-file-selector').hide();
-                        // إعادة تعيين task selectors إذا كانت موجودة
-                        form.find('.task-type-selector').val('');
-                        form.find('.template-task-selector').addClass('d-none');
-                        form.find('.regular-task-selector').addClass('d-none');
+                    console.log('📥 Upload Response:', response); // للـ debugging
+                    console.log('Response type:', typeof response);
+                    console.log('Response.success:', response ? response.success : 'response is null/undefined');
+
+                    // التعامل مع أي response ناجح
+                    if (!response || response.success !== false) {
+                        // إظهار رسالة النجاح
+                        const successMessage = (response && response.message) ? response.message : 'تم رفع الملف بنجاح';
+                        form.prepend('<div class="alert alert-success alert-sm"><i class="fas fa-check-circle me-2"></i>' + successMessage + '</div>');
+
+                        // ✅ Reload مباشر بدون انتظار
+                        console.log('✅ Upload successful! Reloading in 500ms...');
+
+                        // إخفاء الزر وإظهار رسالة
+                        submitBtn.html('<i class="fas fa-check me-1"></i>تم الرفع بنجاح!').removeClass('btn-primary').addClass('btn-success');
+
                         setTimeout(function() {
-                            location.reload();
-                        }, 2000);
+                            console.log('🔄 Reloading page now...');
+                            window.location.reload(true); // force reload
+                        }, 500);
                     } else {
-                        form.prepend('<div class="alert alert-danger alert-sm">' + (response.message || 'حدث خطأ أثناء رفع الملف') + '</div>');
+                        console.error('❌ Upload failed:', response);
+                        form.prepend('<div class="alert alert-danger alert-sm"><i class="fas fa-exclamation-circle me-2"></i>' + (response.message || 'حدث خطأ أثناء رفع الملف') + '</div>');
                     }
                 },
                 error: function(xhr) {
+                    console.error('❌ AJAX Error:', xhr);
                     let message = 'حدث خطأ أثناء رفع الملف';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
@@ -1182,6 +1201,7 @@ waitForJQuery(function() {
                 },
                 complete: function() {
                     submitBtn.prop('disabled', false).html(originalText);
+                    form.data('uploading', false); // إعادة تعيين الـ flag
                 }
             });
         });

@@ -1,23 +1,30 @@
 /**
- * Projects Index Main JavaScript
+ * Projects Index Main JavaScript - OPTIMIZED FOR PERFORMANCE
  * Handles main functionality for projects index page
  */
 
+// Debounce utility function for better scroll performance
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize progress bars with smooth animation
+    // Initialize progress bars with smooth animation - OPTIMIZED
     function initializeProgressBars() {
         const progressBars = document.querySelectorAll('.projects-progress-fill, .progress-bar[data-progress]');
 
         progressBars.forEach(bar => {
             const progress = bar.getAttribute('data-progress');
             if (progress) {
-                // Animate from 0 to target percentage
-                bar.style.width = '0%';
-
-                setTimeout(() => {
-                    bar.style.transition = 'width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                    bar.style.width = progress + '%';
-                }, 100);
+                bar.style.width = progress + '%';
             }
         });
     }
@@ -152,16 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`✅ Switched to ${viewType} view`);
     }
 
-    // Add event listeners with enhanced animations
+    // Add event listeners - OPTIMIZED (removed animations for performance)
     if (tableViewBtn) {
         tableViewBtn.addEventListener('click', (e) => {
             e.preventDefault();
             switchToView('table');
-            // Add click animation
-            tableViewBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                tableViewBtn.style.transform = '';
-            }, 150);
         });
     }
 
@@ -169,10 +171,6 @@ document.addEventListener('DOMContentLoaded', function() {
         kanbanViewBtn.addEventListener('click', (e) => {
             e.preventDefault();
             switchToView('kanban');
-            kanbanViewBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                kanbanViewBtn.style.transform = '';
-            }, 150);
         });
     }
 
@@ -180,10 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
         calendarViewBtn.addEventListener('click', (e) => {
             e.preventDefault();
             switchToView('calendar');
-            calendarViewBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                calendarViewBtn.style.transform = '';
-            }, 150);
         });
     }
 
@@ -408,8 +402,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Attach event listeners to all filters
-    document.getElementById('searchProject')?.addEventListener('keyup', applyAllFilters);
+    // Attach event listeners to all filters - WITH DEBOUNCING FOR PERFORMANCE
+    const debouncedApplyFilters = debounce(applyAllFilters, 300);
+
+    document.getElementById('searchProject')?.addEventListener('keyup', debouncedApplyFilters);
     document.getElementById('statusFilter')?.addEventListener('change', applyAllFilters);
     document.getElementById('clientFilter')?.addEventListener('change', applyAllFilters);
     document.getElementById('monthYearFilter')?.addEventListener('change', applyAllFilters);
@@ -453,19 +449,22 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ All filters have been reset');
     });
 
-    // Also update calendar when filters change
-    function updateCalendarFilters() {
+    // Also update calendar when filters change - WITH DEBOUNCING
+    const debouncedUpdateCalendar = debounce(function() {
         if (window.projectsCalendar) {
             window.projectsCalendar.applyFilters();
         }
-    }
+    }, 300);
 
     // Add calendar update to the existing filter event listeners
     ['searchProject', 'statusFilter', 'clientFilter', 'monthYearFilter', 'deliveryMonthFilter'].forEach(filterId => {
         const element = document.getElementById(filterId);
         if (element) {
-            element.addEventListener('keyup', updateCalendarFilters);
-            element.addEventListener('change', updateCalendarFilters);
+            if (filterId === 'searchProject') {
+                element.addEventListener('keyup', debouncedUpdateCalendar);
+            } else {
+                element.addEventListener('change', debouncedUpdateCalendar);
+            }
         }
     });
 
@@ -528,4 +527,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize delivery month label on page load
     updateDeliveryMonthLabel('client_agreed');
+
+    // ⚡ PERFORMANCE: Add scroll class for optimizations
+    let scrollTimeout;
+    let isScrolling = false;
+
+    window.addEventListener('scroll', function() {
+        if (!isScrolling) {
+            document.body.classList.add('scrolling');
+            isScrolling = true;
+        }
+
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(function() {
+            document.body.classList.remove('scrolling');
+            isScrolling = false;
+        }, 150);
+    }, { passive: true });
+
+    // ⚡ PERFORMANCE: Optimize table row visibility
+    if ('IntersectionObserver' in window) {
+        const observerOptions = {
+            root: null,
+            rootMargin: '50px',
+            threshold: 0.01
+        };
+
+        const rowObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.contentVisibility = 'visible';
+                } else {
+                    entry.target.style.contentVisibility = 'auto';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all table rows
+        const tableRows = document.querySelectorAll('.project-row');
+        tableRows.forEach(row => rowObserver.observe(row));
+
+        // Observe kanban cards
+        const kanbanCards = document.querySelectorAll('.projects-index-kanban-card');
+        kanbanCards.forEach(card => rowObserver.observe(card));
+    }
+
+    console.log('✅ Performance optimizations applied');
 });

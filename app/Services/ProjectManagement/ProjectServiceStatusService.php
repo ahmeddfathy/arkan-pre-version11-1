@@ -3,14 +3,27 @@
 namespace App\Services\ProjectManagement;
 
 use App\Models\Project;
+use App\Models\CompanyService;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\TemplateTaskUser;
+use App\Services\Notifications\ProjectNotificationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectServiceStatusService
 {
+    protected $notificationService;
+    protected $dependencyService;
+
+    public function __construct(
+        ProjectNotificationService $notificationService,
+        ServiceDependencyService $dependencyService
+    ) {
+        $this->notificationService = $notificationService;
+        $this->dependencyService = $dependencyService;
+    }
     public function updateServiceStatus(Project $project, int $serviceId): void
     {
         try {
@@ -32,6 +45,11 @@ class ProjectServiceStatusService
                 'new_status' => $newStatus,
                 'task_stats' => $taskStats
             ]);
+
+            // ✅ إرسال إشعارات للخدمات المعتمدة إذا اكتملت الخدمة
+            if ($newStatus === 'مكتملة') {
+                $this->notifyDependentServices($project, $serviceId);
+            }
 
             // ✅ تحديث حالة المشروع تلقائياً بناءً على حالة الخدمات
             $this->updateProjectStatus($project);
@@ -284,5 +302,54 @@ class ProjectServiceStatusService
 
         // افتراضي
         return 'جديد';
+    }
+
+    /**
+     * إرسال إشعارات للمشاركين في الخدمات التي تعتمد على الخدمة المكتملة
+     */
+    private function notifyDependentServices(Project $project, int $completedServiceId): void
+    {
+        try {
+            // الحصول على المستخدمين الذين يجب إشعارهم
+            $usersToNotify = $this->dependencyService->getUsersToNotify($project->id, $completedServiceId);
+
+            if (empty($usersToNotify)) {
+                Log::info('لا توجد خدمات معتمدة على الخدمة المكتملة', [
+                    'project_id' => $project->id,
+                    'completed_service_id' => $completedServiceId
+                ]);
+                return;
+            }
+
+            // الحصول على الخدمة المكتملة
+            $completedService = CompanyService::find($completedServiceId);
+            if (!$completedService) {
+                return;
+            }
+
+            // الحصول على المستخدم الحالي (الذي أكمل الخدمة)
+            $completedBy = Auth::user();
+
+            // إرسال الإشعارات
+            $this->notificationService->notifyDependentServiceParticipants(
+                $project,
+                $completedService,
+                $usersToNotify,
+                $completedBy
+            );
+
+            Log::info('تم إرسال إشعارات الخدمات المعتمدة بنجاح', [
+                'project_id' => $project->id,
+                'completed_service_id' => $completedServiceId,
+                'users_count' => count($usersToNotify)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في إرسال إشعارات الخدمات المعتمدة', [
+                'project_id' => $project->id,
+                'completed_service_id' => $completedServiceId,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

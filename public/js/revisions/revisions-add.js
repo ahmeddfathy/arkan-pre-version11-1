@@ -220,6 +220,32 @@ function handleExecutorSelection() {
 }
 
 /**
+ * معالجة اختيار المسؤول من datalist
+ */
+function handleResponsibleSelection() {
+    const searchInput = document.getElementById('newResponsibleUserSearch');
+    const hiddenInput = document.getElementById('newResponsibleUserId');
+
+    if (!searchInput || !hiddenInput) return;
+
+    const inputValue = searchInput.value;
+
+    // إزالة العلامة إذا كانت موجودة للبحث عن الاسم الصحيح
+    const searchName = inputValue.replace(' ✅ من المشروع', '').trim();
+
+    // البحث في المستخدمين المخزنين
+    if (window.allUsersForRevision) {
+        const selectedUser = window.allUsersForRevision.find(user => user.name === searchName);
+
+        if (selectedUser) {
+            hiddenInput.value = selectedUser.id;
+        } else {
+            hiddenInput.value = '';
+        }
+    }
+}
+
+/**
  * معالجة اختيار المراجع من datalist - DEPRECATED (replaced by multiple reviewers)
  */
 function handleReviewerSelection() {
@@ -432,38 +458,33 @@ function reorderReviewers() {
 }
 
 /**
- * تحميل المسؤولين (مع فلترة حسب الـ role)
- * ✅ يعرض فقط المراجعين اللي في المشروع
+ * تحميل المسؤولين - يعرض كل الموظفين مع إشارة للموجودين في المشروع
+ * مثل المنفذ والمراجعين
  */
 async function loadResponsibleUsersForRevision(projectId) {
     try {
-        const response = await fetch(`/task-revisions/reviewers-only?project_id=${projectId}`, {
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json'
-            }
+        const responsibleDatalist = document.getElementById('responsibleUsersList');
+        responsibleDatalist.innerHTML = '';
+
+        // استخدام البيانات المخزنة عالمياً من loadProjectParticipantsForRevision
+        const allUsers = window.allUsersForRevision || [];
+        const projectParticipantIds = window.projectParticipantIds || [];
+
+        // ترتيب المستخدمين: اللي في المشروع أولاً
+        const usersInProject = allUsers.filter(user => projectParticipantIds.includes(user.id));
+        const usersNotInProject = allUsers.filter(user => !projectParticipantIds.includes(user.id));
+        const sortedUsers = [...usersInProject, ...usersNotInProject];
+
+        // ملء datalist المسؤول
+        sortedUsers.forEach(user => {
+            const option = document.createElement('option');
+            const isInProject = projectParticipantIds.includes(user.id);
+            option.value = user.name + (isInProject ? ' ✅ من المشروع' : '');
+            option.setAttribute('data-user-id', user.id);
+            option.setAttribute('data-user-name', user.name);
+            option.setAttribute('data-in-project', isInProject);
+            responsibleDatalist.appendChild(option);
         });
-
-        const result = await response.json();
-
-        const responsibleSelect = document.getElementById('newResponsibleUserId');
-        responsibleSelect.innerHTML = '<option value="">-- اختر الشخص المسؤول --</option>';
-
-        if (result.success && result.reviewers && result.reviewers.length > 0) {
-            // استخدام window.projectParticipantIds اللي تم تخزينها في loadProjectParticipantsForRevision
-            const projectParticipantIds = window.projectParticipantIds || [];
-            
-            // ✅ فلترة: فقط المراجعين اللي في المشروع
-            const reviewersInProject = result.reviewers.filter(user => projectParticipantIds.includes(user.id));
-            
-        
-            reviewersInProject.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.id;
-                option.textContent = user.name;
-                responsibleSelect.appendChild(option);
-            });
-        }
     } catch (error) {
         console.error('Error loading responsible users:', error);
     }
@@ -486,12 +507,12 @@ async function loadReviewerUsersForRevision(projectId, allUsers, projectParticip
         if (result.success && result.reviewers && result.reviewers.length > 0) {
             // إذا كان المستخدم له قيود (restricted)، استخدم المراجعين المفلترين
             if (result.is_restricted) {
-            
+
                 // ترتيب: المراجعين اللي في المشروع أولاً، ثم الباقي
                 const reviewersInProject = result.reviewers.filter(user => projectParticipantIds.includes(user.id));
                 const reviewersNotInProject = result.reviewers.filter(user => !projectParticipantIds.includes(user.id));
                 const sortedReviewers = [...reviewersInProject, ...reviewersNotInProject];
-                
+
                 sortedReviewers.forEach(user => {
                     const option = document.createElement('option');
                     const isInProject = projectParticipantIds.includes(user.id);
@@ -501,15 +522,15 @@ async function loadReviewerUsersForRevision(projectId, allUsers, projectParticip
                     option.setAttribute('data-in-project', isInProject);
                     reviewerDatalist.appendChild(option);
                 });
-                
+
             } else {
                 // إذا لم يكن محدوداً، اعرض كل المستخدمين
                 console.log('🔓 Normal mode: showing all users');
-                
+
                 const usersInProject = allUsers.filter(user => projectParticipantIds.includes(user.id));
                 const usersNotInProject = allUsers.filter(user => !projectParticipantIds.includes(user.id));
                 const sortedUsers = [...usersInProject, ...usersNotInProject];
-                
+
                 sortedUsers.forEach(user => {
                     const option = document.createElement('option');
                     const isInProject = projectParticipantIds.includes(user.id);
@@ -523,11 +544,11 @@ async function loadReviewerUsersForRevision(projectId, allUsers, projectParticip
         } else {
             // في حالة عدم وجود نتائج، اعرض كل المستخدمين (fallback)
             console.log('⚠️ No results from API, showing all users as fallback');
-            
+
             const usersInProject = allUsers.filter(user => projectParticipantIds.includes(user.id));
             const usersNotInProject = allUsers.filter(user => !projectParticipantIds.includes(user.id));
             const sortedUsers = [...usersInProject, ...usersNotInProject];
-            
+
             sortedUsers.forEach(user => {
                 const option = document.createElement('option');
                 const isInProject = projectParticipantIds.includes(user.id);
@@ -544,10 +565,10 @@ async function loadReviewerUsersForRevision(projectId, allUsers, projectParticip
         const usersInProject = allUsers.filter(user => projectParticipantIds.includes(user.id));
         const usersNotInProject = allUsers.filter(user => !projectParticipantIds.includes(user.id));
         const sortedUsers = [...usersInProject, ...usersNotInProject];
-        
+
         const reviewerDatalist = document.getElementById('reviewerUsersList');
         reviewerDatalist.innerHTML = '';
-        
+
         sortedUsers.forEach(user => {
             const option = document.createElement('option');
             const isInProject = projectParticipantIds.includes(user.id);
@@ -811,7 +832,9 @@ async function openEditRevisionForm(revisionId) {
                     if (responsibleUserData && responsibleUserData.name) {
                         const responsibleSearch = document.getElementById('newResponsibleUserSearch');
                         if (responsibleSearch) {
-                            responsibleSearch.value = responsibleUserData.name;
+                            // ✅ إضافة العلامة إذا كان الشخص في المشروع
+                            const isInProject = window.projectParticipantIds?.includes(revision.responsible_user_id);
+                            responsibleSearch.value = responsibleUserData.name + (isInProject ? ' ✅ من المشروع' : '');
                             console.log('✅ Responsible user name set:', responsibleUserData.name);
                         }
                     }

@@ -4,6 +4,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="{{ asset('css/revisions/revisions-modern.css') }}?v={{ time() }}">
 <style>
     .stats-card {
         background: white;
@@ -330,45 +331,58 @@
 @endpush
 
 @section('content')
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-2">
-                <i class="fas fa-exchange-alt me-2" style="color: #667eea;"></i>
-                إحصائيات نقل التعديلات
-            </h2>
-            <p class="text-muted mb-0">تتبع وتحليل عمليات نقل التعديلات بين الموظفين</p>
-        </div>
-        <div>
-            <a href="{{ route('revision.page') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-right me-2"></i>
-                العودة لصفحة التعديلات
-            </a>
-        </div>
+<div class="revisions-modern-container">
+    <!-- Header Section -->
+    <div class="revisions-page-header slide-up">
+        <i class="fas fa-exchange-alt header-icon"></i>
+        <h1>
+            <i class="fas fa-exchange-alt"></i>
+            إحصائيات نقل التعديلات
+        </h1>
+        <p>تتبع وتحليل عمليات نقل التعديلات بين الموظفين</p>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-button-container fade-in" style="margin-bottom: 20px;">
+        <a href="{{ route('revision.page') }}" class="btn-filter-reset">
+            <i class="fas fa-arrow-right"></i>
+            العودة لصفحة التعديلات
+        </a>
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row" id="statsCards">
-        <div class="col-md-4">
-            <div class="stats-card total position-relative">
-                <div class="stats-card-title">إجمالي عمليات النقل</div>
-                <h2 class="stats-card-value" id="totalTransfers">0</h2>
-                <i class="fas fa-exchange-alt stats-card-icon"></i>
+    <div class="row stats-row fade-in" id="statsCards">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card bg-gradient-success">
+                <div class="stat-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 id="totalTransfers">0</h3>
+                    <p>إجمالي عمليات النقل</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="stats-card executor position-relative">
-                <div class="stats-card-title">نقل المنفذين</div>
-                <h2 class="stats-card-value" id="executorTransfers">0</h2>
-                <i class="fas fa-user-cog stats-card-icon"></i>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card bg-gradient-pink">
+                <div class="stat-icon">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 id="executorTransfers">0</h3>
+                    <p>نقل المنفذين</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="stats-card reviewer position-relative">
-                <div class="stats-card-title">نقل المراجعين</div>
-                <h2 class="stats-card-value" id="reviewerTransfers">0</h2>
-                <i class="fas fa-user-check stats-card-icon"></i>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card bg-gradient-info">
+                <div class="stat-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 id="reviewerTransfers">0</h3>
+                    <p>نقل المراجعين</p>
+                </div>
             </div>
         </div>
     </div>
@@ -404,11 +418,13 @@
     </div>
 
     <!-- Filters Section -->
-    <div class="filter-section">
-        <h5>
-            <i class="fas fa-filter"></i>
-            تصفية البيانات
-        </h5>
+    <div class="filters-container slide-up">
+        <div class="filters-header">
+            <h3>
+                <i class="fas fa-filter"></i>
+                تصفية البيانات
+            </h3>
+        </div>
         <form id="filterForm">
             <div class="row">
                 <div class="col-md-3 mb-3">
@@ -474,9 +490,15 @@
     </div>
 
     <!-- Transfer Records Table -->
-    <div class="table-container">
+    <div class="revisions-table-container slide-up">
+        <div class="table-header">
+            <h3>
+                <i class="fas fa-list"></i>
+                سجل عمليات النقل
+            </h3>
+        </div>
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="revisions-table">
                 <thead>
                     <tr>
                         <th>#</th>

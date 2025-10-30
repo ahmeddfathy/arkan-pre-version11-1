@@ -20,12 +20,10 @@ use Illuminate\Support\Facades\Auth;
                         {{ __('لوحة التحكم') }}
                     </x-nav-link>
 
-                    <!-- الشارات والإنجازات -->
-                    <x-nav-link href="{{ route('badges.index') }}" :active="request()->routeIs('badges.*')">
-                        {{ __('الشارات والإنجازات') }}
+                    <!-- تاسكاتي -->
+                    <x-nav-link href="{{ route('tasks.my-tasks') }}" :active="request()->routeIs('tasks.my-tasks')">
+                        {{ __('تاسكاتي') }}
                     </x-nav-link>
-
-
 
                     <!-- Employee Profile Link -->
                     <x-nav-link href="{{ route('employee.profile.show') }}" :active="request()->routeIs('employee.profile.*')">
@@ -42,14 +40,15 @@ use Illuminate\Support\Facades\Auth;
                         {{ __('My Attendance') }}
                     </x-nav-link>
 
-                    @if(Auth::user()->hasRole(['admin', 'manager', 'hr']))
-                    <x-nav-link href="{{ route('attendance.dashboard') }}" :active="request()->routeIs('attendance.dashboard')">
-                        {{ __('Attendance Dashboard') }}
+                    <x-nav-link href="{{ route('employee.projects.index') }}" :active="request()->routeIs('employee.projects.*')">
+                        {{ __('مشاريعي') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('attendance.records.index') }}" :active="request()->routeIs('attendance.records.index')">
-                        {{ __('Attendance Records') }}
+
+
+                    <!-- Revisions Link -->
+                    <x-nav-link href="{{ route('revision.page') }}" :active="request()->routeIs('revision.*')">
+                        {{ __('التعديلات') }}
                     </x-nav-link>
-                    @endif
 
                     <x-nav-link href="{{ route('meetings.index') }}" :active="request()->routeIs('meetings.*')">
                         {{ __('الاجتماعات') }}
@@ -249,20 +248,24 @@ use Illuminate\Support\Facades\Auth;
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
+            <!-- تاسكاتي -->
+            <x-responsive-nav-link href="{{ route('tasks.my-tasks') }}" :active="request()->routeIs('tasks.my-tasks')">
+                {{ __('تاسكاتي') }}
+            </x-responsive-nav-link>
 
             <!-- Responsive Attendance Links -->
             <x-responsive-nav-link href="{{ route('attendance.my') }}" :active="request()->routeIs('attendance.my')">
                 {{ __('My Attendance') }}
             </x-responsive-nav-link>
 
-            @if(Auth::user()->hasRole(['admin', 'manager', 'hr']))
-            <x-responsive-nav-link href="{{ route('attendance.dashboard') }}" :active="request()->routeIs('attendance.dashboard')">
-                {{ __('Attendance Dashboard') }}
+            <x-responsive-nav-link href="{{ route('employee.projects.index') }}" :active="request()->routeIs('employee.projects.*')">
+                {{ __('مشاريعي') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('attendance.records.index') }}" :active="request()->routeIs('attendance.records.index')">
-                {{ __('Attendance Records') }}
+
+            <!-- Responsive Revisions Link -->
+            <x-responsive-nav-link href="{{ route('revision.page') }}" :active="request()->routeIs('revision.*')">
+                {{ __('التعديلات') }}
             </x-responsive-nav-link>
-            @endif
 
             <x-responsive-nav-link href="{{ route('meetings.index') }}" :active="request()->routeIs('meetings.*')">
                 {{ __('الاجتماعات') }}

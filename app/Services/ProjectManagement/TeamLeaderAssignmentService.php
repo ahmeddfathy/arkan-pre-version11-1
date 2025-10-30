@@ -26,16 +26,7 @@ class TeamLeaderAssignmentService
         $this->slackNotificationService = $slackNotificationService;
     }
 
-    /**
-     * تعيين Team Leaders لجميع خدمات المشروع بشكل دوري (Round Robin)
-     *
-     * لكل خدمة في المشروع:
-     * 1. نحصل على الأدوار المطلوبة للخدمة
-     * 2. نبحث عن أشخاص بهذه الأدوار (Team Leaders)
-     * 3. نختار واحد منهم بناء على Round Robin
-     * 4. نضيفه للخدمة
-     * 5. نرسل له إشعار
-     */
+
     public function assignTeamLeadersToProjectServices(Project $project)
     {
         try {
@@ -127,13 +118,15 @@ class TeamLeaderAssignmentService
                 ];
             }
 
-            // 2. البحث عن Team Leaders بأي من هذه الأدوار
-            $teamLeaders = User::whereHas('roles', function ($query) use ($requiredRoles) {
-                $query->whereIn('id', $requiredRoles);
-            })->get();
+            // 2. ✅ البحث عن Team Leaders فقط (الترتيب الهرمي = 3)
+            // نجلب الأدوار اللي ترتيبها الهرمي = 3 من الأدوار المطلوبة
+            $teamLeaderRoleIds = RoleHierarchy::whereIn('role_id', $requiredRoles)
+                ->where('hierarchy_level', 3) // Team Leader Level
+                ->pluck('role_id')
+                ->toArray();
 
-            if ($teamLeaders->isEmpty()) {
-                Log::warning('⚠️ لا يوجد Team Leaders للخدمة', [
+            if (empty($teamLeaderRoleIds)) {
+                Log::warning('⚠️ الخدمة لا تحتوي على أدوار بترتيب هرمي 3 (Team Leaders)', [
                     'project_id' => $project->id,
                     'service_id' => $service->id,
                     'service_name' => $service->name ?? 'Unknown',
@@ -142,7 +135,31 @@ class TeamLeaderAssignmentService
 
                 return [
                     'success' => false,
-                    'message' => 'لا يوجد Team Leaders متاحين للخدمة'
+                    'message' => 'الخدمة لا تحتوي على أدوار Team Leaders (ترتيب هرمي 3)'
+                ];
+            }
+
+            // ✅ البحث عن Team Leaders من نفس قسم الخدمة فقط
+            $serviceDepartment = $service->department;
+
+            $teamLeaders = User::whereHas('roles', function ($query) use ($teamLeaderRoleIds) {
+                $query->whereIn('id', $teamLeaderRoleIds);
+            })
+            ->where('department', $serviceDepartment) // ✅ فلتر حسب القسم
+            ->get();
+
+            if ($teamLeaders->isEmpty()) {
+                Log::warning('⚠️ لا يوجد Team Leaders في قسم الخدمة', [
+                    'project_id' => $project->id,
+                    'service_id' => $service->id,
+                    'service_name' => $service->name ?? 'Unknown',
+                    'service_department' => $serviceDepartment,
+                    'team_leader_role_ids' => $teamLeaderRoleIds
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => "لا يوجد Team Leaders في قسم {$serviceDepartment}"
                 ];
             }
 
@@ -194,8 +211,10 @@ class TeamLeaderAssignmentService
                 'project_id' => $project->id,
                 'service_id' => $service->id,
                 'service_name' => $service->name ?? 'Unknown',
+                'service_department' => $service->department,
                 'team_leader_id' => $selectedTeamLeader->id,
-                'team_leader_name' => $selectedTeamLeader->name
+                'team_leader_name' => $selectedTeamLeader->name,
+                'team_leader_department' => $selectedTeamLeader->department
             ]);
 
             // 6. إرسال الإشعارات
@@ -314,13 +333,24 @@ class TeamLeaderAssignmentService
 
     /**
      * الحصول على معرف الدور الأساسي للـ Team Leader من الأدوار المطلوبة
+     * ✅ يختار دور بترتيب هرمي = 3 فقط
      */
     private function getRoleIdForTeamLeader(User $teamLeader, array $requiredRoles)
     {
-        // الحصول على أدوار المستخدم
-        $userRoles = $teamLeader->roles()->whereIn('id', $requiredRoles)->first();
+        // جلب أدوار المستخدم اللي ترتيبها الهرمي = 3
+        $teamLeaderRoleIds = RoleHierarchy::whereIn('role_id', $requiredRoles)
+            ->where('hierarchy_level', 3)
+            ->pluck('role_id')
+            ->toArray();
 
-        return $userRoles?->id ?? $requiredRoles[0] ?? null;
+        if (empty($teamLeaderRoleIds)) {
+            return null;
+        }
+
+        // الحصول على أول دور Team Leader عند المستخدم
+        $userRole = $teamLeader->roles()->whereIn('id', $teamLeaderRoleIds)->first();
+
+        return $userRole?->id ?? $teamLeaderRoleIds[0] ?? null;
     }
 
     /**

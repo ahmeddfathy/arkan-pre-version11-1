@@ -238,6 +238,104 @@ class AdditionalTaskNotificationService
     }
 
     /**
+     * إرسال إشعارات للمستخدمين المؤهلين عند إنشاء مهمة جديدة
+     */
+    public function notifyEligibleUsers(AdditionalTask $task): array
+    {
+        try {
+            // جلب المستخدمين المؤهلين
+            $eligibleUsers = $this->getEligibleUsers($task);
+
+            if ($eligibleUsers->isEmpty()) {
+                Log::info('No eligible users found for task notification', [
+                    'task_id' => $task->id,
+                    'task_title' => $task->title
+                ]);
+
+                return [
+                    'success' => true,
+                    'notified_count' => 0,
+                    'message' => 'لا يوجد مستخدمين مؤهلين'
+                ];
+            }
+
+            $notifiedCount = 0;
+
+            foreach ($eligibleUsers as $user) {
+                try {
+                    $message = "مهمة إضافية جديدة متاحة للتقديم: {$task->title} ({$task->points} نقطة)";
+
+                    // إرسال إشعار Firebase
+                    $this->sendTypedFirebaseNotification(
+                        $user,
+                        'additional-task',
+                        'available',
+                        $message,
+                        $task->id
+                    );
+
+                    $notifiedCount++;
+
+                } catch (\Exception $e) {
+                    Log::error('Failed to notify user about new task', [
+                        'user_id' => $user->id,
+                        'task_id' => $task->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // إرسال إشعار Slack للقناة (HR Channel)
+            if ($task->creator) {
+                $this->sendSlackChannelNotification($task, $task->creator, 'إنشاء مهمة جديدة');
+            }
+
+            Log::info('Task notifications sent successfully', [
+                'task_id' => $task->id,
+                'task_title' => $task->title,
+                'notified_count' => $notifiedCount
+            ]);
+
+            return [
+                'success' => true,
+                'notified_count' => $notifiedCount,
+                'message' => "تم إرسال الإشعارات لـ {$notifiedCount} مستخدم"
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send task notifications', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'notified_count' => 0,
+                'message' => 'فشل إرسال الإشعارات: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * جلب المستخدمين المؤهلين للمهمة
+     */
+    private function getEligibleUsers(AdditionalTask $task)
+    {
+        if ($task->target_type === 'all') {
+            // جميع المستخدمين النشطين
+            return User::where('employee_status', 'active')->get();
+        } elseif ($task->target_type === 'department') {
+            // مستخدمي القسم المحدد فقط
+            return User::where('department', $task->target_department)
+                      ->where('employee_status', 'active')
+                      ->get();
+        }
+
+        return collect();
+    }
+
+    /**
      * إرسال إشعار Slack للقناة (HR Channel)
      */
     private function sendSlackChannelNotification(AdditionalTask $task, User $user, string $operation, ?int $points = null): void

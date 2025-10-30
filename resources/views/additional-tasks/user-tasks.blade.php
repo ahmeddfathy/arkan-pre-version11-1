@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-<div class="additional-tasks-container">
+<div class="additional-tasks-container" style="width: 100%; padding: 0 2rem;">
     <div class="modern-card">
         <!-- Header -->
         <div class="modern-header">
@@ -131,11 +131,7 @@
                                         <div>
                                             <h4 class="task-title">{{ $task->title }}</h4>
                                             <div class="text-sm text-neutral-500 mb-1">
-                                                @if($task->assignment_type === 'auto_assign')
-                                                    <i class="fas fa-magic text-primary-500"></i> تلقائي
-                                                @else
-                                                    <i class="fas fa-hand-paper" style="color: var(--warning);"></i> يتطلب تقديم
-                                                @endif
+                                                <i class="fas fa-hand-paper" style="color: var(--warning);"></i> يتطلب تقديم
                                             </div>
                                             @if($task->creator)
                                                 <div class="text-xs text-primary-600">
@@ -180,19 +176,10 @@
                                 @endif
 
                                 <div class="flex gap-2">
-                                    @if($task->assignment_type === 'auto_assign')
-                                        <form method="POST" action="{{ route('additional-tasks.accept', $task) }}" class="flex-1">
-                                            @csrf
-                                            <button type="submit" class="btn-modern btn-primary" style="width: 100%;">
-                                                <i class="fas fa-check"></i> قبول المهمة
-                                            </button>
-                                        </form>
-                                    @else
-                                        <button onclick="showApplyModal({{ $task->id }}, '{{ $task->title }}')"
-                                                class="btn-modern btn-warning flex-1">
-                                            <i class="fas fa-hand-paper"></i> تقديم طلب
-                                        </button>
-                                    @endif
+                                    <button onclick="showApplyModal({{ $task->id }}, '{{ $task->title }}')"
+                                            class="btn-modern btn-warning flex-1">
+                                        <i class="fas fa-hand-paper"></i> تقديم طلب
+                                    </button>
                                     <a href="{{ route('additional-tasks.show', $task) }}" class="btn-modern btn-ghost">
                                         <i class="fas fa-eye"></i>
                                     </a>
@@ -253,31 +240,16 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($task->assignment_type === 'auto_assign')
-                                                <span class="badge-modern badge-primary">
-                                                    <i class="fas fa-magic"></i> تلقائي
-                                                </span>
-                                            @else
-                                                <span class="badge-modern badge-warning">
-                                                    <i class="fas fa-hand-paper"></i> يتطلب تقديم
-                                                </span>
-                                            @endif
+                                            <span class="badge-modern badge-warning">
+                                                <i class="fas fa-hand-paper"></i> يتطلب تقديم
+                                            </span>
                                         </td>
                                         <td>
                                             <div class="flex gap-2">
-                                                @if($task->assignment_type === 'auto_assign')
-                                                    <form method="POST" action="{{ route('additional-tasks.accept', $task) }}" class="inline">
-                                                        @csrf
-                                                        <button type="submit" class="btn-modern btn-primary btn-sm">
-                                                            <i class="fas fa-check"></i> قبول
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <button onclick="showApplyModal({{ $task->id }}, '{{ $task->title }}')"
-                                                            class="btn-modern btn-warning btn-sm">
-                                                        <i class="fas fa-hand-paper"></i> تقديم
-                                                    </button>
-                                                @endif
+                                                <button onclick="showApplyModal({{ $task->id }}, '{{ $task->title }}')"
+                                                        class="btn-modern btn-warning btn-sm">
+                                                    <i class="fas fa-hand-paper"></i> تقديم
+                                                </button>
                                                 <a href="{{ route('additional-tasks.show', $task) }}" class="btn-modern btn-ghost btn-sm">
                                                     <i class="fas fa-eye"></i> عرض
                                                 </a>

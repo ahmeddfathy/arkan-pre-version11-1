@@ -40,17 +40,6 @@
                             </button>
                         </div>
 
-                        <!-- Project Actions -->
-                        <div class="project-actions d-flex gap-2">
-                            <!-- Project Revisions Button -->
-                            <button class="btn btn-info btn-sm kanban-revisions-btn shadow-sm"
-                                    onclick="openProjectRevisionsSidebar({{ $project->id }})"
-                                    title="تعديلات المشروع">
-                                <i class="fas fa-clipboard-list me-1"></i>
-                                التعديلات
-                            </button>
-                        </div>
-
                         <!-- Analytics Buttons -->
                         <div class="analytics-buttons">
                             <a href="{{ route('projects.service-analytics', $project) }}"

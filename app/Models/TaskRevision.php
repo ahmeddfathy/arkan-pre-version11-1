@@ -535,10 +535,35 @@ class TaskRevision extends Model implements Auditable
      */
     public function scopeForRegularTask($query, $taskId, $taskUserId = null)
     {
+        // إذا كان task_user_id موجود، نحصل على task_id الحقيقي منه
+        if ($taskUserId) {
+            $taskUser = \App\Models\TaskUser::find($taskUserId);
+            if ($taskUser) {
+                $actualTaskId = $taskUser->task_id;
+            } else {
+                $actualTaskId = $taskId;
+            }
+        } else {
+            // إذا لم يكن task_user_id موجود، نتحقق هل الـ taskId هو فعلاً task أم task_user
+            $task = \App\Models\Task::find($taskId);
+            if (!$task) {
+                // قد يكون معرف TaskUser، جرب الحصول عليه
+                $taskUser = \App\Models\TaskUser::find($taskId);
+                if ($taskUser) {
+                    $actualTaskId = $taskUser->task_id;
+                    $taskUserId = $taskId;
+                } else {
+                    $actualTaskId = $taskId; // استخدم القيمة كما هي
+                }
+            } else {
+                $actualTaskId = $taskId;
+            }
+        }
+
         return $query->where('task_type', 'regular')
-                    ->where('task_id', $taskId)
+                    ->where('task_id', $actualTaskId)
                     ->when($taskUserId, function($q) use ($taskUserId) {
-                        return $q->where('task_user_id', $taskUserId);
+                        return $q->orWhere('task_user_id', $taskUserId);
                     });
     }
 
@@ -625,15 +650,21 @@ class TaskRevision extends Model implements Auditable
     }
 
     /**
-     * حذف الملف المرفق عند حذف التعديل
+     * عند حذف التعديل - لا نحذف الملفات من Wasabi (للأرشفة)
      */
     protected static function boot()
     {
         parent::boot();
 
         static::deleting(function ($revision) {
-            if ($revision->attachment_path && Storage::exists($revision->attachment_path)) {
-                Storage::delete($revision->attachment_path);
+            // نسجل فقط أن التعديل تم حذفه، لكن نحتفظ بالملف في Wasabi للأرشفة
+            if ($revision->attachment_path && $revision->attachment_type === 'file') {
+                \Illuminate\Support\Facades\Log::info('📦 Revision deleted but file kept in Wasabi for archive', [
+                    'revision_id' => $revision->id,
+                    'file_path' => $revision->attachment_path,
+                    'deleted_by' => auth()->id(),
+                    'deleted_at' => now()->toDateTimeString()
+                ]);
             }
         });
     }

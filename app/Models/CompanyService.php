@@ -20,13 +20,15 @@ class CompanyService extends Model
         'points',
         'max_points_per_project',
         'is_active',
-        'department'
+        'department',
+        'execution_order'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'points' => 'integer',
-        'max_points_per_project' => 'integer'
+        'max_points_per_project' => 'integer',
+        'execution_order' => 'integer'
     ];
 
     /**
@@ -35,7 +37,7 @@ class CompanyService extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'description', 'points', 'is_active', 'department'])
+            ->logOnly(['name', 'description', 'points', 'is_active', 'department', 'execution_order'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
@@ -240,5 +242,49 @@ class CompanyService extends Model
 
         $currentPoints = $this->getCurrentPointsForProject($projectId);
         return $currentPoints > $this->max_points_per_project;
+    }
+
+    /**
+     * الخدمات التي تعتمد على هذه الخدمة
+     * (الخدمات التي ستبدأ بعد اكتمال هذه الخدمة)
+     */
+    public function dependentServices()
+    {
+        return $this->belongsToMany(
+            CompanyService::class,
+            'service_dependencies',
+            'depends_on_service_id',  // الخدمة الحالية
+            'service_id'               // الخدمات التي تعتمد عليها
+        )->withTimestamps();
+    }
+
+    /**
+     * الخدمات التي تعتمد عليها هذه الخدمة
+     * (الخدمات التي يجب أن تكتمل قبل بدء هذه الخدمة)
+     */
+    public function dependencies()
+    {
+        return $this->belongsToMany(
+            CompanyService::class,
+            'service_dependencies',
+            'service_id',              // الخدمة الحالية
+            'depends_on_service_id'    // الخدمات المطلوبة
+        )->withTimestamps();
+    }
+
+    /**
+     * التحقق من وجود خدمات تعتمد على هذه الخدمة
+     */
+    public function hasDependentServices(): bool
+    {
+        return $this->dependentServices()->exists();
+    }
+
+    /**
+     * التحقق من أن هذه الخدمة تعتمد على خدمات أخرى
+     */
+    public function hasDependencies(): bool
+    {
+        return $this->dependencies()->exists();
     }
 }

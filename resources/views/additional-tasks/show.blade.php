@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-<div class="additional-tasks-container">
+<div class="additional-tasks-container" style="width: 100%; padding: 0 2rem;">
     <div class="modern-card">
         <!-- Header -->
         <div class="modern-header">
@@ -31,21 +31,12 @@
                             @endphp
 
                             @if($canApply)
-                                @if($additionalTask->assignment_type === 'auto_assign')
-                                    <form method="POST" action="{{ route('additional-tasks.accept', $additionalTask) }}">
-                                        @csrf
-                                        <button type="submit" class="btn-modern btn-primary">
-                                            <i class="fas fa-check"></i> قبول المهمة
-                                        </button>
-                                    </form>
-                                @else
-                                    <button id="applyTaskBtn"
-                                            data-task-id="{{ $additionalTask->id }}"
-                                            data-task-title="{{ $additionalTask->title }}"
-                                            class="btn-modern btn-warning">
-                                        <i class="fas fa-hand-paper"></i> تقديم طلب
-                                    </button>
-                                @endif
+                                <button id="applyTaskBtn"
+                                        data-task-id="{{ $additionalTask->id }}"
+                                        data-task-title="{{ $additionalTask->title }}"
+                                        class="btn-modern btn-warning">
+                                    <i class="fas fa-hand-paper"></i> تقديم طلب
+                                </button>
                             @elseif($alreadyApplied)
                                 <div class="badge-modern badge-success">
                                     <i class="fas fa-check-circle"></i> سبق التقديم
@@ -117,20 +108,14 @@
                         <div>
                             <h4 class="font-medium text-neutral-700 mb-1">نوع المهمة:</h4>
                             <div class="text-sm">
-                                @if($additionalTask->assignment_type === 'auto_assign')
-                                    <span class="badge-modern badge-primary">
-                                        <i class="fas fa-magic"></i> تلقائي
-                                    </span>
-                                @else
-                                    <span class="badge-modern badge-warning">
-                                        <i class="fas fa-hand-paper"></i> يتطلب تقديم
-                                    </span>
-                                @endif
+                                <span class="badge-modern badge-warning">
+                                    <i class="fas fa-hand-paper"></i> يتطلب تقديم
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    @if($additionalTask->assignment_type === 'application_required' && $additionalTask->max_participants)
+                    @if($additionalTask->max_participants)
                         <div class="alert-modern alert-warning mt-4">
                             <i class="fas fa-users"></i>
                             <span>الحد الأقصى للمشاركين: {{ $additionalTask->max_participants }}</span>
@@ -245,7 +230,7 @@
                         </div>
                     </div>
 
-                    @if($additionalTask->assignment_type === 'application_required')
+                    @if(true) {{-- جميع المهام تتطلب تقديم الآن --}}
                         <div class="mt-4 pt-4 border-t">
                             <div class="flex justify-between">
                                 <span class="text-neutral-600">طلبات في الانتظار:</span>
@@ -263,7 +248,7 @@
                         <h3 class="text-xl font-semibold text-neutral-900">
                             <i class="fas fa-list text-primary-500"></i> المشاركين في المهمة
                         </h3>
-                        @if($additionalTask->assignment_type === 'application_required')
+                        @if(true) {{-- جميع المهام تتطلب تقديم الآن --}}
                             <a href="{{ route('additional-tasks.applications') }}"
                                class="btn-modern btn-warning">
                                 <i class="fas fa-file-contract"></i> إدارة الطلبات
@@ -379,7 +364,7 @@
                         </div>
                         <h4 class="empty-state-title">لا يوجد مشاركين</h4>
                         <p class="empty-state-description">
-                            @if($additionalTask->assignment_type === 'application_required')
+                            @if(true) {{-- جميع المهام تتطلب تقديم الآن --}}
                                 لم يتقدم أحد على هذه المهمة بعد
                             @else
                                 لم يتم تخصيص هذه المهمة لأي مستخدم

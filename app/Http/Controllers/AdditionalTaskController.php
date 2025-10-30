@@ -8,6 +8,7 @@ use App\Models\Season;
 use App\Models\User;
 use App\Models\DepartmentRole;
 use App\Services\AdditionalTasks\AdditionalTaskFilterService;
+use App\Services\Notifications\AdditionalTaskNotificationService;
 use App\Services\TaskController\TaskHierarchyService;
 use App\Services\Auth\RoleCheckService;
 use Illuminate\Http\Request;
@@ -18,11 +19,17 @@ class AdditionalTaskController extends Controller
 {
     protected $filterService;
     protected $roleCheckService;
+    protected $notificationService;
 
-    public function __construct(AdditionalTaskFilterService $filterService, RoleCheckService $roleCheckService)
+    public function __construct(
+        AdditionalTaskFilterService $filterService,
+        RoleCheckService $roleCheckService,
+        AdditionalTaskNotificationService $notificationService
+    )
     {
         $this->filterService = $filterService;
         $this->roleCheckService = $roleCheckService;
+        $this->notificationService = $notificationService;
     }
     /**
      * عرض قائمة المهام الإضافية
@@ -122,8 +129,7 @@ class AdditionalTaskController extends Controller
             'points' => 'required|integer|min:1|max:1000',
             'target_type' => 'required|in:all,department',
             'target_department' => 'required_if:target_type,department|nullable|string',
-            'assignment_type' => 'required|in:auto_assign,application_required',
-            'max_participants' => 'nullable|integer|min:1|max:1000',
+            'max_participants' => 'required|integer|min:1|max:1000',
             'season_id' => 'nullable|exists:seasons,id',
             'icon' => 'nullable|string',
             'color_code' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
@@ -157,8 +163,8 @@ class AdditionalTaskController extends Controller
             'points' => $request->points,
             'target_type' => $request->target_type,
             'target_department' => $request->target_type === 'department' ? $request->target_department : null,
-            'assignment_type' => $request->assignment_type,
-            'max_participants' => $request->assignment_type === 'application_required' ? $request->max_participants : null,
+            'assignment_type' => 'application_required', // دائماً يتطلب تقديم
+            'max_participants' => $request->max_participants,
             'season_id' => $request->season_id ?: Season::where('is_active', true)->first()?->id,
             'icon' => $request->icon,
             'color_code' => $request->color_code ?: '#3B82F6',
@@ -183,14 +189,12 @@ class AdditionalTaskController extends Controller
 
         $task = AdditionalTask::create($taskData);
 
-        // تخصيص المهمة للمستخدمين المناسبين (إذا كانت تلقائية)
-        $assignedCount = $task->assignToUsers();
+        // إرسال إشعارات للمستخدمين المؤهلين
+        $notificationResult = $this->notificationService->notifyEligibleUsers($task);
 
-        $message = "تم إنشاء المهمة بنجاح";
-        if ($task->requiresApplication()) {
-            $message .= " - في انتظار تقديم المستخدمين";
-        } else {
-            $message .= " وتخصيصها لـ {$assignedCount} مستخدم";
+        $message = 'تم إنشاء المهمة بنجاح';
+        if ($notificationResult['success'] && $notificationResult['notified_count'] > 0) {
+            $message .= " وإرسال إشعارات لـ {$notificationResult['notified_count']} مستخدم";
         }
 
         return redirect()->route('additional-tasks.index')
@@ -270,8 +274,7 @@ class AdditionalTaskController extends Controller
             'points' => 'required|integer|min:1|max:1000',
             'target_type' => 'required|in:all,department',
             'target_department' => 'required_if:target_type,department|nullable|string',
-            'assignment_type' => 'required|in:auto_assign,application_required',
-            'max_participants' => 'nullable|integer|min:1|max:1000',
+            'max_participants' => 'required|integer|min:1|max:1000',
             'season_id' => 'nullable|exists:seasons,id',
             'icon' => 'nullable|string',
             'color_code' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
@@ -297,8 +300,8 @@ class AdditionalTaskController extends Controller
             'points' => $request->points,
             'target_type' => $request->target_type,
             'target_department' => $request->target_type === 'department' ? $request->target_department : null,
-            'assignment_type' => $request->assignment_type,
-            'max_participants' => $request->assignment_type === 'application_required' ? $request->max_participants : null,
+            'assignment_type' => 'application_required', // دائماً يتطلب تقديم
+            'max_participants' => $request->max_participants,
             'season_id' => $request->season_id,
             'icon' => $request->icon,
             'color_code' => $request->color_code ?: '#3B82F6',
@@ -532,8 +535,11 @@ class AdditionalTaskController extends Controller
         ]);
 
         if ($additionalTaskUser->approveApplication($request->admin_notes)) {
+            // إرسال إشعار للمستخدم بالموافقة
+            $this->notificationService->notifyUserApproved($additionalTaskUser);
+
             return redirect()->back()
-                           ->with('success', 'تم قبول الطلب بنجاح');
+                           ->with('success', 'تم قبول الطلب بنجاح وإرسال إشعار للمستخدم');
         } else {
             return redirect()->back()
                            ->with('error', 'لا يمكن قبول هذا الطلب');
@@ -550,8 +556,11 @@ class AdditionalTaskController extends Controller
         ]);
 
         if ($additionalTaskUser->rejectApplication($request->admin_notes)) {
+            // إرسال إشعار للمستخدم بالرفض
+            $this->notificationService->notifyUserRejected($additionalTaskUser);
+
             return redirect()->back()
-                           ->with('success', 'تم رفض الطلب');
+                           ->with('success', 'تم رفض الطلب وإرسال إشعار للمستخدم');
         } else {
             return redirect()->back()
                            ->with('error', 'لا يمكن رفض هذا الطلب');

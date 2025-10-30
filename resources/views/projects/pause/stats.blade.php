@@ -239,17 +239,17 @@
             </div>
 
             @if(!empty($stats['by_reason']))
-                <ul class="reason-list">
+        <ul class="reason-list">
                     @foreach($stats['by_reason'] as $reason => $data)
-                    <li class="reason-item">
+            <li class="reason-item">
                         <span class="reason-label">
                             <i class="fas fa-exclamation-triangle"></i>
                             {{ $data['label'] }}
                         </span>
-                        <span class="reason-count">{{ $data['count'] }}</span>
-                    </li>
-                    @endforeach
-                </ul>
+                <span class="reason-count">{{ $data['count'] }}</span>
+            </li>
+            @endforeach
+        </ul>
             @else
                 <div class="empty-data">
                     <i class="fas fa-inbox"></i>
@@ -263,16 +263,16 @@
     <div class="projects-table-container slide-up">
         <div class="table-header">
             <h3>
-                <i class="fas fa-history"></i>
-                آخر المشاريع الموقوفة
-            </h3>
+            <i class="fas fa-history"></i>
+            آخر المشاريع الموقوفة
+        </h3>
         </div>
 
         @if(!empty($stats['recent_pauses']) && count($stats['recent_pauses']) > 0)
             <div class="table-responsive">
                 <table class="stats-table">
-                    <thead>
-                        <tr>
+            <thead>
+                <tr>
                             <th><i class="fas fa-project-diagram"></i> اسم المشروع</th>
                             <th><i class="fas fa-qrcode"></i> الكود</th>
                             <th><i class="fas fa-exclamation-triangle"></i> سبب التوقيف</th>
@@ -280,9 +280,9 @@
                             <th><i class="fas fa-info-circle"></i> الحالة</th>
                             <th><i class="fas fa-clock"></i> تاريخ التوقيف</th>
                             <th><i class="fas fa-hourglass-half"></i> مدة التوقيف</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                </tr>
+            </thead>
+            <tbody>
                         @foreach($stats['recent_pauses'] as $pause)
                         <tr>
                             <td>
@@ -299,7 +299,7 @@
                                     {{ $pause->pause_reason }}
                                 </span>
                             </td>
-                            <td>{{ $pause->pausedBy->name ?? '-' }}</td>
+                    <td>{{ $pause->pausedBy->name ?? '-' }}</td>
                             <td>
                                 @if($pause->is_active)
                                     <span class="status-badge موقوف">
@@ -341,11 +341,11 @@
                                 @else
                                     -
                                 @endif
-                            </td>
-                        </tr>
+                    </td>
+                </tr>
                         @endforeach
-                    </tbody>
-                </table>
+            </tbody>
+        </table>
             </div>
         @else
             <div class="empty-state">

@@ -10,10 +10,6 @@
 <link rel="stylesheet" href="{{ asset('css/project-acknowledgment.css') }}">
 <!-- Projects Calendar CSS -->
 <link rel="stylesheet" href="{{ asset('css/tasks/my-tasks-calendar.css') }}">
-<!-- Task Revisions CSS -->
-<link rel="stylesheet" href="{{ asset('css/task-revisions.css') }}">
-<!-- Project Revisions Sidebar CSS -->
-<link rel="stylesheet" href="{{ asset('css/project-revisions-sidebar.css') }}">
 @endpush
 
     <meta name="project-id" content="{{ $project->id }}">
@@ -273,275 +269,6 @@
     </div>
 </div>
 
-<!-- Project Revisions Sidebar -->
-<div id="projectRevisionsSidebar" class="project-revisions-sidebar">
-    <!-- Sidebar Header -->
-    <div class="revisions-sidebar-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h5 class="revisions-sidebar-title">
-                    <i class="fas fa-clipboard-list"></i>
-                    تعديلات المشروع
-                </h5>
-                <p class="revisions-sidebar-subtitle">إدارة تعديلات وتحديثات المشروع</p>
-            </div>
-            <button class="revisions-close-btn" onclick="closeProjectRevisionsSidebar()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Sidebar Content -->
-    <div class="revisions-sidebar-content">
-        <!-- Add Revision Button -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="mb-0 text-muted" style="font-size: 14px; font-weight: 600;">التعديلات</h6>
-            <button class="revisions-add-btn" onclick="showAddProjectRevisionForm()">
-                <i class="fas fa-plus"></i>
-                إضافة تعديل
-            </button>
-        </div>
-
-        <!-- Service Tabs -->
-        <ul class="nav nav-pills mb-3" id="serviceRevisionTabs" role="tablist" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 10px;">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active service-tab-btn" id="all-revisions-tab" data-bs-toggle="pill" data-bs-target="#all-revisions-content"
-                        type="button" role="tab" onclick="loadProjectRevisionsByService(null)">
-                    الكل
-                    <span class="badge bg-primary ms-1" id="allRevisionsCount">0</span>
-                </button>
-            </li>
-            @if($project->services && $project->services->count() > 0)
-                @foreach($project->services as $service)
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link service-tab-btn" id="service-{{ $service->id }}-tab" data-bs-toggle="pill"
-                            data-bs-target="#service-{{ $service->id }}-content" type="button" role="tab"
-                            onclick="loadProjectRevisionsByService({{ $service->id }})">
-                        {{ $service->name }}
-                        <span class="badge bg-secondary ms-1" id="service{{ $service->id }}RevisionsCount">0</span>
-                    </button>
-                </li>
-                @endforeach
-            @endif
-        </ul>
-
-        <style>
-            #serviceRevisionTabs {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 5px;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-            .service-tab-btn {
-                font-size: 13px;
-                padding: 8px 15px;
-                border-radius: 20px;
-                margin-right: 5px;
-                transition: all 0.3s ease;
-                border: 1px solid #e0e0e0;
-                background: #fff;
-                color: #666;
-                white-space: nowrap;
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-            }
-            .service-tab-btn:hover {
-                background: #f8f9fa;
-                border-color: #667eea;
-            }
-            .service-tab-btn.active {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border-color: #667eea;
-            }
-            .service-tab-btn .badge {
-                font-size: 10px;
-                padding: 3px 7px;
-                border-radius: 10px;
-            }
-            .service-tab-btn.active .badge {
-                background: rgba(255,255,255,0.3) !important;
-            }
-        </style>
-
-        <!-- Add Revision Form (Hidden by default) -->
-        <div id="addProjectRevisionForm" class="add-project-revision-form" style="display: none;">
-            <!-- نوع التعديل (مخفي - دائماً project) -->
-            <input type="hidden" id="revisionType" value="project">
-
-            <!-- مصدر التعديل -->
-            <div class="mb-3">
-                <label class="form-label">مصدر التعديل</label>
-                <select id="revisionSource" class="form-control">
-                    <option value="internal">تعديل داخلي (من الفريق)</option>
-                    <option value="external">تعديل خارجي (من العميل)</option>
-                </select>
-                <small class="text-muted">حدد ما إذا كان التعديل من الفريق الداخلي أم من العميل</small>
-            </div>
-
-            <!-- الخدمة المرتبطة -->
-            <div class="mb-3" id="serviceContainer">
-                <label class="form-label">الخدمة المرتبطة <span class="text-muted">(اختياري)</span></label>
-                <select id="serviceId" class="form-control">
-                    <option value="">-- اختر الخدمة --</option>
-                    @if($project->services && $project->services->count() > 0)
-                        @foreach($project->services as $service)
-                            <option value="{{ $service->id }}">{{ $service->name }}</option>
-                        @endforeach
-                    @endif
-                </select>
-                <small class="text-muted">حدد الخدمة المرتبطة بهذا التعديل</small>
-            </div>
-
-            <!-- اختيار شخص معين (اختياري) -->
-            <div class="mb-3" id="assignedUserContainer">
-                <label class="form-label">تعديل مرتبط بشخص معين <span class="text-muted">(اختياري)</span></label>
-                <select id="assignedTo" class="form-control">
-                    <option value="">-- اختر شخص (اختياري) --</option>
-                    @if($project->participants && $project->participants->count() > 0)
-                        @foreach($project->participants as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endforeach
-                    @endif
-                </select>
-                <small class="text-muted">يمكن ترك هذا الحقل فارغ للتعديلات من العميل</small>
-            </div>
-
-            <!-- الحقول الجديدة للمسؤولية ⭐ -->
-            <div class="mb-3 p-3" style="background: #fff8f0; border-radius: 8px; border-left: 4px solid #ff9800;">
-                <h6 class="text-warning mb-3">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    تتبع المسؤولية
-                    <span class="text-muted" style="font-size: 12px; font-weight: normal;">(اختياري)</span>
-                </h6>
-
-                <!-- المسؤول (اللي غلط) -->
-                <div class="mb-3">
-                    <label class="form-label">
-                        <span class="text-danger">⚠️ المسؤول عن الغلط</span>
-                        <span class="text-muted" style="font-size: 11px;">(اللي هيتحاسب)</span>
-                    </label>
-                    <select id="responsibleUserId" class="form-control">
-                        <option value="">-- اختر الشخص المسؤول --</option>
-                        {{-- سيتم ملؤه تلقائياً عبر JavaScript حسب role المستخدم --}}
-                    </select>
-                    <small class="text-muted">
-                        القائمة تعتمد على دورك: المراجعين فقط لبعض الأدوار، أو كل المشاركين للأدوار الأخرى
-                    </small>
-                </div>
-
-                <!-- المنفذ (اللي هيصلح) -->
-                <div class="mb-3">
-                    <label class="form-label">
-                        <span class="text-primary">🔨 المنفذ</span>
-                        <span class="text-muted" style="font-size: 11px;">(اللي هيصلح الغلط)</span>
-                    </label>
-                    <select id="executorUserId" class="form-control">
-                        <option value="">-- اختر من سيقوم بالتصليح --</option>
-                        @if($project->participants && $project->participants->count() > 0)
-                            @foreach($project->participants as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                    <small class="text-muted">الشخص الذي سيقوم بتنفيذ التعديل وإصلاح الخطأ</small>
-                </div>
-
-                <!-- المراجع (اللي هيراجع) -->
-                <div class="mb-3">
-                    <label class="form-label">
-                        <span class="text-success">✅ المراجع</span>
-                        <span class="text-muted" style="font-size: 11px;">(اللي هيراجع التعديل)</span>
-                    </label>
-                    <select id="reviewerUserId" class="form-control">
-                        <option value="">-- اختر من سيراجع التعديل --</option>
-                        @if($project->participants && $project->participants->count() > 0)
-                            @foreach($project->participants as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                    <small class="text-muted">الشخص المسؤول عن مراجعة التعديل والموافقة عليه</small>
-                </div>
-
-                <!-- ملاحظات المسؤولية -->
-                <div class="mb-0">
-                    <label class="form-label">
-                        <span>📝 ملاحظات المسؤولية</span>
-                        <span class="text-muted" style="font-size: 11px;">(سبب التعديل)</span>
-                    </label>
-                    <textarea id="responsibilityNotes" class="form-control" rows="2" placeholder="اذكر سبب التعديل والخطأ الذي حدث..." maxlength="2000"></textarea>
-                    <small class="text-muted">توثيق سبب الخطأ الذي أدى للتعديل</small>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">عنوان التعديل</label>
-                <input type="text" id="projectRevisionTitle" class="form-control" placeholder="عنوان التعديل..." maxlength="255">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">وصف التعديل</label>
-                <textarea id="projectRevisionDescription" class="form-control" rows="3" placeholder="اكتب وصف التعديل هنا..." maxlength="5000"></textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">ملاحظات إضافية <span class="text-muted">(اختياري)</span></label>
-                <textarea id="projectRevisionNotes" class="form-control" rows="2" placeholder="أي ملاحظات إضافية..." maxlength="2000"></textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">المرفق <span class="text-muted">(اختياري)</span></label>
-
-                <!-- Attachment Type Selection -->
-                <div class="btn-group w-100 mb-2" role="group">
-                    <input type="radio" class="btn-check" name="projectRevisionAttachmentType" id="projectRevisionAttachmentTypeFile" value="file" checked onclick="toggleProjectRevisionAttachmentType('file')">
-                    <label class="btn btn-outline-primary btn-sm" for="projectRevisionAttachmentTypeFile">
-                        <i class="fas fa-file-upload me-1"></i>رفع ملف
-                    </label>
-
-                    <input type="radio" class="btn-check" name="projectRevisionAttachmentType" id="projectRevisionAttachmentTypeLink" value="link" onclick="toggleProjectRevisionAttachmentType('link')">
-                    <label class="btn btn-outline-primary btn-sm" for="projectRevisionAttachmentTypeLink">
-                        <i class="fas fa-link me-1"></i>إضافة لينك
-                    </label>
-                </div>
-
-                <!-- File Upload Option -->
-                <div id="projectRevisionFileUploadContainer">
-                    <input type="file" id="projectRevisionAttachment" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
-                    <small class="text-muted">الحد الأقصى: 10 ميجابايت</small>
-                </div>
-
-                <!-- Link Input Option (Hidden by default) -->
-                <div id="projectRevisionLinkInputContainer" style="display: none;">
-                    <input type="url" id="projectRevisionAttachmentLink" class="form-control" placeholder="https://example.com/file.pdf">
-                    <small class="text-muted">أدخل رابط المرفق (يجب أن يبدأ بـ http:// أو https://)</small>
-                </div>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-success" onclick="saveProjectRevision()">
-                    <i class="fas fa-save me-1"></i>حفظ التعديل
-                </button>
-                <button class="btn btn-outline-secondary" onclick="hideAddProjectRevisionForm()">
-                    إلغاء
-                </button>
-            </div>
-        </div>
-
-        <!-- Revisions Container -->
-        <div id="projectRevisionsContainer">
-            <div class="text-center py-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">جاري التحميل...</span>
-                </div>
-                <p class="mt-2 text-muted mb-0" style="font-size: 12px;">جاري تحميل التعديلات...</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Revisions Overlay -->
-<div id="revisionsOverlay" class="revisions-overlay" onclick="closeProjectRevisionsSidebar()"></div>
-
 <!-- Modal لعرض تاريخ التعديلات -->
 <div class="modal fade" id="dateHistoryModal" tabindex="-1" aria-labelledby="dateHistoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -649,8 +376,6 @@
 
 <!-- Task Transfer Error Handler (only) - main logic is in project-show-interactions.js -->
 <script src="{{ asset('js/tasks/transfer-error-handler.js') }}?v={{ time() }}"></script>
-
-<script src="{{ asset('js/projects/project-revisions-sidebar.js') }}?v={{ time() }}"></script>
 
 <!-- Attachment Confirmation System -->
 <script src="{{ asset('js/projects/attachment-confirmation.js') }}?v={{ time() }}"></script>

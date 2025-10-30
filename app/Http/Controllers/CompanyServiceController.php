@@ -5,17 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\CompanyService;
 use App\Models\User;
 use App\Services\Auth\RoleCheckService;
+use App\Services\ProjectManagement\ServiceDependencyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CompanyServiceController extends Controller
 {
     protected $roleCheckService;
+    protected $dependencyService;
 
-    public function __construct(RoleCheckService $roleCheckService)
-    {
+    public function __construct(
+        RoleCheckService $roleCheckService,
+        ServiceDependencyService $dependencyService
+    ) {
         $this->roleCheckService = $roleCheckService;
+        $this->dependencyService = $dependencyService;
     }
 
     /**
@@ -139,7 +145,7 @@ class CompanyServiceController extends Controller
         }
 
         $allRoles = \Spatie\Permission\Models\Role::all();
-        $companyService->load('requiredRoles');
+        $companyService->load(['requiredRoles', 'dependencies', 'dependentServices']);
 
         return view('company-services.show', compact('companyService', 'allRoles'));
     }
@@ -297,6 +303,147 @@ class CompanyServiceController extends Controller
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'حدث خطأ'], 500);
+        }
+    }
+
+    // ==================== Service Dependencies Methods ====================
+
+    /**
+     * الحصول على جميع الاعتماديات
+     */
+    public function getAllDependencies()
+    {
+        if (!$this->roleCheckService->userHasRole('sales_employee')) {
+            return response()->json(['success' => false, 'message' => 'غير مسموح'], 403);
+        }
+
+        try {
+            $dependencies = $this->dependencyService->getAllDependencies();
+            $services = CompanyService::active()
+                                     ->orderBy('execution_order')
+                                     ->orderBy('name')
+                                     ->get();
+
+            return response()->json([
+                'success' => true,
+                'dependencies' => $dependencies,
+                'services' => $services
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في الحصول على الاعتماديات', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء الحصول على الاعتماديات'
+            ], 500);
+        }
+    }
+
+    /**
+     * إضافة اعتمادية جديدة
+     */
+    public function addDependency(Request $request)
+    {
+        if (!$this->roleCheckService->userHasRole('sales_employee')) {
+            return response()->json(['success' => false, 'message' => 'غير مسموح'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'service_id' => 'required|exists:company_services,id',
+            'depends_on_service_id' => 'required|exists:company_services,id|different:service_id',
+            'notes' => 'nullable|string|max:500'
+        ], [
+            'service_id.required' => 'يجب تحديد الخدمة',
+            'depends_on_service_id.different' => 'لا يمكن للخدمة أن تعتمد على نفسها',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            $result = $this->dependencyService->addDependency(
+                $request->service_id,
+                $request->depends_on_service_id,
+                $request->notes
+            );
+
+            return response()->json($result, $result['success'] ? 200 : 400);
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في إضافة الاعتمادية', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إضافة الاعتمادية'
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف اعتمادية
+     */
+    public function removeDependency($serviceId, $dependsOnServiceId)
+    {
+        if (!$this->roleCheckService->userHasRole('sales_employee')) {
+            return response()->json(['success' => false, 'message' => 'غير مسموح'], 403);
+        }
+
+        try {
+            $result = $this->dependencyService->removeDependency($serviceId, $dependsOnServiceId);
+            return response()->json($result, $result['success'] ? 200 : 404);
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في حذف الاعتمادية', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء حذف الاعتمادية'
+            ], 500);
+        }
+    }
+
+    /**
+     * تحديث ترتيب/مستوى الخدمة
+     */
+    public function updateExecutionOrder(Request $request, CompanyService $companyService)
+    {
+        if (!$this->roleCheckService->userHasRole('sales_employee')) {
+            return response()->json(['success' => false, 'message' => 'غير مسموح'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'execution_order' => 'required|integer|min:1|max:10'
+        ], [
+            'execution_order.required' => 'يجب تحديد رقم الترتيب',
+            'execution_order.min' => 'رقم الترتيب يجب أن يكون 1 على الأقل',
+            'execution_order.max' => 'رقم الترتيب يجب ألا يتجاوز 10'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            $companyService->execution_order = $request->execution_order;
+            $companyService->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث ترتيب الخدمة بنجاح',
+                'service' => $companyService
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في تحديث ترتيب الخدمة', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تحديث ترتيب الخدمة'
+            ], 500);
         }
     }
 }

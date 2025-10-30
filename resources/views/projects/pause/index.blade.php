@@ -179,7 +179,7 @@
     <div class="projects-table-container slide-up">
         <div class="table-header">
             <h3>
-                <i class="fas fa-list"></i>
+                    <i class="fas fa-list"></i>
                 قائمة المشاريع
                 <span style="font-size: 0.9rem; color: #6c757d; font-weight: normal;">
                     ({{ $projects->count() }} مشروع)
@@ -193,11 +193,11 @@
             </div>
         </div>
 
-        @if($projects->count() > 0)
+            @if($projects->count() > 0)
             <div class="table-responsive">
-                <table class="projects-table">
-                    <thead>
-                        <tr>
+            <table class="projects-table">
+                <thead>
+                    <tr>
                             <th style="width: 50px;">
                                 <input type="checkbox"
                                        id="selectAll"
@@ -211,34 +211,34 @@
                             <th><i class="fas fa-calendar-alt"></i> تسليم العميل</th>
                             <th><i class="fas fa-calendar-check"></i> تسليم الفريق</th>
                             <th><i class="fas fa-cogs"></i> الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($projects as $project)
-                        <tr>
-                            <td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($projects as $project)
+                    <tr>
+                        <td>
                                 @if($project->status != 'موقوف' && $project->status != 'مكتمل' && $project->status != 'ملغي')
                                     <input type="checkbox"
                                            class="project-checkbox"
                                            value="{{ $project->id }}"
-                                           onchange="updatePauseButton()">
-                                @endif
-                            </td>
+                                       onchange="updatePauseButton()">
+                            @endif
+                        </td>
                             <td>
                                 <strong style="color: #007bff;">{{ $project->code ?? '-' }}</strong>
                             </td>
                             <td class="project-name-cell">
                                 {{ $project->name }}
                                 @if($project->activePause && $project->status == 'موقوف')
-                                    <div class="pause-reason-badge">
-                                        <i class="fas fa-pause"></i>
-                                        {{ $project->activePause->pause_reason }}
-                                    </div>
-                                @endif
-                            </td>
-                            <td>{{ $project->client->name ?? '-' }}</td>
-                            <td>
-                                <span class="status-badge {{ $project->status }}">
+                                <div class="pause-reason-badge">
+                                    <i class="fas fa-pause"></i>
+                                    {{ $project->activePause->pause_reason }}
+                                </div>
+                            @endif
+                        </td>
+                        <td>{{ $project->client->name ?? '-' }}</td>
+                        <td>
+                            <span class="status-badge {{ $project->status }}">
                                     @if($project->status == 'جديد')
                                         <i class="fas fa-plus-circle"></i>
                                     @elseif($project->status == 'جاري')
@@ -250,68 +250,68 @@
                                     @elseif($project->status == 'ملغي')
                                         <i class="fas fa-times-circle"></i>
                                     @endif
-                                    {{ $project->status }}
-                                </span>
-                            </td>
-                            <td>
-                                @if($project->client_agreed_delivery_date)
+                                {{ $project->status }}
+                            </span>
+                        </td>
+                        <td>
+                            @if($project->client_agreed_delivery_date)
                                     <div style="font-size: 0.9rem;">
                                         <i class="fas fa-calendar-alt" style="color: #dc3545;"></i>
-                                        {{ \Carbon\Carbon::parse($project->client_agreed_delivery_date)->format('Y-m-d') }}
+                                    {{ \Carbon\Carbon::parse($project->client_agreed_delivery_date)->format('Y-m-d') }}
                                     </div>
-                                @else
+                            @else
                                     <span style="color: #6c757d;">غير محدد</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($project->team_delivery_date)
+                            @endif
+                        </td>
+                        <td>
+                            @if($project->team_delivery_date)
                                     <div style="font-size: 0.9rem;">
                                         <i class="fas fa-calendar-check" style="color: #28a745;"></i>
-                                        {{ \Carbon\Carbon::parse($project->team_delivery_date)->format('Y-m-d') }}
+                                    {{ \Carbon\Carbon::parse($project->team_delivery_date)->format('Y-m-d') }}
                                     </div>
-                                @else
+                            @else
                                     <span style="color: #6c757d;">غير محدد</span>
-                                @endif
-                            </td>
+                            @endif
+                        </td>
                             <td class="actions-cell">
-                                <a href="{{ route('projects.show', $project->id) }}" class="btn-action btn-view">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                            <a href="{{ route('projects.show', $project->id) }}" class="btn-action btn-view">
+                                <i class="fas fa-eye"></i>
+                            </a>
 
                                 @if($project->status == 'موقوف')
                                     <button class="btn-action btn-resume"
                                             data-project-id="{{ $project->id }}">
-                                        <i class="fas fa-play"></i>
-                                    </button>
+                                    <i class="fas fa-play"></i>
+                                </button>
                                 @elseif($project->status != 'مكتمل' && $project->status != 'ملغي')
                                     <button class="btn-action btn-pause"
                                             data-project-id="{{ $project->id }}"
                                             data-project-name="{{ $project->name }}">
-                                        <i class="fas fa-pause"></i>
-                                    </button>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    <i class="fas fa-pause"></i>
+                                </button>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
             </div>
 
             <!-- Pagination -->
             @if(method_exists($projects, 'links'))
                 <div class="pagination-container">
                     {{ $projects->links() }}
-                </div>
+            </div>
             @endif
-        @else
+            @else
             <div class="empty-state">
                 <div class="empty-state-icon">
-                    <i class="fas fa-inbox"></i>
+                <i class="fas fa-inbox"></i>
                 </div>
                 <h3>لا توجد مشاريع</h3>
                 <p>لم يتم العثور على أي مشاريع تطابق معايير البحث</p>
             </div>
-        @endif
+            @endif
     </div>
 </div>
 

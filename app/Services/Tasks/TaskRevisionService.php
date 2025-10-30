@@ -6,6 +6,7 @@ use App\Models\TaskRevision;
 use App\Models\Task;
 use App\Models\TemplateTaskUser;
 use App\Services\Tasks\RevisionFilterService;
+use App\Services\Tasks\RevisionStorageService;
 use App\Services\Slack\RevisionSlackService;
 use App\Traits\SeasonAwareTrait;
 use App\Traits\HasNTPTime;
@@ -19,13 +20,16 @@ class TaskRevisionService
 
     protected $revisionFilterService;
     protected $slackService;
+    protected $storageService;
 
     public function __construct(
         RevisionFilterService $revisionFilterService,
-        RevisionSlackService $slackService
+        RevisionSlackService $slackService,
+        RevisionStorageService $storageService
     ) {
         $this->revisionFilterService = $revisionFilterService;
         $this->slackService = $slackService;
+        $this->storageService = $storageService;
     }
 
     /**
@@ -65,8 +69,8 @@ class TaskRevisionService
                 $revisionData['task_type'] = null;
                 $revisionData['assigned_to'] = $data['assigned_to'] ?? null;
 
-                // معالجة المرفق (ملف أو لينك)
-                $attachmentData = $this->handleAttachment($data, 'project', $data['project_id']);
+                // معالجة المرفق (ملف أو لينك) - تمرير بيانات التعديل
+                $attachmentData = $this->handleAttachment($data, 'project', $data['project_id'], $revisionData);
                 if ($attachmentData) {
                     $revisionData = array_merge($revisionData, $attachmentData);
                 }
@@ -79,13 +83,19 @@ class TaskRevisionService
                 $revisionData['task_type'] = null;
                 $revisionData['assigned_to'] = $data['assigned_to'] ?? null;
 
-                // معالجة المرفق (ملف أو لينك)
-                $attachmentData = $this->handleAttachment($data, 'general', 'general');
+                // معالجة المرفق (ملف أو لينك) - تمرير بيانات التعديل
+                $attachmentData = $this->handleAttachment($data, 'general', 'general', $revisionData);
                 if ($attachmentData) {
                     $revisionData = array_merge($revisionData, $attachmentData);
                 }
             } else {
                 // تعديل مهمة (السلوك القديم)
+                Log::info('Creating task revision', [
+                    'input_task_type' => $data['task_type'],
+                    'input_task_id' => $data['task_id'],
+                    'input_task_user_id' => $data['task_user_id'] ?? null,
+                ]);
+
                 $taskData = $this->validateTaskData($data);
                 $revisionData['task_type'] = $data['task_type'];
 
@@ -97,13 +107,18 @@ class TaskRevisionService
                     $revisionData['task_id'] = $taskData['task_id'];
                     $revisionData['task_user_id'] = $data['task_user_id'] ?? null;
                     $revisionData['template_task_user_id'] = null;
+
+                    Log::info('Task revision data validated', [
+                        'resolved_task_id' => $taskData['task_id'],
+                        'task_user_id' => $data['task_user_id'] ?? null,
+                    ]);
                 }
 
                 $revisionData['project_id'] = null;
                 $revisionData['assigned_to'] = $data['assigned_to'] ?? null;
 
-                // معالجة المرفق (ملف أو لينك)
-                $attachmentData = $this->handleAttachment($data, $data['task_type'], $taskData['task_id']);
+                // معالجة المرفق (ملف أو لينك) - تمرير بيانات التعديل للمسار المنظم
+                $attachmentData = $this->handleAttachment($data, $data['task_type'], $taskData['task_id'], $revisionData);
                 if ($attachmentData) {
                     $revisionData = array_merge($revisionData, $attachmentData);
                 }
@@ -481,18 +496,46 @@ class TaskRevisionService
                 'task_instance' => $templateTaskUser
             ];
         } else {
-            $task = Task::findOrFail($data['task_id']);
-            return [
-                'task_id' => $data['task_id'],
-                'task_instance' => $task
-            ];
+            // للمهام العادية، قد يكون task_id هو معرف TaskUser
+            // لذا نحتاج للتحقق أولاً
+            if (isset($data['task_user_id']) && $data['task_user_id']) {
+                // إذا كان لدينا task_user_id، نستخدمه للحصول على TaskUser
+                $taskUser = \App\Models\TaskUser::findOrFail($data['task_user_id']);
+                return [
+                    'task_id' => $taskUser->task_id,
+                    'task_instance' => $taskUser->task
+                ];
+            } else {
+                // محاولة البحث كـ Task أولاً
+                $task = Task::find($data['task_id']);
+
+                if (!$task) {
+                    // إذا لم يُعثر على Task، جرب TaskUser
+                    $taskUser = \App\Models\TaskUser::find($data['task_id']);
+
+                    if ($taskUser) {
+                        return [
+                            'task_id' => $taskUser->task_id,
+                            'task_instance' => $taskUser->task
+                        ];
+                    }
+
+                    // إذا لم يُعثر على أي منهما، ارجع خطأ واضح
+                    throw new \Exception("لم يتم العثور على المهمة برقم {$data['task_id']}");
+                }
+
+                return [
+                    'task_id' => $task->id,
+                    'task_instance' => $task
+                ];
+            }
         }
     }
 
     /**
      * معالجة المرفق (ملف أو لينك)
      */
-    private function handleAttachment(array $data, string $taskType, $taskId): ?array
+    private function handleAttachment(array $data, string $taskType, $taskId, array $revisionData = []): ?array
     {
         $attachmentType = $data['attachment_type'] ?? 'file';
 
@@ -506,31 +549,21 @@ class TaskRevisionService
                 'attachment_size' => null
             ];
         } elseif ($attachmentType === 'file' && isset($data['attachment']) && $data['attachment']) {
-            // رفع الملف
-            return $this->handleFileUpload($data['attachment'], $taskType, $taskId);
+            // رفع الملف مع تمرير بيانات التعديل
+            return $this->handleFileUpload($data['attachment'], $taskType, $taskId, $revisionData);
         }
 
         return null;
     }
 
     /**
-     * التعامل مع رفع الملف
+     * التعامل مع رفع الملف على Wasabi
      */
-    private function handleFileUpload($file, string $taskType, $taskId): array
+    private function handleFileUpload($file, string $taskType, $taskId, array $revisionData = []): array
     {
-        $directory = "task-revisions/{$taskType}/{$taskId}";
-
-        $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-
-        $path = $file->storeAs($directory, $filename, 'public');
-
-        return [
-            'attachment_path' => $path,
-            'attachment_name' => $file->getClientOriginalName(),
-            'attachment_type' => 'file',
-            'attachment_size' => $file->getSize(),
-            'attachment_link' => null
-        ];
+        // رفع الملف إلى Wasabi باستخدام RevisionStorageService
+        // تمرير بيانات التعديل لبناء المسار المنظم
+        return $this->storageService->uploadRevisionFile($file, $taskType, $taskId, $revisionData);
     }
 
 

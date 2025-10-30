@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="additional-tasks-container">
-    <div class="container">
+    <div style="width: 100%; padding: 0 2rem;">
         <!-- Page Header -->
         <div class="page-header-tasks">
             <h1>➕ إضافة مهمة إضافية جديدة</h1>
@@ -232,62 +232,33 @@
                         <div class="form-section">
                             <div class="form-section-header">
                                 <div class="form-section-icon">
-                                    <i class="fas fa-cogs"></i>
+                                    <i class="fas fa-hand-paper"></i>
                                 </div>
-                                <h3 class="form-section-title">نوعية المهمة</h3>
+                                <h3 class="form-section-title">إعدادات التقديم</h3>
+                            </div>
+
+                            <div class="alert-modern alert-info mb-4">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <strong>ملحوظة:</strong> جميع المهام الإضافية تتطلب تقديم من المستخدمين وموافقة من الإدارة
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 gap-6">
-                                <!-- نوع التخصيص -->
-                                <div>
-                                    <div class="form-group">
-                                        <label class="form-label-modern">
-                                            <i class="fas fa-tasks"></i>
-                                            كيفية تخصيص المهمة <span style="color: #dc3545;">*</span>
-                                        </label>
-                                        <div class="radio-group">
-                                            <div class="radio-option">
-                                                <input id="auto_assign" name="assignment_type" type="radio" value="auto_assign"
-                                                       {{ old('assignment_type', 'auto_assign') === 'auto_assign' ? 'checked' : '' }}
-                                                       class="form-radio"
-                                                       onchange="toggleMaxParticipants()">
-                                                <label for="auto_assign" class="radio-label">
-                                                    <div class="radio-title">
-                                                        <i class="fas fa-magic" style="color: #667eea;"></i> تخصيص تلقائي
-                                                    </div>
-                                                    <div class="radio-description">تُخصص المهمة تلقائياً لجميع المستخدمين المؤهلين</div>
-                                                </label>
-                                            </div>
-
-                                            <div class="radio-option">
-                                                <input id="application_required" name="assignment_type" type="radio" value="application_required"
-                                                       {{ old('assignment_type') === 'application_required' ? 'checked' : '' }}
-                                                       class="form-radio"
-                                                       onchange="toggleMaxParticipants()">
-                                                <label for="application_required" class="radio-label">
-                                                    <div class="radio-title">
-                                                        <i class="fas fa-hand-paper" style="color: #ffc107;"></i> تتطلب تقديم
-                                                    </div>
-                                                    <div class="radio-description">المستخدمون يقدمون طلب للمشاركة وتحتاج موافقة</div>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <!-- الحد الأقصى للمشاركين -->
-                                <div id="max_participants_field" style="display: none;">
+                                <div>
                                     <div class="form-group">
                                         <label for="max_participants" class="form-label-modern">
                                             <i class="fas fa-users"></i>
-                                            الحد الأقصى للمشاركين
+                                            الحد الأقصى للمشاركين <span style="color: #dc3545;">*</span>
                                         </label>
                                         <input type="number" id="max_participants" name="max_participants" min="1" max="1000"
-                                               value="{{ old('max_participants') }}"
-                                               class="form-control-modern @error('max_participants') is-invalid @enderror">
+                                               value="{{ old('max_participants', 10) }}"
+                                               class="form-control-modern @error('max_participants') is-invalid @enderror"
+                                               required>
                                         <small style="display: block; margin-top: 0.5rem; color: #6b7280;">
                                             <i class="fas fa-info-circle"></i>
-                                            اتركه فارغاً لعدم وضع حد أقصى
+                                            حدد عدد المستخدمين الذين يمكنهم المشاركة في هذه المهمة
                                         </small>
                                         @error('max_participants')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -406,18 +377,6 @@ function toggleDepartmentField() {
 }
 
 // Toggle max participants field based on assignment type
-function toggleMaxParticipants() {
-    const assignmentType = document.querySelector('input[name="assignment_type"]:checked').value;
-    const maxParticipantsField = document.getElementById('max_participants_field');
-
-    if (assignmentType === 'application_required') {
-        maxParticipantsField.style.display = 'block';
-    } else {
-        maxParticipantsField.style.display = 'none';
-        document.getElementById('max_participants').value = '';
-    }
-}
-
 // Update icon preview
 function updateIconPreview() {
     const iconSelect = document.getElementById('icon');
@@ -456,7 +415,6 @@ function toggleFlexibleTime() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleDepartmentField();
-    toggleMaxParticipants();
     updateIconPreview();
 
     // Add event listener for flexible time toggle

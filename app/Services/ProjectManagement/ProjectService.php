@@ -489,7 +489,7 @@ class ProjectService
      */
     private function prepareAttachmentData(Project $project, $currentUser, $isAdmin)
     {
-        $fixedTypes = ['مرفقات أولية', 'تقارير مكالمات', 'مرفقات من العميل', 'عقود', 'الدراسه النهائيه'];
+        $fixedTypes = ['مرفقات أولية', 'تقارير مكالمات', 'مرفقات من العميل', 'الدراسه النهائيه'];
 
         // التحقق من صلاحيات المستخدم
         $userRoles = $currentUser->roles->pluck('name')->toArray() ?? [];

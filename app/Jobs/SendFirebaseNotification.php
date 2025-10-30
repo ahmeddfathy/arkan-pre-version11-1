@@ -53,7 +53,10 @@ class SendFirebaseNotification implements ShouldQueue
             'title' => $this->title,
             'token_preview' => substr($this->fcmToken, 0, 20) . '...',
             'attempt' => $this->attempts(),
-            'link' => $this->link
+            'link' => $this->link,
+            'credentials_loaded' => !empty($this->credentials),
+            'has_private_key' => isset($this->credentials['private_key']),
+            'has_client_email' => isset($this->credentials['client_email'])
         ]);
 
         // 🚀 Smart Check: تحقق سريع من FCM token
@@ -62,6 +65,14 @@ class SendFirebaseNotification implements ShouldQueue
                 'title' => $this->title
             ]);
             return; // تم إنهاء المهمة بنجاح
+        }
+
+        // التحقق من تحميل الـ credentials
+        if (empty($this->credentials)) {
+            Log::error('Firebase credentials not loaded', [
+                'title' => $this->title
+            ]);
+            throw new Exception('Firebase credentials not loaded');
         }
 
         try {
@@ -172,6 +183,17 @@ class SendFirebaseNotification implements ShouldQueue
         ]);
 
         if (!$success) {
+            // ✅ خطأ 404 يعني الـ token منتهي أو مش موجود - ده طبيعي، نتجاهله
+            if ($statusCode === 404) {
+                Log::warning('FCM token not found (expired or unregistered) - skipping', [
+                    'title' => $this->title,
+                    'token_preview' => substr($this->fcmToken, 0, 20) . '...',
+                    'status' => $statusCode
+                ]);
+                // نخلي الـ job ينجح عشان ميعيدش المحاولة
+                return;
+            }
+
             Log::error('Firebase notification failed in job', [
                 'status' => $statusCode,
                 'error' => $responseData,
@@ -245,16 +267,37 @@ class SendFirebaseNotification implements ShouldQueue
      */
     private function generateJWT(array $payload, string $privateKey): string
     {
-        $header = json_encode(['typ' => 'JWT', 'alg' => 'RS256']);
-        $payload = json_encode($payload);
+        try {
+            $header = json_encode(['typ' => 'JWT', 'alg' => 'RS256']);
+            $payload = json_encode($payload);
 
-        $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
-        $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
+            $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
+            $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
 
-        $signatureInput = $base64UrlHeader . "." . $base64UrlPayload;
-        openssl_sign($signatureInput, $signature, $privateKey, 'SHA256');
-        $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
+            $signatureInput = $base64UrlHeader . "." . $base64UrlPayload;
 
-        return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+            // التحقق من openssl_sign
+            $signResult = openssl_sign($signatureInput, $signature, $privateKey, 'SHA256');
+
+            if ($signResult === false) {
+                $opensslError = openssl_error_string();
+                Log::error('openssl_sign failed in Firebase job', [
+                    'openssl_error' => $opensslError
+                ]);
+                throw new Exception('Failed to sign JWT: ' . $opensslError);
+            }
+
+            $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
+
+            Log::info('JWT generated successfully in Firebase job');
+
+            return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+
+        } catch (Exception $e) {
+            Log::error('Error in generateJWT', [
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\CompanyService;
 use App\Services\Notifications\Traits\HasFirebaseNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProjectNotificationService
@@ -193,6 +194,191 @@ class ProjectNotificationService
                 'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'project_id' => $project->id
+            ]);
+        }
+    }
+
+    /**
+     * إشعار جميع المشاركين في المشروع برفع مرفق جديد في الفولدرات الثابتة
+     *
+     * @param Project $project المشروع
+     * @param string $folderName اسم الفولدر (مرفقات أولية، تقارير مكالمات، مرفقات من العميل)
+     * @param string $fileName اسم الملف المرفوع
+     * @param User|null $uploadedBy المستخدم الذي رفع الملف
+     * @return void
+     */
+    public function notifyProjectParticipantsOfAttachment(Project $project, string $folderName, string $fileName, ?User $uploadedBy = null): void
+    {
+        try {
+
+            $notifiableFolders = ['مرفقات أولية', 'تقارير مكالمات', 'مرفقات من العميل'];
+
+
+            if (!in_array($folderName, $notifiableFolders)) {
+                return;
+            }
+
+
+            $participants = DB::table('project_service_user')
+                ->where('project_id', $project->id)
+                ->distinct()
+                ->pluck('user_id');
+
+            $uploadedByName = $uploadedBy ? $uploadedBy->name : 'أحد أعضاء الفريق';
+            $projectCode = $project->code ?? 'غير محدد';
+
+            $message = "تم رفع مرفق جديد في المشروع [{$projectCode}] - {$folderName}";
+            $detailedMessage = "قام {$uploadedByName} برفع ملف \"{$fileName}\" في فولدر \"{$folderName}\" للمشروع \"{$project->name}\" (كود: {$projectCode})";
+
+            foreach ($participants as $participantId) {
+
+                if ($uploadedBy && $participantId == $uploadedBy->id) {
+                    continue;
+                }
+
+                $participant = User::find($participantId);
+                if (!$participant) {
+                    continue;
+                }
+
+                Notification::create([
+                    'user_id' => $participant->id,
+                    'type' => 'project_attachment_uploaded',
+                    'data' => [
+                        'message' => $message,
+                        'detailed_message' => $detailedMessage,
+                        'project_id' => $project->id,
+                        'project_name' => $project->name,
+                        'project_code' => $projectCode,
+                        'folder_name' => $folderName,
+                        'file_name' => $fileName,
+                        'uploaded_by_id' => $uploadedBy?->id,
+                        'uploaded_by_name' => $uploadedByName,
+                        'notification_time' => now()->format('Y-m-d H:i:s'),
+                    ],
+                    'related_id' => $project->id
+                ]);
+
+                if ($participant->fcm_token) {
+                    $this->sendTypedFirebaseNotification(
+                        $participant,
+                        'projects',
+                        'attachment_uploaded',
+                        $message,
+                        $project->id
+                    );
+                }
+            }
+
+            Log::info('تم إرسال إشعارات رفع مرفق لمشاركي المشروع', [
+                'project_id' => $project->id,
+                'folder_name' => $folderName,
+                'file_name' => $fileName,
+                'participants_count' => count($participants),
+                'uploaded_by' => $uploadedBy?->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في إرسال إشعارات رفع مرفق للمشروع', [
+                'error' => $e->getMessage(),
+                'project_id' => $project->id,
+                'folder_name' => $folderName
+            ]);
+        }
+    }
+
+    /**
+     * إشعار المشاركين في خدمة بأن الخدمات التي تعتمد عليها قد اكتملت
+     *
+     * @param Project $project المشروع
+     * @param CompanyService $completedService الخدمة التي اكتملت
+     * @param array $usersToNotify المستخدمون الذين سيتم إشعارهم مع خدماتهم
+     * @param User|null $completedBy المستخدم الذي أكمل الخدمة
+     * @return void
+     */
+    public function notifyDependentServiceParticipants(
+        Project $project,
+        CompanyService $completedService,
+        array $usersToNotify,
+        ?User $completedBy = null
+    ): void {
+        try {
+            if (empty($usersToNotify)) {
+                return;
+            }
+
+            $projectCode = $project->code ?? 'غير محدد';
+            $completedByName = $completedBy ? $completedBy->name : 'الفريق';
+
+            // تجميع المستخدمين حسب الخدمة لإرسال إشعار واحد لكل مستخدم
+            $userNotifications = [];
+            foreach ($usersToNotify as $item) {
+                $userId = $item['user']->id;
+                if (!isset($userNotifications[$userId])) {
+                    $userNotifications[$userId] = [
+                        'user' => $item['user'],
+                        'services' => []
+                    ];
+                }
+                $userNotifications[$userId]['services'][] = $item['service']->name;
+            }
+
+            // إرسال إشعار لكل مستخدم
+            foreach ($userNotifications as $userId => $data) {
+                $user = $data['user'];
+                $services = $data['services'];
+
+                $servicesText = count($services) > 1
+                    ? implode('، ', $services)
+                    : $services[0];
+
+                $message = "تم اكتمال خدمة \"{$completedService->name}\" في المشروع [{$projectCode}] - يمكنك الآن البدء في خدمة: {$servicesText}";
+                $detailedMessage = "قام {$completedByName} بإكمال خدمة \"{$completedService->name}\" في المشروع \"{$project->name}\" (كود: {$projectCode}). الخدمات التي يمكنك البدء فيها الآن: {$servicesText}";
+
+                // إنشاء سجل الإشعار
+                Notification::create([
+                    'user_id' => $user->id,
+                    'type' => 'service_dependency_completed',
+                    'data' => [
+                        'message' => $message,
+                        'detailed_message' => $detailedMessage,
+                        'project_id' => $project->id,
+                        'project_name' => $project->name,
+                        'project_code' => $projectCode,
+                        'completed_service_id' => $completedService->id,
+                        'completed_service_name' => $completedService->name,
+                        'dependent_services' => $services,
+                        'completed_by_id' => $completedBy?->id,
+                        'completed_by_name' => $completedByName,
+                        'notification_time' => now()->format('Y-m-d H:i:s'),
+                    ],
+                    'related_id' => $project->id
+                ]);
+
+                // إرسال إشعار Firebase
+                if ($user->fcm_token) {
+                    $this->sendTypedFirebaseNotification(
+                        $user,
+                        'projects',
+                        'service_ready',
+                        $message,
+                        $project->id
+                    );
+                }
+            }
+
+            Log::info('تم إرسال إشعارات اكتمال الخدمات المعتمد عليها', [
+                'project_id' => $project->id,
+                'completed_service_id' => $completedService->id,
+                'users_notified' => count($userNotifications),
+                'completed_by' => $completedBy?->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('خطأ في إرسال إشعارات الخدمات المعتمد عليها', [
+                'error' => $e->getMessage(),
+                'project_id' => $project->id,
+                'completed_service_id' => $completedService->id
             ]);
         }
     }

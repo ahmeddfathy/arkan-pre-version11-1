@@ -4,17 +4,23 @@ namespace App\Services\ProjectManagement;
 
 use App\Models\Project;
 use App\Models\ProjectAttachment;
+use App\Services\Notifications\ProjectNotificationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
 class AttachmentService
 {
     protected $storageService;
+    protected $notificationService;
 
-    public function __construct(ProjectStorageService $storageService)
-    {
+    public function __construct(
+        ProjectStorageService $storageService,
+        ProjectNotificationService $notificationService
+    ) {
         $this->storageService = $storageService;
+        $this->notificationService = $notificationService;
     }
 
     public function getPresignedUrl(Project $project, $fileName, $serviceType, $description, $taskData = null)
@@ -119,65 +125,89 @@ class AttachmentService
     {
         $fileName = $file->getClientOriginalName();
 
-        // فحص لمنع الرفع المكرر - التحقق من وجود ملف بنفس الاسم في نفس المشروع والخدمة
-        $existingAttachment = ProjectAttachment::where('project_id', $project->id)
-            ->where('service_type', $serviceType)
-            ->where('file_name', $fileName)
-            ->where('uploaded_by', Auth::id())
-            ->where('is_uploaded', true) // التحقق فقط من الملفات المرفوعة بالفعل
-            ->where('created_at', '>=', now()->subMinutes(5)) // في آخر 5 دقائق
-            ->first();
+        // 🔒 استخدام Database Transaction لمنع التكرار
+        return DB::transaction(function () use ($project, $file, $serviceType, $description, $taskData, $parentAttachmentId, $fileName) {
+            // فحص محسّن لمنع الرفع المكرر - بدون شرط is_uploaded
+            $existingAttachment = ProjectAttachment::where('project_id', $project->id)
+                ->where('service_type', $serviceType)
+                ->where('file_name', $fileName)
+                ->where('uploaded_by', Auth::id())
+                ->where('created_at', '>=', now()->subMinute()) // في آخر دقيقة فقط (تقليل الفترة)
+                ->first();
 
-        if ($existingAttachment) {
-            throw new \Exception('تم رفع هذا الملف مؤخراً. يرجى الانتظار قليلاً أو تغيير اسم الملف.');
-        }
-
-        $project->load('client');
-        $clientName = $project->client ? $project->client->name : 'no-client';
-        $projectCode = $project->code ? $project->code : 'no-code';
-
-        $projectFolder = 'projects/' . $clientName . '_' . $project->name . '_' . $projectCode;
-
-        $userName = Auth::user() ? Auth::user()->name : 'unknown-user';
-
-        // إذا كان هذا رد على ملف، أضف بادئة "reply_"
-        $filePrefix = $parentAttachmentId ? 'reply_' : '';
-        $fileKey = $projectFolder . '/' . $serviceType . '/' . $filePrefix . $userName . '_' . $fileName;
-
-        Storage::disk('s3')->put($fileKey, file_get_contents($file), 'public');
-
-        $attachmentData = [
-            'project_id' => $project->id,
-            'service_type' => $serviceType,
-            'file_path' => $fileKey,
-            'file_name' => $fileName,
-            'description' => $description,
-            'uploaded_by' => Auth::id(),
-            'is_uploaded' => true,
-            'parent_attachment_id' => $parentAttachmentId,
-        ];
-
-        // إضافة بيانات المهمة
-        if ($taskData && isset($taskData['task_type'])) {
-            // إعطاء أولوية لبيانات المهمة المرسلة من المستخدم
-            $attachmentData['task_type'] = $taskData['task_type'];
-
-            if ($taskData['task_type'] === 'template_task' && isset($taskData['task_id'])) {
-                $attachmentData['template_task_user_id'] = $taskData['task_id'];
-            } elseif ($taskData['task_type'] === 'regular_task' && isset($taskData['task_id'])) {
-                $attachmentData['task_user_id'] = $taskData['task_id'];
+            if ($existingAttachment) {
+                throw new \Exception('تم رفع هذا الملف مؤخراً. يرجى الانتظار قليلاً أو تغيير اسم الملف.');
             }
-        } elseif ($parentAttachmentId) {
-            // إذا كان هذا رد ولم يتم تحديد مهمة، نسخ معلومات المهمة من الملف الأصلي
-            $parentAttachment = ProjectAttachment::find($parentAttachmentId);
-            if ($parentAttachment) {
-                $attachmentData['task_type'] = $parentAttachment->task_type;
-                $attachmentData['template_task_user_id'] = $parentAttachment->template_task_user_id;
-                $attachmentData['task_user_id'] = $parentAttachment->task_user_id;
-            }
-        }
 
-        return ProjectAttachment::create($attachmentData);
+            $project->load('client');
+            $clientName = $project->client ? $project->client->name : 'no-client';
+            $projectCode = $project->code ? $project->code : 'no-code';
+
+            $projectFolder = 'projects/' . $clientName . '_' . $project->name . '_' . $projectCode;
+
+            $userName = Auth::user() ? Auth::user()->name : 'unknown-user';
+
+            // إذا كان هذا رد على ملف، أضف بادئة "reply_"
+            $filePrefix = $parentAttachmentId ? 'reply_' : '';
+            $fileKey = $projectFolder . '/' . $serviceType . '/' . $filePrefix . $userName . '_' . $fileName;
+
+            Storage::disk('s3')->put($fileKey, file_get_contents($file), 'public');
+
+            $attachmentData = [
+                'project_id' => $project->id,
+                'service_type' => $serviceType,
+                'file_path' => $fileKey,
+                'file_name' => $fileName,
+                'description' => $description,
+                'uploaded_by' => Auth::id(),
+                'is_uploaded' => true,
+                'parent_attachment_id' => $parentAttachmentId,
+            ];
+
+            // إضافة بيانات المهمة
+            if ($taskData && isset($taskData['task_type'])) {
+                // إعطاء أولوية لبيانات المهمة المرسلة من المستخدم
+                $attachmentData['task_type'] = $taskData['task_type'];
+
+                if ($taskData['task_type'] === 'template_task' && isset($taskData['task_id'])) {
+                    $attachmentData['template_task_user_id'] = $taskData['task_id'];
+                } elseif ($taskData['task_type'] === 'regular_task' && isset($taskData['task_id'])) {
+                    $attachmentData['task_user_id'] = $taskData['task_id'];
+                }
+            } elseif ($parentAttachmentId) {
+                // إذا كان هذا رد ولم يتم تحديد مهمة، نسخ معلومات المهمة من الملف الأصلي
+                $parentAttachment = ProjectAttachment::find($parentAttachmentId);
+                if ($parentAttachment) {
+                    $attachmentData['task_type'] = $parentAttachment->task_type;
+                    $attachmentData['template_task_user_id'] = $parentAttachment->template_task_user_id;
+                    $attachmentData['task_user_id'] = $parentAttachment->task_user_id;
+                }
+            }
+
+            $attachment = ProjectAttachment::create($attachmentData);
+
+            // إرسال إشعار لجميع المشاركين في المشروع عند رفع مرفق في الفولدرات الثابتة
+            // فقط للمرفقات الأساسية (ليست ردود)
+            if (!$parentAttachmentId) {
+                try {
+                    $this->notificationService->notifyProjectParticipantsOfAttachment(
+                        $project,
+                        $serviceType,
+                        $fileName,
+                        Auth::user()
+                    );
+                } catch (\Exception $e) {
+                    // تسجيل الخطأ فقط دون إيقاف عملية الرفع
+                    Log::error('خطأ في إرسال إشعار رفع مرفق', [
+                        'error' => $e->getMessage(),
+                        'project_id' => $project->id,
+                        'service_type' => $serviceType
+                    ]);
+                }
+            }
+
+            return $attachment;
+        }); // إغلاق الـ transaction
     }
 
     public function getViewUrl($attachmentId)
@@ -187,13 +217,13 @@ class AttachmentService
             $url = $this->storageService->generatePresignedViewUrl($attachment->file_path);
 
             if (!$url) {
-                \Log::warning("Failed to generate view URL for attachment: {$attachmentId}");
+                Log::warning("Failed to generate view URL for attachment: {$attachmentId}");
                 return null;
             }
 
             return $url;
         } catch (\Exception $e) {
-            \Log::error("Error getting view URL for attachment {$attachmentId}: " . $e->getMessage());
+            Log::error("Error getting view URL for attachment {$attachmentId}: " . $e->getMessage());
             return null;
         }
     }
@@ -205,13 +235,13 @@ class AttachmentService
             $url = $this->storageService->generatePresignedDownloadUrl($attachment->file_path, $attachment->file_name);
 
             if (!$url) {
-                \Log::warning("Failed to generate download URL for attachment: {$attachmentId}");
+                Log::warning("Failed to generate download URL for attachment: {$attachmentId}");
                 return null;
             }
 
             return $url;
         } catch (\Exception $e) {
-            \Log::error("Error getting download URL for attachment {$attachmentId}: " . $e->getMessage());
+            Log::error("Error getting download URL for attachment {$attachmentId}: " . $e->getMessage());
             return null;
         }
     }

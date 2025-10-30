@@ -152,30 +152,12 @@ class AdditionalTask extends Model
         return collect();
     }
 
-        public function assignToUsers()
-    {
-
-        if ($this->assignment_type === 'application_required') {
-            return 0;
-        }
-
-        $eligibleUsers = $this->getEligibleUsers();
-
-        foreach ($eligibleUsers as $user) {
-            AdditionalTaskUser::updateOrCreate([
-                'additional_task_id' => $this->id,
-                'user_id' => $user->id,
-            ], [
-                'status' => 'assigned'
-            ]);
-        }
-
-        return $eligibleUsers->count();
-    }
-
+    /**
+     * جميع المهام الآن تتطلب تقديم
+     */
     public function requiresApplication()
     {
-        return $this->assignment_type === 'application_required';
+        return true; // دائماً يتطلب تقديم
     }
 
     public function hasMaxParticipants()

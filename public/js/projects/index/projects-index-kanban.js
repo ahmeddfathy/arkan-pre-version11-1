@@ -1,12 +1,30 @@
 /**
- * Projects Index Kanban Board JavaScript
+ * Projects Index Kanban Board JavaScript - OPTIMIZED
  * Handles kanban board functionality for projects index page
  */
 
-// Enhanced Projects Index Kanban Board Functionality
+// Enhanced Projects Index Kanban Board Functionality - OPTIMIZED FOR PERFORMANCE
 function initializeProjectsIndexKanbanBoard() {
     const kanbanCards = document.querySelectorAll('.projects-index-kanban-card');
     const kanbanColumns = document.querySelectorAll('#kanbanView .projects-index-kanban-cards');
+
+    // ⚡ Use passive event listeners for better scroll performance
+    const passiveIfSupported = (function() {
+        let passive = false;
+        try {
+            const options = {
+                get passive() {
+                    passive = true;
+                    return false;
+                }
+            };
+            window.addEventListener('test', null, options);
+            window.removeEventListener('test', null, options);
+        } catch (err) {
+            passive = false;
+        }
+        return passive ? { passive: true } : false;
+    })();
 
     // Add drag functionality to project cards
     kanbanCards.forEach(card => {
