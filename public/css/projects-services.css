@@ -399,7 +399,7 @@ body {
     margin-bottom: 0.75rem;
     background: #ffffff;
     border-radius: 12px;
-    border-left: 4px solid #e5e7eb;
+    border: none;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
 }
@@ -410,17 +410,14 @@ body {
 }
 
 .service-item.completed {
-    border-left-color: #10b981;
     background: #f0fdf4;
 }
 
 .service-item.in-progress {
-    border-left-color: #f59e0b;
     background: #fffbeb;
 }
 
 .service-item.not-started {
-    border-left-color: #6b7280;
     background: #f9fafb;
 }
 
@@ -600,32 +597,31 @@ body {
 
 .participant-card {
     background: white;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0.75rem;
-    border-left: 3px solid #e5e7eb;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .participant-card:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.02);
 }
 
 /* حالات المشاركين */
 .participant-card.delivered_on_time {
-    border-left-color: #10b981;
-    background: linear-gradient(to right, #ecfdf5 0%, white 15%);
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .participant-card.delivered_late {
-    border-left-color: #ef4444;
-    background: linear-gradient(to right, #fef2f2 0%, white 15%);
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
 .participant-card.not_delivered {
-    border-left-color: #f59e0b;
-    background: linear-gradient(to right, #fffbeb 0%, white 15%);
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
 }
 
 .participant-info {
@@ -639,51 +635,54 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #1f2937;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
 .participant-name i {
-    color: #6366f1;
-    font-size: 1.1rem;
+    color: #4f46e5;
+    font-size: 1.2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .employee-id {
     display: inline-block;
-    background: #e0e7ff;
+    background: rgba(255, 255, 255, 0.7);
     color: #4f46e5;
-    padding: 0.15rem 0.5rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 12px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-right: 0.25rem;
+    border: 2px solid rgba(79, 70, 229, 0.3);
 }
 
 .participant-status {
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.35rem 0.65rem;
-    border-radius: 15px;
+    padding: 0.4rem 0.75rem;
+    border-radius: 20px;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .participant-status.delivered_on_time {
-    background: #d1fae5;
-    color: #065f46;
+    background: #059669;
+    color: white;
 }
 
 .participant-status.delivered_late {
-    background: #fee2e2;
-    color: #991b1b;
+    background: #dc2626;
+    color: white;
 }
 
 .participant-status.not_delivered {
-    background: #fef3c7;
-    color: #92400e;
+    background: #f59e0b;
+    color: white;
 }
 
 .status-icon {
@@ -701,9 +700,10 @@ body {
     gap: 0.5rem;
     margin-top: 0.75rem;
     padding: 0.75rem;
-    background: #f9fafb;
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
 }
 
 .task-stat {
@@ -711,11 +711,12 @@ body {
     align-items: center;
     gap: 0.35rem;
     padding: 0.4rem 0.7rem;
-    background: white;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
     font-size: 0.8rem;
-    border: 1px solid #e5e7eb;
+    border: 2px solid rgba(255, 255, 255, 0.5);
     transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .task-stat:hover {
@@ -1463,7 +1464,7 @@ body {
 
 .participant-card {
     background: #ffffff;
-    border: 2px solid #e5e7eb;
+    border: none;
     border-radius: 12px;
     padding: 1rem;
     cursor: pointer;
@@ -1471,7 +1472,6 @@ body {
 }
 
 .participant-card:hover {
-    border-color: #667eea;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
     transform: translateY(-2px);
 }
@@ -2431,5 +2431,148 @@ body {
     .revision-meta {
         flex-direction: column;
         gap: 0.5rem;
+    }
+}
+
+/* ============================================
+   WORKFLOW VISUALIZATION STYLES
+   ============================================ */
+.workflow-container {
+    background: #f9fafb;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.workflow-steps {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+    direction: rtl;
+    flex-wrap: wrap;
+}
+
+.workflow-step-container {
+    flex: 0 1 auto;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.workflow-step {
+    text-align: center;
+    padding: 0.5rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 0.3rem;
+}
+
+.workflow-step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Service Participants Compact View */
+.service-participants-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.2rem;
+}
+
+/* Participant Mini Cards - تصميم صغير ومختلف */
+.participant-mini-card {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.participant-mini-card:hover {
+    transform: translateX(-3px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.participant-icon {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
+.participant-name {
+    flex: 1;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+/* Step States */
+.step-completed {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 2px solid #10b981;
+    color: #065f46;
+}
+
+.step-draft {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    color: #92400e;
+}
+
+.step-current {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 2px solid #3b82f6;
+    color: #1e40af;
+    animation: pulse 2s infinite;
+}
+
+.step-paused {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+    border: 2px solid #ec4899;
+    color: #831843;
+}
+
+.step-cancelled {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    color: #7f1d1d;
+    opacity: 0.7;
+}
+
+.step-pending {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 2px solid #9ca3af;
+    color: #6b7280;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+    }
+}
+
+/* Responsive Workflow */
+@media (max-width: 768px) {
+    .workflow-steps {
+        flex-wrap: wrap;
+    }
+
+    .workflow-step {
+        min-width: 80px;
+        font-size: 0.65rem;
     }
 }

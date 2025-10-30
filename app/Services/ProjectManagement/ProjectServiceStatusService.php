@@ -306,10 +306,20 @@ class ProjectServiceStatusService
 
     /**
      * إرسال إشعارات للمشاركين في الخدمات التي تعتمد على الخدمة المكتملة
+     * ✅ الإشعار يُرسل فقط إذا كان المستخدم صاحب hierarchy_level = 2 قد أكمل
      */
     private function notifyDependentServices(Project $project, int $completedServiceId): void
     {
         try {
+            // التحقق من أن الخدمة اكتملت فعلياً بواسطة مستخدم من المستوى الهرمي 2
+            if (!$this->isServiceApprovedByReviewer($project->id, $completedServiceId)) {
+                Log::info('الخدمة لم تكتمل بعد من قبل المراجع (hierarchy_level = 2)', [
+                    'project_id' => $project->id,
+                    'completed_service_id' => $completedServiceId
+                ]);
+                return;
+            }
+
             // الحصول على المستخدمين الذين يجب إشعارهم
             $usersToNotify = $this->dependencyService->getUsersToNotify($project->id, $completedServiceId);
 
@@ -351,5 +361,34 @@ class ProjectServiceStatusService
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * التحقق من أن الخدمة تم اعتمادها من قبل مراجع (hierarchy_level = 2)
+     * ✅ يُقبل: تسليم مسودة أو تسليم نهائي فقط
+     *
+     * @param int $projectId
+     * @param int $serviceId
+     * @return bool
+     */
+    private function isServiceApprovedByReviewer(int $projectId, int $serviceId): bool
+    {
+        // الحصول على IDs الأدوار التي لها hierarchy_level = 2
+        $reviewerRoleIds = \App\Models\RoleHierarchy::getReviewerRoleIds();
+
+        if (empty($reviewerRoleIds)) {
+            // لا يوجد أدوار مراجعة محددة - نسمح بالإشعار
+            return true;
+        }
+
+        // التحقق من أن المراجع (hierarchy_level = 2) قد سلم مسودة أو نهائي
+        $reviewersCompleted = DB::table('project_service_user')
+            ->where('project_id', $projectId)
+            ->where('service_id', $serviceId)
+            ->whereIn('role_id', $reviewerRoleIds)
+            ->whereIn('status', ['تسليم مسودة', 'تم تسليم نهائي'])
+            ->exists();
+
+        return $reviewersCompleted;
     }
 }

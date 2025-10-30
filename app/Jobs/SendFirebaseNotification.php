@@ -85,6 +85,22 @@ class SendFirebaseNotification implements ShouldQueue
             ]);
 
         } catch (Exception $e) {
+            // ✅ تحقق إذا كان الخطأ بسبب توكن غلط (404 أو 400) - نتجاهله ونعدي عادي
+            if ($e instanceof \Illuminate\Http\Client\RequestException) {
+                $statusCode = $e->response ? $e->response->status() : null;
+
+                if (in_array($statusCode, [404, 400])) {
+                    Log::warning('Firebase notification skipped due to invalid/expired token', [
+                        'title' => $this->title,
+                        'token_preview' => substr($this->fcmToken, 0, 20) . '...',
+                        'status_code' => $statusCode,
+                        'error_message' => $e->getMessage()
+                    ]);
+                    // لا نرمي exception، نخلي الـ job ينجح
+                    return;
+                }
+            }
+
             Log::error('Firebase notification job failed', [
                 'title' => $this->title,
                 'token_preview' => substr($this->fcmToken, 0, 20) . '...',
@@ -164,8 +180,12 @@ class SendFirebaseNotification implements ShouldQueue
         Log::info('Firebase job payload', ['payload' => json_encode($payload, JSON_UNESCAPED_UNICODE)]);
 
         // Firebase API with proper timeout and retry settings
+        // ⚠️ مهم: لا نرمي exception تلقائياً، سنتعامل مع الأخطاء يدوياً
         $response = Http::timeout(30)
-            ->retry(5, 1000) // 5 محاولات مع انتظار ثانية واحدة
+            ->retry(5, 1000, function($exception, $request) {
+                // نعيد المحاولة فقط في حالة network errors، لا في حالة 404
+                return !($exception instanceof \Illuminate\Http\Client\RequestException && $exception->response->status() === 404);
+            })
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $this->accessToken,
                 'Content-Type' => 'application/json'
@@ -183,12 +203,24 @@ class SendFirebaseNotification implements ShouldQueue
         ]);
 
         if (!$success) {
-            // ✅ خطأ 404 يعني الـ token منتهي أو مش موجود - ده طبيعي، نتجاهله
-            if ($statusCode === 404) {
-                Log::warning('FCM token not found (expired or unregistered) - skipping', [
+            // ✅ أخطاء بسبب التوكن (404, 400) - نتجاهلها ونعدي عادي
+            if (in_array($statusCode, [404, 400])) {
+                $errorMessage = 'FCM token issue detected - skipping notification';
+
+                if ($statusCode === 404) {
+                    $errorMessage = 'FCM token not found (expired or unregistered)';
+                } elseif ($statusCode === 400 && isset($responseData['error']['message'])) {
+                    if (str_contains($responseData['error']['message'], 'not found') ||
+                        str_contains($responseData['error']['message'], 'invalid')) {
+                        $errorMessage = 'FCM token is invalid or expired';
+                    }
+                }
+
+                Log::warning($errorMessage . ' - skipping', [
                     'title' => $this->title,
                     'token_preview' => substr($this->fcmToken, 0, 20) . '...',
-                    'status' => $statusCode
+                    'status' => $statusCode,
+                    'error_message' => $responseData['error']['message'] ?? 'Unknown error'
                 ]);
                 // نخلي الـ job ينجح عشان ميعيدش المحاولة
                 return;

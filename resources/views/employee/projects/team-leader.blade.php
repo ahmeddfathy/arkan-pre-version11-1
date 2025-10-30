@@ -198,14 +198,49 @@
 
                                     // إذا كانت الخدمة متأخرة، نعرض تحذير
                                     $hasOverdue = $projectService['stats']['overdue'] > 0;
+
+                                    // التحقق من المستوى الهرمي والصلاحيات
+                                    $currentUserHierarchy = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
+                                    $userRecord = $projectService['members']->firstWhere('user_id', Auth::id());
+
+                                    // المسؤول (hierarchy 2) يستطيع تغيير حالة الخدمة
+                                    $canEditServiceStatus = $currentUserHierarchy == 2 && $userRecord != null;
+
+                                    // التيم ليدر (hierarchy 3) يستطيع تغيير حالته الشخصية فقط
+                                    $canEditMyStatus = $currentUserHierarchy == 3 && $userRecord != null;
+
+                                    // حالة المستخدم الحالي (لعرض حالته الشخصية للتيم ليدر)
+                                    $myStatus = $userRecord ? $userRecord->status : $projectService['service_status'];
                                 @endphp
                                 <div>
-                                    <button onclick="showStatusModal({{ $projectService['project']->id }}, {{ $projectService['service']->id }}, '{{ $projectService['service_status'] }}', {{ $index }})"
-                                            class="status-badge-main status-{{ $statusColorClass }}"
-                                            style="cursor: pointer; border: none;">
-                                        {{ $projectService['service_status'] }}
-                                        <i class="fas fa-edit" style="margin-right: 5px; font-size: 0.8rem;"></i>
-                                    </button>
+                                    @if($canEditServiceStatus)
+                                        {{-- المسؤول (hierarchy 2): يغير حالة الخدمة بالكامل --}}
+                                        <button onclick="showStatusModal({{ $projectService['project']->id }}, {{ $projectService['service']->id }}, '{{ $projectService['service_status'] }}', {{ $index }}, true)"
+                                                class="status-badge-main status-{{ $statusColorClass }}"
+                                                style="cursor: pointer; border: none;"
+                                                title="تغيير حالة الخدمة">
+                                            {{ $projectService['service_status'] }}
+                                            <i class="fas fa-edit" style="margin-right: 5px; font-size: 0.8rem;"></i>
+                                        </button>
+                                    @elseif($canEditMyStatus)
+                                        {{-- التيم ليدر (hierarchy 3): يغير حالته الشخصية فقط --}}
+                                        <div>
+                                            <span class="status-badge-main status-{{ $statusColorClass }}" style="cursor: default;" title="حالة الخدمة">
+                                                {{ $projectService['service_status'] }}
+                                            </span>
+                                            <button onclick="showStatusModal({{ $projectService['project']->id }}, {{ $projectService['service']->id }}, '{{ $myStatus }}', {{ $index }}, false)"
+                                                    class="status-badge-main status-{{ $statusColorMap[$myStatus] ?? 'secondary' }}"
+                                                    style="cursor: pointer; border: none; margin-top: 5px; font-size: 0.85rem; padding: 6px 14px;"
+                                                    title="حالتي الشخصية - اضغط للتغيير">
+                                                <i class="fas fa-user"></i> حالتي: {{ $myStatus }}
+                                                <i class="fas fa-edit" style="margin-right: 5px; font-size: 0.75rem;"></i>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <span class="status-badge-main status-{{ $statusColorClass }}" style="cursor: default;">
+                                            {{ $projectService['service_status'] }}
+                                        </span>
+                                    @endif
                                     @if($hasOverdue)
                                         <div style="margin-top: 5px;">
                                             <span class="status-badge-main status-danger" style="font-size: 0.75rem; padding: 4px 8px;">
@@ -258,12 +293,43 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="{{ route('projects.show', $projectService['project']->id) }}"
-                                   class="services-btn"
-                                   title="عرض تفاصيل المشروع">
-                                    <i class="fas fa-eye"></i>
-                                    عرض
-                                </a>
+                                @php
+                                    // الحصول على سجل المستخدم الحالي في هذه الخدمة
+                                    $currentUserRecord = $projectService['members']->firstWhere('user_id', Auth::id());
+                                @endphp
+
+                                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap" style="gap: 8px;">
+                                    {{-- زر عرض المشروع --}}
+                                    <a href="{{ route('projects.show', $projectService['project']->id) }}"
+                                       class="services-btn"
+                                       title="عرض تفاصيل المشروع">
+                                        <i class="fas fa-eye"></i>
+                                        عرض
+                                    </a>
+
+                                    {{-- أزرار التسليم (للمستخدم الحالي فقط) --}}
+                                    @if($currentUserRecord)
+                                        @if(!$currentUserRecord->delivered_at)
+                                            <button onclick="deliverProject({{ $currentUserRecord->id }})"
+                                                    class="services-btn"
+                                                    style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none;"
+                                                    title="تسليم المشروع">
+                                                <i class="fas fa-check"></i>
+                                                تسليم
+                                            </button>
+                                        @else
+                                            @if($currentUserRecord->canBeUndelivered())
+                                                <button onclick="undeliverProject({{ $currentUserRecord->id }})"
+                                                        class="services-btn"
+                                                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none;"
+                                                        title="إلغاء التسليم">
+                                                    <i class="fas fa-times"></i>
+                                                    إلغاء التسليم
+                                                </button>
+                                            @endif
+                                        @endif
+                                    @endif
+                                </div>
                             </td>
                         </tr>
 
@@ -276,25 +342,6 @@
                                             <i class="fas fa-users-cog"></i>
                                             أعضاء الفريق في هذه الخدمة ({{ $projectService['stats']['total'] }} عضو)
                                         </h4>
-
-                                        <!-- تغيير حالة الخدمة بالكامل -->
-                                        <div class="service-status-control">
-                                            <label for="serviceStatus-{{ $index }}" style="font-weight: 600; color: #374151; margin-left: 10px;">
-                                                <i class="fas fa-edit"></i>
-                                                تغيير حالة الخدمة:
-                                            </label>
-                                            <select id="serviceStatus-{{ $index }}" class="service-status-select">
-                                                <option value="">-- اختر الحالة --</option>
-                                                @foreach(App\Models\ProjectServiceUser::getAvailableStatuses() as $key => $label)
-                                                    <option value="{{ $key }}">{{ $label }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button onclick="updateServiceStatus({{ $projectService['project']->id }}, {{ $projectService['service']->id }}, {{ $index }})"
-                                                    class="btn-update-service">
-                                                <i class="fas fa-check-circle"></i>
-                                                تطبيق على الكل
-                                            </button>
-                                        </div>
                                     </div>
 
                                     <table class="members-inner-table">
@@ -421,7 +468,7 @@
     }
 
     // عرض modal لاختيار الحالة الجديدة
-    function showStatusModal(projectId, serviceId, currentStatus, index) {
+    function showStatusModal(projectId, serviceId, currentStatus, index, isServiceStatus = false) {
         const statuses = {
             'جاري': { label: 'جاري', icon: 'fa-spinner', color: '#3b82f6' },
             'واقف ع النموذج': { label: 'واقف ع النموذج', icon: 'fa-file-alt', color: '#f59e0b' },
@@ -443,8 +490,19 @@
 
         const currentStatusData = statuses[currentStatus] || { label: currentStatus, icon: 'fa-circle', color: '#6b7280' };
 
+        // نص مختلف حسب نوع التحديث
+        const titleText = isServiceStatus
+            ? '<i class="fas fa-edit" style="color: #3b82f6; margin-left: 10px;"></i>تحديث حالة الخدمة'
+            : '<i class="fas fa-user-edit" style="color: #3b82f6; margin-left: 10px;"></i>تحديث حالتك الشخصية';
+
+        const infoText = isServiceStatus
+            ? 'سيتم تحديث <strong>حالتك الشخصية</strong> و<strong>حالة الخدمة بالكامل</strong> في هذا المشروع'
+            : 'سيتم تحديث <strong>حالتك الشخصية فقط</strong> في هذا المشروع. حالة الخدمة لن تتغير.';
+
+        const infoIcon = isServiceStatus ? 'fa-info-circle' : 'fa-exclamation-circle';
+
         Swal.fire({
-            title: '<i class="fas fa-edit" style="color: #3b82f6; margin-left: 10px;"></i>تحديث حالتك في الخدمة',
+            title: titleText,
             html: `
                 <div style="text-align: right; padding: 0 10px;">
                     <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
@@ -493,8 +551,8 @@
                                 border: 1px solid #bfdbfe;
                                 box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);">
                         <p style="margin: 0; font-size: 0.95rem; color: #1e40af; font-weight: 500; line-height: 1.6;">
-                            <i class="fas fa-info-circle" style="color: #3b82f6; margin-left: 8px; font-size: 1.1rem;"></i>
-                            سيتم تحديث <strong>حالتك الشخصية</strong> و<strong>حالة الخدمة</strong> في هذا المشروع فقط
+                            <i class="fas ${infoIcon}" style="color: #3b82f6; margin-left: 8px; font-size: 1.1rem;"></i>
+                            ${infoText}
                         </p>
                     </div>
                 </div>
@@ -608,33 +666,128 @@
         });
     }
 
-    // تحديث حالة الخدمة بالكامل (من داخل الـ accordion)
-    function updateServiceStatus(projectId, serviceId, index) {
-        const statusSelect = document.getElementById('serviceStatus-' + index);
-        const newStatus = statusSelect.value;
-
-        if (!newStatus) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'تنبيه',
-                text: 'الرجاء اختيار حالة أولاً'
-            });
-            return;
-        }
-
-        // تأكيد التغيير
+    // تسليم المشروع
+    function deliverProject(projectUserId) {
         Swal.fire({
             title: 'هل أنت متأكد؟',
-            text: 'سيتم تغيير حالة جميع الأعضاء في هذه الخدمة',
+            text: 'هل تريد تسليم هذا المشروع؟',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#3b82f6',
+            confirmButtonColor: '#10b981',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'نعم، تطبيق',
+            confirmButtonText: 'نعم، تسليم',
             cancelButtonText: 'إلغاء'
         }).then((result) => {
             if (result.isConfirmed) {
-                applyStatusChange(projectId, serviceId, newStatus);
+                // Show loading
+                Swal.fire({
+                    title: 'جاري التسليم...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Send AJAX request
+                fetch(`/employee/projects/${projectUserId}/deliver`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'تم بنجاح',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: data.message || 'حدث خطأ أثناء التسليم'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'حدث خطأ أثناء التسليم'
+                    });
+                });
+            }
+        });
+    }
+
+    // إلغاء تسليم المشروع
+    function undeliverProject(projectUserId) {
+        Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: 'هل تريد إلغاء تسليم هذا المشروع؟',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'نعم، إلغاء التسليم',
+            cancelButtonText: 'إلغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'جاري الإلغاء...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Send AJAX request
+                fetch(`/employee/projects/${projectUserId}/undeliver`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'تم بنجاح',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: data.message || 'حدث خطأ أثناء إلغاء التسليم'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'حدث خطأ أثناء إلغاء التسليم'
+                    });
+                });
             }
         });
     }
