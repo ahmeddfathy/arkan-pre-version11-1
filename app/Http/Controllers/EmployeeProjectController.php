@@ -362,6 +362,19 @@ class EmployeeProjectController extends Controller
             ], 403);
         }
 
+        // ✅ التحقق من الحالة قبل التسليم
+        $validDeliveryStatuses = [
+            ProjectServiceUser::STATUS_DRAFT_DELIVERY,  // 'تسليم مسودة'
+            ProjectServiceUser::STATUS_FINAL_DELIVERY   // 'تم تسليم نهائي'
+        ];
+
+        if (!in_array($projectServiceUser->status, $validDeliveryStatuses)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'يجب تغيير حالة المشروع إلى "تسليم مسودة" أو "تم تسليم نهائي" قبل التسليم. الحالة الحالية: ' . $projectServiceUser->status
+            ], 400);
+        }
+
         $projectServiceUser->deliver();
 
         return response()->json([

@@ -277,7 +277,7 @@
                         <td>
                             <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
                                 @if(!$projectUser->delivered_at)
-                                    <button onclick="deliverProject({{ $projectUser->id }})"
+                                    <button onclick="deliverProject({{ $projectUser->id }}, '{{ $projectUser->status }}')"
                                             class="services-btn"
                                             style="background: linear-gradient(135deg, #10b981, #059669); color: white;"
                                             title="تسليم المشروع">
@@ -532,8 +532,147 @@
         });
     }
 
+    // تغيير الحالة والتسليم مباشرة
+    function changeStatusAndDeliver(projectUserId, newStatus) {
+        Swal.fire({
+            title: 'جاري التحديث والتسليم...',
+            html: '<i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #3b82f6;"></i>',
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+
+        // الخطوة 1: تغيير الحالة
+        fetch(`/employee/projects/${projectUserId}/update-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // الخطوة 2: التسليم
+                return fetch(`/employee/projects/${projectUserId}/deliver`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                });
+            } else {
+                throw new Error(data.message || 'فشل تحديث الحالة');
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم بنجاح',
+                    html: `
+                        <div style="text-align: center;">
+                            <p style="margin: 10px 0; font-size: 1.1rem;">✅ تم تغيير الحالة إلى: <strong>${newStatus}</strong></p>
+                            <p style="margin: 10px 0; font-size: 1.1rem;">📦 تم التسليم بنجاح</p>
+                        </div>
+                    `,
+                    timer: 3000,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: data.message || 'حدث خطأ أثناء التسليم'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ',
+                text: error.message || 'حدث خطأ أثناء العملية'
+            });
+        });
+    }
+
     // تسليم المشروع
-    function deliverProject(projectUserId) {
+    function deliverProject(projectUserId, currentStatus) {
+        // ✅ التحقق من الحالة قبل التسليم
+        const validDeliveryStatuses = ['تسليم مسودة', 'تم تسليم نهائي'];
+
+        if (!validDeliveryStatuses.includes(currentStatus)) {
+            // عرض alert مع خيار تغيير الحالة مباشرة
+            Swal.fire({
+                icon: 'warning',
+                title: 'يجب تغيير الحالة أولاً',
+                html: `
+                    <div style="text-align: right; padding: 10px;">
+                        <p style="margin-bottom: 15px; color: #64748b; font-size: 1rem;">
+                            الحالة الحالية: <strong style="color: #ef4444;">${currentStatus}</strong>
+                        </p>
+
+                        <div style="background: #f0f9ff; border-right: 4px solid #3b82f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <p style="margin: 0 0 10px 0; color: #1e40af; font-weight: 600;">
+                                <i class="fas fa-info-circle" style="margin-left: 5px;"></i>
+                                اختر حالة التسليم المناسبة:
+                            </p>
+                            <select id="deliveryStatusSelect"
+                                    style="width: 100%;
+                                           padding: 12px;
+                                           border: 2px solid #3b82f6;
+                                           border-radius: 8px;
+                                           font-size: 1rem;
+                                           font-weight: 600;
+                                           color: #1e293b;
+                                           background: white;
+                                           cursor: pointer;
+                                           text-align: right;">
+                                <option value="">-- اختر الحالة --</option>
+                                <option value="تسليم مسودة">📝 تسليم مسودة</option>
+                                <option value="تم تسليم نهائي">✅ تم تسليم نهائي</option>
+                            </select>
+                        </div>
+
+                        <p style="margin: 15px 0 0; color: #059669; font-size: 0.9rem; font-weight: 500;">
+                            <i class="fas fa-check-circle" style="margin-left: 5px;"></i>
+                            سيتم تغيير الحالة والتسليم مباشرة
+                        </p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="fas fa-check" style="margin-left: 5px;"></i>تغيير الحالة والتسليم',
+                cancelButtonText: '<i class="fas fa-times" style="margin-left: 5px;"></i>إلغاء',
+                width: '550px',
+                preConfirm: () => {
+                    const selectedStatus = document.getElementById('deliveryStatusSelect').value;
+                    if (!selectedStatus) {
+                        Swal.showValidationMessage('⚠️ الرجاء اختيار حالة التسليم');
+                        return false;
+                    }
+                    return selectedStatus;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newStatus = result.value;
+                    // تغيير الحالة أولاً ثم التسليم
+                    changeStatusAndDeliver(projectUserId, newStatus);
+                }
+            });
+            return;
+        }
+
+        // إذا كانت الحالة صحيحة، نسأل التأكيد فقط
         Swal.fire({
             title: 'هل أنت متأكد؟',
             text: 'هل تريد تسليم هذا المشروع؟',

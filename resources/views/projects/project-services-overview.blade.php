@@ -169,51 +169,51 @@
 
                             <div style="width: 100%; margin: 0 auto;">
                                 <!-- Workflow Progress Bar - Grouped by Level -->
-                                <div class="workflow-container" style="margin-bottom: 0.5rem;">
+                                <div class="workflow-container" style="margin-bottom: 0.3rem;">
                                     @php
                                         // تجميع الخدمات حسب المستوى
                                         $servicesByLevel = collect($projectServices)->groupBy('execution_order')->sortKeys();
                                     @endphp
 
                                     @foreach($servicesByLevel as $level => $levelServices)
-                                        <div style="margin-bottom: 0.5rem;">
+                                        <div style="margin-bottom: 0.3rem;">
                                             <!-- Level Header -->
-                                            <div style="font-size: 0.7rem; color: #6b7280; margin-bottom: 0.3rem; font-weight: 600;">
+                                            <div style="font-size: 0.65rem; color: #6b7280; margin-bottom: 0.2rem; font-weight: 600;">
                                                 المستوى {{ $level }}
                                             </div>
 
                                             <!-- Services in this level -->
-                                            <div class="workflow-steps" style="display: flex; gap: 0.5rem; align-items: stretch; flex-wrap: wrap;">
+                                            <div class="workflow-steps" style="display: flex; gap: 0.3rem; align-items: stretch; flex-wrap: wrap;">
                                                 @foreach($levelServices as $index => $service)
                                                     @php
                                                         $serviceData = (object) $service;
                                                         $serviceParticipants = $serviceData->participants ?? [];
                                                     @endphp
 
-                                                    <div class="workflow-step-container" style="flex: 0 1 auto; min-width: 200px;">
+                                                    <div class="workflow-step-container" style="flex: 0 1 auto; min-width: 150px;">
                                                         <div class="workflow-step {{ $serviceData->status_class }}"
-                                                             style="text-align: center; padding: 0.5rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500; margin-bottom: 0.3rem;">
-                                                            <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">{{ $serviceData->status_icon }}</div>
+                                                             style="text-align: center; padding: 0.3rem 0.4rem; border-radius: 5px; font-size: 0.7rem; font-weight: 500; margin-bottom: 0.2rem;">
+                                                            <div style="font-size: 0.9rem; margin-bottom: 0.1rem;">{{ $serviceData->status_icon }}</div>
                                                             <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $serviceData->name }}">
-                                                                {{ Str::limit($serviceData->name, 15) }}
+                                                                {{ Str::limit($serviceData->name, 12) }}
                                                             </div>
                                                         </div>
 
                                                         <!-- سهم يشير للموظفين -->
                                                         @if(count($serviceParticipants) > 0)
-                                                            <div style="text-align: center; margin: 0.2rem 0; color: #9ca3af; font-size: 1rem; line-height: 1;">
+                                                            <div style="text-align: center; margin: 0.1rem 0; color: #9ca3af; font-size: 0.8rem; line-height: 1;">
                                                                 ↓
                                                             </div>
 
                                                             <!-- عنوان المشاركين -->
-                                                            <div style="text-align: center; font-size: 0.65rem; color: #6b7280; font-weight: 600; margin-bottom: 0.3rem; padding: 0.2rem 0.3rem; background: #f3f4f6; border-radius: 4px;">
+                                                            <div style="text-align: center; font-size: 0.6rem; color: #6b7280; font-weight: 600; margin-bottom: 0.2rem; padding: 0.15rem 0.25rem; background: #f3f4f6; border-radius: 3px;">
                                                                 👥 الموظفين
                                                             </div>
                                                         @endif
 
                                                         <!-- عرض المشاركين في الخدمة -->
                                                         @if(count($serviceParticipants) > 0)
-                                                            <div class="service-participants-compact" style="display: flex; flex-direction: column; gap: 0.2rem; padding: 0.2rem;">
+                                                            <div class="service-participants-compact" style="display: flex; flex-direction: column; gap: 0.15rem; padding: 0.15rem;">
                                                                 @foreach($serviceParticipants as $participant)
                                                                     @php
                                                                         // تحديد اللون حسب حالة الموظف
@@ -235,17 +235,17 @@
                                                                     @endphp
 
                                                                     <div class="participant-mini-card"
-                                                                         style="background: {{ $participantBgColor }}; border-right: 3px solid {{ $participantColor }};"
+                                                                         style="background: {{ $participantBgColor }}; border-right: 2px solid {{ $participantColor }};"
                                                                          title="{{ $participant['name'] }} - {{ $participant['status'] }}">
-                                                                        <span class="participant-icon" style="font-size: 0.7rem;">{{ $participant['status_icon'] }}</span>
-                                                                        <span class="participant-name" style="font-size: 0.65rem; color: #374151;">
-                                                                            {{ Str::limit($participant['name'], 12) }}
+                                                                        <span class="participant-icon" style="font-size: 0.65rem;">{{ $participant['status_icon'] }}</span>
+                                                                        <span class="participant-name" style="font-size: 0.6rem; color: #374151;">
+                                                                            {{ Str::limit($participant['name'], 10) }}
                                                                         </span>
                                                                     </div>
                                                                 @endforeach
                                                             </div>
                                                         @else
-                                                            <div style="font-size: 0.65rem; color: #9ca3af; text-align: center; padding: 0.3rem; font-style: italic;">
+                                                            <div style="font-size: 0.6rem; color: #9ca3af; text-align: center; padding: 0.2rem; font-style: italic;">
                                                                 لا يوجد موظفين
                                                             </div>
                                                         @endif
@@ -256,7 +256,7 @@
 
                                         @if(!$loop->last)
                                             <!-- السهم بين المستويات -->
-                                            <div style="text-align: center; margin: 0.3rem 0; color: #9ca3af; font-size: 1.5rem;">
+                                            <div style="text-align: center; margin: 0.2rem 0; color: #9ca3af; font-size: 1.2rem;">
                                                 ↓
                                             </div>
                                         @endif
@@ -264,7 +264,7 @@
                                 </div>
 
                                 <!-- Progress Stats -->
-                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #6b7280;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #6b7280; margin-top: 0.3rem;">
                                     <span>
                                         <i class="fas fa-check-circle" style="color: #10b981;"></i>
                                         {{ $completedServices }}/{{ $totalServices }} مكتملة
@@ -272,7 +272,7 @@
                                     <span style="font-weight: 600; color: #3b82f6;">
                                         {{ $progressPercentage }}%
                                     </span>
-                                    <button class="services-btn" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
+                                    <button class="services-btn" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;"
                                             data-project-id="{{ $project->id }}"
                                             data-project-name="{{ $project->name }}"
                                             onclick="toggleServices(this)">
@@ -285,8 +285,8 @@
                                     $overviewPreparationPeriodsCount = \App\Models\ProjectPreparationHistory::getPreparationPeriodsCount($project->id);
                                 @endphp
                                 @if($overviewPreparationPeriodsCount > 0)
-                                    <div style="margin-top: 0.5rem; text-align: center;">
-                                        <span class="badge bg-info text-white" style="font-size: 0.65rem; padding: 0.3rem 0.5rem;">
+                                    <div style="margin-top: 0.3rem; text-align: center;">
+                                        <span class="badge bg-info text-white" style="font-size: 0.6rem; padding: 0.2rem 0.4rem;">
                                             <i class="fas fa-history"></i>
                                             فترات تحضير: {{ $overviewPreparationPeriodsCount }}
                                         </span>
