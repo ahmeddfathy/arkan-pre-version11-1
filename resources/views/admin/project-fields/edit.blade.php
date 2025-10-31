@@ -23,16 +23,6 @@
                         @enderror
                     </div>
 
-                    <!-- مفتاح الحقل -->
-                    <div class="mb-3">
-                        <label for="field_key" class="form-label">مفتاح الحقل *</label>
-                        <input type="text" name="field_key" id="field_key" required class="form-control" value="{{ old('field_key', $projectField->field_key) }}">
-                        <div class="form-text">يستخدم في الكود. تأكد من عدم تغييره إذا كان مستخدماً في المشاريع الحالية</div>
-                        @error('field_key')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <!-- نوع الحقل -->
                     <div class="mb-3">
                         <label for="field_type" class="form-label">نوع الحقل *</label>

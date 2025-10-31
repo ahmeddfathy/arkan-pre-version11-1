@@ -121,6 +121,14 @@
                     <span>مشاريعي</span>
                 </a>
             </li>
+            @if(Auth::user()->hasAnyRole(['operation_assistant', 'technical_support', 'operations_manager', 'project_manager', 'company_manager', 'hr']))
+            <li>
+                <a href="{{ route('projects.archive') }}" class="{{ request()->routeIs('projects.archive') ? 'active' : '' }}">
+                    <i class="fas fa-archive"></i>
+                    <span>أرشيف المشاريع</span>
+                </a>
+            </li>
+            @endif
             <li>
                 <a href="{{ route('projects.services-overview') }}" class="{{ request()->routeIs('projects.services-overview') ? 'active' : '' }}">
                     <i class="fas fa-table"></i>
@@ -424,6 +432,12 @@
                 <a href="{{ route('department-roles.index') }}" class="{{ request()->routeIs('department-roles.*') ? 'active' : '' }}">
                     <i class="fas fa-sitemap"></i>
                     <span>إدارة أدوار الأقسام</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.teams.index') }}" class="{{ request()->routeIs('admin.teams.*') ? 'active' : '' }}">
+                    <i class="fas fa-users-cog"></i>
+                    <span>إدارة الفرق</span>
                 </a>
             </li>
             <li>

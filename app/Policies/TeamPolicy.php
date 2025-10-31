@@ -73,4 +73,12 @@ class TeamPolicy
     {
         return $user->ownsTeam($team);
     }
+
+    /**
+     * Determine whether the user can transfer team ownership.
+     */
+    public function transferTeamOwnership(User $user, Team $team): bool
+    {
+        return $user->ownsTeam($team);
+    }
 }

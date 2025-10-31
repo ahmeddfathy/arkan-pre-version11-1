@@ -89,7 +89,6 @@ class ProjectFieldController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'field_key' => 'required|string|max:255|unique:project_fields,field_key,' . $projectField->id,
             'field_type' => 'required|in:text,select,textarea,number,date',
             'field_options' => 'nullable|array',
             'is_required' => 'boolean',
@@ -97,6 +96,9 @@ class ProjectFieldController extends Controller
             'order' => 'nullable|integer',
             'description' => 'nullable|string',
         ]);
+
+        // منع تحديث field_key - استخدام القيمة القديمة دائماً
+        $validated['field_key'] = $projectField->field_key;
 
         $projectField->update($validated);
 

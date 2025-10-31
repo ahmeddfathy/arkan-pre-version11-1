@@ -897,4 +897,85 @@ trait ProjectCRUDTrait
             return redirect()->back()->with('error', 'حدث خطأ في تحميل الصفحة');
         }
     }
+
+    /**
+     * عرض أرشيف المشاريع
+     */
+    public function archive()
+    {
+        // تسجيل نشاط دخول صفحة الأرشيف
+        if (Auth::check()) {
+            activity()
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'action_type' => 'view_archive',
+                    'page' => 'projects_archive',
+                    'viewed_at' => now()->toDateTimeString(),
+                    'user_agent' => request()->userAgent(),
+                    'ip_address' => request()->ip()
+                ])
+                ->log('دخل على صفحة أرشيف المشاريع');
+        }
+
+        $user = Auth::user();
+        $isAdmin = $this->roleCheckService->userHasRole(['hr', 'company_manager', 'project_manager', 'sales_employee', 'operation_assistant', 'technical_support', 'operations_manager']);
+
+        // التحقق من الصلاحيات المطلوبة للأرشيف
+        if (!$this->roleCheckService->userHasRole(['operation_assistant', 'technical_support', 'operations_manager', 'project_manager', 'company_manager', 'hr'])) {
+            abort(403, 'غير مسموح لك بالوصول إلى أرشيف المشاريع');
+        }
+
+        $projectsQuery = Project::query();
+
+        if (!$isAdmin) {
+            $userProjectIds = DB::table('project_service_user')
+                ->where('user_id', $user->id)
+                ->pluck('project_id')
+                ->toArray();
+
+            $projectsQuery->whereIn('id', $userProjectIds);
+        }
+
+        // البحث
+        if (request('search')) {
+            $search = request('search');
+            $projectsQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // جلب الحقول المخصصة
+        $customFields = ProjectField::active()->ordered()->get();
+
+        // فلترة بالحقول المخصصة
+        foreach ($customFields as $field) {
+            $filterKey = 'custom_field_' . $field->id;
+            if (request($filterKey) !== null && request($filterKey) !== '') {
+                $projectsQuery->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(custom_fields_data, '$.{$field->field_key}')) = ?", [request($filterKey)]);
+            }
+        }
+
+        $projects = $projectsQuery->orderBy('created_at', 'desc')->paginate(20)->appends(request()->query());
+
+        // جلب القيم الفريدة لكل حقل مخصص من البيانات الموجودة
+        $customFieldsOptions = [];
+        foreach ($customFields as $field) {
+            // جلب جميع المشاريع للحصول على القيم الفريدة
+            $allProjects = Project::whereNotNull('custom_fields_data')->get();
+            $uniqueValues = collect();
+
+            foreach ($allProjects as $project) {
+                $customFieldsData = $project->custom_fields_data ?? [];
+                if (isset($customFieldsData[$field->field_key]) && !empty($customFieldsData[$field->field_key])) {
+                    $uniqueValues->push($customFieldsData[$field->field_key]);
+                }
+            }
+
+            $customFieldsOptions[$field->id] = $uniqueValues->unique()->sort()->values();
+        }
+
+        return view('projects.archive', compact('projects', 'customFields', 'customFieldsOptions'));
+    }
 }

@@ -22,15 +22,6 @@
                         @enderror
                     </div>
 
-                    <!-- مفتاح الحقل -->
-                    <div class="mb-3">
-                        <label for="field_key" class="form-label">مفتاح الحقل (اختياري - سيتم إنشاؤه تلقائياً)</label>
-                        <input type="text" name="field_key" id="field_key" class="form-control" value="{{ old('field_key') }}" placeholder="مثال: sector, city">
-                        <div class="form-text">يستخدم في الكود. إذا تركته فارغاً سيتم إنشاؤه من اسم الحقل</div>
-                        @error('field_key')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
 
                     <!-- نوع الحقل -->
                     <div class="mb-3">
