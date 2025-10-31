@@ -521,21 +521,17 @@ async function loadResponsibleUsersForRevision(projectId) {
         const allUsers = window.allUsersForRevision || [];
         const projectParticipantIds = window.projectParticipantIds || [];
 
+        // عرض فقط الأشخاص الموجودين في المشروع
         const usersInProject = allUsers.filter((user) =>
             projectParticipantIds.includes(user.id)
         );
-        const usersNotInProject = allUsers.filter(
-            (user) => !projectParticipantIds.includes(user.id)
-        );
-        const sortedUsers = [...usersInProject, ...usersNotInProject];
 
-        sortedUsers.forEach((user) => {
+        usersInProject.forEach((user) => {
             const option = document.createElement("option");
-            const isInProject = projectParticipantIds.includes(user.id);
-            option.value = user.name + (isInProject ? " ✅ من المشروع" : "");
+            option.value = user.name + " ✅ من المشروع";
             option.setAttribute("data-user-id", user.id);
             option.setAttribute("data-user-name", user.name);
-            option.setAttribute("data-in-project", isInProject);
+            option.setAttribute("data-in-project", true);
             responsibleDatalist.appendChild(option);
         });
     } catch (error) {
