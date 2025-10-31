@@ -516,6 +516,71 @@
     .datalist-input:hover {
         border-color: #667eea;
     }
+
+    /* Projects Status Table Styles */
+    .projects-table-wrapper {
+        margin-bottom: 20px;
+    }
+
+    .projects-status-table {
+        background: white;
+    }
+
+    .projects-filter-tabs-row {
+        background: #f8f9fa !important;
+    }
+
+    .projects-filter-tabs-row td {
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    .projects-tab-btn {
+        background: white !important;
+        color: #495057 !important;
+        border: 2px solid #e9ecef !important;
+        font-weight: 500;
+    }
+
+    .projects-tab-btn:hover {
+        background: #f8f9fa !important;
+        border-color: #667eea !important;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+
+    .projects-tab-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-color: #667eea !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .projects-tab-btn.active .badge {
+        background-color: rgba(255, 255, 255, 0.3) !important;
+        color: white !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .projects-status-table tbody tr:not(.projects-filter-tabs-row):hover {
+        background: #f8f9fa !important;
+        transform: scale(1.01);
+    }
+
+    .projects-status-table tbody tr:not(.projects-filter-tabs-row) {
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    @media (max-width: 768px) {
+        .projects-tab-btn {
+            font-size: 12px;
+            padding: 8px 10px !important;
+        }
+
+        .projects-status-table {
+            font-size: 12px;
+        }
+    }
 </style>
 @endpush
 
@@ -1118,7 +1183,23 @@
                     </small>
                 </div>
 
-                <!-- المراجعين المتعددين (مراجعة متسلسلة) -->
+                <!-- ديدلاين المنفذ -->
+                <div class="mb-3" id="executorDeadlineContainer" style="display: none;">
+                    <label class="form-label">
+                        <span class="text-primary">⏰ ديدلاين المنفذ</span>
+                        <span class="text-muted" style="font-size: 11px;">(اختياري)</span>
+                    </label>
+                    <input type="datetime-local"
+                           id="newExecutorDeadline"
+                           class="form-control"
+                           min=""
+                           onchange="validateExecutorDeadlineOrder()">
+                    <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        تاريخ ووقت الانتهاء المتوقع للمنفذ (يجب أن يكون قبل المراجع الأول)
+                    </small>
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label d-flex justify-content-between align-items-center">
                         <span>
@@ -1164,6 +1245,23 @@
                               placeholder="اذكر سبب التعديل والخطأ الذي حدث..." maxlength="2000"></textarea>
                     <small class="text-muted">توثيق سبب الخطأ الذي أدى للتعديل</small>
                 </div>
+            </div>
+
+                <!-- ديدلاين التعديل العام -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-calendar-times me-1"></i>
+                    ديدلاين التعديل <span class="text-muted" style="font-size: 11px;">(اختياري)</span>
+                </label>
+                <input type="datetime-local"
+                       id="newRevisionDeadline"
+                       class="form-control"
+                       min=""
+                       onchange="validateRevisionDeadlineOrder()">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    تاريخ ووقت الانتهاء المتوقع للتعديل ككل (يجب أن يكون بعد جميع الديدلاينات الأخرى)
+                </small>
             </div>
 
             <!-- العنوان -->

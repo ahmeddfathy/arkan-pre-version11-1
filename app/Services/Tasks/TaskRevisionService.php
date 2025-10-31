@@ -56,6 +56,7 @@ class TaskRevisionService
                 'executor_user_id' => $data['executor_user_id'] ?? null,
                 'reviewers' => isset($data['reviewers']) ? (is_string($data['reviewers']) ? json_decode($data['reviewers'], true) : $data['reviewers']) : null,
                 'responsibility_notes' => $data['responsibility_notes'] ?? null,
+                'revision_deadline' => isset($data['revision_deadline']) ? $data['revision_deadline'] : null,
             ];
 
             // ربط التعديل حسب النوع
@@ -126,6 +127,9 @@ class TaskRevisionService
 
             // إنشاء التعديل
             $revision = TaskRevision::create($revisionData);
+
+            // حفظ الديدلاينات إذا كانت موجودة
+            $this->saveRevisionDeadlines($revision, $data);
 
             // تسجيل النشاط
             $this->logRevisionActivity($revision, 'created');
@@ -1025,6 +1029,85 @@ class TaskRevisionService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+        }
+    }
+
+    /**
+     * حفظ الديدلاينات للتعديل
+     */
+    private function saveRevisionDeadlines(TaskRevision $revision, array $data): void
+    {
+        try {
+            // حفظ ديدلاين المنفذ
+            if (!empty($data['executor_deadline']) && !empty($data['executor_user_id'])) {
+                \App\Models\RevisionDeadline::create([
+                    'revision_id' => $revision->id,
+                    'deadline_type' => 'executor',
+                    'user_id' => $data['executor_user_id'],
+                    'deadline_date' => $data['executor_deadline'],
+                    'status' => 'pending',
+                    'assigned_by' => Auth::id(),
+                    'original_deadline' => $data['executor_deadline'],
+                ]);
+
+                Log::info('✅ Executor deadline created', [
+                    'revision_id' => $revision->id,
+                    'executor_id' => $data['executor_user_id'],
+                    'deadline' => $data['executor_deadline']
+                ]);
+            }
+
+            // حفظ ديدلاينات المراجعين
+            if (!empty($data['reviewer_deadlines'])) {
+                $reviewerDeadlines = is_string($data['reviewer_deadlines'])
+                    ? json_decode($data['reviewer_deadlines'], true)
+                    : $data['reviewer_deadlines'];
+
+                if (is_array($reviewerDeadlines) && !empty($revision->reviewers)) {
+                    foreach ($reviewerDeadlines as $reviewerDeadline) {
+                        // التحقق من وجود reviewer_id و deadline
+                        if (empty($reviewerDeadline['reviewer_id']) || empty($reviewerDeadline['deadline'])) {
+                            continue;
+                        }
+
+                        // البحث عن المراجع في قائمة المراجعين للحصول على الترتيب
+                        $reviewerOrder = null;
+                        foreach ($revision->reviewers as $reviewer) {
+                            if ($reviewer['reviewer_id'] == $reviewerDeadline['reviewer_id']) {
+                                $reviewerOrder = $reviewer['order'];
+                                break;
+                            }
+                        }
+
+                        if ($reviewerOrder !== null) {
+                            \App\Models\RevisionDeadline::create([
+                                'revision_id' => $revision->id,
+                                'deadline_type' => 'reviewer',
+                                'user_id' => $reviewerDeadline['reviewer_id'],
+                                'deadline_date' => $reviewerDeadline['deadline'],
+                                'reviewer_order' => $reviewerOrder,
+                                'status' => 'pending',
+                                'assigned_by' => Auth::id(),
+                                'original_deadline' => $reviewerDeadline['deadline'],
+                            ]);
+
+                            Log::info('✅ Reviewer deadline created', [
+                                'revision_id' => $revision->id,
+                                'reviewer_id' => $reviewerDeadline['reviewer_id'],
+                                'reviewer_order' => $reviewerOrder,
+                                'deadline' => $reviewerDeadline['deadline']
+                            ]);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error saving revision deadlines', [
+                'revision_id' => $revision->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            // لا نرمي Exception هنا لأن الديدلاين اختياري
         }
     }
 }

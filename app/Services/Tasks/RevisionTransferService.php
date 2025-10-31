@@ -27,7 +27,7 @@ class RevisionTransferService
     /**
      * نقل المنفذ (Executor) - من شخص لشخص آخر
      */
-    public function transferExecutor(TaskRevision $revision, User $fromUser, User $toUser, string $reason = null): array
+    public function transferExecutor(TaskRevision $revision, User $fromUser, User $toUser, string $reason = null, ?string $newDeadline = null): array
     {
         // ✅ التحقق من الصلاحيات
         $currentUser = Auth::user();
@@ -55,11 +55,62 @@ class RevisionTransferService
         }
 
         try {
-            return DB::transaction(function () use ($revision, $fromUser, $toUser, $reason, $currentUser) {
+            return DB::transaction(function () use ($revision, $fromUser, $toUser, $reason, $currentUser, $newDeadline) {
                 // تحديث المنفذ
                 $revision->update([
                     'executor_user_id' => $toUser->id,
                 ]);
+
+                // تحديث أو إنشاء ديدلاين المنفذ الجديد
+                if ($newDeadline) {
+                    $existingDeadline = \App\Models\RevisionDeadline::where('revision_id', $revision->id)
+                        ->where('deadline_type', 'executor')
+                        ->first();
+
+                    if ($existingDeadline) {
+                        // تحديث ديدلاين موجود
+                        $existingDeadline->update([
+                            'user_id' => $toUser->id,
+                            'deadline_date' => $newDeadline,
+                            'last_updated_by' => $currentUser->id,
+                        ]);
+
+                        Log::info('✅ Executor deadline updated on transfer', [
+                            'revision_id' => $revision->id,
+                            'new_executor' => $toUser->id,
+                            'new_deadline' => $newDeadline
+                        ]);
+                    } else {
+                        // إنشاء ديدلاين جديد
+                        \App\Models\RevisionDeadline::create([
+                            'revision_id' => $revision->id,
+                            'deadline_type' => 'executor',
+                            'user_id' => $toUser->id,
+                            'deadline_date' => $newDeadline,
+                            'status' => 'pending',
+                            'assigned_by' => $currentUser->id,
+                            'original_deadline' => $newDeadline,
+                        ]);
+
+                        Log::info('✅ New executor deadline created on transfer', [
+                            'revision_id' => $revision->id,
+                            'new_executor' => $toUser->id,
+                            'deadline' => $newDeadline
+                        ]);
+                    }
+                } else {
+                    // تحديث user_id في الديدلاين الموجود إذا لم يكن هناك ديدلاين جديد
+                    $existingDeadline = \App\Models\RevisionDeadline::where('revision_id', $revision->id)
+                        ->where('deadline_type', 'executor')
+                        ->first();
+
+                    if ($existingDeadline) {
+                        $existingDeadline->update([
+                            'user_id' => $toUser->id,
+                            'last_updated_by' => $currentUser->id,
+                        ]);
+                    }
+                }
 
                 // تسجيل عملية النقل
                 $assignment = RevisionAssignment::create([
@@ -134,7 +185,7 @@ class RevisionTransferService
     /**
      * نقل المراجع (Reviewer) - تحديث المراجع في القائمة
      */
-    public function transferReviewer(TaskRevision $revision, int $reviewerOrder, User $toUser, string $reason = null): array
+    public function transferReviewer(TaskRevision $revision, int $reviewerOrder, User $toUser, string $reason = null, ?string $newDeadline = null): array
     {
         // ✅ التحقق من الصلاحيات
         $currentUser = Auth::user();
@@ -181,7 +232,7 @@ class RevisionTransferService
         }
 
         try {
-            return DB::transaction(function () use ($revision, $reviewerIndex, $fromUser, $toUser, $reason, $currentUser, $reviewerOrder) {
+            return DB::transaction(function () use ($revision, $reviewerIndex, $fromUser, $toUser, $reason, $currentUser, $reviewerOrder, $newDeadline) {
                 // تحديث المراجع في القائمة
                 $reviewers = $revision->reviewers;
                 $oldStatus = $reviewers[$reviewerIndex]['status'];
@@ -195,6 +246,62 @@ class RevisionTransferService
                 $revision->update([
                     'reviewers' => $reviewers
                 ]);
+
+                // تحديث أو إنشاء ديدلاين المراجع
+                if ($newDeadline) {
+                    $existingDeadline = \App\Models\RevisionDeadline::where('revision_id', $revision->id)
+                        ->where('deadline_type', 'reviewer')
+                        ->where('reviewer_order', $reviewerOrder)
+                        ->first();
+
+                    if ($existingDeadline) {
+                        // تحديث ديدلاين موجود
+                        $existingDeadline->update([
+                            'user_id' => $toUser->id,
+                            'deadline_date' => $newDeadline,
+                            'last_updated_by' => $currentUser->id,
+                        ]);
+
+                        Log::info('✅ Reviewer deadline updated on transfer', [
+                            'revision_id' => $revision->id,
+                            'reviewer_order' => $reviewerOrder,
+                            'new_reviewer' => $toUser->id,
+                            'new_deadline' => $newDeadline
+                        ]);
+                    } else {
+                        // إنشاء ديدلاين جديد
+                        \App\Models\RevisionDeadline::create([
+                            'revision_id' => $revision->id,
+                            'deadline_type' => 'reviewer',
+                            'user_id' => $toUser->id,
+                            'deadline_date' => $newDeadline,
+                            'reviewer_order' => $reviewerOrder,
+                            'status' => 'pending',
+                            'assigned_by' => $currentUser->id,
+                            'original_deadline' => $newDeadline,
+                        ]);
+
+                        Log::info('✅ New reviewer deadline created on transfer', [
+                            'revision_id' => $revision->id,
+                            'reviewer_order' => $reviewerOrder,
+                            'new_reviewer' => $toUser->id,
+                            'deadline' => $newDeadline
+                        ]);
+                    }
+                } else {
+                    // تحديث user_id في الديدلاين الموجود إذا لم يكن هناك ديدلاين جديد
+                    $existingDeadline = \App\Models\RevisionDeadline::where('revision_id', $revision->id)
+                        ->where('deadline_type', 'reviewer')
+                        ->where('reviewer_order', $reviewerOrder)
+                        ->first();
+
+                    if ($existingDeadline) {
+                        $existingDeadline->update([
+                            'user_id' => $toUser->id,
+                            'last_updated_by' => $currentUser->id,
+                        ]);
+                    }
+                }
 
                 // تسجيل عملية النقل
                 $assignment = RevisionAssignment::create([

@@ -62,7 +62,6 @@ class TaskRevision extends Model implements Auditable
         'created_by',
         'revision_date',
         'status', // new, in_progress, paused, completed
-        'approval_status', // pending, approved, rejected
         'reviewed_by',
         'reviewed_at',
         'review_notes',
@@ -86,6 +85,7 @@ class TaskRevision extends Model implements Auditable
         'review_actual_minutes',
         'review_current_session_start',
         'review_status',
+        'revision_deadline', // ديدلاين التعديل العام
     ];
 
     protected $casts = [
@@ -107,6 +107,7 @@ class TaskRevision extends Model implements Auditable
         'review_actual_minutes' => 'integer',
         // Multiple reviewers JSON cast
         'reviewers' => 'array',
+        'revision_deadline' => 'datetime',
     ];
 
     protected $dates = [
@@ -121,6 +122,7 @@ class TaskRevision extends Model implements Auditable
         'completed_at_work',
         'resumed_at',
         'current_session_start',
+        'revision_deadline',
     ];
 
     protected $appends = [
@@ -213,6 +215,34 @@ class TaskRevision extends Model implements Auditable
     public function executorUser()
     {
         return $this->belongsTo(User::class, 'executor_user_id');
+    }
+
+    /**
+     * العلاقة مع الديدلاينات (Deadlines)
+     */
+    public function deadlines()
+    {
+        return $this->hasMany(RevisionDeadline::class, 'revision_id');
+    }
+
+    /**
+     * الحصول على ديدلاين المنفذ
+     */
+    public function executorDeadline()
+    {
+        return $this->hasOne(RevisionDeadline::class, 'revision_id')
+                    ->where('deadline_type', 'executor')
+                    ->latest();
+    }
+
+    /**
+     * الحصول على ديدلاينات المراجعين
+     */
+    public function reviewerDeadlines()
+    {
+        return $this->hasMany(RevisionDeadline::class, 'revision_id')
+                    ->where('deadline_type', 'reviewer')
+                    ->orderBy('reviewer_order');
     }
 
     /**
@@ -466,32 +496,6 @@ class TaskRevision extends Model implements Auditable
                 'completed_at' => $reviewer['completed_at'] ?? null
             ];
         })->toArray();
-    }
-
-    /**
-     * الحصول على لون حالة الموافقة
-     */
-    public function getApprovalStatusColorAttribute()
-    {
-        return match($this->approval_status) {
-            'pending' => 'warning',
-            'approved' => 'success',
-            'rejected' => 'danger',
-            default => 'secondary'
-        };
-    }
-
-    /**
-     * الحصول على نص حالة الموافقة
-     */
-    public function getApprovalStatusTextAttribute()
-    {
-        return match($this->approval_status) {
-            'pending' => 'في الانتظار',
-            'approved' => 'موافق عليه',
-            'rejected' => 'مرفوض',
-            default => 'غير محدد'
-        };
     }
 
     /**

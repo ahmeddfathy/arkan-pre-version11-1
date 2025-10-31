@@ -88,7 +88,11 @@ class TaskRevisionController extends Controller
             'notes' => 'nullable|string|max:2000',
             'attachment_type' => 'nullable|in:file,link',
             'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar',
-            'attachment_link' => 'nullable|url|max:2048'
+            'attachment_link' => 'nullable|url|max:2048',
+            // حقول الديدلاين
+            'revision_deadline' => 'nullable|date|after:now', // ديدلاين التعديل العام
+            'executor_deadline' => 'nullable|date|after:now',
+            'reviewer_deadlines' => 'nullable|json', // JSON array of deadlines for each reviewer
         ];
 
         $messages = [
@@ -119,7 +123,12 @@ class TaskRevisionController extends Controller
             'attachment.max' => 'حجم المرفق لا يجب أن يتجاوز 10 ميجابايت',
             'attachment.mimes' => 'نوع الملف المرفق غير مدعوم',
             'attachment_link.url' => 'رابط المرفق يجب أن يكون رابط صحيح',
-            'attachment_link.max' => 'رابط المرفق لا يجب أن يتجاوز 2048 حرف'
+            'attachment_link.max' => 'رابط المرفق لا يجب أن يتجاوز 2048 حرف',
+            'revision_deadline.date' => 'تاريخ ديدلاين التعديل غير صحيح',
+            'revision_deadline.after' => 'تاريخ ديدلاين التعديل يجب أن يكون بعد الآن',
+            'executor_deadline.date' => 'تاريخ ديدلاين المنفذ غير صحيح',
+            'executor_deadline.after' => 'تاريخ ديدلاين المنفذ يجب أن يكون بعد الآن',
+            'reviewer_deadlines.json' => 'بيانات ديدلاينات المراجعين غير صحيحة'
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -902,6 +911,9 @@ class TaskRevisionController extends Controller
                 'responsibility_notes' => 'nullable|string|max:2000',
                 'attachment' => 'nullable|file|max:10240',
                 'attachment_link' => 'nullable|url',
+                'revision_deadline' => 'nullable|date|after:now',
+                'executor_deadline' => 'nullable|date|after:now',
+                'reviewer_deadlines' => 'nullable|json',
             ]);
 
             // Update basic fields
@@ -910,6 +922,13 @@ class TaskRevisionController extends Controller
             $revision->title = $request->title;
             $revision->description = $request->description;
             $revision->notes = $request->notes;
+
+            // تحديث ديدلاين التعديل
+            if ($request->filled('revision_deadline')) {
+                $revision->revision_deadline = $request->revision_deadline;
+            } else {
+                $revision->revision_deadline = null;
+            }
 
             // Update project-related fields
             if ($request->revision_type === 'project') {
@@ -941,6 +960,9 @@ class TaskRevisionController extends Controller
 
             $revision->save();
 
+            // تحديث الديدلاينات
+            $this->updateRevisionDeadlines($revision, $request);
+
             // Activity log
             activity()
                 ->causedBy(Auth::user())
@@ -955,7 +977,7 @@ class TaskRevisionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'تم تحديث التعديل بنجاح',
-                'revision' => $revision
+                'revision' => $revision->load(['deadlines', 'executorDeadline', 'reviewerDeadlines'])
             ]);
 
         } catch (\Exception $e) {
@@ -977,6 +999,7 @@ class TaskRevisionController extends Controller
             $request->validate([
                 'to_user_id' => 'required|exists:users,id',
                 'reason' => 'nullable|string|max:500',
+                'new_deadline' => 'nullable|date|after:now',
             ]);
 
             $fromUser = $revision->executor_user_id ? \App\Models\User::find($revision->executor_user_id) : null;
@@ -989,9 +1012,15 @@ class TaskRevisionController extends Controller
                 ], 400);
             }
 
-            // استخدام الـ Service
+            // استخدام الـ Service مع الديدلاين الجديد
             $transferService = app(\App\Services\Tasks\RevisionTransferService::class);
-            $result = $transferService->transferExecutor($revision, $fromUser, $toUser, $request->reason);
+            $result = $transferService->transferExecutor(
+                $revision,
+                $fromUser,
+                $toUser,
+                $request->reason,
+                $request->new_deadline
+            );
 
             if (!$result['success']) {
                 return response()->json($result, 400);
@@ -1019,14 +1048,21 @@ class TaskRevisionController extends Controller
                 'to_user_id' => 'required|exists:users,id',
                 'reviewer_order' => 'required|integer|min:1',
                 'reason' => 'nullable|string|max:500',
+                'new_deadline' => 'nullable|date|after:now',
             ]);
 
             $toUser = \App\Models\User::findOrFail($request->to_user_id);
             $reviewerOrder = $request->reviewer_order;
 
-            // استخدام الـ Service
+            // استخدام الـ Service مع الديدلاين الجديد
             $transferService = app(\App\Services\Tasks\RevisionTransferService::class);
-            $result = $transferService->transferReviewer($revision, $reviewerOrder, $toUser, $request->reason);
+            $result = $transferService->transferReviewer(
+                $revision,
+                $reviewerOrder,
+                $toUser,
+                $request->reason,
+                $request->new_deadline
+            );
 
             if (!$result['success']) {
                 return response()->json($result, 400);
@@ -1403,6 +1439,98 @@ class TaskRevisionController extends Controller
                 'success' => false,
                 'message' => 'حدث خطأ أثناء إعادة فتح المراجعة'
             ], 500);
+        }
+    }
+
+    /**
+     * تحديث ديدلاينات التعديل
+     */
+    private function updateRevisionDeadlines(TaskRevision $revision, Request $request): void
+    {
+        try {
+            // تحديث أو إنشاء ديدلاين المنفذ
+            if ($request->filled('executor_deadline') && $request->filled('executor_user_id')) {
+                $existingExecutorDeadline = \App\Models\RevisionDeadline::where('revision_id', $revision->id)
+                    ->where('deadline_type', 'executor')
+                    ->first();
+
+                if ($existingExecutorDeadline) {
+                    // تمديد الديدلاين القائم
+                    $existingExecutorDeadline->extend(
+                        \Carbon\Carbon::parse($request->executor_deadline),
+                        Auth::id()
+                    );
+                } else {
+                    // إنشاء ديدلاين جديد
+                    \App\Models\RevisionDeadline::create([
+                        'revision_id' => $revision->id,
+                        'deadline_type' => 'executor',
+                        'user_id' => $request->executor_user_id,
+                        'deadline_date' => $request->executor_deadline,
+                        'status' => 'pending',
+                        'assigned_by' => Auth::id(),
+                        'original_deadline' => $request->executor_deadline,
+                    ]);
+                }
+            }
+
+            // تحديث ديدلاينات المراجعين
+            if ($request->filled('reviewer_deadlines')) {
+                $reviewerDeadlines = json_decode($request->reviewer_deadlines, true);
+
+                if (is_array($reviewerDeadlines)) {
+                    foreach ($reviewerDeadlines as $reviewerDeadline) {
+                        if (empty($reviewerDeadline['reviewer_id']) || empty($reviewerDeadline['deadline'])) {
+                            continue;
+                        }
+
+                        // البحث عن الترتيب
+                        $reviewerOrder = null;
+                        if (!empty($revision->reviewers)) {
+                            foreach ($revision->reviewers as $reviewer) {
+                                if ($reviewer['reviewer_id'] == $reviewerDeadline['reviewer_id']) {
+                                    $reviewerOrder = $reviewer['order'];
+                                    break;
+                                }
+                            }
+                        }
+
+                        if ($reviewerOrder === null) {
+                            continue;
+                        }
+
+                        $existingReviewerDeadline = \App\Models\RevisionDeadline::where('revision_id', $revision->id)
+                            ->where('deadline_type', 'reviewer')
+                            ->where('reviewer_order', $reviewerOrder)
+                            ->first();
+
+                        if ($existingReviewerDeadline) {
+                            // تمديد الديدلاين القائم
+                            $existingReviewerDeadline->extend(
+                                \Carbon\Carbon::parse($reviewerDeadline['deadline']),
+                                Auth::id()
+                            );
+                        } else {
+                            // إنشاء ديدلاين جديد
+                            \App\Models\RevisionDeadline::create([
+                                'revision_id' => $revision->id,
+                                'deadline_type' => 'reviewer',
+                                'user_id' => $reviewerDeadline['reviewer_id'],
+                                'deadline_date' => $reviewerDeadline['deadline'],
+                                'reviewer_order' => $reviewerOrder,
+                                'status' => 'pending',
+                                'assigned_by' => Auth::id(),
+                                'original_deadline' => $reviewerDeadline['deadline'],
+                            ]);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error updating revision deadlines', [
+                'revision_id' => $revision->id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

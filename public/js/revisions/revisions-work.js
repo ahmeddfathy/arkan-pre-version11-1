@@ -1,8 +1,4 @@
-// ====================================
-// 🎯 Revisions Page - Work Actions & Timers
-// ====================================
 
-// Get action buttons based on revision status (for sidebar)
 function getRevisionActionButtons(revision) {
     let buttons = '';
 
@@ -45,7 +41,6 @@ function getRevisionActionButtons(revision) {
     return buttons;
 }
 
-// Get compact action buttons for table (icons only)
 function getRevisionActionButtonsCompact(revision) {
     let buttons = '';
 
@@ -92,7 +87,6 @@ function getRevisionActionButtonsCompact(revision) {
     return buttons;
 }
 
-// Start revision work
 async function startRevisionWork(revisionId) {
     console.log('Starting revision work for ID:', revisionId);
 
@@ -110,7 +104,6 @@ async function startRevisionWork(revisionId) {
         console.log('Result:', result);
 
         if (result.success) {
-            // ✅ استخدام SweetAlert2 للرسائل
             Swal.fire({
                 title: 'نجح!',
                 text: result.message || 'تم بدء العمل على التعديل',
@@ -123,7 +116,6 @@ async function startRevisionWork(revisionId) {
                     popup: 'rtl-swal'
                 }
             });
-            // تحديث بدون loading
             setTimeout(() => {
                 const activeTab = $('#revisionTabs .nav-link.active').attr('data-bs-target');
                 if (activeTab === '#my-revisions') {
@@ -150,7 +142,6 @@ async function startRevisionWork(revisionId) {
                 }
             }, 100);
         } else {
-            // التحقق من وجود تعديل آخر نشط
             if (result.active_revision_id) {
                 Swal.fire({
                     title: 'تنبيه!',
@@ -191,7 +182,6 @@ async function startRevisionWork(revisionId) {
     }
 }
 
-// Pause revision work
 async function pauseRevisionWork(revisionId) {
     try {
         const response = await fetch(`/task-revisions/${revisionId}/pause`, {
@@ -218,7 +208,6 @@ async function pauseRevisionWork(revisionId) {
                 }
             });
             closeSidebar();
-            // تحديث بدون loading
             setTimeout(() => {
                 const activeTab = $('#revisionTabs .nav-link.active').attr('data-bs-target');
                 if (activeTab === '#my-revisions') {
@@ -269,7 +258,6 @@ async function pauseRevisionWork(revisionId) {
     }
 }
 
-// Resume revision work
 async function resumeRevisionWork(revisionId) {
     try {
         const response = await fetch(`/task-revisions/${revisionId}/resume`, {
@@ -296,7 +284,6 @@ async function resumeRevisionWork(revisionId) {
                 }
             });
             closeSidebar();
-            // تحديث بدون loading
             setTimeout(() => {
                 const activeTab = $('#revisionTabs .nav-link.active').attr('data-bs-target');
                 if (activeTab === '#my-revisions') {
@@ -323,7 +310,6 @@ async function resumeRevisionWork(revisionId) {
                 }
             }, 100);
         } else {
-            // التحقق من وجود تعديل آخر نشط
             if (result.active_revision_id) {
                 Swal.fire({
                     title: 'تنبيه!',
@@ -364,7 +350,6 @@ async function resumeRevisionWork(revisionId) {
     }
 }
 
-// Complete revision work
 async function completeRevisionWork(revisionId) {
     try {
         const response = await fetch(`/task-revisions/${revisionId}/complete`, {
@@ -391,7 +376,6 @@ async function completeRevisionWork(revisionId) {
                 }
             });
             closeSidebar();
-            // تحديث بدون loading
             setTimeout(() => {
                 const activeTab = $('#revisionTabs .nav-link.active').attr('data-bs-target');
                 if (activeTab === '#my-revisions') {
@@ -442,20 +426,15 @@ async function completeRevisionWork(revisionId) {
     }
 }
 
-// ⏰ دوال التايمر للتعديلات
-
-// تهيئة التايمرات للتعديلات قيد التنفيذ
 function initializeRevisionTimers() {
     console.log('🔄 تهيئة التايمرات...');
 
     console.log('📊 revisionTimers object:', revisionTimers);
 
-    // بدء التايمرات للتعديلات قيد التنفيذ (بدون إيقاف التايمرات السابقة)
     Object.keys(revisionTimers).forEach(revisionId => {
         console.log('🔍 فحص التعديل:', revisionId, 'حالته:', revisionTimers[revisionId].status);
 
         if (revisionTimers[revisionId].status === 'in_progress') {
-            // فحص لو التايمر شغال فعلاً
             if (revisionTimerIntervals[revisionId]) {
                 console.log('⏭️ التايمر شغال بالفعل للتعديل:', revisionId);
                 return;
@@ -476,7 +455,6 @@ function initializeRevisionTimers() {
 
     console.log('✅ تم تهيئة تايمرات التنفيذ');
 
-    // بدء تايمرات المراجعة
     console.log('📊 reviewTimers object:', reviewTimers);
     Object.keys(reviewTimers).forEach(revisionId => {
         console.log('🔍 فحص المراجعة:', revisionId, 'حالتها:', reviewTimers[revisionId].status);
@@ -496,7 +474,6 @@ function initializeRevisionTimers() {
 
     console.log('✅ تم تهيئة تايمرات المراجعة');
 
-    // logging للتأكد من النتيجة النهائية
     console.log('🎉 النتيجة النهائية بعد التهيئة:');
     console.log('📊 revisionTimers:', revisionTimers);
     console.log('⏱️ revisionTimerIntervals:', revisionTimerIntervals);
@@ -506,7 +483,6 @@ function initializeRevisionTimers() {
     console.log('🎯 التايمرات النشطة (مراجعة):', Object.keys(reviewTimerIntervals).length);
 }
 
-// بدء تايمر لتعديل معين
 function startRevisionTimer(revisionId) {
     console.log('⏰ بدء تايمر للتعديل:', revisionId);
     console.log('🔍 البيانات الحالية للتعديل:', revisionTimers[revisionId]);
@@ -541,7 +517,6 @@ function startRevisionTimer(revisionId) {
     console.log('⏱️ revisionTimerIntervals بعد الإنشاء:', revisionTimerIntervals);
 }
 
-// إيقاف تايمر لتعديل معين
 function stopRevisionTimer(revisionId) {
     if (revisionTimerIntervals[revisionId]) {
         clearInterval(revisionTimerIntervals[revisionId]);
@@ -549,7 +524,6 @@ function stopRevisionTimer(revisionId) {
     }
 }
 
-// إيقاف جميع التايمرات
 function stopAllRevisionTimers() {
     Object.keys(revisionTimerIntervals).forEach(revisionId => {
         clearInterval(revisionTimerIntervals[revisionId]);
@@ -564,11 +538,6 @@ function stopAllRevisionTimers() {
     reviewTimers = {};
 }
 
-// ====================================
-// ⏰ دوال تايمر المراجعة
-// ====================================
-
-// بدء تايمر للمراجعة
 function startReviewTimer(revisionId) {
     console.log('⏰ بدء تايمر المراجعة:', revisionId);
 
@@ -592,7 +561,6 @@ function startReviewTimer(revisionId) {
     console.log('✅ تم إنشاء تايمر المراجعة:', revisionId);
 }
 
-// إيقاف تايمر المراجعة
 function stopReviewTimer(revisionId) {
     if (reviewTimerIntervals[revisionId]) {
         clearInterval(reviewTimerIntervals[revisionId]);
@@ -600,7 +568,6 @@ function stopReviewTimer(revisionId) {
     }
 }
 
-// تحديث عرض تايمر المراجعة
 function updateReviewTimerDisplay(revisionId, seconds) {
     const timerElement = document.querySelector(`#review-timer-${revisionId}`);
     if (timerElement) {
@@ -746,15 +713,9 @@ $(window).on('beforeunload', function() {
 });
 
 // ====================================
-// 🔄 Reassignment Functions
-// ====================================
 
-/**
- * إعادة تعيين المنفذ
- */
 async function reassignExecutor(revisionId, projectId) {
     try {
-        // جلب المشاركين في المشروع
         const response = await fetch(`/projects/${projectId}/participants`, {
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -769,13 +730,11 @@ async function reassignExecutor(revisionId, projectId) {
             return;
         }
 
-        // تحضير خيارات الـ dropdown
         const options = {};
         result.participants.forEach(user => {
             options[user.id] = user.name;
         });
 
-        // عرض نافذة الاختيار
         const { value: selectedUserId } = await Swal.fire({
             title: '🔨 إعادة تعيين المنفذ',
             html: `
@@ -812,7 +771,6 @@ async function reassignExecutor(revisionId, projectId) {
 
         if (!selectedUserId) return;
 
-        // إرسال الطلب
         const reassignResponse = await fetch(`/task-revisions/${revisionId}/reassign-executor`, {
             method: 'POST',
             headers: {
@@ -837,12 +795,10 @@ async function reassignExecutor(revisionId, projectId) {
                 showConfirmButton: false
             });
 
-            // تحديث العرض
             if (typeof refreshData === 'function') {
                 refreshData();
             }
 
-            // إغلاق الـ sidebar وإعادة فتحه لعرض البيانات المحدثة
             if (typeof closeSidebar === 'function') {
                 closeSidebar();
             }
@@ -856,12 +812,8 @@ async function reassignExecutor(revisionId, projectId) {
     }
 }
 
-/**
- * إعادة تعيين المراجع
- */
 async function reassignReviewer(revisionId, projectId, reviewerOrder) {
     try {
-        // جلب المراجعين المؤهلين
         const response = await fetch(`/task-revisions/reviewers-only?project_id=${projectId}`, {
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -876,13 +828,11 @@ async function reassignReviewer(revisionId, projectId, reviewerOrder) {
             return;
         }
 
-        // تحضير خيارات الـ dropdown
         const options = {};
         result.reviewers.forEach(user => {
             options[user.id] = user.name;
         });
 
-        // عرض نافذة الاختيار
         const { value: selectedUserId } = await Swal.fire({
             title: `✅ إعادة تعيين المراجع رقم ${reviewerOrder}`,
             html: `
@@ -919,7 +869,6 @@ async function reassignReviewer(revisionId, projectId, reviewerOrder) {
 
         if (!selectedUserId) return;
 
-        // إرسال الطلب
         const reassignResponse = await fetch(`/task-revisions/${revisionId}/reassign-reviewer`, {
             method: 'POST',
             headers: {
@@ -945,12 +894,10 @@ async function reassignReviewer(revisionId, projectId, reviewerOrder) {
                 showConfirmButton: false
             });
 
-            // تحديث العرض
             if (typeof refreshData === 'function') {
                 refreshData();
             }
 
-            // إغلاق الـ sidebar وإعادة فتحه لعرض البيانات المحدثة
             if (typeof closeSidebar === 'function') {
                 closeSidebar();
             }
@@ -965,7 +912,6 @@ async function reassignReviewer(revisionId, projectId, reviewerOrder) {
 }
 
 
-// Get review action buttons based on review status (for sidebar)
 function getReviewActionButtons(revision) {
     let buttons = '';
 
@@ -1008,7 +954,6 @@ function getReviewActionButtons(revision) {
     return buttons;
 }
 
-// Get compact review action buttons for table (icons only)
 function getReviewActionButtonsCompact(revision) {
     let buttons = '';
 
@@ -1055,7 +1000,6 @@ function getReviewActionButtonsCompact(revision) {
     return buttons;
 }
 
-// Start review
 async function startReview(revisionId) {
     console.log('Starting review for ID:', revisionId);
 
@@ -1084,10 +1028,8 @@ async function startReview(revisionId) {
                 }
             });
             closeSidebar();
-            // تحديث البيانات
             setTimeout(() => refreshRevisionData(), 100);
         } else {
-            // التحقق من وجود مراجعة أخرى نشطة
             if (result.active_review_id) {
                 Swal.fire({
                     title: 'تنبيه!',
@@ -1128,7 +1070,6 @@ async function startReview(revisionId) {
     }
 }
 
-// Pause review
 async function pauseReview(revisionId) {
     try {
         const response = await fetch(`/task-revisions/${revisionId}/pause-review`, {
@@ -1181,7 +1122,6 @@ async function pauseReview(revisionId) {
     }
 }
 
-// Resume review
 async function resumeReview(revisionId) {
     try {
         const response = await fetch(`/task-revisions/${revisionId}/resume-review`, {
@@ -1210,7 +1150,6 @@ async function resumeReview(revisionId) {
             closeSidebar();
             setTimeout(() => refreshRevisionData(), 100);
         } else {
-            // التحقق من وجود مراجعة أخرى نشطة
             if (result.active_review_id) {
                 Swal.fire({
                     title: 'تنبيه!',
@@ -1251,7 +1190,6 @@ async function resumeReview(revisionId) {
     }
 }
 
-// Complete review
 async function completeReview(revisionId) {
     try {
         const response = await fetch(`/task-revisions/${revisionId}/complete-review`, {
@@ -1304,7 +1242,6 @@ async function completeReview(revisionId) {
     }
 }
 
-// Helper function to refresh revision data
 function refreshRevisionData() {
     const activeTab = $('#revisionTabs .nav-link.active').attr('data-bs-target');
     if (activeTab === '#my-revisions') {
@@ -1330,7 +1267,7 @@ function refreshRevisionData() {
         });
     }
 
-    // Update Kanban if in Kanban view
+
     if (typeof updateKanbanOnTabChange === 'function') {
         setTimeout(() => {
             updateKanbanOnTabChange();
@@ -1338,11 +1275,7 @@ function refreshRevisionData() {
     }
 }
 
-// ====================================
-// 🔄 Reopen Functions (إعادة فتح)
-// ====================================
 
-// Reopen work (إعادة فتح العمل)
 async function reopenWork(revisionId) {
     const result = await Swal.fire({
         title: 'إعادة فتح العمل',

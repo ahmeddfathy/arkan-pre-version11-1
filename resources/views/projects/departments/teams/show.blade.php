@@ -25,12 +25,282 @@
 <link rel="stylesheet" href="{{ asset('css/project-dashboard/teams.css') }}">
 <link rel="stylesheet" href="{{ asset('css/project-dashboard/teams/show.css') }}">
 <link rel="stylesheet" href="{{ asset('css/project-dashboard/revisions-modern.css') }}">
+<style>
+    /* Container Fluid Styling for Full Width */
+    .container-fluid {
+        width: 100%;
+        padding-right: 30px;
+        padding-left: 30px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+    }
+
+    /* Modern Dashboard Full Width */
+    .modern-dashboard {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 1.5rem;
+    }
+
+    /* Projects Overview Grid */
+    .projects-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .projects-overview-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .projects-overview-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Project Summary Card */
+    .project-summary-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e9ecef;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .project-summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+
+
+    /* Project Icon */
+    .project-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+    }
+
+
+    .project-icon.all {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .project-icon.progress {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .project-icon.completed {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .project-icon.new {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .project-icon.cancelled {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    /* Project Info */
+    .project-info {
+        flex: 1;
+    }
+
+    .project-number {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 5px;
+        line-height: 1.2;
+    }
+
+    .project-label {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+
+    .project-sublabel {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    /* Completion Rate Card */
+    .project-summary-card.completion-rate {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+    }
+
+    .project-summary-card.completion-rate .project-label {
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 600;
+    }
+
+    .completion-circle {
+        width: 60px;
+        height: 60px;
+        position: relative;
+    }
+
+    .circular-chart {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.2);
+        stroke-width: 3;
+    }
+
+    .circle {
+        fill: none;
+        stroke: white;
+        stroke-width: 3;
+        stroke-linecap: round;
+        animation: progress 1s ease-out forwards;
+    }
+
+    @keyframes progress {
+        0% {
+            stroke-dasharray: 0 100;
+        }
+    }
+
+    .percentage {
+        fill: white;
+        font-family: 'Cairo', sans-serif;
+        font-size: 8px;
+        font-weight: 700;
+        text-anchor: middle;
+    }
+
+    /* Section Modern */
+    .section-modern {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-modern .section-header {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .section-modern .section-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-modern .section-header h2 i {
+        color: #667eea;
+        font-size: 28px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .project-number {
+            font-size: 24px;
+        }
+
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        .project-summary-card {
+            padding: 15px;
+        }
+
+        .section-modern {
+            padding: 20px;
+        }
+    }
+
+    /* Animation on load */
+    .project-summary-card {
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+
+    .project-summary-card:nth-child(1) { animation-delay: 0.1s; }
+    .project-summary-card:nth-child(2) { animation-delay: 0.15s; }
+    .project-summary-card:nth-child(3) { animation-delay: 0.2s; }
+    .project-summary-card:nth-child(4) { animation-delay: 0.25s; }
+    .project-summary-card:nth-child(5) { animation-delay: 0.3s; }
+    .project-summary-card:nth-child(6) { animation-delay: 0.35s; }
+    .project-summary-card:nth-child(7) { animation-delay: 0.4s; }
+    .project-summary-card:nth-child(8) { animation-delay: 0.45s; }
+    .project-summary-card:nth-child(9) { animation-delay: 0.5s; }
+    .project-summary-card:nth-child(10) { animation-delay: 0.55s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 @endpush
 
 @section('content')
 <div class="modern-dashboard">
     <!-- Breadcrumb -->
-    <div class="container">
+    <div class="container-fluid">
         <nav class="breadcrumb">
             <a href="{{ route('company-projects.dashboard') }}" class="breadcrumb-item">لوحة التحكم</a>
             <a href="{{ route('departments.show', urlencode($department)) }}" class="breadcrumb-item">{{ $department }}</a>
@@ -40,7 +310,7 @@
 
     <!-- Team Header -->
     <div class="team-detail-header">
-        <div class="container">
+        <div class="container-fluid">
             <div class="team-info">
                 <h1 class="team-name">{{ $team->name }}</h1>
                 <p class="team-description">
@@ -54,7 +324,7 @@
 
     <!-- Filters Section -->
     <div class="filters-section">
-        <div class="container">
+        <div class="container-fluid">
             <div class="filters-container">
                 <div class="filters-header">
                     <h3><i class="fas fa-filter"></i> فلتر البيانات</h3>
@@ -128,7 +398,7 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
         <!-- Filter Indicator -->
         @if(isset($periodDescription) && $periodDescription != 'جميع الفترات')
         <div class="section-modern">
@@ -247,6 +517,125 @@
         <!-- Detailed Statistics & Charts -->
         <div class="team-analytics">
             <!-- Projects Analytics -->
+            <!-- Projects Status Cards -->
+            <div class="section-modern">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-briefcase"></i>
+                        نظرة عامة على المشاريع
+                    </h2>
+                </div>
+
+                <div class="projects-overview-grid">
+                    <div class="project-summary-card">
+                        <div class="project-icon all">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['total'] ?? 0 }}</div>
+                            <div class="project-label">إجمالي المشاريع</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card">
+                        <div class="project-icon progress">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['in_progress'] ?? 0 }}</div>
+                            <div class="project-label">جاري</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card" style="border-color: #f39c12;">
+                        <div class="project-icon" style="background: #f39c12;">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['waiting_form'] ?? 0 }}</div>
+                            <div class="project-label">واقف (نموذج)</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card" style="border-color: #3498db;">
+                        <div class="project-icon" style="background: #3498db;">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['waiting_questions'] ?? 0 }}</div>
+                            <div class="project-label">واقف (أسئلة)</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card" style="border-color: #e67e22;">
+                        <div class="project-icon" style="background: #e67e22;">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['waiting_client'] ?? 0 }}</div>
+                            <div class="project-label">واقف (عميل)</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card" style="border-color: #9b59b6;">
+                        <div class="project-icon" style="background: #9b59b6;">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['waiting_call'] ?? 0 }}</div>
+                            <div class="project-label">واقف (مكالمة)</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card" style="border-color: #e74c3c;">
+                        <div class="project-icon" style="background: #e74c3c;">
+                            <i class="fas fa-pause-circle"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['paused'] ?? 0 }}</div>
+                            <div class="project-label">موقوف</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card" style="border-color: #f093fb;">
+                        <div class="project-icon" style="background: #f093fb;">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['draft_delivery'] ?? 0 }}</div>
+                            <div class="project-label">تسليم مسودة</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card" style="border-color: #00f2fe;">
+                        <div class="project-icon completed" style="background: #00f2fe;">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-number">{{ $projectStats['final_delivery'] ?? 0 }}</div>
+                            <div class="project-label">تسليم نهائي</div>
+                        </div>
+                    </div>
+
+                    <div class="project-summary-card completion-rate">
+                        <div class="completion-circle">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="circle" stroke-dasharray="{{ $projectStats['total'] > 0 ? round(($projectStats['final_delivery'] / $projectStats['total']) * 100) : 0 }}, 100" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <text x="18" y="20.35" class="percentage">{{ $projectStats['total'] > 0 ? round(($projectStats['final_delivery'] / $projectStats['total']) * 100) : 0 }}%</text>
+                            </svg>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-label">معدل التسليم النهائي</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="analytics-section">
                 <div class="section-header">
                     <h3>
@@ -260,21 +649,37 @@
                             <canvas id="projectStatusChart"></canvas>
                         </div>
                         <div class="chart-legend">
-                            <div class="legend-item new">
-                                <span class="legend-color"></span>
-                                جديد: {{ $projectStats['new'] }}
-                            </div>
                             <div class="legend-item progress">
-                                <span class="legend-color"></span>
-                                قيد التنفيذ: {{ $projectStats['in_progress'] }}
+                                <span class="legend-color" style="background: #3498db;"></span>
+                                جاري: {{ $projectStats['in_progress'] ?? 0 }}
+                            </div>
+                            <div class="legend-item" style="color: #f39c12;">
+                                <span class="legend-color" style="background: #f39c12;"></span>
+                                واقف (نموذج): {{ $projectStats['waiting_form'] ?? 0 }}
+                            </div>
+                            <div class="legend-item" style="color: #3498db;">
+                                <span class="legend-color" style="background: #3498db;"></span>
+                                واقف (أسئلة): {{ $projectStats['waiting_questions'] ?? 0 }}
+                            </div>
+                            <div class="legend-item" style="color: #e67e22;">
+                                <span class="legend-color" style="background: #e67e22;"></span>
+                                واقف (عميل): {{ $projectStats['waiting_client'] ?? 0 }}
+                            </div>
+                            <div class="legend-item" style="color: #9b59b6;">
+                                <span class="legend-color" style="background: #9b59b6;"></span>
+                                واقف (مكالمة): {{ $projectStats['waiting_call'] ?? 0 }}
+                            </div>
+                            <div class="legend-item" style="color: #e74c3c;">
+                                <span class="legend-color" style="background: #e74c3c;"></span>
+                                موقوف: {{ $projectStats['paused'] ?? 0 }}
+                            </div>
+                            <div class="legend-item" style="color: #f093fb;">
+                                <span class="legend-color" style="background: #f093fb;"></span>
+                                تسليم مسودة: {{ $projectStats['draft_delivery'] ?? 0 }}
                             </div>
                             <div class="legend-item completed">
-                                <span class="legend-color"></span>
-                                مكتمل: {{ $projectStats['completed'] }}
-                            </div>
-                            <div class="legend-item cancelled">
-                                <span class="legend-color"></span>
-                                ملغي: {{ $projectStats['cancelled'] }}
+                                <span class="legend-color" style="background: #00f2fe;"></span>
+                                تسليم نهائي: {{ $projectStats['final_delivery'] ?? 0 }}
                             </div>
                         </div>
                     </div>

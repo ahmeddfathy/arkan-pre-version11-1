@@ -328,17 +328,18 @@ class RevisionPageController extends Controller
         try {
             $userId = Auth::id();
 
-            // إحصائيات عامة مع تطبيق الفلترة الهرمية
+            // إحصائيات عامة مع تطبيق الفلترة الهرمية - حسب حالة العمل (work_status)
             $allRevisionsQuery = TaskRevision::query();
             $allRevisionsQuery = $this->revisionFilterService->applyHierarchicalRevisionFiltering($allRevisionsQuery);
 
             $totalRevisions = $allRevisionsQuery->count();
-            $pendingRevisions = (clone $allRevisionsQuery)->where('status', 'pending')->count();
-            $approvedRevisions = (clone $allRevisionsQuery)->where('status', 'approved')->count();
-            $rejectedRevisions = (clone $allRevisionsQuery)->where('status', 'rejected')->count();
+            $newRevisions = (clone $allRevisionsQuery)->where('status', 'new')->count();
+            $inProgressRevisions = (clone $allRevisionsQuery)->where('status', 'in_progress')->count();
+            $pausedRevisions = (clone $allRevisionsQuery)->where('status', 'paused')->count();
+            $completedRevisions = (clone $allRevisionsQuery)->where('status', 'completed')->count();
 
             // إحصائيات التعديلات المسندة للمستخدم (مباشرة أو عبر TaskUser أو TemplateTaskUser)
-            $myAssignedRevisions = TaskRevision::where(function($q) use ($userId) {
+            $myAssignedQuery = TaskRevision::where(function($q) use ($userId) {
                 $q->where('assigned_to', $userId)
                   ->orWhereHas('taskUser', function($taskUserQuery) use ($userId) {
                       $taskUserQuery->where('user_id', $userId);
@@ -346,46 +347,21 @@ class RevisionPageController extends Controller
                   ->orWhereHas('templateTaskUser', function($templateTaskUserQuery) use ($userId) {
                       $templateTaskUserQuery->where('user_id', $userId);
                   });
-            })->count();
+            });
 
-            $myAssignedPending = TaskRevision::where(function($q) use ($userId) {
-                $q->where('assigned_to', $userId)
-                  ->orWhereHas('taskUser', function($taskUserQuery) use ($userId) {
-                      $taskUserQuery->where('user_id', $userId);
-                  })
-                  ->orWhereHas('templateTaskUser', function($templateTaskUserQuery) use ($userId) {
-                      $templateTaskUserQuery->where('user_id', $userId);
-                  });
-            })->where('status', 'pending')->count();
-
-            $myAssignedApproved = TaskRevision::where(function($q) use ($userId) {
-                $q->where('assigned_to', $userId)
-                  ->orWhereHas('taskUser', function($taskUserQuery) use ($userId) {
-                      $taskUserQuery->where('user_id', $userId);
-                  })
-                  ->orWhereHas('templateTaskUser', function($templateTaskUserQuery) use ($userId) {
-                      $templateTaskUserQuery->where('user_id', $userId);
-                  });
-            })->where('status', 'approved')->count();
-
-            $myAssignedRejected = TaskRevision::where(function($q) use ($userId) {
-                $q->where('assigned_to', $userId)
-                  ->orWhereHas('taskUser', function($taskUserQuery) use ($userId) {
-                      $taskUserQuery->where('user_id', $userId);
-                  })
-                  ->orWhereHas('templateTaskUser', function($templateTaskUserQuery) use ($userId) {
-                      $templateTaskUserQuery->where('user_id', $userId);
-                  });
-            })->where('status', 'rejected')->count();
+            $myAssignedRevisions = (clone $myAssignedQuery)->count();
+            $myAssignedNew = (clone $myAssignedQuery)->where('status', 'new')->count();
+            $myAssignedInProgress = (clone $myAssignedQuery)->where('status', 'in_progress')->count();
+            $myAssignedPaused = (clone $myAssignedQuery)->where('status', 'paused')->count();
+            $myAssignedCompleted = (clone $myAssignedQuery)->where('status', 'completed')->count();
 
             // إحصائيات التعديلات التي أنشأها المستخدم
-            $myCreatedRevisions = TaskRevision::where('created_by', $userId)->count();
-            $myCreatedPending = TaskRevision::where('created_by', $userId)
-                                          ->where('status', 'pending')->count();
-            $myCreatedApproved = TaskRevision::where('created_by', $userId)
-                                           ->where('status', 'approved')->count();
-            $myCreatedRejected = TaskRevision::where('created_by', $userId)
-                                           ->where('status', 'rejected')->count();
+            $myCreatedQuery = TaskRevision::where('created_by', $userId);
+            $myCreatedRevisions = (clone $myCreatedQuery)->count();
+            $myCreatedNew = (clone $myCreatedQuery)->where('status', 'new')->count();
+            $myCreatedInProgress = (clone $myCreatedQuery)->where('status', 'in_progress')->count();
+            $myCreatedPaused = (clone $myCreatedQuery)->where('status', 'paused')->count();
+            $myCreatedCompleted = (clone $myCreatedQuery)->where('status', 'completed')->count();
 
             // إحصائيات حسب المصدر مع تطبيق الفلترة الهرمية
             $internalRevisions = (clone $allRevisionsQuery)->where('revision_source', 'internal')->count();
@@ -396,23 +372,26 @@ class RevisionPageController extends Controller
                 'stats' => [
                     'general' => [
                         'total' => $totalRevisions,
-                        'pending' => $pendingRevisions,
-                        'approved' => $approvedRevisions,
-                        'rejected' => $rejectedRevisions,
+                        'new' => $newRevisions,
+                        'in_progress' => $inProgressRevisions,
+                        'paused' => $pausedRevisions,
+                        'completed' => $completedRevisions,
                         'internal' => $internalRevisions,
                         'external' => $externalRevisions
                     ],
                     'my_assigned_revisions' => [
                         'total' => $myAssignedRevisions,
-                        'pending' => $myAssignedPending,
-                        'approved' => $myAssignedApproved,
-                        'rejected' => $myAssignedRejected
+                        'new' => $myAssignedNew,
+                        'in_progress' => $myAssignedInProgress,
+                        'paused' => $myAssignedPaused,
+                        'completed' => $myAssignedCompleted
                     ],
                     'my_created_revisions' => [
                         'total' => $myCreatedRevisions,
-                        'pending' => $myCreatedPending,
-                        'approved' => $myCreatedApproved,
-                        'rejected' => $myCreatedRejected
+                        'new' => $myCreatedNew,
+                        'in_progress' => $myCreatedInProgress,
+                        'paused' => $myCreatedPaused,
+                        'completed' => $myCreatedCompleted
                     ]
                 ]
             ]);
@@ -448,7 +427,10 @@ class RevisionPageController extends Controller
                 'taskUser',
                 'taskUser.user:id,name',
                 'templateTaskUser',
-                'templateTaskUser.user:id,name'
+                'templateTaskUser.user:id,name',
+                'deadlines',
+                'executorDeadline',
+                'reviewerDeadlines'
             ]);
 
             $query = $this->revisionFilterService->applyHierarchicalRevisionFiltering($query);

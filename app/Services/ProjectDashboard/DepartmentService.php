@@ -307,6 +307,114 @@ class DepartmentService
     }
 
     /**
+     * حساب إحصائيات المشاريع من حالة الخدمات في القسم
+     */
+    public function calculateDepartmentProjectStats($departmentProjects, $department = null)
+    {
+        // حساب إحصائيات القسم من حالة الخدمات (project_service.service_status)
+        $stats = [
+            'total' => 0,
+            'in_progress' => 0,
+            'waiting_form' => 0,
+            'waiting_questions' => 0,
+            'waiting_client' => 0,
+            'waiting_call' => 0,
+            'paused' => 0,
+            'draft_delivery' => 0,
+            'final_delivery' => 0,
+        ];
+
+        foreach ($departmentProjects as $project) {
+            // جلب حالات الخدمات في هذا المشروع
+            $serviceStatuses = DB::table('project_service')
+                ->where('project_id', $project->id)
+                ->pluck('service_status')
+                ->toArray();
+
+            if (empty($serviceStatuses)) {
+                continue;
+            }
+
+            // نعد المشروع مرة واحدة
+            $stats['total'] += 1;
+
+            // اختيار الحالة الغالبة للمشروع
+            $dominantStatus = $this->getDominantServiceStatus($serviceStatuses);
+
+            // تصنيف حسب الحالة
+            switch ($dominantStatus) {
+                case 'جاري':
+                case 'جاري التنفيذ':
+                    $stats['in_progress'] += 1;
+                    break;
+                case 'واقف ع النموذج':
+                    $stats['waiting_form'] += 1;
+                    break;
+                case 'واقف ع الأسئلة':
+                    $stats['waiting_questions'] += 1;
+                    break;
+                case 'واقف ع العميل':
+                    $stats['waiting_client'] += 1;
+                    break;
+                case 'واقف ع مكالمة':
+                    $stats['waiting_call'] += 1;
+                    break;
+                case 'موقوف':
+                    $stats['paused'] += 1;
+                    break;
+                case 'تسليم مسودة':
+                    $stats['draft_delivery'] += 1;
+                    break;
+                case 'تم تسليم نهائي':
+                case 'مكتمل':
+                    $stats['final_delivery'] += 1;
+                    break;
+                default:
+                    $stats['in_progress'] += 1;
+            }
+        }
+
+        return $stats;
+    }
+
+    /**
+     * تحديد الحالة الغالبة من مجموعة حالات الخدمات
+     */
+    private function getDominantServiceStatus($statuses)
+    {
+        if (empty($statuses)) {
+            return 'جاري';
+        }
+
+        // ترتيب الأولوية: الحالات الأكثر أهمية أولاً
+        $priority = [
+            'موقوف' => 1,
+            'واقف ع العميل' => 2,
+            'واقف ع النموذج' => 3,
+            'واقف ع الأسئلة' => 4,
+            'واقف ع مكالمة' => 5,
+            'لم تبدأ' => 6,
+            'جاري' => 7,
+            'جاري التنفيذ' => 8,
+            'تسليم مسودة' => 9,
+            'تم تسليم نهائي' => 10,
+            'مكتمل' => 11,
+        ];
+
+        $statusCounts = array_count_values($statuses);
+
+        // ترتيب الحالات حسب الأولوية
+        uksort($statusCounts, function($a, $b) use ($priority) {
+            $priorityA = $priority[$a] ?? 999;
+            $priorityB = $priority[$b] ?? 999;
+            return $priorityA - $priorityB;
+        });
+
+        // إرجاع الحالة ذات الأولوية الأعلى
+        return array_key_first($statusCounts);
+    }
+
+    /**
      * الحصول على معرفات المستخدمين في القسم
      */
     public function getDepartmentUserIds($department)

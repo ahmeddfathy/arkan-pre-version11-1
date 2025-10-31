@@ -70,16 +70,20 @@ class EmployeePerformanceService
     {
         $projectStats = [
             'total' => 0,
-            'new' => 0,
             'in_progress' => 0,
-            'completed' => 0,
-            'cancelled' => 0,
+            'waiting_form' => 0,
+            'waiting_questions' => 0,
+            'waiting_client' => 0,
+            'waiting_call' => 0,
+            'paused' => 0,
+            'draft_delivery' => 0,
+            'final_delivery' => 0,
             'completion_points' => 0,
             'effective_completed' => 0,
         ];
 
         foreach ($employeeProjects as $project) {
-    
+
             $projectShare = $this->getProjectShareForUser($userId, $project->id);
 
             $projectStats['total'] += $projectShare;
@@ -97,18 +101,53 @@ class EmployeePerformanceService
                 $projectStats['effective_completed'] += $projectShare;
             }
 
-            if ($currentTasksTotal == 0) {
-                $projectStats['new'] += $projectShare;
-            } elseif ($currentTasksCompleted >= $currentTasksTotal) {
-                $projectStats['completed'] += $projectShare;
-            } elseif ($currentTasksCompleted > 0) {
-                $projectStats['in_progress'] += $projectShare;
-            } else {
-                $projectStats['new'] += $projectShare;
+            // الحصول على حالة الموظف في المشروع من project_service_user
+            $employeeStatus = $this->getEmployeeProjectStatus($userId, $project->id);
+
+            // تصنيف المشاريع حسب حالة الموظف
+            switch ($employeeStatus) {
+                case 'جاري':
+                    $projectStats['in_progress'] += $projectShare;
+                    break;
+                case 'واقف ع النموذج':
+                    $projectStats['waiting_form'] += $projectShare;
+                    break;
+                case 'واقف ع الأسئلة':
+                    $projectStats['waiting_questions'] += $projectShare;
+                    break;
+                case 'واقف ع العميل':
+                    $projectStats['waiting_client'] += $projectShare;
+                    break;
+                case 'واقف ع مكالمة':
+                    $projectStats['waiting_call'] += $projectShare;
+                    break;
+                case 'موقوف':
+                    $projectStats['paused'] += $projectShare;
+                    break;
+                case 'تسليم مسودة':
+                    $projectStats['draft_delivery'] += $projectShare;
+                    break;
+                case 'تم تسليم نهائي':
+                    $projectStats['final_delivery'] += $projectShare;
+                    break;
+                default:
+                    // إذا كانت الحالة فارغة أو غير معروفة، صنفها كـ جاري
+                    $projectStats['in_progress'] += $projectShare;
             }
         }
 
         return $projectStats;
+    }
+
+    /**
+     * الحصول على حالة الموظف في المشروع من project_service_user
+     */
+    private function getEmployeeProjectStatus($userId, $projectId)
+    {
+        return DB::table('project_service_user')
+            ->where('user_id', $userId)
+            ->where('project_id', $projectId)
+            ->value('status') ?? 'جاري';
     }
 
     public function calculateEmployeeProjectCompletion($userId, $projectId, $dateFilters = null)

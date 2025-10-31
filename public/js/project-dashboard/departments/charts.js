@@ -1,12 +1,16 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Chart Colors
     const colors = {
-        new: '#f59e0b',
-        progress: '#3b82f6',
-        completed: '#10b981',
-        cancelled: '#ef4444',
-        paused: '#f97316',
-        template: '#8b5cf6'
+        inProgress: '#3498db',
+        waitingForm: '#f39c12',
+        waitingQuestions: '#3498db',
+        waitingClient: '#e67e22',
+        waitingCall: '#9b59b6',
+        paused: '#e74c3c',
+        draftDelivery: '#f093fb',
+        finalDelivery: '#00f2fe',
+        template: '#8b5cf6',
+        completed: '#10b981'
     };
 
     // Project Status Chart (Pie Chart)
@@ -15,19 +19,27 @@ document.addEventListener('DOMContentLoaded', function () {
         new Chart(projectCtx, {
             type: 'doughnut',
             data: {
-                labels: ['جديد', 'قيد التنفيذ', 'مكتمل', 'ملغي'],
+                labels: ['جاري', 'واقف (نموذج)', 'واقف (أسئلة)', 'واقف (عميل)', 'واقف (مكالمة)', 'موقوف', 'تسليم مسودة', 'تسليم نهائي'],
                 datasets: [{
                     data: [
-                        window.departmentData.projectStats.new,
-                        window.departmentData.projectStats.in_progress,
-                        window.departmentData.projectStats.completed,
-                        window.departmentData.projectStats.cancelled
+                        window.departmentData.projectStats.in_progress || 0,
+                        window.departmentData.projectStats.waiting_form || 0,
+                        window.departmentData.projectStats.waiting_questions || 0,
+                        window.departmentData.projectStats.waiting_client || 0,
+                        window.departmentData.projectStats.waiting_call || 0,
+                        window.departmentData.projectStats.paused || 0,
+                        window.departmentData.projectStats.draft_delivery || 0,
+                        window.departmentData.projectStats.final_delivery || 0
                     ],
                     backgroundColor: [
-                        colors.new,
-                        colors.progress,
-                        colors.completed,
-                        colors.cancelled
+                        colors.inProgress,
+                        colors.waitingForm,
+                        colors.waitingQuestions,
+                        colors.waitingClient,
+                        colors.waitingCall,
+                        colors.paused,
+                        colors.draftDelivery,
+                        colors.finalDelivery
                     ],
                     borderWidth: 0,
                     cutout: '60%'

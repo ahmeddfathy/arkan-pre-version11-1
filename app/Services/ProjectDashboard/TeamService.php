@@ -296,52 +296,104 @@ class TeamService
 
     public function calculateProjectStatsFromCollection($teamProjects, $teamUserIds = [], $dateFilters = null)
     {
-        if (!empty($teamUserIds)) {
-            $stats = [
-                'total' => 0,
-                'new' => 0,
-                'in_progress' => 0,
-                'completed' => 0,
-                'cancelled' => 0,
-            ];
+        // حساب إحصائيات التيم من حالات الموظفين في الخدمات
+        $stats = [
+            'total' => 0,
+            'in_progress' => 0,
+            'waiting_form' => 0,
+            'waiting_questions' => 0,
+            'waiting_client' => 0,
+            'waiting_call' => 0,
+            'paused' => 0,
+            'draft_delivery' => 0,
+            'final_delivery' => 0,
+        ];
 
-            foreach ($teamProjects as $project) {
-                // حساب مجموع نسب المشاركة لأعضاء الفريق في هذا المشروع
-                $projectShare = DB::table('project_service_user')
-                    ->whereIn('user_id', $teamUserIds)
-                    ->where('project_id', $project->id)
-                    ->sum('project_share') ?? 0;
+        foreach ($teamProjects as $project) {
+            // جلب حالات أعضاء التيم في خدمات هذا المشروع
+            $teamMembersStatuses = DB::table('project_service_user')
+                ->whereIn('user_id', $teamUserIds)
+                ->where('project_id', $project->id)
+                ->pluck('status')
+                ->toArray();
 
-                $stats['total'] += $projectShare;
-
-                // تصنيف حسب الحالة
-                switch ($project->status) {
-                    case 'جديد':
-                        $stats['new'] += $projectShare;
-                        break;
-                    case 'جاري التنفيذ':
-                        $stats['in_progress'] += $projectShare;
-                        break;
-                    case 'مكتمل':
-                        $stats['completed'] += $projectShare;
-                        break;
-                    case 'ملغي':
-                        $stats['cancelled'] += $projectShare;
-                        break;
-                }
+            if (empty($teamMembersStatuses)) {
+                continue;
             }
 
-            return $stats;
+            // نعد المشروع مرة واحدة
+            $stats['total'] += 1;
+
+            // اختيار الحالة الغالبة (أو أول حالة) للمشروع
+            // يمكن تعديل هذا المنطق حسب احتياجك
+            $dominantStatus = $this->getDominantStatus($teamMembersStatuses);
+
+            // تصنيف حسب الحالة
+            switch ($dominantStatus) {
+                case 'جاري':
+                    $stats['in_progress'] += 1;
+                    break;
+                case 'واقف ع النموذج':
+                    $stats['waiting_form'] += 1;
+                    break;
+                case 'واقف ع الأسئلة':
+                    $stats['waiting_questions'] += 1;
+                    break;
+                case 'واقف ع العميل':
+                    $stats['waiting_client'] += 1;
+                    break;
+                case 'واقف ع مكالمة':
+                    $stats['waiting_call'] += 1;
+                    break;
+                case 'موقوف':
+                    $stats['paused'] += 1;
+                    break;
+                case 'تسليم مسودة':
+                    $stats['draft_delivery'] += 1;
+                    break;
+                case 'تم تسليم نهائي':
+                    $stats['final_delivery'] += 1;
+                    break;
+                default:
+                    $stats['in_progress'] += 1;
+            }
         }
 
-        // الحساب القديم (بدون نسب المشاركة)
-        return [
-            'total' => $teamProjects->count(),
-            'new' => $teamProjects->where('status', 'جديد')->count(),
-            'in_progress' => $teamProjects->where('status', 'جاري التنفيذ')->count(),
-            'completed' => $teamProjects->where('status', 'مكتمل')->count(),
-            'cancelled' => $teamProjects->where('status', 'ملغي')->count(),
+        return $stats;
+    }
+
+    /**
+     * تحديد الحالة الغالبة من مجموعة حالات
+     */
+    private function getDominantStatus($statuses)
+    {
+        if (empty($statuses)) {
+            return 'جاري';
+        }
+
+        // ترتيب الأولوية: الحالات الأكثر أهمية أولاً
+        $priority = [
+            'موقوف' => 1,
+            'واقف ع العميل' => 2,
+            'واقف ع النموذج' => 3,
+            'واقف ع الأسئلة' => 4,
+            'واقف ع مكالمة' => 5,
+            'جاري' => 6,
+            'تسليم مسودة' => 7,
+            'تم تسليم نهائي' => 8,
         ];
+
+        $statusCounts = array_count_values($statuses);
+
+        // ترتيب الحالات حسب الأولوية
+        uksort($statusCounts, function($a, $b) use ($priority) {
+            $priorityA = $priority[$a] ?? 999;
+            $priorityB = $priority[$b] ?? 999;
+            return $priorityA - $priorityB;
+        });
+
+        // إرجاع الحالة ذات الأولوية الأعلى
+        return array_key_first($statusCounts);
     }
 
     /**
@@ -352,3 +404,4 @@ class TeamService
         return Team::with('users')->findOrFail($teamId)->users->pluck('id')->toArray();
     }
 }
+

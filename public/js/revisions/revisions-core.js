@@ -1,21 +1,14 @@
-// ====================================
-// 🎯 Revisions Page - Core Functions
-// ====================================
 
-// ⏱️ نظام التايمرات للتعديلات
 let revisionTimers = {};
 let revisionTimerIntervals = {};
 
-// ⏱️ نظام التايمرات للمراجعة
+
 let reviewTimers = {};
 let reviewTimerIntervals = {};
 
-// Global: All users for reviewer names lookup
 window.allUsers = [];
 
-/**
- * Load all users for reviewer names
- */
+
 async function loadAllUsersForReviewers() {
     try {
         const response = await fetch('/users/all', {
@@ -33,36 +26,26 @@ async function loadAllUsersForReviewers() {
     }
 }
 
-/**
- * Helper: الحصول على المراجع الحالي من reviewers array
- */
+
 function getCurrentReviewer(revision) {
     if (!revision.reviewers || !Array.isArray(revision.reviewers) || revision.reviewers.length === 0) {
         return null;
     }
 
-    // البحث عن أول مراجع pending أو in_progress
     const currentReviewer = revision.reviewers.find(r => r.status === 'pending' || r.status === 'in_progress');
     return currentReviewer || null;
 }
-
-/**
- * Helper: التحقق إذا كان المستخدم هو المراجع الحالي
- */
+    
 function isCurrentReviewer(revision, userId) {
     const currentReviewer = getCurrentReviewer(revision);
     return currentReviewer && currentReviewer.reviewer_id == userId;
 }
 
-/**
- * Helper: الحصول على جميع المراجعين
- */
+
 function getAllReviewers(revision) {
-    // استخدام reviewers_with_data إذا متاح (يحتوي على بيانات المستخدمين)
     if (revision.reviewers_with_data && Array.isArray(revision.reviewers_with_data)) {
         return revision.reviewers_with_data;
     }
-    // fallback للـ reviewers العادي
     if (revision.reviewers && Array.isArray(revision.reviewers)) {
         return revision.reviewers;
     }
@@ -70,18 +53,15 @@ function getAllReviewers(revision) {
 }
 
 $(document).ready(function() {
-    // Initialize page
-    loadAllUsersForReviewers(); // جلب كل المستخدمين لعرض أسماء المراجعين
+    loadAllUsersForReviewers();
     loadStats();
     loadAllRevisions();
     loadProjectsList();
 
-    // Initialize Kanban Board
     if (typeof initializeRevisionsKanban === 'function') {
         initializeRevisionsKanban();
     }
 
-    // Tab change event
     $('#revisionTabs button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
         const target = $(e.target).attr('data-bs-target');
         if (target === '#my-revisions') {
@@ -92,13 +72,11 @@ $(document).ready(function() {
             loadAllRevisions();
         }
 
-        // Update Kanban if in Kanban view
         if (typeof updateKanbanOnTabChange === 'function') {
             updateKanbanOnTabChange();
         }
     });
 
-    // Search inputs
     $('#allSearchInput, #mySearchInput, #myCreatedSearchInput').on('keyup', debounce(function() {
         let tabType = 'all';
         if ($(this).attr('id').includes('myCreated')) {
@@ -109,16 +87,13 @@ $(document).ready(function() {
         applyFilters(tabType);
     }, 500));
 
-    // Keyboard shortcuts
     $(document).on('keydown', function(e) {
-        // Close sidebar with Escape key
         if (e.key === 'Escape' && $('#revisionSidebar').hasClass('active')) {
             closeSidebar();
         }
     });
 });
 
-// Load statistics
 function loadStats() {
     $.get('/revision-page/stats')
         .done(function(response) {
@@ -130,11 +105,9 @@ function loadStats() {
             toastr.error('حدث خطأ في تحميل الإحصائيات');
         });
 
-    // تحميل إحصائيات النقل
     loadTransferStats();
 }
 
-// Load transfer statistics for current user
 function loadTransferStats() {
     $.get('/task-revisions/user-transfer-stats')
         .done(function(response) {
@@ -147,7 +120,6 @@ function loadTransferStats() {
         });
 }
 
-// Render transfer statistics
 function renderTransferStats(stats) {
     const html = `
         <div class="col-12">
@@ -215,7 +187,6 @@ function renderTransferStats(stats) {
     $('#transferStatsContainer').html(html).show();
 }
 
-// Load all revisions
 function loadAllRevisions(page = 1, filters = {}) {
     showLoading();
 
@@ -230,7 +201,6 @@ function loadAllRevisions(page = 1, filters = {}) {
                 renderRevisions(response.revisions, 'all');
                 $('#allRevisionsCount').text(response.revisions.total || 0);
 
-                // تهيئة التايمرات للتعديلات قيد التنفيذ
                 setTimeout(() => {
                     console.log('🚀 بدء تهيئة التايمرات بعد تحميل البيانات...');
                     initializeRevisionTimers();
@@ -245,7 +215,6 @@ function loadAllRevisions(page = 1, filters = {}) {
         });
 }
 
-// Load my revisions
 function loadMyRevisions(page = 1, filters = {}) {
     showLoading();
 
@@ -260,7 +229,6 @@ function loadMyRevisions(page = 1, filters = {}) {
                 renderRevisions(response.revisions, 'my');
                 $('#myRevisionsCount').text(response.revisions.total || 0);
 
-                // تهيئة التايمرات للتعديلات قيد التنفيذ
                 setTimeout(() => {
                     console.log('🚀 بدء تهيئة التايمرات بعد تحميل البيانات...');
                     initializeRevisionTimers();
@@ -275,7 +243,6 @@ function loadMyRevisions(page = 1, filters = {}) {
         });
 }
 
-// Load my created revisions
 function loadMyCreatedRevisions(page = 1, filters = {}) {
     showLoading();
 
@@ -290,7 +257,6 @@ function loadMyCreatedRevisions(page = 1, filters = {}) {
                 renderRevisions(response.revisions, 'myCreated');
                 $('#myCreatedRevisionsCount').text(response.revisions.total || 0);
 
-                // تهيئة التايمرات للتعديلات قيد التنفيذ
                 setTimeout(() => {
                     console.log('🚀 بدء تهيئة التايمرات بعد تحميل البيانات...');
                     initializeRevisionTimers();
@@ -305,7 +271,6 @@ function loadMyCreatedRevisions(page = 1, filters = {}) {
         });
 }
 
-// Render statistics
 function renderStats(stats) {
     const html = `
         <div class="col-md-4 mb-4">
@@ -320,20 +285,26 @@ function renderStats(stats) {
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.general.pending}</div>
+                            <div class="stats-number">${stats.general.new || 0}</div>
                             <div>في الانتظار</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.general.approved}</div>
-                            <div>موافق عليها</div>
+                            <div class="stats-number">${stats.general.in_progress || 0}</div>
+                            <div>جاري العمل</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.general.rejected}</div>
-                            <div>مرفوضة</div>
+                            <div class="stats-number">${stats.general.paused || 0}</div>
+                            <div>متوقفة</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stats-item">
+                            <div class="stats-number">${stats.general.completed || 0}</div>
+                            <div>مكتملة</div>
                         </div>
                     </div>
                 </div>
@@ -351,20 +322,26 @@ function renderStats(stats) {
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.pending}</div>
+                            <div class="stats-number">${stats.my_assigned_revisions.new || 0}</div>
                             <div>في الانتظار</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.approved}</div>
-                            <div>موافق عليها</div>
+                            <div class="stats-number">${stats.my_assigned_revisions.in_progress || 0}</div>
+                            <div>جاري العمل</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.rejected}</div>
-                            <div>مرفوضة</div>
+                            <div class="stats-number">${stats.my_assigned_revisions.paused || 0}</div>
+                            <div>متوقفة</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stats-item">
+                            <div class="stats-number">${stats.my_assigned_revisions.completed || 0}</div>
+                            <div>مكتملة</div>
                         </div>
                     </div>
                 </div>
@@ -382,20 +359,26 @@ function renderStats(stats) {
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.my_created_revisions.pending}</div>
+                            <div class="stats-number">${stats.my_created_revisions.new || 0}</div>
                             <div>في الانتظار</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.my_created_revisions.approved}</div>
-                            <div>موافق عليها</div>
+                            <div class="stats-number">${stats.my_created_revisions.in_progress || 0}</div>
+                            <div>جاري العمل</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="stats-item">
-                            <div class="stats-number">${stats.my_created_revisions.rejected}</div>
-                            <div>مرفوضة</div>
+                            <div class="stats-number">${stats.my_created_revisions.paused || 0}</div>
+                            <div>متوقفة</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stats-item">
+                            <div class="stats-number">${stats.my_created_revisions.completed || 0}</div>
+                            <div>مكتملة</div>
                         </div>
                     </div>
                 </div>
@@ -406,7 +389,193 @@ function renderStats(stats) {
     $('#statsContainer').html(html);
 }
 
-// Render revisions
+function groupProjectsByStatus(revisions) {
+    const projectsMap = {};
+
+    revisions.forEach(revision => {
+        if (!revision.project) return;
+
+        const projectId = revision.project.id;
+        const projectCode = revision.project.code || revision.project.name;
+        const projectName = revision.project.name;
+
+        if (!projectsMap[projectId]) {
+            projectsMap[projectId] = {
+                id: projectId,
+                code: projectCode,
+                name: projectName,
+                revisions: [],
+                statuses: new Set()
+            };
+        }
+
+        projectsMap[projectId].revisions.push(revision);
+        projectsMap[projectId].statuses.add(revision.status);
+    });
+
+    const projects = Object.values(projectsMap);
+    const grouped = {
+        all: projects,
+        new: [],
+        in_progress: [],
+        paused: [],
+        completed: []
+    };
+
+    projects.forEach(project => {
+        if (project.statuses.has('new')) grouped.new.push(project);
+        if (project.statuses.has('in_progress')) grouped.in_progress.push(project);
+        if (project.statuses.has('paused')) grouped.paused.push(project);
+        if (project.statuses.has('completed')) grouped.completed.push(project);
+    });
+
+    return grouped;
+}
+
+function renderProjectsByStatusTabs(projectsByStatus) {
+    const statusConfig = {
+        all: { label: 'الكل', icon: 'fa-list', color: '#667eea', count: projectsByStatus.all.length },
+        new: { label: 'جديد', icon: 'fa-plus-circle', color: '#6c757d', count: projectsByStatus.new.length },
+        in_progress: { label: 'جاري العمل', icon: 'fa-spinner', color: '#0d6efd', count: projectsByStatus.in_progress.length },
+        paused: { label: 'متوقف', icon: 'fa-pause-circle', color: '#ffc107', count: projectsByStatus.paused.length },
+        completed: { label: 'مكتمل', icon: 'fa-check-circle', color: '#198754', count: projectsByStatus.completed.length }
+    };
+
+    let tabsRow = '<tr class="projects-filter-tabs-row">';
+    tabsRow += '<td colspan="8" style="padding: 0; background: #f8f9fa; border-bottom: 2px solid #e9ecef;">';
+    tabsRow += '<div class="d-flex gap-2 p-3" id="projectsStatusTabs">';
+
+    Object.keys(statusConfig).forEach((status, index) => {
+        const config = statusConfig[status];
+        const activeClass = index === 0 ? 'active' : '';
+
+        tabsRow += `
+            <button class="btn projects-tab-btn ${activeClass}"
+                    id="projects-${status}-tab"
+                    data-status="${status}"
+                    onclick="filterProjectsByStatus('${status}')"
+                    style="flex: 1; border-radius: 8px; padding: 10px 15px; border: 2px solid transparent; transition: all 0.3s ease;">
+                <i class="fas ${config.icon} me-2"></i>
+                ${config.label}
+                <span class="badge ms-2" style="background-color: ${config.color}15; color: ${config.color}; border: 1px solid ${config.color}40;">
+                    ${config.count}
+                </span>
+            </button>
+        `;
+    });
+
+    tabsRow += '</div></td></tr>';
+
+    let tableHtml = `
+        <div class="projects-table-wrapper mb-4">
+            <div class="revisions-table">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 projects-status-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">كود المشروع</th>
+                                <th style="width: 20%;">اسم المشروع</th>
+                                <th style="width: 10%;">إجمالي التعديلات</th>
+                                <th style="width: 12%;">جديد</th>
+                                <th style="width: 12%;">جاري العمل</th>
+                                <th style="width: 12%;">متوقف</th>
+                                <th style="width: 12%;">مكتمل</th>
+                                <th style="width: 7%;">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tabsRow}
+    `;
+
+    Object.keys(statusConfig).forEach((status, index) => {
+        const config = statusConfig[status];
+        const projects = projectsByStatus[status];
+        const activeClass = index === 0 ? '' : 'd-none';
+
+        if (projects.length === 0) {
+            tableHtml += `
+                <tr class="projects-rows-${status} ${activeClass}">
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="fas fa-folder-open fa-2x mb-2 d-block"></i>
+                        لا توجد مشاريع بهذه الحالة
+                    </td>
+                </tr>
+            `;
+        } else {
+            projects.forEach(project => {
+                const statusCounts = {
+                    new: 0,
+                    in_progress: 0,
+                    paused: 0,
+                    completed: 0
+                };
+
+                project.revisions.forEach(rev => {
+                    if (statusCounts.hasOwnProperty(rev.status)) {
+                        statusCounts[rev.status]++;
+                    }
+                });
+
+                tableHtml += `
+                    <tr class="projects-rows-${status} ${activeClass}"
+                        onclick="filterRevisionsByProject(${project.id}, '${project.code}')"
+                        style="cursor: pointer; transition: all 0.3s ease;">
+                        <td>
+                            <strong style="color: ${config.color};">
+                                <i class="fas fa-project-diagram me-1"></i>
+                                ${project.code}
+                            </strong>
+                        </td>
+                        <td>${project.name}</td>
+                        <td>
+                            <span class="badge" style="background-color: ${config.color}15; color: ${config.color};">
+                                ${project.revisions.length} تعديل
+                            </span>
+                        </td>
+                        <td>
+                            ${statusCounts.new > 0 ? `
+                                <span class="badge status-new">${statusCounts.new}</span>
+                            ` : '<small class="text-muted">-</small>'}
+                        </td>
+                        <td>
+                            ${statusCounts.in_progress > 0 ? `
+                                <span class="badge status-in_progress">${statusCounts.in_progress}</span>
+                            ` : '<small class="text-muted">-</small>'}
+                        </td>
+                        <td>
+                            ${statusCounts.paused > 0 ? `
+                                <span class="badge status-paused">${statusCounts.paused}</span>
+                            ` : '<small class="text-muted">-</small>'}
+                        </td>
+                        <td>
+                            ${statusCounts.completed > 0 ? `
+                                <span class="badge status-completed">${statusCounts.completed}</span>
+                            ` : '<small class="text-muted">-</small>'}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary"
+                                    onclick="event.stopPropagation(); filterRevisionsByProject(${project.id}, '${project.code}')"
+                                    title="عرض التعديلات">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+    });
+
+    tableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+
+    return tableHtml;
+}
+
 function renderRevisions(data, type) {
     let container, paginationContainer;
 
@@ -433,20 +602,35 @@ function renderRevisions(data, type) {
         return;
     }
 
-    // فصل التعديلات حسب النوع
     const projectRevisions = data.data.filter(r => r.revision_type === 'project');
     const taskRevisions = data.data.filter(r => r.revision_type === 'task');
 
     let html = '';
 
-    // ✅ جدول تعديلات المشاريع
     if (projectRevisions.length > 0) {
+        const projectsByStatus = groupProjectsByStatus(projectRevisions);
+
         html += `
             <div class="mb-4">
-                <h5 class="mb-3" style="color: #667eea; font-weight: 600;">
-                    <i class="fas fa-project-diagram me-2"></i>
-                    تعديلات المشاريع (${projectRevisions.length})
-                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0" style="color: #667eea; font-weight: 600;">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        تعديلات المشاريع (${projectRevisions.length})
+                    </h5>
+                    <button class="btn btn-sm btn-outline-primary"
+                            onclick="toggleProjectsTable()"
+                            id="toggleProjectsBtn"
+                            title="عرض/إخفاء جدول المشاريع">
+                        <i class="fas fa-table me-1"></i>
+                        المشاريع
+                        <i class="fas fa-chevron-down ms-1" id="toggleProjectsIcon"></i>
+                    </button>
+                </div>
+
+                <div id="projectsTableContainer" style="display: none;">
+                    ${renderProjectsByStatusTabs(projectsByStatus)}
+                </div>
+
                 <div class="revisions-table">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
@@ -606,6 +790,12 @@ function renderRevisionRow(revision) {
                 <div class="fw-bold text-truncate" style="max-width: 200px;" title="${revision.title}">
                     ${revision.title}
                 </div>
+                ${revision.project && revision.project.code ? `
+                    <small class="text-primary d-block text-truncate" style="max-width: 200px; font-weight: 500;" title="${revision.project.code}">
+                        <i class="fas fa-project-diagram me-1"></i>
+                        ${revision.project.code}
+                    </small>
+                ` : ''}
                 <small class="text-muted d-block text-truncate" style="max-width: 200px;" title="${revision.description}">
                     ${revision.description}
                 </small>
@@ -793,6 +983,12 @@ function renderTaskRevisionRow(revision) {
                 <div class="fw-bold text-truncate" style="max-width: 200px;" title="${revision.title}">
                     ${revision.title}
                 </div>
+                ${revision.project && revision.project.code ? `
+                    <small class="text-primary d-block text-truncate" style="max-width: 200px; font-weight: 500;" title="${revision.project.code}">
+                        <i class="fas fa-project-diagram me-1"></i>
+                        ${revision.project.code}
+                    </small>
+                ` : ''}
                 <small class="text-muted d-block text-truncate" style="max-width: 200px;" title="${revision.description}">
                     ${revision.description}
                 </small>
@@ -1064,7 +1260,6 @@ function hideLoading() {
 
 function getStatusText(status) {
     const statuses = {
-        // Work statuses
         'new': 'جديد',
         'in_progress': 'جاري العمل',
         'paused': 'متوقف',
@@ -1080,7 +1275,8 @@ function getStatusText(status) {
 function getSourceText(source) {
     const sources = {
         'internal': 'داخلي',
-        'external': 'خارجي'
+        'external': 'خارجي',
+        'canceled': 'ملغي'
     };
     return sources[source] || 'غير محدد';
 }
@@ -1088,7 +1284,8 @@ function getSourceText(source) {
 function getSourceIcon(source) {
     const icons = {
         'internal': 'fas fa-users',
-        'external': 'fas fa-external-link-alt'
+        'external': 'fas fa-external-link-alt',
+        'canceled': 'fas fa-times'
     };
     return icons[source] || 'fas fa-question';
 }
@@ -1102,6 +1299,7 @@ function getAttachmentIcon(type) {
     if (lowerType.includes('word') || lowerType.includes('document')) return 'fas fa-file-word';
     if (lowerType.includes('excel') || lowerType.includes('spreadsheet')) return 'fas fa-file-excel';
     if (lowerType.includes('zip') || lowerType.includes('rar')) return 'fas fa-file-archive';
+    if (lowerType.includes('canceled')) return 'fas fa-times';
     return 'fas fa-file';
 }
 
@@ -1169,6 +1367,11 @@ function showRevisionDetails(revisionId) {
     $.get(`/revision-page/revision/${revisionId}`)
         .done(function(response) {
             if (response.success) {
+                console.log('📅 Revision deadline:', {
+                    revision_deadline: response.revision.revision_deadline,
+                    revisionDeadline: response.revision.revisionDeadline,
+                    hasDeadline: !!(response.revision.revision_deadline || response.revision.revisionDeadline)
+                });
                 renderSidebarContent(response.revision);
             } else {
                 $('#sidebarContent').html(`
@@ -1222,6 +1425,104 @@ function renderSidebarContent(revision) {
             ${revision.actual_minutes ? `
                 <p><strong>الوقت المستغرق:</strong> ${formatRevisionTimeInMinutes(revision.actual_minutes)}</p>
             ` : ''}
+            ${(() => {
+                const revisionDeadline = revision.revision_deadline || revision.revisionDeadline;
+                if (revisionDeadline) {
+                    const deadlineDate = new Date(revisionDeadline);
+                    const now = new Date();
+                    const diffMs = deadlineDate - now;
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffDays = Math.floor(diffHours / 24);
+
+                    let deadlineColor = '#10b981';
+                    let deadlineIcon = 'fa-calendar-check';
+                    let deadlineText = '';
+                    let deadlineBg = '#f0fdf4';
+                    let deadlineBorder = '#10b981';
+
+                    if (diffMs < 0) {
+                        deadlineColor = '#ef4444';
+                        deadlineIcon = 'fa-exclamation-triangle';
+                        deadlineText = `⚠️ التعديل متأخر بـ ${Math.abs(diffDays)} يوم`;
+                        deadlineBg = '#fef2f2';
+                        deadlineBorder = '#ef4444';
+                    } else if (diffHours < 24) {
+                        deadlineColor = '#f59e0b';
+                        deadlineIcon = 'fa-hourglass-half';
+                        deadlineText = `⏰ متبقي ${diffHours} ساعة فقط`;
+                        deadlineBg = '#fffbeb';
+                        deadlineBorder = '#f59e0b';
+                    } else if (diffDays <= 3) {
+                        deadlineColor = '#f59e0b';
+                        deadlineIcon = 'fa-calendar-times';
+                        deadlineText = `⏰ متبقي ${diffDays} يوم`;
+                        deadlineBg = '#fffbeb';
+                        deadlineBorder = '#f59e0b';
+                    } else {
+                        deadlineText = `متبقي ${diffDays} يوم`;
+                    }
+
+                    let deadlineFormatted;
+                    try {
+                        deadlineFormatted = deadlineDate.toLocaleDateString('ar-EG', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    } catch (e) {
+                        const year = deadlineDate.getFullYear();
+                        const month = deadlineDate.getMonth() + 1;
+                        const day = deadlineDate.getDate();
+                        const hours = deadlineDate.getHours().toString().padStart(2, '0');
+                        const minutes = deadlineDate.getMinutes().toString().padStart(2, '0');
+                        deadlineFormatted = `${day}/${month}/${year} ${hours}:${minutes}`;
+                    }
+
+                    return `
+                    <div style="margin-top: 1rem; padding: 1rem; background: ${deadlineBg}; border: 3px solid ${deadlineBorder}; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
+                            <i class="fas ${deadlineIcon}" style="color: ${deadlineColor}; font-size: 1.4rem;"></i>
+                            <strong style="color: ${deadlineColor}; font-size: 1.1rem; font-weight: 700;">⏰ ديدلاين التعديل:</strong>
+                        </div>
+                        <div style="padding: 0.8rem; background: white; border-radius: 8px; margin-bottom: 0.6rem; border: 2px solid ${deadlineBorder}20;">
+                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                <i class="fas fa-calendar-alt" style="color: ${deadlineColor}; font-size: 1rem;"></i>
+                                <strong style="color: #1e293b; font-size: 1.05rem; font-weight: 600;">${deadlineFormatted}</strong>
+                            </div>
+                        </div>
+                        ${deadlineText ? `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem; background: ${deadlineBg}; border: 2px solid ${deadlineBorder}; border-radius: 6px;">
+                            <i class="fas ${deadlineIcon}" style="color: ${deadlineColor}; font-size: 1rem;"></i>
+                            <span style="color: ${deadlineColor}; font-size: 0.95rem; font-weight: 700;">
+                                ${deadlineText}
+                            </span>
+                        </div>
+                        ` : `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem; background: ${deadlineBg}; border: 2px solid ${deadlineBorder}; border-radius: 6px;">
+                            <i class="fas fa-check-circle" style="color: ${deadlineColor}; font-size: 1rem;"></i>
+                            <span style="color: ${deadlineColor}; font-size: 0.95rem; font-weight: 600;">
+                                في الموعد
+                            </span>
+                        </div>
+                        `}
+                    </div>
+                    `;
+                }
+                return `
+                <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 10px;">
+                    <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-info-circle" style="color: #6c757d; font-size: 1.2rem;"></i>
+                        <strong style="color: #6c757d; font-size: 1rem;">ديدلاين التعديل:</strong>
+                    </div>
+                    <p style="color: #6c757d; margin: 0; font-size: 0.9rem;">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        لم يتم تحديد ديدلاين للتعديل. يمكنك إضافته عند التعديل.
+                    </p>
+                </div>
+                `;
+            })()}
         </div>
 
         ${isCreator ? `
@@ -1324,6 +1625,72 @@ function renderSidebarContent(revision) {
                     <div style="padding: 0.4rem 0.6rem; background: white; border-radius: 6px; margin-bottom: 0.5rem;">
                         <strong style="color: #1e293b; font-size: 1rem;">${revision.executor_user.name}</strong>
                     </div>
+                    ${(() => {
+                        const executorDeadline = revision.executor_deadline ||
+                            (revision.deadlines && revision.deadlines.find(d => d.deadline_type === 'executor'));
+
+                        if (executorDeadline) {
+                            const deadlineDate = new Date(executorDeadline.deadline_date || executorDeadline);
+                            const now = new Date();
+                            const diffMs = deadlineDate - now;
+                            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                            const diffDays = Math.floor(diffHours / 24);
+
+                            let deadlineColor = '#10b981';
+                            let deadlineIcon = 'fa-clock';
+                            let deadlineText = '';
+                            let deadlineBg = '#f0fdf4';
+                            let deadlineBorder = '#10b981';
+
+                            if (diffMs < 0) {
+                                deadlineColor = '#ef4444';
+                                deadlineIcon = 'fa-exclamation-triangle';
+                                deadlineText = `فات الموعد بـ ${Math.abs(diffDays)} يوم`;
+                                deadlineBg = '#fef2f2';
+                                deadlineBorder = '#ef4444';
+                            } else if (diffHours < 24) {
+                                deadlineColor = '#f59e0b';
+                                deadlineIcon = 'fa-hourglass-half';
+                                deadlineText = `متبقي ${diffHours} ساعة`;
+                                deadlineBg = '#fffbeb';
+                                deadlineBorder = '#f59e0b';
+                            } else if (diffDays <= 3) {
+                                deadlineColor = '#f59e0b';
+                                deadlineIcon = 'fa-clock';
+                                deadlineText = `متبقي ${diffDays} يوم`;
+                                deadlineBg = '#fffbeb';
+                                deadlineBorder = '#f59e0b';
+                            } else {
+                                deadlineText = `متبقي ${diffDays} يوم`;
+                            }
+
+                            const deadlineFormatted = deadlineDate.toLocaleDateString('ar-EG', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+
+                            return `
+                            <div style="margin-bottom: 0.5rem; padding: 0.5rem; background: ${deadlineBg}; border: 2px solid ${deadlineBorder}; border-radius: 6px;">
+                                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem;">
+                                    <i class="fas ${deadlineIcon}" style="color: ${deadlineColor}; font-size: 0.9rem;"></i>
+                                    <span style="color: #1e293b; font-size: 0.85rem; font-weight: 600;">⏰ الديدلاين:</span>
+                                    <span style="color: ${deadlineColor}; font-size: 0.85rem; font-weight: 700;">${deadlineFormatted}</span>
+                                </div>
+                                ${deadlineText ? `
+                                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                    <span style="color: ${deadlineColor}; font-size: 0.75rem; font-weight: 600;">
+                                        <i class="fas fa-info-circle me-1"></i>${deadlineText}
+                                    </span>
+                                </div>
+                                ` : ''}
+                            </div>
+                            `;
+                        }
+                        return '';
+                    })()}
                     <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem; background: ${getExecutorStatusBg(revision.status)}; border: 2px solid ${getExecutorBorderColor(revision.status)}; border-radius: 6px;">
                         <i class="fas ${getExecutorStatusIcon(revision.status)}" style="color: ${getExecutorBorderColor(revision.status)}; font-size: 1.1rem;"></i>
                         <strong style="color: ${getExecutorBorderColor(revision.status)}; font-size: 0.95rem;">${getExecutorStatusText(revision.status)}</strong>
@@ -1336,8 +1703,7 @@ function renderSidebarContent(revision) {
                 if (!reviewers || reviewers.length === 0) return '';
 
                 const reviewersHtml = reviewers.map((reviewer, index) => {
-                    // استخدام reviewer.user إذا متاح، أو البحث في window.allUsers
-                    const reviewerName = reviewer.user ? reviewer.user.name :
+                        const reviewerName = reviewer.user ? reviewer.user.name :
                         (window.allUsers?.find(u => u.id == reviewer.reviewer_id)?.name || ('مراجع ' + reviewer.order));
                     const isCurrent = reviewer.status === 'in_progress' || reviewer.status === 'pending';
                     const isCompleted = reviewer.status === 'completed';
@@ -1383,10 +1749,77 @@ function renderSidebarContent(revision) {
                                     </button>
                                 ` : ''}
                             </div>
-                            <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem; background: ${statusBg}; border: 1px solid ${statusBorder}; border-radius: 4px;">
+                            <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem; background: ${statusBg}; border: 1px solid ${statusBorder}; border-radius: 4px; margin-bottom: 0.4rem;">
                                 <i class="fas ${statusIcon}" style="color: ${statusColor}; font-size: 0.9rem;"></i>
                                 <span style="color: ${statusColor}; font-size: 0.85rem; font-weight: 600;">${statusText}</span>
                             </div>
+                            ${(() => {
+                                const reviewerDeadline = revision.deadlines && revision.deadlines.find(d =>
+                                    d.deadline_type === 'reviewer' && d.reviewer_order === reviewer.order
+                                );
+
+                                if (reviewerDeadline) {
+                                    const deadlineDate = new Date(reviewerDeadline.deadline_date);
+                                    const now = new Date();
+                                    const diffMs = deadlineDate - now;
+                                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                    const diffDays = Math.floor(diffHours / 24);
+
+                                    let deadlineColor = '#10b981';
+                                    let deadlineIcon = 'fa-clock';
+                                    let deadlineText = '';
+                                    let deadlineBg = '#f0fdf4';
+                                    let deadlineBorder = '#10b981';
+
+                                    if (diffMs < 0) {
+                                        deadlineColor = '#ef4444';
+                                        deadlineIcon = 'fa-exclamation-triangle';
+                                        deadlineText = `فات الموعد بـ ${Math.abs(diffDays)} يوم`;
+                                        deadlineBg = '#fef2f2';
+                                        deadlineBorder = '#ef4444';
+                                    } else if (diffHours < 24) {
+                                        deadlineColor = '#f59e0b';
+                                        deadlineIcon = 'fa-hourglass-half';
+                                        deadlineText = `متبقي ${diffHours} ساعة`;
+                                        deadlineBg = '#fffbeb';
+                                        deadlineBorder = '#f59e0b';
+                                    } else if (diffDays <= 3) {
+                                        deadlineColor = '#f59e0b';
+                                        deadlineIcon = 'fa-clock';
+                                        deadlineText = `متبقي ${diffDays} يوم`;
+                                        deadlineBg = '#fffbeb';
+                                        deadlineBorder = '#f59e0b';
+                                    } else {
+                                        deadlineText = `متبقي ${diffDays} يوم`;
+                                    }
+
+                                    const deadlineFormatted = deadlineDate.toLocaleDateString('ar-EG', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+
+                                    return `
+                                    <div style="padding: 0.4rem; background: ${deadlineBg}; border: 1px solid ${deadlineBorder}; border-radius: 4px;">
+                                        <div style="display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.2rem;">
+                                            <i class="fas ${deadlineIcon}" style="color: ${deadlineColor}; font-size: 0.75rem;"></i>
+                                            <span style="color: #1e293b; font-size: 0.75rem; font-weight: 600;">⏰ الديدلاين:</span>
+                                            <span style="color: ${deadlineColor}; font-size: 0.75rem; font-weight: 700;">${deadlineFormatted}</span>
+                                        </div>
+                                        ${deadlineText ? `
+                                        <div style="display: flex; align-items: center; gap: 0.2rem;">
+                                            <span style="color: ${deadlineColor}; font-size: 0.7rem; font-weight: 600;">
+                                                <i class="fas fa-info-circle me-1"></i>${deadlineText}
+                                            </span>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                    `;
+                                }
+                                return '';
+                            })()}
                         </div>
                     </div>`;
                 }).join('');
@@ -1755,5 +2188,64 @@ async function loadTransferHistory(revisionId) {
         console.error('Error loading transfer history:', error);
         $(contentId).html('<p class="text-danger text-center mb-0"><small>حدث خطأ في الاتصال بالخادم</small></p>');
     }
+}
+
+function filterProjectsByStatus(status) {
+
+    $('.projects-status-table tbody tr').not('.projects-filter-tabs-row').addClass('d-none');
+
+
+    $(`.projects-rows-${status}`).removeClass('d-none');
+
+
+    $('#projectsStatusTabs .projects-tab-btn').removeClass('active');
+    $(`#projects-${status}-tab`).addClass('active');
+}
+
+function toggleProjectsTable() {
+    const container = $('#projectsTableContainer');
+    const icon = $('#toggleProjectsIcon');
+
+    if (container.is(':visible')) {
+        container.slideUp(300);
+        icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    } else {
+        container.slideDown(300);
+        icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    }
+}
+
+function filterRevisionsByProject(projectId, projectCode) {
+    const activeTab = $('#revisionTabs .nav-link.active').attr('id');
+    let tabType = 'all';
+
+    if (activeTab && activeTab.includes('my')) {
+        tabType = 'my';
+    } else if (activeTab && activeTab.includes('created')) {
+        tabType = 'myCreated';
+    }
+
+
+    let projectFilterInput;
+    if (tabType === 'all') {
+        projectFilterInput = $('#allProjectCodeFilter');
+    } else if (tabType === 'my') {
+        projectFilterInput = $('#myProjectCodeFilter');
+    } else if (tabType === 'myCreated') {
+        projectFilterInput = $('#myCreatedProjectCodeFilter');
+    }
+
+
+    if (projectFilterInput) {
+        projectFilterInput.val(projectCode);
+
+        setTimeout(() => {
+            applyFilters(tabType);
+        }, 100);
+    }
+
+
+    $('#projectsTableContainer').slideUp(300);
+    $('#toggleProjectsIcon').removeClass('fa-chevron-up').addClass('fa-chevron-down');
 }
 

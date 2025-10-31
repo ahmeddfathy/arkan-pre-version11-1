@@ -1,20 +1,17 @@
-// ====================================
-// 🎯 Revisions Kanban Board
-// ====================================
 
 let currentRevisionsView = 'table';
 
-// تهيئة نظام الكانبان
+
 function initializeRevisionsKanban() {
     console.log('🚀 Initializing Revisions Kanban Board...');
 
-    // استعادة تفضيل العرض المحفوظ
+
     const savedView = localStorage.getItem('revisionsViewPreference');
     if (savedView === 'kanban') {
         switchToKanbanView();
     }
 
-    // إضافة event listeners لأزرار التبديل
+
     $('#tableViewBtn').on('click', function() {
         switchToTableView();
     });
@@ -26,7 +23,7 @@ function initializeRevisionsKanban() {
     console.log('✅ Revisions Kanban Board initialized successfully');
 }
 
-// التبديل إلى عرض الجدول
+
 function switchToTableView() {
     currentRevisionsView = 'table';
 
@@ -40,7 +37,7 @@ function switchToTableView() {
     console.log('📊 Switched to table view');
 }
 
-// التبديل إلى عرض الكانبان
+
 function switchToKanbanView() {
     currentRevisionsView = 'kanban';
 
@@ -51,7 +48,6 @@ function switchToKanbanView() {
 
     localStorage.setItem('revisionsViewPreference', 'kanban');
 
-    // تحميل البيانات في الكانبان
     setTimeout(() => {
         loadRevisionsIntoKanban();
     }, 100);
@@ -59,11 +55,9 @@ function switchToKanbanView() {
     console.log('🎯 Switched to kanban view');
 }
 
-// تحميل التعديلات في الكانبان
 function loadRevisionsIntoKanban() {
     console.log('📋 Loading revisions into kanban...');
 
-    // الحصول على التبويب النشط
     const activeTab = $('#revisionTabs .nav-link.active').attr('data-bs-target');
     let endpoint = '/revision-page/all-revisions';
 
@@ -73,7 +67,6 @@ function loadRevisionsIntoKanban() {
         endpoint = '/revision-page/my-created-revisions';
     }
 
-    // إضافة الفلاتر الحالية
     const filters = getCurrentFilters();
     const queryString = $.param(filters);
     const fullEndpoint = queryString ? `${endpoint}?${queryString}` : endpoint;
@@ -92,7 +85,6 @@ function loadRevisionsIntoKanban() {
         });
 }
 
-// الحصول على الفلاتر الحالية
 function getCurrentFilters() {
     return {
         revision_type: $('#revisionTypeFilter').val(),
@@ -103,13 +95,11 @@ function getCurrentFilters() {
     };
 }
 
-// رسم لوحة الكانبان
 function renderKanbanBoard(revisions) {
     console.log('🎨 Rendering kanban board with', revisions.length, 'revisions');
 
     const currentUserId = typeof AUTH_USER_ID !== 'undefined' ? AUTH_USER_ID : '';
 
-    // تجميع التعديلات حسب حالة العمل للمستخدم الحالي
     const groupedRevisions = {
         new: [],
         in_progress: [],
@@ -118,41 +108,32 @@ function renderKanbanBoard(revisions) {
     };
 
     revisions.forEach(revision => {
-        // تحديد الحالة المناسبة للمستخدم الحالي
         let userStatus = 'new';
 
         const isExecutor = revision.executor_user_id == currentUserId || revision.assigned_to == currentUserId;
         const isReviewer = isCurrentReviewer ? isCurrentReviewer(revision, currentUserId) : false;
 
         if (isExecutor) {
-            // استخدام حالة التنفيذ
             userStatus = revision.status || 'new';
         } else if (isReviewer) {
-            // استخدام حالة المراجعة
             userStatus = revision.review_status || 'new';
         } else if (revision.responsible_user_id == currentUserId) {
-            // المسؤول يشوف الحالة المجمعة (لو حد متوقف = متوقف، لو الاتنين مكتملين = مكتمل)
             const executorStatus = revision.status || 'new';
             const reviewerStatus = revision.review_status || 'new';
 
-            // لو أي حد متوقف، الحالة تبقى متوقف
             if (executorStatus === 'paused' || reviewerStatus === 'paused') {
                 userStatus = 'paused';
             }
-            // لو أي حد شغال، الحالة تبقى جاري العمل
             else if (executorStatus === 'in_progress' || reviewerStatus === 'in_progress') {
                 userStatus = 'in_progress';
             }
-            // لو الاتنين مكتملين، الحالة تبقى مكتمل
             else if (executorStatus === 'completed' && reviewerStatus === 'completed') {
                 userStatus = 'completed';
             }
-            // لو أي حد لسه ما بداش، الحالة تبقى جديد
             else {
                 userStatus = 'new';
             }
         } else {
-            // باقي المستخدمين يشوفوا الحالة المجمعة
             const executorStatus = revision.status || 'new';
             const reviewerStatus = revision.review_status || 'new';
 
@@ -172,27 +153,22 @@ function renderKanbanBoard(revisions) {
         }
     });
 
-    // رسم كل عمود
     renderKanbanColumn('new', groupedRevisions.new);
     renderKanbanColumn('in_progress', groupedRevisions.in_progress);
     renderKanbanColumn('paused', groupedRevisions.paused);
     renderKanbanColumn('completed', groupedRevisions.completed);
 
-    // تهيئة التايمرات
     setTimeout(() => {
         initializeKanbanTimers();
     }, 100);
 }
 
-// رسم عمود في الكانبان
 function renderKanbanColumn(status, revisions) {
     const columnSelector = `#kanban-column-${status} .kanban-column-cards`;
     const countSelector = `#kanban-column-${status} .kanban-column-count`;
 
-    // تحديث العدد
     $(countSelector).text(revisions.length);
 
-    // رسم البطاقات
     if (revisions.length === 0) {
         $(columnSelector).html(`
             <div class="kanban-empty-state">
@@ -207,13 +183,11 @@ function renderKanbanColumn(status, revisions) {
     $(columnSelector).html(cardsHtml);
 }
 
-// إنشاء بطاقة تعديل في الكانبان
 function createRevisionKanbanCard(revision) {
     const currentUserId = typeof AUTH_USER_ID !== 'undefined' ? AUTH_USER_ID : '';
     const isExecutor = revision.executor_user_id == currentUserId || revision.assigned_to == currentUserId;
     const isReviewer = revision.assigned_reviewer_id == currentUserId;
 
-    // تحديد نوع العمل للمستخدم الحالي
     let workType = '';
     let workStatus = 'new';
     if (isExecutor) {
@@ -224,7 +198,6 @@ function createRevisionKanbanCard(revision) {
         workStatus = revision.review_status || 'new';
     }
 
-    // أيقونة المصدر
     const sourceIcons = {
         'internal': 'fa-building',
         'client': 'fa-user',
@@ -233,7 +206,6 @@ function createRevisionKanbanCard(revision) {
 
     const sourceIcon = sourceIcons[revision.revision_source] || 'fa-question';
 
-    // التايمرات
     let timerHtml = '';
     if (workType === 'executor' && workStatus === 'in_progress') {
         const initialSeconds = calculateInitialRevisionTime(revision);
@@ -255,7 +227,6 @@ function createRevisionKanbanCard(revision) {
         `;
     }
 
-    // المستخدمين مع حالاتهم
     let usersHtml = '';
     if (revision.responsible_user) {
         usersHtml += `
@@ -269,7 +240,6 @@ function createRevisionKanbanCard(revision) {
         `;
     }
 
-    // المنفذ مع حالته
     if (revision.executor_user) {
         const executorStatus = revision.status || 'new';
         let executorStatusText = '';
@@ -314,7 +284,6 @@ function createRevisionKanbanCard(revision) {
         `;
     }
 
-    // المراجعين المتعددين
     const reviewers = (typeof getAllReviewers === 'function') ? getAllReviewers(revision) : [];
     if (reviewers && reviewers.length > 0) {
         reviewers.forEach((reviewer, index) => {
@@ -368,7 +337,6 @@ function createRevisionKanbanCard(revision) {
         });
     }
 
-    // الأزرار حسب نوع العمل
     let actionsHtml = '';
     if (workType === 'executor') {
         if (['new', 'in_progress', 'paused'].includes(workStatus)) {
@@ -392,7 +360,6 @@ function createRevisionKanbanCard(revision) {
         }
     }
 
-    // Badge نوع العمل
     let workTypeBadge = '';
     if (workType === 'executor') {
         workTypeBadge = `
@@ -461,11 +428,9 @@ function createRevisionKanbanCard(revision) {
     `;
 }
 
-// تهيئة التايمرات في الكانبان
 function initializeKanbanTimers() {
     console.log('⏱️ Initializing kanban timers...');
 
-    // تايمرات التنفيذ
     $('.revision-kanban-card[data-status="in_progress"]').each(function() {
         const revisionId = $(this).data('revision-id');
         if (revisionTimers[revisionId]) {
@@ -473,7 +438,6 @@ function initializeKanbanTimers() {
         }
     });
 
-    // تايمرات المراجعة
     $('.revision-kanban-card[data-review-status="in_progress"]').each(function() {
         const revisionId = $(this).data('revision-id');
         if (reviewTimers[revisionId]) {
@@ -482,14 +446,13 @@ function initializeKanbanTimers() {
     });
 }
 
-// بدء تايمر في الكانبان
 function startKanbanTimer(revisionId, type) {
     const timerId = type === 'review' ? `kanban-review-timer-${revisionId}` : `kanban-timer-${revisionId}`;
     const timers = type === 'review' ? reviewTimers : revisionTimers;
     const intervals = type === 'review' ? reviewTimerIntervals : revisionTimerIntervals;
 
     if (intervals[revisionId]) {
-        return; // التايمر يعمل بالفعل
+        return;
     }
 
     const intervalId = setInterval(() => {
@@ -511,21 +474,18 @@ function startKanbanTimer(revisionId, type) {
     intervals[revisionId] = intervalId;
 }
 
-// تحديث الكانبان عند تغيير التبويب
 function updateKanbanOnTabChange() {
     if (currentRevisionsView === 'kanban') {
         loadRevisionsIntoKanban();
     }
 }
 
-// تحديث الكانبان عند تطبيق الفلاتر
 function updateKanbanOnFilter() {
     if (currentRevisionsView === 'kanban') {
         loadRevisionsIntoKanban();
     }
 }
-
-// Export functions
+    
 window.initializeRevisionsKanban = initializeRevisionsKanban;
 window.switchToTableView = switchToTableView;
 window.switchToKanbanView = switchToKanbanView;

@@ -28,7 +28,7 @@ function toggleServices(button) {
 
 function loadServices(projectId, projectName, container) {
     currentProjectId = projectId; // Store for later use
-    
+
     // Show loading
     container.innerHTML = `
         <div class="services-loading">
@@ -160,7 +160,7 @@ function displayParticipantsList(participants) {
                         <span class="status-text">${statusText}</span>
                     </div>
                 </div>
-                
+
                 <!-- معلومات المهام -->
                 <div class="participant-tasks-info">
                     <div class="task-stat">
@@ -181,7 +181,7 @@ function displayParticipantsList(participants) {
                         </div>
                     ` : ''}
                 </div>
-                
+
                 ${participant.deadline ? `
                     <div class="participant-deadline-info">
                         <i class="fas fa-calendar-alt"></i>
@@ -1240,7 +1240,6 @@ function displayTaskRevisions(revisions) {
 
     revisions.forEach(revision => {
         const statusClass = getRevisionStatusClass(revision.status);
-        const approvalClass = getApprovalStatusClass(revision.approval_status);
 
         html += `
             <div class="revision-item">
@@ -1260,9 +1259,6 @@ function displayTaskRevisions(revisions) {
 
                 <div class="revision-badges">
                     <span class="revision-status-badge ${statusClass}">${revision.status_text}</span>
-                    ${revision.approval_status ? `
-                        <span class="revision-approval-badge ${approvalClass}">${revision.approval_status_text}</span>
-                    ` : ''}
                     ${revision.revision_source_text ? `
                         <span class="revision-source-badge">${revision.revision_source_text}</span>
                     ` : ''}
@@ -1308,15 +1304,6 @@ function getRevisionStatusClass(status) {
         case 'in_progress': return 'status-in-progress';
         case 'paused': return 'status-paused';
         case 'completed': return 'status-completed';
-        default: return '';
-    }
-}
-
-function getApprovalStatusClass(status) {
-    switch (status) {
-        case 'pending': return 'approval-pending';
-        case 'approved': return 'approval-approved';
-        case 'rejected': return 'approval-rejected';
         default: return '';
     }
 }

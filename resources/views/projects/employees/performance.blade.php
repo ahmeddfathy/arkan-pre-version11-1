@@ -27,12 +27,36 @@
 <link rel="stylesheet" href="{{ asset('css/project-dashboard/employees.css') }}">
 <link rel="stylesheet" href="{{ asset('css/project-dashboard/employee/performance.css') }}">
 <link rel="stylesheet" href="{{ asset('css/project-dashboard/revisions-modern.css') }}">
+<style>
+    /* Container Fluid Styling for Full Width */
+    .container-fluid {
+        width: 100%;
+        padding-right: 30px;
+        padding-left: 30px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    /* Responsive Padding */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+    }
+
+    /* Ensure Modern Dashboard Takes Full Width */
+    .modern-dashboard {
+        width: 100%;
+        max-width: 100%;
+    }
+</style>
 @endpush
 
 @section('content')
 <div class="modern-dashboard">
     <!-- Breadcrumb -->
-    <div class="container">
+    <div class="container-fluid">
         <nav class="breadcrumb">
             <a href="{{ route('company-projects.dashboard') }}" class="breadcrumb-item">لوحة التحكم</a>
             @if($employee->department)
@@ -44,7 +68,7 @@
 
     <!-- Employee Header -->
     <div class="employee-header">
-        <div class="container">
+        <div class="container-fluid">
             <div class="employee-info">
                                                 @php
                     $nameParts = explode(' ', trim($employee->name));
@@ -85,7 +109,7 @@
 
     <!-- Filters Section -->
     <div class="filters-section">
-        <div class="container">
+        <div class="container-fluid">
             <div class="filters-container">
                 <div class="filters-header">
                     <h3><i class="fas fa-filter"></i> فلتر البيانات</h3>
@@ -159,7 +183,7 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
         <!-- Filter Indicator -->
         @if(isset($periodDescription) && $periodDescription != 'جميع الفترات')
         <div class="section-modern">
@@ -323,6 +347,137 @@
             </div>
         </div>
 
+        <!-- Projects Status Overview Section -->
+        <div class="section-modern">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-project-diagram"></i>
+                    حالات المشاريع
+                </h2>
+            </div>
+
+            <div class="stats-grid">
+                <!-- جاري التنفيذ -->
+                <div class="stat-card-modern primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ number_format($projectStats['in_progress'] ?? 0, 1) }}</div>
+                        <div class="stat-label">جاري التنفيذ</div>
+                        <div class="stat-trend">
+                            {{ $projectStats['in_progress'] > 0 ? round(($projectStats['in_progress'] / max($projectStats['total'], 1)) * 100) : 0 }}% من الإجمالي
+                        </div>
+                    </div>
+                </div>
+
+                <!-- واقف على النموذج -->
+                <div class="stat-card-modern warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ number_format($projectStats['waiting_form'] ?? 0, 1) }}</div>
+                        <div class="stat-label">واقف على النموذج</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-hourglass-half"></i>
+                            في انتظار النموذج
+                        </div>
+                    </div>
+                </div>
+
+                <!-- واقف على الأسئلة -->
+                <div class="stat-card-modern info">
+                    <div class="stat-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ number_format($projectStats['waiting_questions'] ?? 0, 1) }}</div>
+                        <div class="stat-label">واقف على الأسئلة</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-hourglass-half"></i>
+                            في انتظار الإجابات
+                        </div>
+                    </div>
+                </div>
+
+                <!-- واقف على العميل -->
+                <div class="stat-card-modern warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ number_format($projectStats['waiting_client'] ?? 0, 1) }}</div>
+                        <div class="stat-label">واقف على العميل</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-hourglass-half"></i>
+                            في انتظار العميل
+                        </div>
+                    </div>
+                </div>
+
+                <!-- واقف على مكالمة -->
+                <div class="stat-card-modern info">
+                    <div class="stat-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ number_format($projectStats['waiting_call'] ?? 0, 1) }}</div>
+                        <div class="stat-label">واقف على مكالمة</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-hourglass-half"></i>
+                            في انتظار المكالمة
+                        </div>
+                    </div>
+                </div>
+
+                <!-- موقوف -->
+                <div class="stat-card-modern" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); border: none;">
+                    <div class="stat-icon" style="background: rgba(255, 255, 255, 0.25);">
+                        <i class="fas fa-pause-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">{{ number_format($projectStats['paused'] ?? 0, 1) }}</div>
+                        <div class="stat-label" style="color: rgba(255, 255, 255, 0.95);">موقوف</div>
+                        <div class="stat-trend" style="background: rgba(255, 255, 255, 0.2); color: white;">
+                            <i class="fas fa-pause"></i>
+                            مشاريع متوقفة
+                        </div>
+                    </div>
+                </div>
+
+                <!-- تسليم مسودة -->
+                <div class="stat-card-modern" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none;">
+                    <div class="stat-icon" style="background: rgba(255, 255, 255, 0.25);">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">{{ number_format($projectStats['draft_delivery'] ?? 0, 1) }}</div>
+                        <div class="stat-label" style="color: rgba(255, 255, 255, 0.95);">تسليم مسودة</div>
+                        <div class="stat-trend" style="background: rgba(255, 255, 255, 0.2); color: white;">
+                            <i class="fas fa-file"></i>
+                            مسودة مسلمة
+                        </div>
+                    </div>
+                </div>
+
+                <!-- تم تسليم نهائي -->
+                <div class="stat-card-modern" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border: none;">
+                    <div class="stat-icon" style="background: rgba(255, 255, 255, 0.25);">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">{{ number_format($projectStats['final_delivery'] ?? 0, 1) }}</div>
+                        <div class="stat-label" style="color: rgba(255, 255, 255, 0.95);">تم تسليم نهائي</div>
+                        <div class="stat-trend" style="background: rgba(255, 255, 255, 0.2); color: white;">
+                            <i class="fas fa-trophy"></i>
+                            {{ $projectStats['final_delivery'] > 0 ? round(($projectStats['final_delivery'] / max($projectStats['total'], 1)) * 100) : 0 }}% مكتمل
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Tasks Overview Section -->
         <div class="section-modern">
             <div class="section-header">
@@ -455,26 +610,42 @@
                             <canvas id="projectStatusChart"></canvas>
                         </div>
                         <div class="chart-legend">
-                            <div class="legend-item new">
-                                <span class="legend-color"></span>
-                                جديد: {{ $projectStats['new'] }}
-                            </div>
                             <div class="legend-item progress">
-                                <span class="legend-color"></span>
-                                قيد التنفيذ: {{ $projectStats['in_progress'] }}
+                                <span class="legend-color" style="background: #3498db;"></span>
+                                جاري: {{ number_format($projectStats['in_progress'] ?? 0, 1) }}
                             </div>
-                                                        <div class="legend-item completed">
-                                <span class="legend-color"></span>
+                            <div class="legend-item" style="color: #f39c12;">
+                                <span class="legend-color" style="background: #f39c12;"></span>
+                                واقف (نموذج): {{ number_format($projectStats['waiting_form'] ?? 0, 1) }}
+                            </div>
+                            <div class="legend-item" style="color: #3498db;">
+                                <span class="legend-color" style="background: #3498db;"></span>
+                                واقف (أسئلة): {{ number_format($projectStats['waiting_questions'] ?? 0, 1) }}
+                            </div>
+                            <div class="legend-item" style="color: #e67e22;">
+                                <span class="legend-color" style="background: #e67e22;"></span>
+                                واقف (عميل): {{ number_format($projectStats['waiting_client'] ?? 0, 1) }}
+                            </div>
+                            <div class="legend-item" style="color: #9b59b6;">
+                                <span class="legend-color" style="background: #9b59b6;"></span>
+                                واقف (مكالمة): {{ number_format($projectStats['waiting_call'] ?? 0, 1) }}
+                            </div>
+                            <div class="legend-item" style="color: #e74c3c;">
+                                <span class="legend-color" style="background: #e74c3c;"></span>
+                                موقوف: {{ number_format($projectStats['paused'] ?? 0, 1) }}
+                            </div>
+                            <div class="legend-item" style="color: #f093fb;">
+                                <span class="legend-color" style="background: #f093fb;"></span>
+                                تسليم مسودة: {{ number_format($projectStats['draft_delivery'] ?? 0, 1) }}
+                            </div>
+                            <div class="legend-item completed">
+                                <span class="legend-color" style="background: #00f2fe;"></span>
                                 <span style="cursor: pointer;"
                                       data-bs-toggle="modal"
                                       data-bs-target="#projectCompletionModal">
-                                    مكتمل: {{ number_format($projectCompletionPoints ?? 0, 1) }} نقطة
+                                    تسليم نهائي: {{ number_format($projectStats['final_delivery'] ?? 0, 1) }}
                                     <i class="fas fa-chart-bar text-info ms-1" style="font-size: 0.7em;"></i>
                                 </span>
-                            </div>
-                            <div class="legend-item cancelled">
-                                <span class="legend-color"></span>
-                                ملغي: {{ $projectStats['cancelled'] }}
                             </div>
                         </div>
                     </div>

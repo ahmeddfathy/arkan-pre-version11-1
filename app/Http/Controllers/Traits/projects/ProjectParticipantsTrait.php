@@ -1183,7 +1183,6 @@ trait ProjectParticipantsTrait
                     'task_revisions.title',
                     'task_revisions.description',
                     'task_revisions.status',
-                    'task_revisions.approval_status',
                     'task_revisions.revision_source',
                     'task_revisions.revision_type',
                     'task_revisions.created_at',
@@ -1202,8 +1201,6 @@ trait ProjectParticipantsTrait
                         'description' => $revision->description,
                         'status' => $revision->status,
                         'status_text' => $this->getRevisionStatusText($revision->status),
-                        'approval_status' => $revision->approval_status,
-                        'approval_status_text' => $this->getApprovalStatusText($revision->approval_status),
                         'revision_source' => $revision->revision_source,
                         'revision_source_text' => $revision->revision_source === 'internal' ? 'داخلي' : 'خارجي',
                         'revision_type' => $revision->revision_type,
@@ -1256,16 +1253,6 @@ trait ProjectParticipantsTrait
             'in_progress' => 'جاري العمل',
             'paused' => 'متوقف',
             'completed' => 'مكتمل',
-            default => 'غير محدد'
-        };
-    }
-
-    private function getApprovalStatusText($status)
-    {
-        return match($status) {
-            'pending' => 'في الانتظار',
-            'approved' => 'موافق عليه',
-            'rejected' => 'مرفوض',
             default => 'غير محدد'
         };
     }

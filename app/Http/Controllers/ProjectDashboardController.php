@@ -570,8 +570,8 @@ class ProjectDashboardController extends Controller
             $templateTasksWithAdditional
         );
 
-        // حساب إحصائيات المشاريع
-        $projectStats = $this->projectStatsService->calculateProjectStats($departmentProjects);
+        // حساب إحصائيات المشاريع من حالة الخدمات (project_service.service_status)
+        $projectStats = $this->departmentService->calculateDepartmentProjectStats($departmentProjects, $department);
 
         // الحصول على معرفات مستخدمي القسم
         $departmentUserIds = $this->departmentService->getDepartmentUserIds($department);
