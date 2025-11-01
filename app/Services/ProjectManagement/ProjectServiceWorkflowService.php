@@ -3,6 +3,8 @@
 namespace App\Services\ProjectManagement;
 
 use App\Models\Project;
+use App\Models\Task;
+use App\Models\TaskRevision;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -42,6 +44,9 @@ class ProjectServiceWorkflowService
             // جلب الموظفين المشاركين في هذه الخدمة
             $participants = $this->getServiceParticipants($projectId, $service->id);
 
+            // حساب التعديلات لهذه الخدمة
+            $revisionsData = $this->getServiceRevisionsData($projectId, $service->id);
+
             $workflow[] = [
                 'id' => $service->id,
                 'name' => $service->name,
@@ -52,6 +57,8 @@ class ProjectServiceWorkflowService
                 'status_icon' => $this->getStatusIcon($effectiveStatus),
                 'status_label' => $this->getStatusLabel($effectiveStatus),
                 'participants' => $participants, // إضافة معلومات المشاركين
+                'revisions_count' => $revisionsData['total'], // عدد التعديلات الإجمالي
+                'revisions_data' => $revisionsData, // بيانات التعديلات التفصيلية
             ];
 
             if (in_array($effectiveStatus, ['مكتملة', 'تسليم نهائي'])) {
@@ -230,6 +237,94 @@ class ProjectServiceWorkflowService
             'لم تبدأ' => 'لم تبدأ',
             default => $status,
         };
+    }
+
+    /**
+     * حساب بيانات التعديلات التفصيلية لخدمة معينة
+     */
+    private function getServiceRevisionsData(int $projectId, int $serviceId): array
+    {
+        // 1. جلب IDs المهام (Tasks) المرتبطة بهذه الخدمة
+        $taskIds = Task::where('project_id', $projectId)
+            ->where('service_id', $serviceId)
+            ->pluck('id')
+            ->toArray();
+
+        $allRevisions = collect();
+
+        // 2. التعديلات على المهام العادية لهذه الخدمة
+        if (!empty($taskIds)) {
+            // التعديلات المرتبطة بـ task_id مباشرة
+            $directTaskRevisions = TaskRevision::where('revision_type', 'task')
+                ->whereIn('task_id', $taskIds)
+                ->get();
+
+            // التعديلات المرتبطة بـ task_user_id (عن طريق TaskUser -> Task -> service_id)
+            $taskUserRevisions = TaskRevision::whereHas('taskUser.task', function($query) use ($projectId, $serviceId) {
+                $query->where('project_id', $projectId)
+                      ->where('service_id', $serviceId);
+            })
+            ->get();
+
+            $allRevisions = $allRevisions->merge($directTaskRevisions)->merge($taskUserRevisions);
+        }
+
+        // 3. التعديلات على المشروع المرتبطة بأشخاص من هذه الخدمة (responsible/executor)
+        $serviceUserIds = DB::table('project_service_user')
+            ->where('project_id', $projectId)
+            ->where('service_id', $serviceId)
+            ->pluck('user_id')
+            ->toArray();
+
+        if (!empty($serviceUserIds)) {
+            $projectRevisions = TaskRevision::where('revision_type', 'project')
+                ->where('project_id', $projectId)
+                ->where(function($query) use ($serviceUserIds) {
+                    $query->whereIn('responsible_user_id', $serviceUserIds)
+                          ->orWhereIn('executor_user_id', $serviceUserIds);
+                })
+                ->get();
+
+            $allRevisions = $allRevisions->merge($projectRevisions);
+        }
+
+        // 4. التعديلات على مهام القوالب المرتبطة بهذه الخدمة
+        $templateTaskUserIds = DB::table('template_task_user')
+            ->where('project_id', $projectId)
+            ->whereIn('template_task_id', function($query) use ($serviceId) {
+                $query->select('id')
+                    ->from('template_tasks')
+                    ->whereIn('task_template_id', function($subQuery) use ($serviceId) {
+                        $subQuery->select('id')
+                            ->from('task_templates')
+                            ->where('service_id', $serviceId);
+                    });
+            })
+            ->pluck('id')
+            ->toArray();
+
+        if (!empty($templateTaskUserIds)) {
+            $templateRevisions = TaskRevision::whereIn('template_task_user_id', $templateTaskUserIds)
+                ->get();
+
+            $allRevisions = $allRevisions->merge($templateRevisions);
+        }
+
+        // إزالة التكرارات
+        $allRevisions = $allRevisions->unique('id');
+
+        // تصنيف التعديلات حسب المصدر والحالة
+        return [
+            'total' => $allRevisions->count(),
+            'internal' => $allRevisions->where('revision_source', 'internal')->count(),
+            'external' => $allRevisions->where('revision_source', 'external')->count(),
+            'by_status' => [
+                'new' => $allRevisions->where('status', 'new')->count(),
+                'in_progress' => $allRevisions->where('status', 'in_progress')->count(),
+                'paused' => $allRevisions->where('status', 'paused')->count(),
+                'completed' => $allRevisions->where('status', 'completed')->count(),
+            ],
+        ];
     }
 }
 

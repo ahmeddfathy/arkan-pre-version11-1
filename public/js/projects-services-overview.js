@@ -1322,3 +1322,23 @@ function closeTaskDetailsModal() {
     const modals = document.querySelectorAll('.task-details-modal');
     modals.forEach(modal => modal.remove());
 }
+
+// ===================================
+// Revision Guide Sidebar Functions
+// ===================================
+
+function openRevisionGuide() {
+    const sidebar = document.getElementById('revisionGuideSidebar');
+    if (sidebar) {
+        sidebar.classList.add('active');
+        document.body.style.overflow = 'hidden'; // منع Scroll في الخلفية
+    }
+}
+
+function closeRevisionGuide() {
+    const sidebar = document.getElementById('revisionGuideSidebar');
+    if (sidebar) {
+        sidebar.classList.remove('active');
+        document.body.style.overflow = ''; // إرجاع Scroll
+    }
+}

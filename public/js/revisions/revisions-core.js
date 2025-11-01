@@ -35,7 +35,7 @@ function getCurrentReviewer(revision) {
     const currentReviewer = revision.reviewers.find(r => r.status === 'pending' || r.status === 'in_progress');
     return currentReviewer || null;
 }
-    
+
 function isCurrentReviewer(revision, userId) {
     const currentReviewer = getCurrentReviewer(revision);
     return currentReviewer && currentReviewer.reviewer_id == userId;

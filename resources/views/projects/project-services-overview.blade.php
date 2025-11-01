@@ -10,9 +10,18 @@
 <div class="simple-container">
     <div class="container">
         <!-- Page Header -->
-        <div class="page-header">
-            <h1>📊 نظرة عامة على المشاريع</h1>
-            <p>عرض سريع وبسيط لجميع المشاريع وخدماتها</p>
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1>📊 نظرة عامة على المشاريع</h1>
+                <p>عرض سريع وبسيط لجميع المشاريع وخدماتها</p>
+            </div>
+            <button onclick="openRevisionGuide()"
+                    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3); transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(99, 102, 241, 0.4)'"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(99, 102, 241, 0.3)'">
+                <i class="fas fa-book-open"></i>
+                <span>📖 دليل ألوان التعديلات</span>
+            </button>
         </div>
 
         <!-- Filters Section -->
@@ -192,11 +201,100 @@
 
                                                     <div class="workflow-step-container" style="flex: 0 1 auto; min-width: 150px;">
                                                         <div class="workflow-step {{ $serviceData->status_class }}"
-                                                             style="text-align: center; padding: 0.3rem 0.4rem; border-radius: 5px; font-size: 0.7rem; font-weight: 500; margin-bottom: 0.2rem;">
+                                                             style="text-align: center; padding: 0.3rem 0.4rem; border-radius: 5px; font-size: 0.7rem; font-weight: 500; margin-bottom: 0.2rem; position: relative;">
                                                             <div style="font-size: 0.9rem; margin-bottom: 0.1rem;">{{ $serviceData->status_icon }}</div>
                                                             <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $serviceData->name }}">
                                                                 {{ Str::limit($serviceData->name, 12) }}
                                                             </div>
+
+                                                            @if(isset($serviceData->revisions_count) && $serviceData->revisions_count > 0)
+                                                                @php
+                                                                    $revisionsData = $serviceData->revisions_data ?? [];
+                                                                    $internal = $revisionsData['internal'] ?? 0;
+                                                                    $external = $revisionsData['external'] ?? 0;
+                                                                    $byStatus = $revisionsData['by_status'] ?? [];
+
+                                                                    // تحديد الحالة السائدة
+                                                                    $newCount = $byStatus['new'] ?? 0;
+                                                                    $inProgressCount = $byStatus['in_progress'] ?? 0;
+                                                                    $pausedCount = $byStatus['paused'] ?? 0;
+                                                                    $completedCount = $byStatus['completed'] ?? 0;
+
+                                                                    // تحديد لون الدائرة حسب الحالة السائدة
+                                                                    $badgeColor = '#9ca3af'; // رمادي (افتراضي)
+                                                                    $badgeBorderColor = '#6b7280';
+                                                                    $dominantStatusIcon = '🚨';
+                                                                    $statusLabel = '';
+
+                                                                    if ($pausedCount > 0) {
+                                                                        // واقف - له أولوية قصوى
+                                                                        $badgeColor = '#ef4444'; // أحمر
+                                                                        $badgeBorderColor = '#dc2626';
+                                                                        $dominantStatusIcon = '⏸️';
+                                                                        $statusLabel = 'واقف';
+                                                                    } elseif ($inProgressCount > 0) {
+                                                                        // جاري
+                                                                        $badgeColor = '#3b82f6'; // أزرق
+                                                                        $badgeBorderColor = '#2563eb';
+                                                                        $dominantStatusIcon = '🔄';
+                                                                        $statusLabel = 'جاري';
+                                                                    } elseif ($newCount > 0) {
+                                                                        // جديد
+                                                                        $badgeColor = '#f97316'; // برتقالي
+                                                                        $badgeBorderColor = '#ea580c';
+                                                                        $dominantStatusIcon = '🆕';
+                                                                        $statusLabel = 'جديد';
+                                                                    } elseif ($completedCount > 0) {
+                                                                        // مكتمل
+                                                                        $badgeColor = '#22c55e'; // أخضر
+                                                                        $badgeBorderColor = '#16a34a';
+                                                                        $dominantStatusIcon = '✅';
+                                                                        $statusLabel = 'مكتمل';
+                                                                    }
+
+                                                                    // تحديد المصدر (داخلي/خارجي/مختلط)
+                                                                    $sourceIcon = '';
+                                                                    $sourceLabel = '';
+                                                                    if ($internal > 0 && $external > 0) {
+                                                                        $sourceIcon = '🔀'; // مختلط
+                                                                        $sourceLabel = 'داخلي+خارجي';
+                                                                    } elseif ($internal > 0) {
+                                                                        $sourceIcon = '🏢'; // داخلي فقط
+                                                                        $sourceLabel = 'داخلي';
+                                                                    } elseif ($external > 0) {
+                                                                        $sourceIcon = '🌐'; // خارجي فقط
+                                                                        $sourceLabel = 'خارجي';
+                                                                    }
+
+                                                                    // بناء النص التوضيحي
+                                                                    $tooltipText = "عدد التعديلات: {$serviceData->revisions_count}\n";
+                                                                    $tooltipText .= "الحالة: {$statusLabel}\n";
+                                                                    $tooltipText .= "المصدر: {$sourceLabel}\n\n";
+                                                                    if ($internal > 0) $tooltipText .= "• داخلي: {$internal}\n";
+                                                                    if ($external > 0) $tooltipText .= "• خارجي: {$external}\n";
+                                                                    $tooltipText .= "\nتفصيل الحالات:\n";
+                                                                    if ($newCount > 0) $tooltipText .= "🆕 جديد: {$newCount}\n";
+                                                                    if ($inProgressCount > 0) $tooltipText .= "🔄 جاري: {$inProgressCount}\n";
+                                                                    if ($pausedCount > 0) $tooltipText .= "⏸️ واقف: {$pausedCount}\n";
+                                                                    if ($completedCount > 0) $tooltipText .= "✅ مكتمل: {$completedCount}";
+                                                                @endphp
+
+                                                                <div class="revision-badge-wrapper" style="position: absolute; top: -8px; left: -8px;">
+                                                                    <!-- الدائرة الرئيسية بلون حسب الحالة -->
+                                                                    <div class="revision-badge"
+                                                                         style="background: {{ $badgeColor }}; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; border: 2.5px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); cursor: help;"
+                                                                         title="{{ $tooltipText }}">
+                                                                        {{ $serviceData->revisions_count }}
+                                                                    </div>
+
+                                                                    <!-- أيقونة المصدر (داخلي/خارجي/مختلط) -->
+                                                                    @if($sourceIcon)
+                                                                        <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 2px solid {{ $badgeBorderColor }}; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                                            {{ $sourceIcon }}
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                            @endif
                                                         </div>
 
                                                         <!-- سهم يشير للموظفين -->
@@ -282,6 +380,61 @@
                                 </div>
 
                                 @php
+                                    // حساب إجمالي التعديلات للمشروع
+                                    $totalRevisions = collect($projectServices)->sum('revisions_count');
+                                    $totalInternal = collect($projectServices)->sum('revisions_data.internal');
+                                    $totalExternal = collect($projectServices)->sum('revisions_data.external');
+                                    $totalNew = collect($projectServices)->sum('revisions_data.by_status.new');
+                                    $totalInProgress = collect($projectServices)->sum('revisions_data.by_status.in_progress');
+                                    $totalPaused = collect($projectServices)->sum('revisions_data.by_status.paused');
+                                    $totalCompleted = collect($projectServices)->sum('revisions_data.by_status.completed');
+                                @endphp
+                                @if($totalRevisions > 0)
+                                    <div style="margin-top: 0.3rem; display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; align-items: center;">
+                                        <!-- إجمالي التعديلات -->
+                                        <span class="badge" style="background: #fef2f2; color: #dc2626; font-size: 0.65rem; padding: 0.2rem 0.5rem; border: 1px solid #fee2e2; border-radius: 4px;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            تعديلات: {{ $totalRevisions }}
+                                        </span>
+
+                                        <!-- داخلي/خارجي -->
+                                        @if($totalInternal > 0)
+                                            <span class="badge" style="background: #dbeafe; color: #1e40af; font-size: 0.6rem; padding: 0.15rem 0.4rem; border: 1px solid #bfdbfe; border-radius: 4px;">
+                                                🏢 داخلي: {{ $totalInternal }}
+                                            </span>
+                                        @endif
+                                        @if($totalExternal > 0)
+                                            <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.6rem; padding: 0.15rem 0.4rem; border: 1px solid #fde68a; border-radius: 4px;">
+                                                🌐 خارجي: {{ $totalExternal }}
+                                            </span>
+                                        @endif
+
+                                        <!-- الحالات -->
+                                        @if($totalPaused > 0)
+                                            <span class="badge" style="background: #fee2e2; color: #dc2626; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #fecaca;">
+                                                ⏸️ {{ $totalPaused }}
+                                            </span>
+                                        @endif
+                                        @if($totalInProgress > 0)
+                                            <span class="badge" style="background: #dbeafe; color: #2563eb; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #bfdbfe;">
+                                                🔄 {{ $totalInProgress }}
+                                            </span>
+                                        @endif
+                                        @if($totalNew > 0)
+                                            <span class="badge" style="background: #ffedd5; color: #ea580c; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #fed7aa;">
+                                                🆕 {{ $totalNew }}
+                                            </span>
+                                        @endif
+                                        @if($totalCompleted > 0)
+                                            <span class="badge" style="background: #dcfce7; color: #16a34a; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #bbf7d0;">
+                                                ✅ {{ $totalCompleted }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                @endif
+
+                                @php
                                     $overviewPreparationPeriodsCount = \App\Models\ProjectPreparationHistory::getPreparationPeriodsCount($project->id);
                                 @endphp
                                 @if($overviewPreparationPeriodsCount > 0)
@@ -317,6 +470,127 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Revision Guide Sidebar -->
+<div id="revisionGuideSidebar" class="project-sidebar">
+    <div class="sidebar-overlay" onclick="closeRevisionGuide()"></div>
+    <div class="sidebar-content" style="max-width: 500px;">
+        <div class="sidebar-header" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+            <div class="sidebar-title-section">
+                <div class="project-title-row">
+                    <i class="fas fa-book-open project-icon" style="color: white;"></i>
+                    <h3 style="color: white;">📖 دليل ألوان التعديلات</h3>
+                </div>
+                <p style="color: rgba(255,255,255,0.9); font-size: 0.85rem; margin-top: 0.5rem;">
+                    تعرف على معنى كل لون وأيقونة في مؤشرات التعديلات
+                </p>
+            </div>
+            <button class="sidebar-close" onclick="closeRevisionGuide()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-body" style="padding: 1.5rem;">
+            <!-- حالات التعديلات (لون الدائرة) -->
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-size: 1rem; color: #374151; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">🎨</span>
+                    لون الدائرة = حالة التعديل
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem; background: #fee2e2; border-right: 4px solid #ef4444; border-radius: 8px;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ef4444; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); color: white; font-weight: 700; font-size: 0.9rem;">5</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #dc2626; font-size: 0.95rem; margin-bottom: 0.2rem;">⏸️ واقف (أولوية قصوى!)</div>
+                            <div style="font-size: 0.8rem; color: #991b1b;">يحتاج متابعة فورية - متوقف مؤقتاً</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem; background: #dbeafe; border-right: 4px solid #3b82f6; border-radius: 8px;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #3b82f6; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); color: white; font-weight: 700; font-size: 0.9rem;">3</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #2563eb; font-size: 0.95rem; margin-bottom: 0.2rem;">🔄 جاري</div>
+                            <div style="font-size: 0.8rem; color: #1e40af;">يتم العمل عليه حالياً</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem; background: #ffedd5; border-right: 4px solid #f97316; border-radius: 8px;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #f97316; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); color: white; font-weight: 700; font-size: 0.9rem;">2</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #ea580c; font-size: 0.95rem; margin-bottom: 0.2rem;">🆕 جديد</div>
+                            <div style="font-size: 0.8rem; color: #c2410c;">لم يبدأ العمل عليه بعد</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem; background: #dcfce7; border-right: 4px solid #22c55e; border-radius: 8px;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #22c55e; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); color: white; font-weight: 700; font-size: 0.9rem;">4</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #16a34a; font-size: 0.95rem; margin-bottom: 0.2rem;">✅ مكتمل</div>
+                            <div style="font-size: 0.8rem; color: #15803d;">تم الانتهاء منه بنجاح</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المصدر (الأيقونة أسفل الدائرة) -->
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-size: 1rem; color: #374151; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">📍</span>
+                    الأيقونة أسفل الدائرة = مصدر التعديل
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem; background: #f3f4f6; border-right: 4px solid #6b7280; border-radius: 8px;">
+                        <div style="position: relative;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #3b82f6; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); color: white; font-weight: 700; font-size: 0.9rem;">3</span>
+                            <span style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; background: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 2px solid #3b82f6; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">🏢</span>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #374151; font-size: 0.95rem; margin-bottom: 0.2rem;">🏢 داخلي</div>
+                            <div style="font-size: 0.8rem; color: #6b7280;">من الفريق الداخلي (خطأ من موظف)</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem; background: #f3f4f6; border-right: 4px solid #6b7280; border-radius: 8px;">
+                        <div style="position: relative;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #f59e0b; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); color: white; font-weight: 700; font-size: 0.9rem;">2</span>
+                            <span style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; background: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 2px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">🌐</span>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #374151; font-size: 0.95rem; margin-bottom: 0.2rem;">🌐 خارجي</div>
+                            <div style="font-size: 0.8rem; color: #6b7280;">من العميل (طلب تعديل)</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem; background: #f3f4f6; border-right: 4px solid #6b7280; border-radius: 8px;">
+                        <div style="position: relative;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ef4444; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); color: white; font-weight: 700; font-size: 0.9rem;">5</span>
+                            <span style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; background: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 2px solid #ef4444; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">🔀</span>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #374151; font-size: 0.95rem; margin-bottom: 0.2rem;">🔀 مختلط</div>
+                            <div style="font-size: 0.8rem; color: #6b7280;">داخلي وخارجي معاً</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ملاحظة مهمة -->
+            <div style="padding: 1rem; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #fbbf24; border-radius: 10px; box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);">
+                <div style="display: flex; gap: 0.75rem; align-items: start;">
+                    <span style="font-size: 1.5rem;">💡</span>
+                    <div>
+                        <div style="font-weight: 700; color: #92400e; font-size: 0.95rem; margin-bottom: 0.3rem;">ملاحظة مهمة</div>
+                        <div style="font-size: 0.8rem; color: #78350f; line-height: 1.6;">
+                            • الرقم داخل الدائرة = إجمالي عدد التعديلات<br>
+                            • لو مش شايف أي دائرة = مفيش تعديلات على الخدمة دي<br>
+                            • مرر الماوس على الدائرة لرؤية التفاصيل الكاملة
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
