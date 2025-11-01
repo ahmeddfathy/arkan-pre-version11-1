@@ -1,86 +1,85 @@
-
 <link rel="stylesheet" href="{{ asset('css/projects/attachments.css') }}">
 
 <style>
-/* تنسيق checkbox التأكيد */
-.confirmation-checkbox-container {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-    border: 1.5px solid #dee2e6;
-    white-space: nowrap;
-    min-width: 95px;
-    justify-content: center;
-}
+    /* تنسيق checkbox التأكيد */
+    .confirmation-checkbox-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        border: 1.5px solid #dee2e6;
+        white-space: nowrap;
+        min-width: 95px;
+        justify-content: center;
+    }
 
-.confirmation-checkbox-container:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
-}
+    .confirmation-checkbox-container:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+    }
 
-.confirmation-checkbox-container.pending-confirmation {
-    background-color: #fff3cd;
-    border: 1.5px solid #ffc107;
-}
+    .confirmation-checkbox-container.pending-confirmation {
+        background-color: #fff3cd;
+        border: 1.5px solid #ffc107;
+    }
 
-.confirmation-checkbox-container.confirmed {
-    background-color: #d1e7dd;
-    border: 1.5px solid #28a745;
-}
+    .confirmation-checkbox-container.confirmed {
+        background-color: #d1e7dd;
+        border: 1.5px solid #28a745;
+    }
 
-.confirmation-checkbox-container.rejected {
-    background-color: #f8d7da;
-    border: 1.5px solid #dc3545;
-}
+    .confirmation-checkbox-container.rejected {
+        background-color: #f8d7da;
+        border: 1.5px solid #dc3545;
+    }
 
-.confirmation-checkbox {
-    width: 18px !important;
-    height: 18px !important;
-    cursor: pointer;
-    margin: 0 !important;
-    flex-shrink: 0;
-}
+    .confirmation-checkbox {
+        width: 18px !important;
+        height: 18px !important;
+        cursor: pointer;
+        margin: 0 !important;
+        flex-shrink: 0;
+    }
 
-.confirmation-checkbox:checked {
-    background-color: #28a745;
-    border-color: #28a745;
-}
+    .confirmation-checkbox:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
 
-.confirmation-checkbox-container.pending-confirmation .confirmation-checkbox:checked {
-    background-color: #ffc107;
-    border-color: #ffc107;
-}
+    .confirmation-checkbox-container.pending-confirmation .confirmation-checkbox:checked {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
 
-.confirmation-checkbox:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
+    .confirmation-checkbox:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
 
-.confirmation-checkbox-container label {
-    margin-bottom: 0;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    user-select: none;
-    color: #495057;
-    flex-shrink: 0;
-    line-height: 1;
-}
+    .confirmation-checkbox-container label {
+        margin-bottom: 0;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        color: #495057;
+        flex-shrink: 0;
+        line-height: 1;
+    }
 
-.confirmation-checkbox-container.confirmed label {
-    color: #155724;
-}
+    .confirmation-checkbox-container.confirmed label {
+        color: #155724;
+    }
 
-.confirmation-checkbox-container.pending-confirmation label {
-    color: #856404;
-}
+    .confirmation-checkbox-container.pending-confirmation label {
+        color: #856404;
+    }
 
-.confirmation-checkbox-container.rejected label {
-    color: #721c24;
-}
+    .confirmation-checkbox-container.rejected label {
+        color: #721c24;
+    }
 </style>
 
 {{-- البيانات تأتي جاهزة من الـ Controller --}}
@@ -119,297 +118,299 @@
             </div>
             <div class="card-body">
                 <div class="row">
-    @foreach($fixedTypes ?? [] as $type)
-        <div class="col-md-4 mb-3">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-header text-center" style="background: linear-gradient(135deg, #6c757d, #545b62); color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; border-radius: 12px 12px 0 0; border: none;">
-                    <i class="fas fa-folder-open me-2" style="opacity: 0.9;"></i>{{ $type }}
-                </div>
-                <div class="card-body">
-                    <form class="attachment-upload-form upload-form mb-3" data-service-type="{{ $type }}" action="{{ route('projects.attachments.store', $project->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="service_type" value="{{ $type }}">
-
-                        <div class="drag-drop-upload-container">
-                            <div class="drag-drop-area" id="dragDropArea{{ str_replace(' ', '', $type) }}">
-                                <div class="drag-drop-message">
-                                    <i class="fas fa-cloud-upload-alt mb-2"></i>
-                                    <p>اسحب الملفات وأفلتها هنا</p>
-                                    <p class="small text-muted">أو</p>
-                                    <button type="button" class="file-select-button">اختر ملفات</button>
-                                    <input type="file" name="attachment" id="fileInput{{ str_replace(' ', '', $type) }}" class="file-input-hidden">
-                                </div>
+                    @foreach($fixedTypes ?? [] as $type)
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header text-center" style="background: linear-gradient(135deg, #6c757d, #545b62); color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; border-radius: 12px 12px 0 0; border: none;">
+                                <i class="fas fa-folder-open me-2" style="opacity: 0.9;"></i>{{ $type }}
                             </div>
+                            <div class="card-body">
+                                <form class="attachment-upload-form upload-form mb-3" data-service-type="{{ $type }}" action="{{ route('projects.attachments.store', $project->id) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" name="service_type" value="{{ $type }}">
 
-                            <div class="selected-files-container" id="selectedFiles{{ str_replace(' ', '', $type) }}"></div>
-                        </div>
+                                    <div class="drag-drop-upload-container">
+                                        <div class="drag-drop-area" id="dragDropArea{{ str_replace(' ', '', $type) }}">
+                                            <div class="drag-drop-message">
+                                                <i class="fas fa-cloud-upload-alt mb-2"></i>
+                                                <p>اسحب الملفات وأفلتها هنا</p>
+                                                <p class="small text-muted">أو</p>
+                                                <button type="button" class="file-select-button">اختر ملفات</button>
+                                                <input type="file" name="attachment" id="fileInput{{ str_replace(' ', '', $type) }}" class="file-input-hidden">
+                                            </div>
+                                        </div>
 
-                        <div class="mb-2 mt-2">
-                            <input type="text" name="description" class="form-control form-control-sm" placeholder="وصف (اختياري)">
-                        </div>
+                                        <div class="selected-files-container" id="selectedFiles{{ str_replace(' ', '', $type) }}"></div>
+                                    </div>
 
-                                                <!-- Progress Bar Elements -->
-                        <div class="upload-progress-container" id="progress-container-{{ str_replace(' ', '', $type) }}">
-                            <div class="progress-bar-container">
-                                <div class="progress-bar-animated"
-                                     id="progress-bar-{{ str_replace(' ', '', $type) }}"
-                                     role="progressbar"
-                                     aria-valuenow="0"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100">
-                                </div>
-                            </div>
-                            <div class="progress-text-container">
-                                <span id="percentage-{{ str_replace(' ', '', $type) }}" class="progress-percentage">0%</span>
-                            </div>
-                        </div>
+                                    <div class="mb-2 mt-2">
+                                        <input type="text" name="description" class="form-control form-control-sm" placeholder="وصف (اختياري)">
+                                    </div>
 
-                        <div class="upload-status alert alert-info" id="status-{{ str_replace(' ', '', $type) }}">
-                            جاري التحضير...
-                        </div>
+                                    <!-- Progress Bar Elements -->
+                                    <div class="upload-progress-container" id="progress-container-{{ str_replace(' ', '', $type) }}">
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-animated"
+                                                id="progress-bar-{{ str_replace(' ', '', $type) }}"
+                                                role="progressbar"
+                                                aria-valuenow="0"
+                                                aria-valuemin="0"
+                                                aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <div class="progress-text-container">
+                                            <span id="percentage-{{ str_replace(' ', '', $type) }}" class="progress-percentage">0%</span>
+                                        </div>
+                                    </div>
 
-                        <!-- الفولدرات الثابتة بدون ربط بمهام محددة -->
-                        @php
-                            $isFixedFolder = in_array($type, $fixedTypes ?? []);
-                        @endphp
+                                    <div class="upload-status alert alert-info" id="status-{{ str_replace(' ', '', $type) }}">
+                                        جاري التحضير...
+                                    </div>
 
-                        @if(!$isFixedFolder)
-                            <!-- اختيار نوع المهمة فقط في فولدرات الخدمات -->
-                            <div class="mb-2">
-                                <label class="form-label small">ربط بمهمة (اختياري):</label>
-                                <select name="task_type" class="form-control form-control-sm task-type-selector" id="taskType{{ str_replace(' ', '', $type) }}">
-                                    <option value="">-- بدون ربط بمهمة --</option>
-                                    <option value="template_task">مهمة قالب</option>
-                                    <option value="regular_task">مهمة عادية</option>
-                                </select>
-                            </div>
+                                    <!-- الفولدرات الثابتة بدون ربط بمهام محددة -->
+                                    @php
+                                    $isFixedFolder = in_array($type, $fixedTypes ?? []);
+                                    @endphp
 
-                            <!-- اختيار المهمة القالب -->
-                            <div class="mb-2 template-task-selector d-none" id="templateTaskSelector{{ str_replace(' ', '', $type) }}">
-                                <select name="template_task_id" class="form-control form-control-sm">
-                                    <option value="">-- اختر مهمة القالب --</option>
-                                    @if(isset($userTasks[auth()->id()]) && $userTasks[auth()->id()]->count() > 0)
-                                        @foreach($userTasks[auth()->id()] as $taskUser)
+                                    @if(!$isFixedFolder)
+                                    <!-- اختيار نوع المهمة فقط في فولدرات الخدمات -->
+                                    <div class="mb-2">
+                                        <label class="form-label small">ربط بمهمة (اختياري):</label>
+                                        <select name="task_type" class="form-control form-control-sm task-type-selector" id="taskType{{ str_replace(' ', '', $type) }}">
+                                            <option value="">-- بدون ربط بمهمة --</option>
+                                            <option value="template_task">مهمة قالب</option>
+                                            <option value="regular_task">مهمة عادية</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- اختيار المهمة القالب -->
+                                    <div class="mb-2 template-task-selector d-none" id="templateTaskSelector{{ str_replace(' ', '', $type) }}">
+                                        <select name="template_task_id" class="form-control form-control-sm">
+                                            <option value="">-- اختر مهمة القالب --</option>
+                                            @if(isset($userTasks[auth()->id()]) && $userTasks[auth()->id()]->count() > 0)
+                                            @foreach($userTasks[auth()->id()] as $taskUser)
                                             <option value="{{ $taskUser->id }}" data-service="{{ optional($taskUser->templateTask->template->service)->name }}">
                                                 {{ optional($taskUser->templateTask)->name }}
                                             </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
+                                            @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
 
-                            <!-- اختيار المهمة العادية -->
-                            <div class="mb-2 regular-task-selector d-none" id="regularTaskSelector{{ str_replace(' ', '', $type) }}">
-                                <select name="task_user_id" class="form-control form-control-sm">
-                                    <option value="">-- اختر المهمة العادية --</option>
-                                    @if(isset($userActualTasks[auth()->id()]) && $userActualTasks[auth()->id()]->count() > 0)
-                                        @foreach($userActualTasks[auth()->id()] as $taskUser)
+                                    <!-- اختيار المهمة العادية -->
+                                    <div class="mb-2 regular-task-selector d-none" id="regularTaskSelector{{ str_replace(' ', '', $type) }}">
+                                        <select name="task_user_id" class="form-control form-control-sm">
+                                            <option value="">-- اختر المهمة العادية --</option>
+                                            @if(isset($userActualTasks[auth()->id()]) && $userActualTasks[auth()->id()]->count() > 0)
+                                            @foreach($userActualTasks[auth()->id()] as $taskUser)
                                             <option value="{{ $taskUser->id }}" data-service="{{ optional($taskUser->task->service)->name }}">
                                                 {{ optional($taskUser->task)->title }}
                                             </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                        @else
-                            <!-- الفولدرات الثابتة - عامة بدون مهام محددة -->
-                            <div class="mb-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    هذا مجلد عام للمرفقات
-                                </small>
-                            </div>
-                        @endif
-
-                        <div class="mb-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="isReply{{ str_replace(' ', '', $type) }}" name="is_reply">
-                                <label class="form-check-label small" for="isReply{{ str_replace(' ', '', $type) }}">
-                                    رد على ملف موجود
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="mb-2 reply-file-selector d-none">
-                            <select name="parent_attachment_id" class="form-control form-control-sm">
-                                <option value="">-- اختر الملف للرد عليه --</option>
-                                @php
-                                    $typeAttachments = $project->attachments->where('service_type', $type)->where('parent_attachment_id', null);
-                                @endphp
-                                @if($typeAttachments->count() > 0)
-                                    @foreach($typeAttachments as $attachment)
-                                        <option value="{{ $attachment->id }}">
-                                            {{ $attachment->file_name }}
-                                            @if($attachment->replies && $attachment->replies->count() > 0)
-                                                ({{ $attachment->replies->count() }} رد)
+                                            @endforeach
                                             @endif
-                                        </option>
-                                    @endforeach
-                                @else
-                                    <option value="" disabled>لا توجد ملفات للرد عليها</option>
-                                @endif
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-upload me-2"></i>رفع الملفات
-                        </button>
-                    </form>
-
-                    @php
-                        // استخدام المرفقات المفلترة من الـ Controller
-                        $typeAttachments = isset($filteredAttachments) ?
-                            $filteredAttachments->where('service_type', $type) :
-                            collect();
-
-                        $groupedAttachments = $typeAttachments->groupBy(function($attachment) {
-                            if ($attachment->task_type == 'template_task' && $attachment->templateTaskUser) {
-                                return 'template_task_' . $attachment->template_task_user_id;
-                            } elseif ($attachment->task_type == 'regular_task' && $attachment->taskUser) {
-                                return 'regular_task_' . $attachment->task_user_id;
-                            } else {
-                                return 'no_task';
-                            }
-                        });
-                    @endphp
-
-                    @foreach($groupedAttachments as $taskKey => $attachments)
-                        @php
-                            $firstAttachment = $attachments->first();
-                            $taskName = 'بدون مهمة';
-                            $taskIcon = 'fas fa-folder';
-                            $taskColor = 'text-secondary';
-                            $taskClass = 'no-task';
-
-                            if ($taskKey !== 'no_task') {
-                                if ($firstAttachment->task_type == 'template_task') {
-                                    $taskName = 'قالب مهمة: ' . optional(optional($firstAttachment->templateTaskUser)->templateTask)->name;
-                                    $taskIcon = 'fas fa-clipboard-list';
-                                    $taskColor = 'text-info';
-                                    $taskClass = 'template-task';
-                                } elseif ($firstAttachment->task_type == 'regular_task') {
-                                    $taskName = 'مهمة: ' . optional(optional($firstAttachment->taskUser)->task)->title;
-                                    $taskIcon = 'fas fa-tasks';
-                                    $taskColor = 'text-success';
-                                    $taskClass = 'regular-task';
-                                }
-                            }
-                        @endphp
-
-                        <div class="task-group {{ $taskClass }} mb-3">
-                            <div class="task-group-header">
-                                <h6 class="mb-2 {{ $taskColor }}">
-                                    <i class="{{ $taskIcon }} me-2"></i>
-                                    {{ $taskName }}
-                                    <span class="badge bg-primary text-white ms-2">{{ $attachments->count() }} ملف</span>
-                                </h6>
-                            </div>
-
-                            <div class="attachment-list-container attachment-list-container-400">
-                                <ul class="list-group">
-                                    @foreach($attachments as $attachment)
-                                    <li class="list-group-item" data-attachment-id="{{ $attachment->id }}">
-                                        <div class="d-flex w-100 justify-content-between align-items-start mb-2">
-                                            <div class="d-flex align-items-center flex-grow-1">
-                                                <a href="{{ route('projects.attachments.view', $attachment->id) }}" target="_blank" class="me-2" title="عرض الملف">
-                                                    <i class="fas fa-eye text-info"></i>
-                                                </a>
-                                                <a href="{{ route('projects.attachments.view', $attachment->id) }}" target="_blank" class="attachment-name text-decoration-none" title="عرض الملف">
-                                                    {{ $attachment->file_name }}
-                                                </a>
-                                            </div>
-                                            <div class="d-flex flex-column align-items-end gap-2" style="min-width: fit-content;">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <!-- Checkbox للتأكيد -->
-                                                    <div class="confirmation-checkbox-container"
-                                                         data-attachment-id="{{ $attachment->id }}"
-                                                         title="تأكيد المرفق">
-                                                        <input class="confirmation-checkbox"
-                                                               type="checkbox"
-                                                               id="confirm_{{ $attachment->id }}"
-                                                               data-attachment-id="{{ $attachment->id }}"
-                                                               data-attachment-name="{{ $attachment->file_name }}">
-                                                        <label class="m-0"
-                                                               for="confirm_{{ $attachment->id }}">
-                                                            <i class="fas fa-check-circle me-1"></i>تأكيد
-                                                        </label>
-                                                    </div>
-
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-link text-muted p-1" type="button"
-                                                                data-bs-toggle="dropdown" aria-expanded="false" title="خيارات المشاركة">
-                                                            <i class="fas fa-ellipsis-v"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu dropdown-menu-start">
-                                                            <li>
-                                                                <a class="dropdown-item share-attachment-btn" href="#"
-                                                                   data-attachment-id="{{ $attachment->id }}"
-                                                                   data-attachment-name="{{ $attachment->file_name }}">
-                                                                    <i class="fas fa-share text-primary me-2"></i>
-                                                                    مشاركة الملف
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item view-shares-btn" href="#"
-                                                                   data-attachment-id="{{ $attachment->id }}">
-                                                                    <i class="fas fa-users text-info me-2"></i>
-                                                                    عرض المشاركات
-                                                                </a>
-                                                            </li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li>
-                                                                <a class="dropdown-item copy-attachment-link"
-                                                                   href="javascript:void(0);"
-                                                                   data-attachment-id="{{ $attachment->id }}"
-                                                                   data-attachment-url="{{ route('projects.attachments.view', $attachment->id) }}">
-                                                                    <i class="fas fa-copy text-warning me-2"></i>
-                                                                    نسخ الرابط
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item" href="{{ route('projects.attachments.download', $attachment->id) }}">
-                                                                    <i class="fas fa-download text-success me-2"></i>
-                                                                    تحميل
-                                                                </a>
-                                                            </li>
-
-                                                        </ul>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-check" style="margin-right: 0;">
-                                                    <input class="form-check-input attachment-select" type="checkbox"
-                                                           value="{{ $attachment->id }}"
-                                                           id="attachment_{{ $attachment->id }}">
-                                                    <label class="form-check-label" for="attachment_{{ $attachment->id }}"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @if($attachment->description)
-                                            <small class="text-muted mt-1">{{ $attachment->description }}</small>
-                                        @endif
-                                        @if($attachment->uploaded_by)
-                                            <small class="text-secondary mt-1">
-                                                <i class="fas fa-user"></i>
-                                                رفع بواسطة: {{ optional(\App\Models\User::find($attachment->uploaded_by))->name }}
-                                            </small>
-                                        @endif
-                                        <small class="text-muted mt-1">
-                                            <i class="fas fa-calendar-alt"></i>
-                                            تاريخ الرفع: {{ $attachment->created_at->format('d/m/Y - H:i') }}
-                                            <span class="badge bg-light text-dark ms-1">{{ $attachment->created_at->diffForHumans() }}</span>
+                                        </select>
+                                    </div>
+                                    @else
+                                    <!-- الفولدرات الثابتة - عامة بدون مهام محددة -->
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            هذا مجلد عام للمرفقات
                                         </small>
+                                    </div>
+                                    @endif
 
-                                        @if($attachment->replies && $attachment->replies->count() > 0)
-                                            <small class="text-info mt-1">
-                                                <i class="fas fa-reply"></i>
-                                                {{ $attachment->replies->count() }} رد
-                                            </small>
-                                        @endif
+                                    <div class="mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="isReply{{ str_replace(' ', '', $type) }}" name="is_reply">
+                                            <label class="form-check-label small" for="isReply{{ str_replace(' ', '', $type) }}">
+                                                رد على ملف موجود
+                                            </label>
+                                        </div>
+                                    </div>
 
-                                        @if($attachment->replies && $attachment->replies->count() > 0)
-                                            <div class="attachment-replies mt-2">
-                                                @foreach($attachment->replies as $reply)
+                                    <div class="mb-2 reply-file-selector d-none">
+                                        <select name="parent_attachment_id" class="form-control form-control-sm">
+                                            <option value="">-- اختر الملف للرد عليه --</option>
+                                            @php
+                                            $typeAttachments = $project->attachments->where('service_type', $type)->where('parent_attachment_id', null);
+                                            @endphp
+                                            @if($typeAttachments->count() > 0)
+                                            @foreach($typeAttachments as $attachment)
+                                            <option value="{{ $attachment->id }}">
+                                                {{ $attachment->file_name }}
+                                                @if($attachment->replies && $attachment->replies->count() > 0)
+                                                ({{ $attachment->replies->count() }} رد)
+                                                @endif
+                                            </option>
+                                            @endforeach
+                                            @else
+                                            <option value="" disabled>لا توجد ملفات للرد عليها</option>
+                                            @endif
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-upload me-2"></i>رفع الملفات
+                                    </button>
+                                </form>
+
+                                @php
+                                // استخدام المرفقات المفلترة من الـ Controller
+                                $typeAttachments = isset($filteredAttachments) ?
+                                $filteredAttachments->where('service_type', $type) :
+                                collect();
+
+                                $groupedAttachments = $typeAttachments->groupBy(function($attachment) {
+                                if ($attachment->task_type == 'template_task' && $attachment->templateTaskUser) {
+                                return 'template_task_' . $attachment->template_task_user_id;
+                                } elseif ($attachment->task_type == 'regular_task' && $attachment->taskUser) {
+                                return 'regular_task_' . $attachment->task_user_id;
+                                } else {
+                                return 'no_task';
+                                }
+                                });
+                                @endphp
+
+                                @foreach($groupedAttachments as $taskKey => $attachments)
+                                @php
+                                $firstAttachment = $attachments->first();
+                                $taskName = 'بدون مهمة';
+                                $taskIcon = 'fas fa-folder';
+                                $taskColor = 'text-secondary';
+                                $taskClass = 'no-task';
+
+                                if ($taskKey !== 'no_task') {
+                                if ($firstAttachment->task_type == 'template_task') {
+                                $taskName = 'قالب مهمة: ' . optional(optional($firstAttachment->templateTaskUser)->templateTask)->name;
+                                $taskIcon = 'fas fa-clipboard-list';
+                                $taskColor = 'text-info';
+                                $taskClass = 'template-task';
+                                } elseif ($firstAttachment->task_type == 'regular_task') {
+                                $taskName = 'مهمة: ' . optional(optional($firstAttachment->taskUser)->task)->title;
+                                $taskIcon = 'fas fa-tasks';
+                                $taskColor = 'text-success';
+                                $taskClass = 'regular-task';
+                                }
+                                }
+                                @endphp
+
+                                <div class="task-group {{ $taskClass }} mb-3">
+                                    <div class="task-group-header">
+                                        <h6 class="mb-2 {{ $taskColor }}">
+                                            <i class="{{ $taskIcon }} me-2"></i>
+                                            {{ $taskName }}
+                                            <span class="badge bg-primary text-white ms-2">{{ $attachments->count() }} ملف</span>
+                                        </h6>
+                                    </div>
+
+                                    <div class="attachment-list-container attachment-list-container-400">
+                                        <ul class="list-group">
+                                            @foreach($attachments as $attachment)
+                                            <li class="list-group-item" data-attachment-id="{{ $attachment->id }}">
+                                                <div class="d-flex w-100 justify-content-between align-items-start mb-2">
+                                                    <div class="d-flex align-items-center flex-grow-1">
+                                                        <a href="{{ route('projects.attachments.view', $attachment->id) }}" target="_blank" class="me-2" title="عرض الملف">
+                                                            <i class="fas fa-eye text-info"></i>
+                                                        </a>
+                                                        <a href="{{ route('projects.attachments.view', $attachment->id) }}" target="_blank" class="attachment-name text-decoration-none" title="عرض الملف">
+                                                            {{ $attachment->file_name }}
+                                                        </a>
+                                                    </div>
+                                                    <div class="d-flex flex-column align-items-end gap-2" style="min-width: fit-content;">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <!-- Checkbox للتأكيد -->
+                                                            <div class="confirmation-checkbox-container"
+                                                                data-attachment-id="{{ $attachment->id }}"
+                                                                title="تأكيد المرفق">
+                                                                <input class="confirmation-checkbox"
+                                                                    type="checkbox"
+                                                                    id="confirm_{{ $attachment->id }}"
+                                                                    data-attachment-id="{{ $attachment->id }}"
+                                                                    data-attachment-name="{{ $attachment->file_name }}">
+                                                                <label class="m-0"
+                                                                    for="confirm_{{ $attachment->id }}">
+                                                                    <i class="fas fa-check-circle me-1"></i>تأكيد
+                                                                </label>
+                                                            </div>
+
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-sm btn-link text-muted p-1" type="button"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false" title="خيارات المشاركة">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-start">
+                                                                    <li>
+                                                                        <a class="dropdown-item share-attachment-btn" href="#"
+                                                                            data-attachment-id="{{ $attachment->id }}"
+                                                                            data-attachment-name="{{ $attachment->file_name }}">
+                                                                            <i class="fas fa-share text-primary me-2"></i>
+                                                                            مشاركة الملف
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item view-shares-btn" href="#"
+                                                                            data-attachment-id="{{ $attachment->id }}">
+                                                                            <i class="fas fa-users text-info me-2"></i>
+                                                                            عرض المشاركات
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item copy-attachment-link"
+                                                                            href="javascript:void(0);"
+                                                                            data-attachment-id="{{ $attachment->id }}"
+                                                                            data-attachment-url="{{ route('projects.attachments.view', $attachment->id) }}">
+                                                                            <i class="fas fa-copy text-warning me-2"></i>
+                                                                            نسخ الرابط
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="{{ route('projects.attachments.download', $attachment->id) }}">
+                                                                            <i class="fas fa-download text-success me-2"></i>
+                                                                            تحميل
+                                                                        </a>
+                                                                    </li>
+
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-check" style="margin-right: 0;">
+                                                            <input class="form-check-input attachment-select" type="checkbox"
+                                                                value="{{ $attachment->id }}"
+                                                                id="attachment_{{ $attachment->id }}">
+                                                            <label class="form-check-label" for="attachment_{{ $attachment->id }}"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @if($attachment->description)
+                                                <small class="text-muted mt-1">{{ $attachment->description }}</small>
+                                                @endif
+                                                @if($attachment->uploaded_by)
+                                                <small class="text-secondary mt-1">
+                                                    <i class="fas fa-user"></i>
+                                                    رفع بواسطة: {{ optional(\App\Models\User::find($attachment->uploaded_by))->name }}
+                                                </small>
+                                                @endif
+                                                <small class="text-muted mt-1">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    تاريخ الرفع: {{ $attachment->created_at->format('d/m/Y - H:i') }}
+                                                    <span class="badge bg-light text-dark ms-1">{{ $attachment->created_at->diffForHumans() }}</span>
+                                                </small>
+
+                                                @if($attachment->replies && $attachment->replies->count() > 0)
+                                                <small class="text-info mt-1">
+                                                    <i class="fas fa-reply"></i>
+                                                    {{ $attachment->replies->count() }} رد
+                                                </small>
+                                                @endif
+
+                                                @if($attachment->replies && $attachment->replies->count() > 0)
+                                                <div class="attachment-replies mt-2">
+                                                    @foreach($attachment->replies as $reply)
                                                     <div class="reply-item">
                                                         <div class="reply-header">
                                                             <span class="reply-author">
@@ -423,7 +424,7 @@
                                                             </span>
                                                         </div>
                                                         @if($reply->description)
-                                                            <div class="reply-description">{{ $reply->description }}</div>
+                                                        <div class="reply-description">{{ $reply->description }}</div>
                                                         @endif
                                                         <div class="reply-file">
                                                             <i class="fas fa-paperclip"></i>
@@ -431,10 +432,10 @@
                                                                 {{ $reply->file_name }}
                                                             </a>
                                                             <a href="javascript:void(0);"
-                                                               class="btn btn-sm btn-outline-warning copy-attachment-link me-1"
-                                                               data-attachment-id="{{ $reply->id }}"
-                                                               data-attachment-url="{{ route('projects.attachments.view', $reply->id) }}"
-                                                               title="نسخ الرابط">
+                                                                class="btn btn-sm btn-outline-warning copy-attachment-link me-1"
+                                                                data-attachment-id="{{ $reply->id }}"
+                                                                data-attachment-url="{{ route('projects.attachments.view', $reply->id) }}"
+                                                                title="نسخ الرابط">
                                                                 <i class="fas fa-copy"></i>
                                                             </a>
                                                             <a href="{{ route('projects.attachments.download', $reply->id) }}" class="btn btn-sm btn-outline-primary">
@@ -442,26 +443,26 @@
                                                             </a>
                                                         </div>
                                                     </div>
-                                                @endforeach
-                                            </div>
-                                        @endif
-                                    </li>
-                                    @endforeach
-                                </ul>
+                                                    @endforeach
+                                                </div>
+                                                @endif
+                                            </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                                @endforeach
+
+                                @if($typeAttachments->isEmpty())
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                    <p>لا توجد مرفقات</p>
+                                </div>
+                                @endif
                             </div>
                         </div>
+                    </div>
                     @endforeach
-
-                    @if($typeAttachments->isEmpty())
-                        <div class="text-center text-muted py-3">
-                            <i class="fas fa-folder-open fa-2x mb-2"></i>
-                            <p>لا توجد مرفقات</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    @endforeach
                 </div>
             </div>
         </div>
@@ -482,340 +483,344 @@
             <div class="card-body">
                 <div class="row">
                     @foreach($userServices ?? [] as $serviceName)
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100 border-0 shadow-sm">
-                                <div class="card-header text-center" style="background: linear-gradient(135deg, #17a2b8, #138496); color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; border-radius: 12px 12px 0 0; border: none;">
-                                    <i class="fas fa-cog me-2" style="opacity: 0.9;"></i>{{ $serviceName }}
-                                </div>
-                                <div class="card-body">
-                                    <form class="attachment-upload-form upload-form mb-3" data-service-type="{{ $serviceName }}" action="{{ route('projects.attachments.store', $project->id) }}" method="POST" enctype="multipart/form-data">
-                                        @csrf
-                                        <input type="hidden" name="service_type" value="{{ $serviceName }}">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header text-center" style="background: linear-gradient(135deg, #17a2b8, #138496); color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; border-radius: 12px 12px 0 0; border: none;">
+                                <i class="fas fa-cog me-2" style="opacity: 0.9;"></i>{{ $serviceName }}
+                            </div>
+                            <div class="card-body">
+                                <form class="attachment-upload-form upload-form mb-3" data-service-type="{{ $serviceName }}" action="{{ route('projects.attachments.store', $project->id) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" name="service_type" value="{{ $serviceName }}">
 
-                                        <div class="drag-drop-upload-container">
-                                            <div class="drag-drop-area" id="dragDropArea{{ str_replace(' ', '', $serviceName) }}">
-                                                <div class="drag-drop-message">
-                            <i class="fas fa-cloud-upload-alt mb-2"></i>
-                            <p>اسحب الملفات وأفلتها هنا</p>
-                            <p class="small text-muted">أو</p>
-                            <button type="button" class="file-select-button">اختر ملفات</button>
-                                                    <input type="file" name="attachment" id="fileInput{{ str_replace(' ', '', $serviceName) }}" class="file-input-hidden">
-                                                </div>
-                                            </div>
-
-                                            <div class="selected-files-container" id="selectedFiles{{ str_replace(' ', '', $serviceName) }}"></div>
-                                        </div>
-
-                                        <div class="mb-2 mt-2">
-                                            <input type="text" name="description" class="form-control form-control-sm" placeholder="وصف (اختياري)">
-                                        </div>
-
-                                                                                <!-- Progress Bar Elements for Services -->
-                                        <div class="upload-progress-container" id="progress-container-{{ str_replace(' ', '', $serviceName) }}">
-                                            <div class="progress-bar-container">
-                                                <div class="progress-bar-animated"
-                                                     id="progress-bar-{{ str_replace(' ', '', $serviceName) }}"
-                                                     role="progressbar"
-                                                     aria-valuenow="0"
-                                                     aria-valuemin="0"
-                                                     aria-valuemax="100">
-                                                </div>
-                                            </div>
-                                            <div class="progress-text-container">
-                                                <span id="percentage-{{ str_replace(' ', '', $serviceName) }}" class="progress-percentage">0%</span>
+                                    <div class="drag-drop-upload-container">
+                                        <div class="drag-drop-area" id="dragDropArea{{ str_replace(' ', '', $serviceName) }}">
+                                            <div class="drag-drop-message">
+                                                <i class="fas fa-cloud-upload-alt mb-2"></i>
+                                                <p>اسحب الملفات وأفلتها هنا</p>
+                                                <p class="small text-muted">أو</p>
+                                                <button type="button" class="file-select-button">اختر ملفات</button>
+                                                <input type="file" name="attachment" id="fileInput{{ str_replace(' ', '', $serviceName) }}" class="file-input-hidden">
                                             </div>
                                         </div>
 
-                                        <div class="upload-status alert alert-info" id="status-{{ str_replace(' ', '', $serviceName) }}">
-                                            جاري التحضير...
-                                        </div>
+                                        <div class="selected-files-container" id="selectedFiles{{ str_replace(' ', '', $serviceName) }}"></div>
+                                    </div>
 
-                                        <!-- اختيار نوع المهمة في فولدرات الخدمات -->
-                                        <div class="mb-2">
-                                            <label class="form-label small">ربط بمهمة (اختياري):</label>
-                                            <select name="task_type" class="form-control form-control-sm task-type-selector" id="taskType{{ str_replace(' ', '', $serviceName) }}">
-                                                <option value="">-- بدون ربط بمهمة --</option>
-                                                <option value="template_task">مهمة قالب</option>
-                                                <option value="regular_task">مهمة عادية</option>
-                                            </select>
-                                        </div>
+                                    <div class="mb-2 mt-2">
+                                        <input type="text" name="description" class="form-control form-control-sm" placeholder="وصف (اختياري)">
+                                    </div>
 
-                                        <!-- اختيار المهمة القالب - فقط مهام هذه الخدمة -->
-                                        <div class="mb-2 template-task-selector d-none" id="templateTaskSelector{{ str_replace(' ', '', $serviceName) }}">
-                                            <select name="template_task_id" class="form-control form-control-sm">
-                                                <option value="">-- اختر مهمة القالب --</option>
-                                                @if(isset($userTasks[auth()->id()]) && $userTasks[auth()->id()]->count() > 0)
-                                                    @foreach($userTasks[auth()->id()] as $taskUser)
-                                                        @if(optional($taskUser->templateTask->template->service)->name === $serviceName)
-                                                            <option value="{{ $taskUser->id }}">
-                                                                {{ optional($taskUser->templateTask)->name }}
-                                                            </option>
-                                                        @endif
-                                                    @endforeach
-                                                @else
-                                                    <option value="" disabled>لا توجد مهام قوالب لهذه الخدمة</option>
+                                    <!-- Progress Bar Elements for Services -->
+                                    <div class="upload-progress-container" id="progress-container-{{ str_replace(' ', '', $serviceName) }}">
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-animated"
+                                                id="progress-bar-{{ str_replace(' ', '', $serviceName) }}"
+                                                role="progressbar"
+                                                aria-valuenow="0"
+                                                aria-valuemin="0"
+                                                aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <div class="progress-text-container">
+                                            <span id="percentage-{{ str_replace(' ', '', $serviceName) }}" class="progress-percentage">0%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="upload-status alert alert-info" id="status-{{ str_replace(' ', '', $serviceName) }}">
+                                        جاري التحضير...
+                                    </div>
+
+                                    <!-- اختيار نوع المهمة في فولدرات الخدمات -->
+                                    <div class="mb-2">
+                                        <label class="form-label small">ربط بمهمة (اختياري):</label>
+                                        <select name="task_type" class="form-control form-control-sm task-type-selector" id="taskType{{ str_replace(' ', '', $serviceName) }}">
+                                            <option value="">-- بدون ربط بمهمة --</option>
+                                            <option value="template_task">مهمة قالب</option>
+                                            <option value="regular_task">مهمة عادية</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- اختيار المهمة القالب - فقط مهام هذه الخدمة -->
+                                    <div class="mb-2 template-task-selector d-none" id="templateTaskSelector{{ str_replace(' ', '', $serviceName) }}">
+                                        <select name="template_task_id" class="form-control form-control-sm">
+                                            <option value="">-- اختر مهمة القالب --</option>
+                                            @if(isset($userTasks[auth()->id()]) && $userTasks[auth()->id()]->count() > 0)
+                                            @foreach($userTasks[auth()->id()] as $taskUser)
+                                            @if(optional($taskUser->templateTask->template->service)->name === $serviceName)
+                                            <option value="{{ $taskUser->id }}">
+                                                {{ optional($taskUser->templateTask)->name }}
+                                            </option>
+                                            @endif
+                                            @endforeach
+                                            @else
+                                            <option value="" disabled>لا توجد مهام قوالب لهذه الخدمة</option>
+                                            @endif
+                                        </select>
+                                    </div>
+
+                                    <!-- اختيار المهمة العادية - فقط مهام هذه الخدمة -->
+                                    <div class="mb-2 regular-task-selector d-none" id="regularTaskSelector{{ str_replace(' ', '', $serviceName) }}">
+                                        <select name="task_user_id" class="form-control form-control-sm">
+                                            <option value="">-- اختر المهمة العادية --</option>
+                                            @if(isset($userActualTasks[auth()->id()]) && $userActualTasks[auth()->id()]->count() > 0)
+                                            @foreach($userActualTasks[auth()->id()] as $taskUser)
+                                            @if(optional($taskUser->task->service)->name === $serviceName)
+                                            <option value="{{ $taskUser->id }}">
+                                                {{ optional($taskUser->task)->title }}
+                                            </option>
+                                            @endif
+                                            @endforeach
+                                            @else
+                                            <option value="" disabled>لا توجد مهام عادية لهذه الخدمة</option>
+                                            @endif
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="isReply{{ str_replace(' ', '', $serviceName) }}" name="is_reply">
+                                            <label class="form-check-label small" for="isReply{{ str_replace(' ', '', $serviceName) }}">
+                                                رد على ملف موجود
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-2 reply-file-selector d-none">
+                                        <select name="parent_attachment_id" class="form-control form-control-sm">
+                                            <option value="">-- اختر الملف للرد عليه --</option>
+                                            @php
+                                            $serviceAttachmentsForReply = $project->attachments->where('service_type', $serviceName)->where('parent_attachment_id', null);
+                                            @endphp
+                                            @if($serviceAttachmentsForReply->count() > 0)
+                                            @foreach($serviceAttachmentsForReply as $attachment)
+                                            <option value="{{ $attachment->id }}">
+                                                {{ $attachment->file_name }}
+                                                @if($attachment->replies && $attachment->replies->count() > 0)
+                                                ({{ $attachment->replies->count() }} رد)
                                                 @endif
-                                            </select>
-                                        </div>
+                                            </option>
+                                            @endforeach
+                                            @else
+                                            <option value="" disabled>لا توجد ملفات للرد عليها في هذه الخدمة</option>
+                                            @endif
+                                        </select>
+                                    </div>
 
-                                        <!-- اختيار المهمة العادية - فقط مهام هذه الخدمة -->
-                                        <div class="mb-2 regular-task-selector d-none" id="regularTaskSelector{{ str_replace(' ', '', $serviceName) }}">
-                                            <select name="task_user_id" class="form-control form-control-sm">
-                                                <option value="">-- اختر المهمة العادية --</option>
-                                                @if(isset($userActualTasks[auth()->id()]) && $userActualTasks[auth()->id()]->count() > 0)
-                                                    @foreach($userActualTasks[auth()->id()] as $taskUser)
-                                                        @if(optional($taskUser->task->service)->name === $serviceName)
-                                                            <option value="{{ $taskUser->id }}">
-                                                                {{ optional($taskUser->task)->title }}
-                                                            </option>
-                                                        @endif
-                                                    @endforeach
-                                                @else
-                                                    <option value="" disabled>لا توجد مهام عادية لهذه الخدمة</option>
-                                                @endif
-                                            </select>
-                                        </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-upload me-2"></i>رفع الملفات
+                                    </button>
+                                </form>
 
-                                        <div class="mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="isReply{{ str_replace(' ', '', $serviceName) }}" name="is_reply">
-                                                <label class="form-check-label small" for="isReply{{ str_replace(' ', '', $serviceName) }}">
-                                                    رد على ملف موجود
-                                                </label>
-                                            </div>
-                                        </div>
+                                @php
+                                // استخدام المرفقات المفلترة من الـ Controller
+                                $serviceAttachments = isset($filteredAttachments) ?
+                                $filteredAttachments->where('service_type', $serviceName) :
+                                collect();
 
-                                        <div class="mb-2 reply-file-selector d-none">
-                                            <select name="parent_attachment_id" class="form-control form-control-sm">
-                                                <option value="">-- اختر الملف للرد عليه --</option>
-                                                @php
-                                                    $serviceAttachmentsForReply = $project->attachments->where('service_type', $serviceName)->where('parent_attachment_id', null);
-                                                @endphp
-                                                @if($serviceAttachmentsForReply->count() > 0)
-                                                    @foreach($serviceAttachmentsForReply as $attachment)
-                                                        <option value="{{ $attachment->id }}">
-                                                            {{ $attachment->file_name }}
-                                                            @if($attachment->replies && $attachment->replies->count() > 0)
-                                                                ({{ $attachment->replies->count() }} رد)
-                                                            @endif
-                                                        </option>
-                                                    @endforeach
-                                                @else
-                                                    <option value="" disabled>لا توجد ملفات للرد عليها في هذه الخدمة</option>
-                                                @endif
-                                            </select>
-                                        </div>
+                                $groupedServiceAttachments = $serviceAttachments->groupBy(function($attachment) {
+                                if ($attachment->task_type == 'template_task' && $attachment->templateTaskUser) {
+                                return 'template_task_' . $attachment->template_task_user_id;
+                                } elseif ($attachment->task_type == 'regular_task' && $attachment->taskUser) {
+                                return 'regular_task_' . $attachment->task_user_id;
+                                } else {
+                                return 'no_task';
+                                }
+                                });
+                                @endphp
 
-                                        <button type="submit" class="btn btn-primary w-100">
-                                            <i class="fas fa-upload me-2"></i>رفع الملفات
-                                        </button>
-                                    </form>
-
+                                @if($serviceAttachments->count() > 0)
+                                <div class="attachments-list">
+                                    @foreach($groupedServiceAttachments as $taskKey => $attachments)
                                     @php
-                                        // استخدام المرفقات المفلترة من الـ Controller
-                                        $serviceAttachments = isset($filteredAttachments) ?
-                                            $filteredAttachments->where('service_type', $serviceName) :
-                                            collect();
+                                    $firstAttachment = $attachments->first();
+                                    $taskName = null;
+                                    $taskUser = null;
 
-                                        $groupedServiceAttachments = $serviceAttachments->groupBy(function($attachment) {
-                                            if ($attachment->task_type == 'template_task' && $attachment->templateTaskUser) {
-                                                return 'template_task_' . $attachment->template_task_user_id;
-                                            } elseif ($attachment->task_type == 'regular_task' && $attachment->taskUser) {
-                                                return 'regular_task_' . $attachment->task_user_id;
-                                            } else {
-                                                return 'no_task';
-                                            }
-                                        });
+                                    if ($taskKey !== 'no_task') {
+                                    if ($firstAttachment->task_type == 'template_task' && $firstAttachment->templateTaskUser) {
+                                    $taskName = optional($firstAttachment->templateTaskUser->templateTask)->name;
+                                    $taskUser = optional($firstAttachment->templateTaskUser->user)->name;
+                                    } elseif ($firstAttachment->task_type == 'regular_task' && $firstAttachment->taskUser) {
+                                    $taskName = optional($firstAttachment->taskUser->task)->title;
+                                    $taskUser = optional($firstAttachment->taskUser->user)->name;
+                                    }
+                                    }
                                     @endphp
 
-                                    @if($serviceAttachments->count() > 0)
-                                        <div class="attachments-list">
-                                            @foreach($groupedServiceAttachments as $taskKey => $attachments)
-                                                @php
-                                                    $firstAttachment = $attachments->first();
-                                                    $taskName = null;
-                                                    $taskUser = null;
+                                    @if($taskName)
+                                    <div class="task-section mb-3">
+                                        <div class="task-header bg-light p-2 rounded">
+                                            <small class="text-muted">
+                                                <i class="fas fa-tasks me-1"></i>
+                                                المهمة: <strong>{{ $taskName }}</strong>
+                                                @if($taskUser)
+                                                | المسؤول: <strong>{{ $taskUser }}</strong>
+                                                @endif
+                                            </small>
+                                        </div>
+                                        @endif
 
-                                                    if ($taskKey !== 'no_task') {
-                                                        if ($firstAttachment->task_type == 'template_task' && $firstAttachment->templateTaskUser) {
-                                                            $taskName = optional($firstAttachment->templateTaskUser->templateTask)->name;
-                                                            $taskUser = optional($firstAttachment->templateTaskUser->user)->name;
-                                                        } elseif ($firstAttachment->task_type == 'regular_task' && $firstAttachment->taskUser) {
-                                                            $taskName = optional($firstAttachment->taskUser->task)->title;
-                                                            $taskUser = optional($firstAttachment->taskUser->user)->name;
-                                                        }
-                                                    }
-                                                @endphp
-
-                                                @if($taskName)
-                                                    <div class="task-section mb-3">
-                                                        <div class="task-header bg-light p-2 rounded">
-                                                            <small class="text-muted">
-                                                                <i class="fas fa-tasks me-1"></i>
-                                                                المهمة: <strong>{{ $taskName }}</strong>
-                                                                @if($taskUser)
-                                                                    | المسؤول: <strong>{{ $taskUser }}</strong>
-                                                                @endif
+                                        <div class="service-attachment-list-container service-attachment-list-container-350">
+                                            <ul class="list-unstyled mt-2">
+                                                @foreach($attachments->where('parent_attachment_id', null) as $attachment)
+                                                <li class="attachment-item mb-2 p-2 border rounded">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div class="attachment-info">
+                                                            <a href="{{ route('projects.attachments.view', $attachment->id) }}" target="_blank" class="text-decoration-none" title="عرض الملف">
+                                                                <strong>{{ $attachment->file_name }}</strong>
+                                                            </a>
+                                                            @if($attachment->description)
+                                                            <br><small class="text-muted">{{ $attachment->description }}</small>
+                                                            @endif
+                                                            <br><small class="text-muted">
+                                                                <i class="fas fa-user me-1"></i>بواسطة: {{ optional($attachment->user)->name ?? 'غير معروف' }}
+                                                            </small>
+                                                            <br><small class="text-muted">
+                                                                <i class="fas fa-calendar-alt me-1"></i>{{ $attachment->created_at->format('d/m/Y - H:i') }}
+                                                                <span class="badge bg-light text-dark ms-1">{{ $attachment->created_at->diffForHumans() }}</span>
                                                             </small>
                                                         </div>
-                                                @endif
-
-                                                <div class="service-attachment-list-container service-attachment-list-container-350">
-                                                    <ul class="list-unstyled mt-2">
-                                                        @foreach($attachments->where('parent_attachment_id', null) as $attachment)
-                                                        <li class="attachment-item mb-2 p-2 border rounded">
-                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                <div class="attachment-info">
-                                                                    <a href="{{ route('projects.attachments.view', $attachment->id) }}" target="_blank" class="text-decoration-none" title="عرض الملف">
-                                                                        <strong>{{ $attachment->file_name }}</strong>
-                                                                    </a>
-                                                                    @if($attachment->description)
-                                                                        <br><small class="text-muted">{{ $attachment->description }}</small>
-                                                                    @endif
-                                                                    <br><small class="text-muted">
-                                                                        <i class="fas fa-user me-1"></i>بواسطة: {{ optional($attachment->user)->name ?? 'غير معروف' }}
-                                                                    </small>
-                                                                    <br><small class="text-muted">
-                                                                        <i class="fas fa-calendar-alt me-1"></i>{{ $attachment->created_at->format('d/m/Y - H:i') }}
-                                                                        <span class="badge bg-light text-dark ms-1">{{ $attachment->created_at->diffForHumans() }}</span>
-                                                                    </small>
-                                                                </div>
-                                                                <div class="attachment-actions d-flex align-items-center">
-                                                                    <div class="dropdown me-1">
-                                                                        <button class="btn btn-sm btn-link text-muted p-1" type="button"
-                                                                                data-bs-toggle="dropdown" aria-expanded="false" title="خيارات المشاركة">
-                                                                            <i class="fas fa-ellipsis-v"></i>
-                                                                        </button>
-                                                                        <ul class="dropdown-menu dropdown-menu-start">
-                                                                            <li>
-                                                                                <a class="dropdown-item share-attachment-btn" href="#"
-                                                                                   data-attachment-id="{{ $attachment->id }}"
-                                                                                   data-attachment-name="{{ $attachment->file_name }}">
-                                                                                    <i class="fas fa-share text-primary me-2"></i>
-                                                                                    مشاركة الملف
-                                                                                </a>
-                                                                            </li>
-                                                                            <li>
-                                                                                <a class="dropdown-item view-shares-btn" href="#"
-                                                                                   data-attachment-id="{{ $attachment->id }}">
-                                                                                    <i class="fas fa-users text-info me-2"></i>
-                                                                                    عرض المشاركات
-                                                                                </a>
-                                                                            </li>
-                                                                            <li><hr class="dropdown-divider"></li>
-                                                                            <li>
-                                                                                <a class="dropdown-item copy-attachment-link"
-                                                                                   href="javascript:void(0);"
-                                                                                   data-attachment-id="{{ $attachment->id }}"
-                                                                                   data-attachment-url="{{ route('projects.attachments.view', $attachment->id) }}">
-                                                                                    <i class="fas fa-copy text-warning me-2"></i>
-                                                                                    نسخ الرابط
-                                                                                </a>
-                                                                            </li>
-                                                                            <li>
-                                                                                <a class="dropdown-item" href="{{ route('projects.attachments.download', $attachment->id) }}">
-                                                                                    <i class="fas fa-download text-success me-2"></i>
-                                                                                    تحميل
-                                                                                </a>
-                                                                            </li>
-                                                                        </ul>
-                                                                    </div>
-
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input attachment-select" type="checkbox"
-                                                                               value="{{ $attachment->id }}"
-                                                                               id="service_attachment_{{ $attachment->id }}">
-                                                                        <label class="form-check-label" for="service_attachment_{{ $attachment->id }}"></label>
-                                                                    </div>
-                                                                </div>
+                                                        <div class="attachment-actions d-flex align-items-center">
+                                                            <div class="dropdown me-1">
+                                                                <button class="btn btn-sm btn-link text-muted p-1" type="button"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false" title="خيارات المشاركة">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-start">
+                                                                    <li>
+                                                                        <a class="dropdown-item share-attachment-btn" href="#"
+                                                                            data-attachment-id="{{ $attachment->id }}"
+                                                                            data-attachment-name="{{ $attachment->file_name }}">
+                                                                            <i class="fas fa-share text-primary me-2"></i>
+                                                                            مشاركة الملف
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item view-shares-btn" href="#"
+                                                                            data-attachment-id="{{ $attachment->id }}">
+                                                                            <i class="fas fa-users text-info me-2"></i>
+                                                                            عرض المشاركات
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item copy-attachment-link"
+                                                                            href="javascript:void(0);"
+                                                                            data-attachment-id="{{ $attachment->id }}"
+                                                                            data-attachment-url="{{ route('projects.attachments.view', $attachment->id) }}">
+                                                                            <i class="fas fa-copy text-warning me-2"></i>
+                                                                            نسخ الرابط
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="{{ route('projects.attachments.download', $attachment->id) }}">
+                                                                            <i class="fas fa-download text-success me-2"></i>
+                                                                            تحميل
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
                                                             </div>
 
-                                                            <!-- الردود على هذا المرفق -->
-                                                            @if($attachment->replies->count() > 0)
-                                                                <div class="replies-section mt-2 ps-3 border-start">
-                                                                    @foreach($attachment->replies as $reply)
-                                                                        <div class="reply-item mb-1 p-1 bg-light rounded">
-                                                                            <small>
-                                                                                <strong>رد:</strong> {{ $reply->file_name }}
-                                                                                @if($reply->description)
-                                                                                    - {{ $reply->description }}
-                                                                                @endif
-                                                                                <br>
-                                                                                <i class="fas fa-user me-1"></i>بواسطة: {{ optional($reply->user)->name ?? 'غير معروف' }}
-                                                                                <br><i class="fas fa-calendar-alt me-1"></i>{{ $reply->created_at->format('d/m/Y - H:i') }}
-                                                                                <span class="badge bg-secondary text-white ms-1" class="badge bg-secondary text-white ms-1 badge-small-text">{{ $reply->created_at->diffForHumans() }}</span>
-                                                                            </small>
-                                                                            <div class="reply-actions d-flex align-items-center">
-                                                                                <div class="dropdown me-1">
-                                                                                    <button class="btn btn-xs btn-link text-muted p-1" type="button"
-                                                                                            data-bs-toggle="dropdown" aria-expanded="false" title="خيارات المشاركة">
-                                                                                        <i class="fas fa-ellipsis-v"></i>
-                                                                                    </button>
-                                                                                    <ul class="dropdown-menu dropdown-menu-start">
-                                                                                        <li>
-                                                                                            <a class="dropdown-item share-attachment-btn" href="#"
-                                                                                               data-attachment-id="{{ $reply->id }}"
-                                                                                               data-attachment-name="{{ $reply->file_name }}">
-                                                                                                <i class="fas fa-share text-primary me-2"></i>
-                                                                                                مشاركة الملف
-                                                                                            </a>
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            <a class="dropdown-item view-shares-btn" href="#"
-                                                                                               data-attachment-id="{{ $reply->id }}">
-                                                                                                <i class="fas fa-users text-info me-2"></i>
-                                                                                                عرض المشاركات
-                                                                                            </a>
-                                                                                        </li>
-                                                                                        <li><hr class="dropdown-divider"></li>
-                                                                                        <li>
-                                                                                            <a class="dropdown-item copy-attachment-link"
-                                                                                               href="javascript:void(0);"
-                                                                                               data-attachment-id="{{ $reply->id }}"
-                                                                                               data-attachment-url="{{ route('projects.attachments.view', $reply->id) }}">
-                                                                                                <i class="fas fa-copy text-warning me-2"></i>
-                                                                                                نسخ الرابط
-                                                                                            </a>
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            <a class="dropdown-item" href="{{ route('projects.attachments.download', $reply->id) }}">
-                                                                                                <i class="fas fa-download text-success me-2"></i>
-                                                                                                تحميل
-                                                                                            </a>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </div>
-
-                                                                                <div class="form-check">
-                                                                                    <input class="form-check-input attachment-select" type="checkbox"
-                                                                                           value="{{ $reply->id }}"
-                                                                                           id="service_reply_{{ $reply->id }}">
-                                                                                    <label class="form-check-label" for="service_reply_{{ $reply->id }}"></label>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    @endforeach
-                                                                </div>
-                                                            @endif
-                                                        </li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-
-                                                @if($taskName)
+                                                            <div class="form-check">
+                                                                <input class="form-check-input attachment-select" type="checkbox"
+                                                                    value="{{ $attachment->id }}"
+                                                                    id="service_attachment_{{ $attachment->id }}">
+                                                                <label class="form-check-label" for="service_attachment_{{ $attachment->id }}"></label>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                @endif
-                                            @endforeach
+
+                                                    <!-- الردود على هذا المرفق -->
+                                                    @if($attachment->replies->count() > 0)
+                                                    <div class="replies-section mt-2 ps-3 border-start">
+                                                        @foreach($attachment->replies as $reply)
+                                                        <div class="reply-item mb-1 p-1 bg-light rounded">
+                                                            <small>
+                                                                <strong>رد:</strong> {{ $reply->file_name }}
+                                                                @if($reply->description)
+                                                                - {{ $reply->description }}
+                                                                @endif
+                                                                <br>
+                                                                <i class="fas fa-user me-1"></i>بواسطة: {{ optional($reply->user)->name ?? 'غير معروف' }}
+                                                                <br><i class="fas fa-calendar-alt me-1"></i>{{ $reply->created_at->format('d/m/Y - H:i') }}
+                                                                <span class="badge bg-secondary text-white ms-1" class="badge bg-secondary text-white ms-1 badge-small-text">{{ $reply->created_at->diffForHumans() }}</span>
+                                                            </small>
+                                                            <div class="reply-actions d-flex align-items-center">
+                                                                <div class="dropdown me-1">
+                                                                    <button class="btn btn-xs btn-link text-muted p-1" type="button"
+                                                                        data-bs-toggle="dropdown" aria-expanded="false" title="خيارات المشاركة">
+                                                                        <i class="fas fa-ellipsis-v"></i>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu dropdown-menu-start">
+                                                                        <li>
+                                                                            <a class="dropdown-item share-attachment-btn" href="#"
+                                                                                data-attachment-id="{{ $reply->id }}"
+                                                                                data-attachment-name="{{ $reply->file_name }}">
+                                                                                <i class="fas fa-share text-primary me-2"></i>
+                                                                                مشاركة الملف
+                                                                            </a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a class="dropdown-item view-shares-btn" href="#"
+                                                                                data-attachment-id="{{ $reply->id }}">
+                                                                                <i class="fas fa-users text-info me-2"></i>
+                                                                                عرض المشاركات
+                                                                            </a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <hr class="dropdown-divider">
+                                                                        </li>
+                                                                        <li>
+                                                                            <a class="dropdown-item copy-attachment-link"
+                                                                                href="javascript:void(0);"
+                                                                                data-attachment-id="{{ $reply->id }}"
+                                                                                data-attachment-url="{{ route('projects.attachments.view', $reply->id) }}">
+                                                                                <i class="fas fa-copy text-warning me-2"></i>
+                                                                                نسخ الرابط
+                                                                            </a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a class="dropdown-item" href="{{ route('projects.attachments.download', $reply->id) }}">
+                                                                                <i class="fas fa-download text-success me-2"></i>
+                                                                                تحميل
+                                                                            </a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input attachment-select" type="checkbox"
+                                                                        value="{{ $reply->id }}"
+                                                                        id="service_reply_{{ $reply->id }}">
+                                                                    <label class="form-check-label" for="service_reply_{{ $reply->id }}"></label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @endforeach
+                                                    </div>
+                                                    @endif
+                                                </li>
+                                                @endforeach
+                                            </ul>
                                         </div>
-                                    @else
-                                        <div class="text-center text-muted py-3">
-                                            <i class="fas fa-folder-open fa-2x mb-2"></i>
-                                            <p>لا توجد مرفقات لهذه الخدمة</p>
-                                        </div>
+
+                                        @if($taskName)
+                                    </div>
                                     @endif
+                                    @endforeach
                                 </div>
+                                @else
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                    <p>لا توجد مرفقات لهذه الخدمة</p>
+                                </div>
+                                @endif
                             </div>
                         </div>
+                    </div>
                     @endforeach
                 </div>
             </div>
@@ -909,7 +914,7 @@
                     <div class="col-12">
                         <label for="shareDescription" class="form-label">وصف المشاركة (اختياري):</label>
                         <input type="text" class="form-control" id="shareDescription"
-                               placeholder="مثال: مستندات المشروع الأساسية">
+                            placeholder="مثال: مستندات المشروع الأساسية">
                     </div>
                 </div>
             </div>
@@ -1065,191 +1070,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-<script>
-function waitForJQuery(callback) {
-    if (typeof $ !== 'undefined') {
-        callback();
-    } else {
-        setTimeout(function() {
-            waitForJQuery(callback);
-        }, 100);
-    }
-}
-
-waitForJQuery(function() {
-    $(document).ready(function() {
-
-        // 🔒 إزالة أي event handlers سابقة لمنع التسجيل المكرر
-        $('.attachment-upload-form').off('submit').on('submit', function(e) {
-            e.preventDefault();
-
-            const form = $(this);
-            const fileInput = form.find('input[type="file"]')[0];
-            const submitBtn = form.find('button[type="submit"]');
-            const originalText = submitBtn.html();
-
-            // 🚫 منع الرفع المتعدد - إذا الزر معطل أو الفورم بيرفع حالياً، لا ترسل
-            if (submitBtn.prop('disabled') || form.data('uploading') === true) {
-                console.log('Upload already in progress, ignoring duplicate request');
-                return false;
-            }
-
-            // التحقق من وجود ملف
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert('يرجى اختيار ملف للرفع');
-                return;
-            }
-
-            const formData = new FormData();
-
-            // إضافة الملف
-            formData.append('attachment', fileInput.files[0]);
-
-            // إضافة البيانات الأساسية
-            formData.append('service_type', form.find('input[name="service_type"]').val());
-            formData.append('description', form.find('input[name="description"]').val() || '');
-            formData.append('_token', form.find('input[name="_token"]').val());
-
-            const isReply = form.find('input[name="is_reply"]').is(':checked');
-
-            // إضافة is_reply للـ FormData إذا كان محدد
-            if (isReply) {
-                formData.append('is_reply', '1');
-                const selectedFile = form.find('select[name="parent_attachment_id"]').val();
-                if (!selectedFile) {
-                    alert('يرجى اختيار ملف للرد عليه');
-                    return;
-                }
-                // إضافة parent_attachment_id للـ FormData
-                formData.append('parent_attachment_id', selectedFile);
-            }
-
-            // إضافة بيانات المهمة (سواء كان رد أو لا)
-            const taskType = form.find('select[name="task_type"]').val();
-            if (taskType) {
-                formData.append('task_type', taskType);
-                if (taskType === 'template_task') {
-                    const templateTaskId = form.find('select[name="template_task_id"]').val();
-                    if (templateTaskId) {
-                        formData.append('template_task_id', templateTaskId);
-                    }
-                } else if (taskType === 'regular_task') {
-                    const taskUserId = form.find('select[name="task_user_id"]').val();
-                    if (taskUserId) {
-                        formData.append('task_user_id', taskUserId);
-                    }
-                }
-            }
-
-            // 🔒 تعطيل الزر وإضافة flag لمنع الإرسال المكرر
-            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>جاري الرفع...');
-            form.data('uploading', true); // flag إضافي
-
-            form.find('.alert').remove();
-
-            const url = form.attr('action');
-
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    console.log('📥 Upload Response:', response); // للـ debugging
-                    console.log('Response type:', typeof response);
-                    console.log('Response.success:', response ? response.success : 'response is null/undefined');
-
-                    // التعامل مع أي response ناجح
-                    if (!response || response.success !== false) {
-                        // إظهار رسالة النجاح
-                        const successMessage = (response && response.message) ? response.message : 'تم رفع الملف بنجاح';
-                        form.prepend('<div class="alert alert-success alert-sm"><i class="fas fa-check-circle me-2"></i>' + successMessage + '</div>');
-
-                        // ✅ Reload مباشر بدون انتظار
-                        console.log('✅ Upload successful! Reloading in 500ms...');
-
-                        // إخفاء الزر وإظهار رسالة
-                        submitBtn.html('<i class="fas fa-check me-1"></i>تم الرفع بنجاح!').removeClass('btn-primary').addClass('btn-success');
-
-                        setTimeout(function() {
-                            console.log('🔄 Reloading page now...');
-                            window.location.reload(true); // force reload
-                        }, 500);
-                    } else {
-                        console.error('❌ Upload failed:', response);
-                        form.prepend('<div class="alert alert-danger alert-sm"><i class="fas fa-exclamation-circle me-2"></i>' + (response.message || 'حدث خطأ أثناء رفع الملف') + '</div>');
-                    }
-                },
-                error: function(xhr) {
-                    console.error('❌ AJAX Error:', xhr);
-                    let message = 'حدث خطأ أثناء رفع الملف';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
-                    }
-                    form.prepend('<div class="alert alert-danger alert-sm">' + message + '</div>');
-                },
-                complete: function() {
-                    submitBtn.prop('disabled', false).html(originalText);
-                    form.data('uploading', false); // إعادة تعيين الـ flag
-                }
-            });
-        });
-
-        // معالج تغيير نوع المهمة
-        $(document).on('change', '.task-type-selector', function() {
-            const taskType = $(this).val();
-            const form = $(this).closest('form');
-
-            // إخفاء جميع selectors المهام
-            form.find('.template-task-selector').addClass('d-none');
-            form.find('.regular-task-selector').addClass('d-none');
-
-            // إظهار المناسب حسب النوع
-            if (taskType === 'template_task') {
-                form.find('.template-task-selector').removeClass('d-none');
-            } else if (taskType === 'regular_task') {
-                form.find('.regular-task-selector').removeClass('d-none');
-            }
-        });
-
-        // معالج الرد على ملف
-        $(document).on('change', 'input[name="is_reply"]', function() {
-            const isReply = $(this).is(':checked');
-            const form = $(this).closest('form');
-
-            if (isReply) {
-                form.find('.reply-file-selector').removeClass('d-none');
-                // إخفاء task selectors عند الرد
-                form.find('.task-type-selector').closest('.mb-2').hide();
-                form.find('.template-task-selector').addClass('d-none');
-                form.find('.regular-task-selector').addClass('d-none');
-            } else {
-                form.find('.reply-file-selector').addClass('d-none');
-                // إظهار task selectors مرة أخرى
-                form.find('.task-type-selector').closest('.mb-2').show();
-            }
-        });
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-
-    });
-});
-</script>

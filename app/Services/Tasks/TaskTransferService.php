@@ -37,6 +37,27 @@ class TaskTransferService
      */
     public function transferTask(TaskUser $taskUser, User $toUser, int $transferPoints, string $reason = null, string $transferType = 'positive', $newDeadline = null): array
     {
+        // ✅ التحقق من حالة المشروع - منع نقل المهام التابعة لمشروع ملغي
+        $task = $taskUser->task;
+        if ($task && $task->project_id) {
+            $project = $task->project;
+            if ($project && $project->status === 'ملغي') {
+                Log::warning('🚫 Attempted to transfer task from cancelled project', [
+                    'task_user_id' => $taskUser->id,
+                    'task_id' => $task->id,
+                    'project_id' => $project->id,
+                    'project_status' => $project->status,
+                    'user_id' => $toUser->id
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => 'لا يمكن نقل المهام التابعة لمشروع تم إلغاؤه',
+                    'error_type' => 'project_cancelled'
+                ];
+            }
+        }
+
         // ✅ منع نقل المهمة لنفس الشخص
         if ($taskUser->user_id == $toUser->id) {
             Log::warning('🚫 Attempted to transfer task to same user', [
@@ -164,36 +185,36 @@ class TaskTransferService
                         ]);
                     }
 
-                $result = [
-                    'success' => true,
-                    'message' => "تم تعديل المستلم بنجاح من {$fromUser->name} إلى {$toUser->name}",
-                    'updated_task_user' => $taskUser->fresh(),
-                    'transfer_info' => [
-                        'method' => 'update_recipient',
-                        'updated_record_id' => $taskUser->id,
-                        'transfer_type' => $transferType
-                    ]
-                ];
+                    $result = [
+                        'success' => true,
+                        'message' => "تم تعديل المستلم بنجاح من {$fromUser->name} إلى {$toUser->name}",
+                        'updated_task_user' => $taskUser->fresh(),
+                        'transfer_info' => [
+                            'method' => 'update_recipient',
+                            'updated_record_id' => $taskUser->id,
+                            'transfer_type' => $transferType
+                        ]
+                    ];
 
-                // إرسال إشعارات Slack
-                try {
-                    $this->slackService->sendTaskTransferNotifications(
-                        $taskUser,
-                        null,
-                        $fromUser,
-                        $toUser,
-                        $transferType,
-                        $transferPoints,
-                        $reason
-                    );
-                } catch (\Exception $e) {
-                    Log::warning('Failed to send task transfer Slack notifications', [
-                        'task_user_id' => $taskUser->id,
-                        'error' => $e->getMessage()
-                    ]);
-                }
+                    // إرسال إشعارات Slack
+                    try {
+                        $this->slackService->sendTaskTransferNotifications(
+                            $taskUser,
+                            null,
+                            $fromUser,
+                            $toUser,
+                            $transferType,
+                            $transferPoints,
+                            $reason
+                        );
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to send task transfer Slack notifications', [
+                            'task_user_id' => $taskUser->id,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
 
-                return $result;
+                    return $result;
                 }
 
                 // 🆕 مهمة أصلية - ننشئ سجل جديد
@@ -226,7 +247,7 @@ class TaskTransferService
                 // نسخ البنود من TaskUser الأصلي إلى الجديد
                 if ($taskUser->items) {
                     // نسخ البنود من الأصلي مع إعادة حالتها إلى pending
-                    $itemsCopy = array_map(function($item) {
+                    $itemsCopy = array_map(function ($item) {
                         $item['status'] = 'pending';
                         $item['note'] = null;
                         $item['completed_at'] = null;
@@ -353,7 +374,6 @@ class TaskTransferService
 
                 return $result;
             });
-
         } catch (Exception $e) {
             Log::error('Error in task transfer', [
                 'task_user_id' => $taskUser->id,
@@ -382,6 +402,25 @@ class TaskTransferService
             'original_template_task_user_id' => $templateTaskUser->original_template_task_user_id,
             'to_user_id' => $toUser->id
         ]);
+
+        // ✅ التحقق من حالة المشروع - منع نقل المهام التابعة لمشروع ملغي
+        if ($templateTaskUser->project_id) {
+            $project = \App\Models\Project::find($templateTaskUser->project_id);
+            if ($project && $project->status === 'ملغي') {
+                Log::warning('🚫 Attempted to transfer template task from cancelled project', [
+                    'template_task_user_id' => $templateTaskUser->id,
+                    'project_id' => $project->id,
+                    'project_status' => $project->status,
+                    'user_id' => $toUser->id
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => 'لا يمكن نقل المهام التابعة لمشروع تم إلغاؤه',
+                    'error_type' => 'project_cancelled'
+                ];
+            }
+        }
 
         // ✅ منع نقل المهمة لنفس الشخص
         if ($templateTaskUser->user_id == $toUser->id) {
@@ -578,7 +617,7 @@ class TaskTransferService
                 if ($templateTaskUser->items) {
                     $taskItemService = app(\App\Services\Tasks\TaskItemService::class);
                     // نسخ البنود من الأصلي مع إعادة حالتها إلى pending
-                    $itemsCopy = array_map(function($item) {
+                    $itemsCopy = array_map(function ($item) {
                         $item['status'] = 'pending';
                         $item['note'] = null;
                         $item['completed_at'] = null;
@@ -701,7 +740,6 @@ class TaskTransferService
 
                 return $result;
             });
-
         } catch (Exception $e) {
             Log::error('Error in template task transfer', [
                 'template_task_user_id' => $templateTaskUser->id,
@@ -1036,7 +1074,7 @@ class TaskTransferService
         // TODO: إضافة مهام القوالب بنفس الطريقة إذا لزم الأمر
 
         // ترتيب حسب التاريخ
-        usort($history, function($a, $b) {
+        usort($history, function ($a, $b) {
             return ($b['transferred_at'] ?? '') <=> ($a['transferred_at'] ?? '');
         });
 

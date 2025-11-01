@@ -280,22 +280,22 @@ class TemplateTaskUser extends Model implements Auditable
     public function scopeTransferredFromOthers($query)
     {
         return $query->where('is_transferred', true)
-                    ->whereNotNull('original_user_id');
+            ->whereNotNull('original_user_id');
     }
 
 
     public function scopeOriginalTasks($query)
     {
         return $query->where('is_transferred', false)
-                    ->orWhereNull('is_transferred');
+            ->orWhereNull('is_transferred');
     }
 
 
     public function notes()
     {
         return $this->hasMany(TaskNote::class, 'template_task_user_id')
-                    ->where('task_type', 'template')
-                    ->orderBy('created_at', 'desc');
+            ->where('task_type', 'template')
+            ->orderBy('created_at', 'desc');
     }
 
 
@@ -308,15 +308,15 @@ class TemplateTaskUser extends Model implements Auditable
     public function timeLogs()
     {
         return $this->hasMany(TaskTimeLog::class, 'template_task_user_id')
-                    ->orderBy('started_at', 'desc');
+            ->orderBy('started_at', 'desc');
     }
 
 
     public function activeTimeLog()
     {
         return $this->hasOne(TaskTimeLog::class, 'template_task_user_id')
-                    ->whereNull('stopped_at')
-                    ->latest('started_at');
+            ->whereNull('stopped_at')
+            ->latest('started_at');
     }
 
 
@@ -331,8 +331,8 @@ class TemplateTaskUser extends Model implements Auditable
         $now = $this->getCurrentCairoTime();
 
         TaskTimeLog::where('user_id', $this->user_id)
-                  ->whereNull('stopped_at')
-                  ->update(['stopped_at' => $now]);
+            ->whereNull('stopped_at')
+            ->update(['stopped_at' => $now]);
 
         return TaskTimeLog::create([
             'template_task_user_id' => $this->id,
@@ -344,7 +344,7 @@ class TemplateTaskUser extends Model implements Auditable
         ]);
     }
 
-                /**
+    /**
      * إيقاف الجلسة النشطة (time logs منفصل عن النظام الأصلي)
      */
     public function stopActiveTimeLog(): ?TaskTimeLog
@@ -370,9 +370,9 @@ class TemplateTaskUser extends Model implements Auditable
         $today = $this->getCurrentCairoTime()->toDateString();
 
         return $this->timeLogs()
-                   ->where('work_date', $today)
-                   ->whereNotNull('stopped_at')
-                   ->sum('duration_minutes') ?? 0;
+            ->where('work_date', $today)
+            ->whereNotNull('stopped_at')
+            ->sum('duration_minutes') ?? 0;
     }
 
     /**
@@ -724,5 +724,46 @@ class TemplateTaskUser extends Model implements Auditable
 
         // للتاسكات المرتبطة بمشاريع: is_approved + جميع الاعتمادات المطلوبة
         return (bool) $this->is_approved && $this->hasAllRequiredApprovals();
+    }
+
+    /**
+     * التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
+     */
+    public function canUpdateStatus(): bool
+    {
+        // إذا لم تكن المهمة مرتبطة بمشروع، يمكن تحديث حالتها
+        if (!$this->project_id) {
+            return true;
+        }
+
+        // التحقق من حالة المشروع
+        $project = $this->project;
+        if (!$project) {
+            return true; // إذا لم يكن هناك مشروع، نسمح بالتحديث
+        }
+
+        // إذا كان المشروع ملغي، لا يمكن تحديث حالة المهمة
+        if ($project->status === 'ملغي') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * الحصول على رسالة خطأ عند عدم إمكانية تحديث الحالة
+     */
+    public function getStatusUpdateErrorMessage(): string
+    {
+        if (!$this->project_id) {
+            return '';
+        }
+
+        $project = $this->project;
+        if ($project && $project->status === 'ملغي') {
+            return 'لا يمكن تحديث حالة المهمة لأن المشروع تم إلغاؤه';
+        }
+
+        return '';
     }
 }

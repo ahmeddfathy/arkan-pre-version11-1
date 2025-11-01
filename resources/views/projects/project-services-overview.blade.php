@@ -56,10 +56,45 @@
                         <i class="fas fa-code"></i>
                         فلتر بكود المشروع
                     </label>
-                    <select id="projectCodeFilter" class="filter-select" onchange="filterByProjectCode()">
-                        <option value="">جميع أكواد المشاريع</option>
+                    <input type="text"
+                        id="projectCodeFilter"
+                        class="filter-select"
+                        list="projectCodesList"
+                        placeholder="اكتب أو اختر كود المشروع..."
+                        autocomplete="off"
+                        oninput="filterByProjectCode()">
+                    <datalist id="projectCodesList">
                         <!-- Project codes will be loaded here -->
+                    </datalist>
+                </div>
+
+                <!-- Project Status Filter -->
+                <div class="filter-group">
+                    <label for="projectStatusFilter" class="filter-label">
+                        <i class="fas fa-info-circle"></i>
+                        فلتر بحالة المشروع
+                    </label>
+                    <select id="projectStatusFilter" class="filter-select" onchange="filterByProjectStatus()">
+                        <option value="">جميع الحالات</option>
+                        <option value="جديد">جديد</option>
+                        <option value="جاري التنفيذ">جاري التنفيذ</option>
+                        <option value="مكتمل">مكتمل</option>
+                        <option value="ملغي">ملغي</option>
                     </select>
+                </div>
+
+                <!-- Has Revisions Filter -->
+                <div class="filter-group">
+                    <label class="filter-label" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox"
+                            id="hasRevisionsFilter"
+                            style="width: 18px; height: 18px; cursor: pointer;"
+                            onchange="filterByHasRevisions()">
+                        <span>
+                            <i class="fas fa-edit"></i>
+                            مشاريع بها تعديلات
+                        </span>
+                    </label>
                 </div>
 
                 <!-- Clear Filters -->
@@ -104,16 +139,26 @@
                         <th>المشروع</th>
                         <th>العميل</th>
                         <th>الحالة</th>
-                        <th >التاريخ المتفق  الفريق</th>
+                        <th>التاريخ المتفق الفريق</th>
                         <th>الخدمات</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($projects as $project)
+                    @php
+                    // استخدام الـ Workflow Service (سيتم إعادة استخدامه في قسم الخدمات)
+                    $workflowService = app(\App\Services\ProjectManagement\ProjectServiceWorkflowService::class);
+                    $workflowForFilter = $workflowService->getProjectServicesWorkflow($project->id);
+                    $projectServicesForRevisions = $workflowForFilter['services'];
+                    $totalRevisionsForFilter = collect($projectServicesForRevisions)->sum('revisions_count');
+                    $hasRevisions = $totalRevisionsForFilter > 0;
+                    @endphp
                     <tr class="project-row"
                         data-project-id="{{ $project->id }}"
                         data-project-code="{{ $project->code ?? '' }}"
-                        data-project-date="{{ $project->team_delivery_date ? \Carbon\Carbon::parse($project->team_delivery_date)->format('Y-m-d') : '' }}">
+                        data-project-status="{{ $project->status ?? '' }}"
+                        data-project-date="{{ $project->team_delivery_date ? \Carbon\Carbon::parse($project->team_delivery_date)->format('Y-m-d') : '' }}"
+                        data-has-revisions="{{ $hasRevisions ? '1' : '0' }}">
                         <td>
                             <div class="project-info">
                                 <button class="project-details-btn"
@@ -174,9 +219,8 @@
                         </td>
                         <td>
                             @php
-                            // استخدام الـ Workflow Service
-                            $workflowService = app(\App\Services\ProjectManagement\ProjectServiceWorkflowService::class);
-                            $workflow = $workflowService->getProjectServicesWorkflow($project->id);
+                            // إعادة استخدام الـ Workflow Service الذي تم استدعاؤه مسبقاً
+                            $workflow = $workflowForFilter;
 
                             $projectServices = $workflow['services'];
                             $totalServices = $workflow['total'];

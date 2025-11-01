@@ -294,7 +294,7 @@ class Project extends Model implements Auditable
     // المرفقات
     public function attachments()
     {
-        return $this->hasMany(\App\Models\ProjectAttachment::class);
+        return $this->hasMany(\App\Models\ProjectAttachment::class)->orderBy('created_at', 'desc');
     }
 
     public function participants()

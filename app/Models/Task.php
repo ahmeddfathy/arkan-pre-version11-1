@@ -485,4 +485,45 @@ class Task extends Model implements Auditable
 
         return 'mixed'; // خليط من مقبول ومرفوض
     }
+
+    /**
+     * التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
+     */
+    public function canUpdateStatus(): bool
+    {
+        // إذا لم تكن المهمة مرتبطة بمشروع، يمكن تحديث حالتها
+        if (!$this->project_id) {
+            return true;
+        }
+
+        // التحقق من حالة المشروع
+        $project = $this->project;
+        if (!$project) {
+            return true; // إذا لم يكن هناك مشروع، نسمح بالتحديث
+        }
+
+        // إذا كان المشروع ملغي، لا يمكن تحديث حالة المهمة
+        if ($project->status === 'ملغي') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * الحصول على رسالة خطأ عند عدم إمكانية تحديث الحالة
+     */
+    public function getStatusUpdateErrorMessage(): string
+    {
+        if (!$this->project_id) {
+            return '';
+        }
+
+        $project = $this->project;
+        if ($project && $project->status === 'ملغي') {
+            return 'لا يمكن تحديث حالة المهمة لأن المشروع تم إلغاؤه';
+        }
+
+        return '';
+    }
 }

@@ -1,5 +1,3 @@
-
-
 <div class="row mt-4">
     <div class="col-12 px-0">
         <div class="kanban-main-container kanban-main-container-external shadow-sm">
@@ -14,9 +12,9 @@
                         <div>
                             <h4 class="mb-1 text-white fw-bold">
                                 @if($isHRUser ?? false)
-                                    📋 جميع مهام المشروع
+                                📋 جميع مهام المشروع
                                 @else
-                                    🎯 مهامي في المشروع
+                                🎯 مهامي في المشروع
                                 @endif
                             </h4>
                             <p class="mb-0 text-white-50 small">
@@ -43,13 +41,13 @@
                         <!-- Analytics Buttons -->
                         <div class="analytics-buttons">
                             <a href="{{ route('projects.service-analytics', $project) }}"
-                               class="btn btn-success btn-analytics btn-sm d-flex align-items-center shadow-sm">
+                                class="btn btn-success btn-analytics btn-sm d-flex align-items-center shadow-sm">
                                 <i class="fas fa-chart-pie me-2"></i>
                                 إحصائيات الخدمات
                             </a>
 
                             <a href="{{ route('projects.analytics', $project->id) }}#task-analytics"
-                               class="btn btn-info btn-analytics btn-sm d-flex align-items-center shadow-sm">
+                                class="btn btn-info btn-analytics btn-sm d-flex align-items-center shadow-sm">
                                 <i class="fas fa-chart-line me-2"></i>
                                 إحصائيات المهام
                             </a>
@@ -77,535 +75,553 @@
                 <div class="kanban-board kanban-board-external">
                     <div class="kanban-columns">
                         @php
-                            $statuses = [
-                                'new' => ['name' => 'جديدة', 'icon' => 'fas fa-circle-plus'],
-                                'in_progress' => ['name' => 'قيد التنفيذ', 'icon' => 'fas fa-play-circle'],
-                                'paused' => ['name' => 'متوقفة', 'icon' => 'fas fa-pause-circle'],
-                                'completed' => ['name' => 'مكتملة', 'icon' => 'fas fa-check-circle'],
-                            ];
-                            $user = auth()->user();
+                        $statuses = [
+                        'new' => ['name' => 'جديدة', 'icon' => 'fas fa-circle-plus'],
+                        'in_progress' => ['name' => 'قيد التنفيذ', 'icon' => 'fas fa-play-circle'],
+                        'paused' => ['name' => 'متوقفة', 'icon' => 'fas fa-pause-circle'],
+                        'completed' => ['name' => 'مكتملة', 'icon' => 'fas fa-check-circle'],
+                        ];
+                        $user = auth()->user();
 
-                            $isHRUser = $user && $user->hasRole('hr');
+                        $isHRUser = $user && $user->hasRole('hr');
 
-                            if ($isHRUser) {
-                                $userTemplateTasks = App\Models\TemplateTaskUser::with(['templateTask.template', 'user'])
-                                    ->withCount('notes')
-                                    ->where('project_id', $project->id)
-                                    ->get();
+                        if ($isHRUser) {
+                        $userTemplateTasks = App\Models\TemplateTaskUser::with(['templateTask.template', 'user'])
+                        ->withCount('notes')
+                        ->where('project_id', $project->id)
+                        ->get();
 
-                                $userRegularTasks = App\Models\TaskUser::with(['task', 'user'])
-                                    ->withCount('notes')
-                                    ->whereHas('task', function ($query) use ($project) {
-                                        $query->where('project_id', $project->id);
-                                    })
-                                    ->get();
-                            } else {
-                                $userTemplateTasks = $user
-                                    ? App\Models\TemplateTaskUser::with('templateTask.template')
-                                        ->withCount('notes')
-                                        ->where('user_id', $user->id)
-                                        ->where('project_id', $project->id)
-                                        ->get()
-                                    : collect();
+                        $userRegularTasks = App\Models\TaskUser::with(['task', 'user'])
+                        ->withCount('notes')
+                        ->whereHas('task', function ($query) use ($project) {
+                        $query->where('project_id', $project->id);
+                        })
+                        ->get();
+                        } else {
+                        $userTemplateTasks = $user
+                        ? App\Models\TemplateTaskUser::with('templateTask.template')
+                        ->withCount('notes')
+                        ->where('user_id', $user->id)
+                        ->where('project_id', $project->id)
+                        ->get()
+                        : collect();
 
-                                $userRegularTasks = $user
-                                    ? App\Models\TaskUser::with('task')
-                                        ->withCount('notes')
-                                        ->whereHas('task', function ($query) use ($project) {
-                                            $query->where('project_id', $project->id);
-                                        })
-                                        ->where('user_id', $user->id)
-                                        ->get()
-                                    : collect();
-                            }
+                        $userRegularTasks = $user
+                        ? App\Models\TaskUser::with('task')
+                        ->withCount('notes')
+                        ->whereHas('task', function ($query) use ($project) {
+                        $query->where('project_id', $project->id);
+                        })
+                        ->where('user_id', $user->id)
+                        ->get()
+                        : collect();
+                        }
                         @endphp
 
                         @foreach($statuses as $statusKey => $statusData)
-                            <div class="kanban-column" data-status="{{ $statusKey }}">
-                                <div class="kanban-column-header">
-                                    <h6><i class="{{ $statusData['icon'] }}"></i> {{ $statusData['name'] }}</h6>
-                                    <span class="task-count" id="count-{{ $statusKey }}">
-                                        {{ $userTemplateTasks->where('status', $statusKey)->count() + $userRegularTasks->where('status', $statusKey)->count() }}
-                                    </span>
-                                </div>
-                                <div class="kanban-tasks kanban-drop-zone" data-status="{{ $statusKey }}" id="kanban-{{ $statusKey }}">
+                        <div class="kanban-column" data-status="{{ $statusKey }}">
+                            <div class="kanban-column-header">
+                                <h6><i class="{{ $statusData['icon'] }}"></i> {{ $statusData['name'] }}</h6>
+                                <span class="task-count" id="count-{{ $statusKey }}">
+                                    {{ $userTemplateTasks->where('status', $statusKey)->count() + $userRegularTasks->where('status', $statusKey)->count() }}
+                                </span>
+                            </div>
+                            <div class="kanban-tasks kanban-drop-zone" data-status="{{ $statusKey }}" id="kanban-{{ $statusKey }}">
                                 {{-- مهام القوالب --}}
                                 @foreach($userTemplateTasks->where('status', $statusKey) as $taskUser)
-                                    @php
-                                        $task = $taskUser->templateTask;
-                                        $actualMinutes = $taskUser->actual_minutes ?? 0;
-                                        $hours = floor($actualMinutes / 60);
-                                        $minutes = $actualMinutes % 60;
-                                        $formattedTime = sprintf('%02d:%02d:00', $hours, $minutes);
+                                @php
+                                $task = $taskUser->templateTask;
+                                $actualMinutes = $taskUser->actual_minutes ?? 0;
+                                $hours = floor($actualMinutes / 60);
+                                $minutes = $actualMinutes % 60;
+                                $formattedTime = sprintf('%02d:%02d:00', $hours, $minutes);
 
-                                        $startedAt = null;
-                                        if ($taskUser->status == 'in_progress' && $taskUser->started_at) {
-                                            $startedAt = $taskUser->started_at->timestamp * 1000;
-                                        }
-                                    @endphp
-                                    @if($task)
-                                    @php
-                                        $canDragTemplate = $taskUser->canBeDragged();
-                                        $isTransferredFromTemplate = (bool) ($taskUser->is_transferred ?? false);
-                                        $isTransferredToTemplate = (bool) ($taskUser->is_additional_task ?? false) || (method_exists($taskUser, 'isTransferredFromAnother') ? $taskUser->isTransferredFromAnother() : false);
-                                        $canOriginalOwnerTransferTemplate = false;
-                                        try { $canOriginalOwnerTransferTemplate = ($taskUser->originalTemplateTaskUser && $taskUser->originalTemplateTaskUser->user_id === auth()->id()); } catch (\Throwable $e) { $canOriginalOwnerTransferTemplate = false; }
-                                        $isApprovedTemplate = $taskUser->hasAdministrativeApproval() || $taskUser->hasTechnicalApproval();
-                                    @endphp
-                                    <div class="kanban-task template-task task-clickable {{ $isTransferredFromTemplate ? 'transferred-from' : '' }} {{ $isTransferredToTemplate ? 'transferred-to' : '' }} {{ $isApprovedTemplate ? 'approved-task' : '' }}"
-                                         draggable="{{ $canDragTemplate ? 'true' : 'false' }}"
-                                         data-task-id="{{ $task->id }}"
-                                         data-task-user-id="{{ $taskUser->id }}"
-                                         data-user-id="{{ $taskUser->user_id }}"
-                                         data-task-type="template_task"
-                                         data-sidebar-task-type="template"
-                                         data-sidebar-task-user-id="{{ $taskUser->id }}"
-                                         data-initial-minutes="{{ $actualMinutes }}"
-                                         data-started-at="{{ $startedAt }}"
-                                         data-status="{{ $taskUser->status }}"
-                                         title="@if(!$canDragTemplate) {{ $isApprovedTemplate ? 'تم اعتماد هذه المهمة - لا يمكنك تغيير حالتها' : ($isTransferredFromTemplate ? 'تم نقل هذه المهمة من حسابك - لا يمكنك تغيير حالتها' : 'هذه المهمة مخصصة لمستخدم آخر - لا يمكنك تحريكها') }} @endif">
+                                $startedAt = null;
+                                if ($taskUser->status == 'in_progress' && $taskUser->started_at) {
+                                $startedAt = $taskUser->started_at->timestamp * 1000;
+                                }
+                                @endphp
+                                @if($task)
+                                @php
+                                // التحقق من حالة المشروع
+                                $projectStatus = $project->status ?? '';
+                                $isProjectCancelled = $projectStatus === 'ملغي';
 
-                                        <h6>{{ $task->name }}</h6>
+                                $canDragTemplate = $taskUser->canBeDragged() && !$isProjectCancelled;
+                                $isTransferredFromTemplate = (bool) ($taskUser->is_transferred ?? false);
+                                $isTransferredToTemplate = (bool) ($taskUser->is_additional_task ?? false) || (method_exists($taskUser, 'isTransferredFromAnother') ? $taskUser->isTransferredFromAnother() : false);
+                                $canOriginalOwnerTransferTemplate = false;
+                                try { $canOriginalOwnerTransferTemplate = ($taskUser->originalTemplateTaskUser && $taskUser->originalTemplateTaskUser->user_id === auth()->id()); } catch (\Throwable $e) { $canOriginalOwnerTransferTemplate = false; }
+                                $isApprovedTemplate = $taskUser->hasAdministrativeApproval() || $taskUser->hasTechnicalApproval();
+                                @endphp
+                                <div class="kanban-task template-task task-clickable {{ $isTransferredFromTemplate ? 'transferred-from' : '' }} {{ $isTransferredToTemplate ? 'transferred-to' : '' }} {{ $isApprovedTemplate ? 'approved-task' : '' }} {{ $isProjectCancelled ? 'project-cancelled' : '' }}"
+                                    draggable="{{ $canDragTemplate ? 'true' : 'false' }}"
+                                    data-task-id="{{ $task->id }}"
+                                    data-task-user-id="{{ $taskUser->id }}"
+                                    data-user-id="{{ $taskUser->user_id }}"
+                                    data-task-type="template_task"
+                                    data-sidebar-task-type="template"
+                                    data-sidebar-task-user-id="{{ $taskUser->id }}"
+                                    data-initial-minutes="{{ $actualMinutes }}"
+                                    data-started-at="{{ $startedAt }}"
+                                    data-status="{{ $taskUser->status }}"
+                                    data-project-status="{{ $projectStatus }}"
+                                    title="@if(!$canDragTemplate) {{ $isProjectCancelled ? 'المشروع تم إلغاؤه - لا يمكنك تغيير حالة المهمة' : ($isApprovedTemplate ? 'تم اعتماد هذه المهمة - لا يمكنك تغيير حالتها' : ($isTransferredFromTemplate ? 'تم نقل هذه المهمة من حسابك - لا يمكنك تغيير حالتها' : 'هذه المهمة مخصصة لمستخدم آخر - لا يمكنك تحريكها')) }} @endif">
 
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <div class="d-flex align-items-center gap-1">
-                                                <span class="badge bg-success">🏢 قالب</span>
-                                                @if($isApprovedTemplate)
-                                                    <span class="badge bg-success"><i class="fas fa-shield-check me-1"></i>معتمدة</span>
-                                                @endif
-                                                @if($isTransferredFromTemplate)
-                                                    <span class="badge bg-danger">تم نقلها</span>
-                                                @endif
-                                                @if($isTransferredToTemplate)
-                                                    <span class="badge bg-success">منقولة إليك</span>
-                                                    <span class="badge bg-info text-dark">إضافية</span>
-                                                @endif
-                                            </div>
-                                            @if($taskUser->notes_count > 0)
-                                                <span class="task-notes-indicator" title="{{ $taskUser->notes_count }} ملاحظات">
-                                                    <i class="fas fa-sticky-note"></i>
-                                                    <span class="notes-count">{{ $taskUser->notes_count }}</span>
-                                                </span>
+                                    <h6>{{ $task->name }}</h6>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="badge bg-success">🏢 قالب</span>
+                                            @if($isApprovedTemplate)
+                                            <span class="badge bg-success"><i class="fas fa-shield-check me-1"></i>معتمدة</span>
                                             @endif
-                                            @if($taskUser->revisions_count > 0)
-                                                @php
-                                                    $revisionsStatus = 'pending'; // Default
-                                                    if ($taskUser->pending_revisions_count > 0) {
-                                                        if (($taskUser->approved_revisions_count ?? 0) > 0 || ($taskUser->rejected_revisions_count ?? 0) > 0) {
-                                                            $revisionsStatus = 'mixed';
-                                                        } else {
-                                                            $revisionsStatus = 'pending';
-                                                        }
-                                                    } else {
-                                                        if (($taskUser->approved_revisions_count ?? 0) > 0 && ($taskUser->rejected_revisions_count ?? 0) == 0) {
-                                                            $revisionsStatus = 'approved';
-                                                        } elseif (($taskUser->rejected_revisions_count ?? 0) > 0 && ($taskUser->approved_revisions_count ?? 0) == 0) {
-                                                            $revisionsStatus = 'rejected';
-                                                        } else {
-                                                            $revisionsStatus = 'mixed';
-                                                        }
-                                                    }
-
-                                                    $tooltipText = $taskUser->revisions_count . ' تعديلات';
-                                                    if ($taskUser->pending_revisions_count > 0) {
-                                                        $tooltipText .= ' - ' . $taskUser->pending_revisions_count . ' معلق';
-                                                    }
-                                                    if (($taskUser->approved_revisions_count ?? 0) > 0) {
-                                                        $tooltipText .= ' - ' . $taskUser->approved_revisions_count . ' مقبول';
-                                                    }
-                                                    if (($taskUser->rejected_revisions_count ?? 0) > 0) {
-                                                        $tooltipText .= ' - ' . $taskUser->rejected_revisions_count . ' مرفوض';
-                                                    }
-                                                @endphp
-                                                <span class="task-revisions-badge {{ $revisionsStatus }}" title="{{ $tooltipText }}">
-                                                    <i class="fas fa-edit"></i>
-                                                    <span class="revisions-count">{{ $taskUser->revisions_count }}</span>
-                                                </span>
+                                            @if($isTransferredFromTemplate)
+                                            <span class="badge bg-danger">تم نقلها</span>
+                                            @endif
+                                            @if($isTransferredToTemplate)
+                                            <span class="badge bg-success">منقولة إليك</span>
+                                            <span class="badge bg-info text-dark">إضافية</span>
                                             @endif
                                         </div>
-
-                                        @if($isHRUser && $taskUser->user)
-                                        <div class="user-info">
-                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
-                                                 class="user-info-circle">
-                                                <i class="fas fa-user text-white user-info-icon"></i>
-                                            </div>
-                                            <span class="text-dark fw-semibold">{{ $taskUser->user->name }}</span>
-                                        </div>
+                                        @if($taskUser->notes_count > 0)
+                                        <span class="task-notes-indicator" title="{{ $taskUser->notes_count }} ملاحظات">
+                                            <i class="fas fa-sticky-note"></i>
+                                            <span class="notes-count">{{ $taskUser->notes_count }}</span>
+                                        </span>
                                         @endif
+                                        @if($taskUser->revisions_count > 0)
+                                        @php
+                                        $revisionsStatus = 'pending'; // Default
+                                        if ($taskUser->pending_revisions_count > 0) {
+                                        if (($taskUser->approved_revisions_count ?? 0) > 0 || ($taskUser->rejected_revisions_count ?? 0) > 0) {
+                                        $revisionsStatus = 'mixed';
+                                        } else {
+                                        $revisionsStatus = 'pending';
+                                        }
+                                        } else {
+                                        if (($taskUser->approved_revisions_count ?? 0) > 0 && ($taskUser->rejected_revisions_count ?? 0) == 0) {
+                                        $revisionsStatus = 'approved';
+                                        } elseif (($taskUser->rejected_revisions_count ?? 0) > 0 && ($taskUser->approved_revisions_count ?? 0) == 0) {
+                                        $revisionsStatus = 'rejected';
+                                        } else {
+                                        $revisionsStatus = 'mixed';
+                                        }
+                                        }
 
-                                        <!-- Time Information -->
-                                        <div class="time-info">
-                                            <div class="time-row estimated">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-clock me-2"></i>
-                                                    <span>الوقت المقدر</span>
-                                                </div>
-                                                <span>{{ $task->estimated_hours }}س {{ sprintf('%02d', $task->estimated_minutes) }}د</span>
+                                        $tooltipText = $taskUser->revisions_count . ' تعديلات';
+                                        if ($taskUser->pending_revisions_count > 0) {
+                                        $tooltipText .= ' - ' . $taskUser->pending_revisions_count . ' معلق';
+                                        }
+                                        if (($taskUser->approved_revisions_count ?? 0) > 0) {
+                                        $tooltipText .= ' - ' . $taskUser->approved_revisions_count . ' مقبول';
+                                        }
+                                        if (($taskUser->rejected_revisions_count ?? 0) > 0) {
+                                        $tooltipText .= ' - ' . $taskUser->rejected_revisions_count . ' مرفوض';
+                                        }
+                                        @endphp
+                                        <span class="task-revisions-badge {{ $revisionsStatus }}" title="{{ $tooltipText }}">
+                                            <i class="fas fa-edit"></i>
+                                            <span class="revisions-count">{{ $taskUser->revisions_count }}</span>
+                                        </span>
+                                        @endif
+                                    </div>
+
+                                    @if($isHRUser && $taskUser->user)
+                                    <div class="user-info">
+                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                                            class="user-info-circle">
+                                            <i class="fas fa-user text-white user-info-icon"></i>
+                                        </div>
+                                        <span class="text-dark fw-semibold">{{ $taskUser->user->name }}</span>
+                                    </div>
+                                    @endif
+
+                                    <!-- Time Information -->
+                                    <div class="time-info">
+                                        <div class="time-row estimated">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-clock me-2"></i>
+                                                <span>الوقت المقدر</span>
                                             </div>
-                                            <div class="time-row actual">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-stopwatch me-2"></i>
-                                                    <span>الوقت الفعلي</span>
-                                                </div>
-                                                <span>
-                                                    @php
-                                                        $actualHours = intval($actualMinutes / 60);
-                                                        $remainingMinutes = $actualMinutes % 60;
-                                                    @endphp
-                                                    {{ $actualHours }}س {{ sprintf('%02d', $remainingMinutes) }}د
-                                                </span>
+                                            <span>{{ $task->estimated_hours }}س {{ sprintf('%02d', $task->estimated_minutes) }}د</span>
+                                        </div>
+                                        <div class="time-row actual">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-stopwatch me-2"></i>
+                                                <span>الوقت الفعلي</span>
+                                            </div>
+                                            <span>
+                                                @php
+                                                $actualHours = intval($actualMinutes / 60);
+                                                $remainingMinutes = $actualMinutes % 60;
+                                                @endphp
+                                                {{ $actualHours }}س {{ sprintf('%02d', $remainingMinutes) }}د
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Deadline Information -->
+                                    @if($taskUser->deadline)
+                                    @php
+                                    $now = now();
+                                    $isOverdue = $taskUser->deadline->isPast() && $taskUser->status !== 'completed';
+                                    $isDueSoon = $taskUser->deadline->isFuture() && $taskUser->deadline->diffInHours($now) <= 24 && $taskUser->status !== 'completed';
+
+                                        if ($taskUser->status === 'completed') {
+                                        $deadlineClass = 'success';
+                                        } elseif ($isOverdue) {
+                                        $deadlineClass = 'danger';
+                                        } elseif ($isDueSoon) {
+                                        $deadlineClass = 'warning';
+                                        } else {
+                                        $deadlineClass = 'primary';
+                                        }
+                                        @endphp
+                                        <div class="deadline-info {{ $deadlineClass }}">
+                                            <div class="rounded-circle">
+                                                <i class="fas fa-calendar"></i>
+                                            </div>
+                                            <div>
+                                                <strong>{{ $taskUser->deadline->format('d/m/Y') }}</strong><br>
+                                                <small>
+                                                    @if($isOverdue)
+                                                    متأخر {{ $taskUser->deadline->diffForHumans() }}
+                                                    @elseif($isDueSoon)
+                                                    ينتهي {{ $taskUser->deadline->diffForHumans() }}
+                                                    @elseif($taskUser->status === 'completed')
+                                                    مكتمل في الموعد
+                                                    @else
+                                                    {{ $taskUser->deadline->diffForHumans() }}
+                                                    @endif
+                                                </small>
                                             </div>
                                         </div>
-
-                                        <!-- Deadline Information -->
-                                        @if($taskUser->deadline)
-                                            @php
-                                                $now = now();
-                                                $isOverdue = $taskUser->deadline->isPast() && $taskUser->status !== 'completed';
-                                                $isDueSoon = $taskUser->deadline->isFuture() && $taskUser->deadline->diffInHours($now) <= 24 && $taskUser->status !== 'completed';
-
-                                                if ($taskUser->status === 'completed') {
-                                                    $deadlineClass = 'success';
-                                                } elseif ($isOverdue) {
-                                                    $deadlineClass = 'danger';
-                                                } elseif ($isDueSoon) {
-                                                    $deadlineClass = 'warning';
-                                                } else {
-                                                    $deadlineClass = 'primary';
-                                                }
-                                            @endphp
-                                            <div class="deadline-info {{ $deadlineClass }}">
-                                                <div class="rounded-circle">
-                                                    <i class="fas fa-calendar"></i>
-                                                </div>
-                                                <div>
-                                                    <strong>{{ $taskUser->deadline->format('d/m/Y') }}</strong><br>
-                                                    <small>
-                                                        @if($isOverdue)
-                                                            متأخر {{ $taskUser->deadline->diffForHumans() }}
-                                                        @elseif($isDueSoon)
-                                                            ينتهي {{ $taskUser->deadline->diffForHumans() }}
-                                                        @elseif($taskUser->status === 'completed')
-                                                            مكتمل في الموعد
-                                                        @else
-                                                            {{ $taskUser->deadline->diffForHumans() }}
-                                                        @endif
-                                                    </small>
-                                                </div>
-                                            </div>
                                         @endif
 
                                         <!-- Timer and Actions -->
                                         <div class="task-actions">
                                             <span class="timer" id="kanban-timer-template-{{ $taskUser->id }}">{{ $formattedTime }}</span>
                                             @php
-                                                // ✅ تحديد إمكانية النقل أو التعديل
-                                                $canShowTransferBtn = false;
-                                                $transferBtnMode = 'transfer';
-                                                $transferBtnTitle = 'نقل المهمة';
-                                                $transferBtnIcon = 'fas fa-exchange-alt';
+                                            // ✅ تحديد إمكانية النقل أو التعديل
+                                            $canShowTransferBtn = false;
+                                            $transferBtnMode = 'transfer';
+                                            $transferBtnTitle = 'نقل المهمة';
+                                            $transferBtnIcon = 'fas fa-exchange-alt';
 
-                                                // الشروط الأساسية: المهمة ليست مكتملة أو ملغاة
-                                                if (!in_array($taskUser->status, ['completed', 'cancelled'])) {
-                                                    // ❌ منع ظهور الزر للمهام الأصلية المنقولة
-                                                    if ($isTransferredFromTemplate) {
-                                                        $canShowTransferBtn = false;
-                                                    }
-                                                    // ✅ السماح بتعديل المستلم للمهام المنقولة (للشخص الحالي أو HR)
-                                                    elseif ($isTransferredToTemplate && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id())) {
-                                                        $canShowTransferBtn = true;
-                                                        $transferBtnMode = 'reassign';
-                                                        $transferBtnTitle = 'تعديل المستلم';
-                                                        $transferBtnIcon = 'fas fa-user-edit';
-                                                    }
-                                                    // ✅ السماح بالنقل للمهام الأصلية غير المنقولة
-                                                    elseif (!$isTransferredFromTemplate && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id() || $canOriginalOwnerTransferTemplate)) {
-                                                        $canShowTransferBtn = true;
-                                                        $transferBtnMode = 'transfer';
-                                                        $transferBtnTitle = 'نقل المهمة';
-                                                        $transferBtnIcon = 'fas fa-exchange-alt';
-                                                    }
-                                                }
+                                            // الشروط الأساسية: المهمة ليست مكتملة أو ملغاة والمشروع لم يتم إلغاؤه
+                                            if (!in_array($taskUser->status, ['completed', 'cancelled']) && !$isProjectCancelled) {
+                                            // ❌ منع ظهور الزر للمهام الأصلية المنقولة
+                                            if ($isTransferredFromTemplate) {
+                                            $canShowTransferBtn = false;
+                                            }
+                                            // ✅ السماح بتعديل المستلم للمهام المنقولة (للشخص الحالي أو HR)
+                                            elseif ($isTransferredToTemplate && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id())) {
+                                            $canShowTransferBtn = true;
+                                            $transferBtnMode = 'reassign';
+                                            $transferBtnTitle = 'تعديل المستلم';
+                                            $transferBtnIcon = 'fas fa-user-edit';
+                                            }
+                                            // ✅ السماح بالنقل للمهام الأصلية غير المنقولة
+                                            elseif (!$isTransferredFromTemplate && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id() || $canOriginalOwnerTransferTemplate)) {
+                                            $canShowTransferBtn = true;
+                                            $transferBtnMode = 'transfer';
+                                            $transferBtnTitle = 'نقل المهمة';
+                                            $transferBtnIcon = 'fas fa-exchange-alt';
+                                            }
+                                            }
                                             @endphp
 
                                             @if($canShowTransferBtn)
-                                                <button class="transfer-btn {{ $transferBtnMode === 'reassign' ? 'reassign-btn' : '' }}"
-                                                        data-task-type="template"
-                                                        data-task-id="{{ $taskUser->id }}"
-                                                        data-task-name="{{ $task->name ?? 'مهمة' }}"
-                                                        data-user-name="{{ $taskUser->user->name ?? auth()->user()->name }}"
-                                                        data-mode="{{ $transferBtnMode }}"
-                                                        onclick="event.stopPropagation(); openTransferModal(this.dataset.taskType, this.dataset.taskId, this.dataset.taskName, this.dataset.userName, this.dataset.mode)"
-                                                        title="{{ $transferBtnTitle }}">
-                                                    <i class="{{ $transferBtnIcon }}"></i>
-                                                </button>
+                                            <button class="transfer-btn {{ $transferBtnMode === 'reassign' ? 'reassign-btn' : '' }}"
+                                                data-task-type="template"
+                                                data-task-id="{{ $taskUser->id }}"
+                                                data-task-name="{{ $task->name ?? 'مهمة' }}"
+                                                data-user-name="{{ $taskUser->user->name ?? auth()->user()->name }}"
+                                                data-mode="{{ $transferBtnMode }}"
+                                                onclick="event.stopPropagation(); openTransferModal(this.dataset.taskType, this.dataset.taskId, this.dataset.taskName, this.dataset.userName, this.dataset.mode)"
+                                                title="{{ $transferBtnTitle }}">
+                                                <i class="{{ $transferBtnIcon }}"></i>
+                                            </button>
+                                            @elseif($isProjectCancelled)
+                                            <button class="transfer-btn" disabled title="لا يمكن نقل المهام التابعة لمشروع ملغي">
+                                                <i class="fas fa-exchange-alt"></i>
+                                            </button>
                                             @endif
 
                                             {{-- زر إلغاء النقل للمهام المنقولة --}}
                                             @if($isTransferredToTemplate && !in_array($taskUser->status, ['completed', 'cancelled']) &&
-                                               (auth()->user()->hasRole('hr') || auth()->user()->hasRole('admin') || $taskUser->user_id === auth()->id()))
-                                                <button class="cancel-transfer-task btn btn-sm btn-danger"
-                                                        data-task-type="template"
-                                                        data-task-id="{{ $taskUser->id }}"
-                                                        data-task-name="{{ $task->name ?? 'مهمة' }}"
-                                                        title="إلغاء النقل"
-                                                        style="padding: 4px 8px; font-size: 12px; border-radius: 4px;">
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
+                                            (auth()->user()->hasRole('hr') || auth()->user()->hasRole('admin') || $taskUser->user_id === auth()->id()))
+                                            <button class="cancel-transfer-task btn btn-sm btn-danger"
+                                                data-task-type="template"
+                                                data-task-id="{{ $taskUser->id }}"
+                                                data-task-name="{{ $task->name ?? 'مهمة' }}"
+                                                title="إلغاء النقل"
+                                                style="padding: 4px 8px; font-size: 12px; border-radius: 4px;">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
                                             @endif
                                         </div>
 
-                                    </div>
-                                    @endif
+                                </div>
+                                @endif
                                 @endforeach
 
                                 {{-- المهام العادية --}}
                                 @foreach($userRegularTasks->where('status', $statusKey) as $taskUser)
-                                    @php
-                                        $task = $taskUser->task;
-                                        $actualMinutes = ($taskUser->actual_hours * 60) + $taskUser->actual_minutes;
-                                        $hours = floor($actualMinutes / 60);
-                                        $minutes = $actualMinutes % 60;
-                                        $formattedTime = sprintf('%02d:%02d:00', $hours, $minutes);
+                                @php
+                                $task = $taskUser->task;
+                                $actualMinutes = ($taskUser->actual_hours * 60) + $taskUser->actual_minutes;
+                                $hours = floor($actualMinutes / 60);
+                                $minutes = $actualMinutes % 60;
+                                $formattedTime = sprintf('%02d:%02d:00', $hours, $minutes);
 
-                                        $startedAt = null;
-                                        if ($taskUser->status == 'in_progress' && $taskUser->start_date) {
-                                            $startedAt = $taskUser->start_date->timestamp * 1000;
+                                $startedAt = null;
+                                if ($taskUser->status == 'in_progress' && $taskUser->start_date) {
+                                $startedAt = $taskUser->start_date->timestamp * 1000;
+                                }
+                                @endphp
+                                @if($task)
+                                @php
+                                // التحقق من حالة المشروع
+                                $projectStatus = $project->status ?? '';
+                                $isProjectCancelled = $projectStatus === 'ملغي';
+
+                                $canDragRegular = $taskUser->canBeDragged() && !$isProjectCancelled;
+                                $isTransferredFromRegular = (bool) ($taskUser->is_transferred ?? false);
+                                $isTransferredToRegular = (method_exists($taskUser, 'isTransferredFromAnother') ? $taskUser->isTransferredFromAnother() : false) || (bool) ($taskUser->is_additional_task ?? false) || (($taskUser->task_source ?? null) === 'transferred');
+                                $canOriginalOwnerTransferRegular = false;
+                                try { $canOriginalOwnerTransferRegular = ($taskUser->originalTaskUser && $taskUser->originalTaskUser->user_id === auth()->id()); } catch (\Throwable $e) { $canOriginalOwnerTransferRegular = false; }
+                                $isApprovedRegular = $taskUser->hasAdministrativeApproval() || $taskUser->hasTechnicalApproval();
+                                @endphp
+                                <div class="kanban-task regular-task task-clickable {{ $isTransferredFromRegular ? 'transferred-from' : '' }} {{ $isTransferredToRegular ? 'transferred-to' : '' }} {{ $isApprovedRegular ? 'approved-task' : '' }} {{ $isProjectCancelled ? 'project-cancelled' : '' }}"
+                                    draggable="{{ $canDragRegular ? 'true' : 'false' }}"
+                                    data-task-id="{{ $task->id }}"
+                                    data-task-user-id="{{ $taskUser->id }}"
+                                    data-user-id="{{ $taskUser->user_id }}"
+                                    data-task-type="regular_task"
+                                    data-sidebar-task-type="regular"
+                                    data-sidebar-task-user-id="{{ $taskUser->id }}"
+                                    data-initial-minutes="{{ $actualMinutes }}"
+                                    data-started-at="{{ $startedAt }}"
+                                    data-status="{{ $taskUser->status }}"
+                                    data-project-status="{{ $projectStatus }}"
+                                    title="@if(!$canDragRegular) {{ $isProjectCancelled ? 'المشروع تم إلغاؤه - لا يمكنك تغيير حالة المهمة' : ($isApprovedRegular ? 'تم اعتماد هذه المهمة - لا يمكنك تغيير حالتها' : ($isTransferredFromRegular ? 'تم نقل هذه المهمة من حسابك - لا يمكنك تغيير حالتها' : 'هذه المهمة مخصصة لمستخدم آخر - لا يمكنك تحريكها')) }} @endif">
+
+                                    <!-- Task Title -->
+                                    <h6>{{ $task->name }}</h6>
+
+                                    <!-- Regular Task Badge and Notes Indicator -->
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="badge bg-primary">📋 مهمة</span>
+                                            @if($isApprovedRegular)
+                                            <span class="badge bg-success"><i class="fas fa-shield-check me-1"></i>معتمدة</span>
+                                            @endif
+                                            @if($isTransferredFromRegular)
+                                            <span class="badge bg-danger">تم نقلها</span>
+                                            @endif
+                                            @if($isTransferredToRegular)
+                                            <span class="badge bg-success">منقولة إليك</span>
+                                            <span class="badge bg-info text-dark">إضافية</span>
+                                            @endif
+                                        </div>
+                                        @if($taskUser->notes_count > 0)
+                                        <span class="task-notes-indicator" title="{{ $taskUser->notes_count }} ملاحظات">
+                                            <i class="fas fa-sticky-note"></i>
+                                            <span class="notes-count">{{ $taskUser->notes_count }}</span>
+                                        </span>
+                                        @endif
+                                        @if($taskUser->revisions_count > 0)
+                                        @php
+                                        $revisionsStatus = 'pending'; // Default
+                                        if ($taskUser->pending_revisions_count > 0) {
+                                        if (($taskUser->approved_revisions_count ?? 0) > 0 || ($taskUser->rejected_revisions_count ?? 0) > 0) {
+                                        $revisionsStatus = 'mixed';
+                                        } else {
+                                        $revisionsStatus = 'pending';
                                         }
-                                    @endphp
-                                    @if($task)
-                                    @php
-                                        $canDragRegular = $taskUser->canBeDragged();
-                                        $isTransferredFromRegular = (bool) ($taskUser->is_transferred ?? false);
-                                        $isTransferredToRegular = (method_exists($taskUser, 'isTransferredFromAnother') ? $taskUser->isTransferredFromAnother() : false) || (bool) ($taskUser->is_additional_task ?? false) || (($taskUser->task_source ?? null) === 'transferred');
-                                        $canOriginalOwnerTransferRegular = false;
-                                        try { $canOriginalOwnerTransferRegular = ($taskUser->originalTaskUser && $taskUser->originalTaskUser->user_id === auth()->id()); } catch (\Throwable $e) { $canOriginalOwnerTransferRegular = false; }
-                                        $isApprovedRegular = $taskUser->hasAdministrativeApproval() || $taskUser->hasTechnicalApproval();
-                                    @endphp
-                                    <div class="kanban-task regular-task task-clickable {{ $isTransferredFromRegular ? 'transferred-from' : '' }} {{ $isTransferredToRegular ? 'transferred-to' : '' }} {{ $isApprovedRegular ? 'approved-task' : '' }}"
-                                         draggable="{{ $canDragRegular ? 'true' : 'false' }}"
-                                         data-task-id="{{ $task->id }}"
-                                         data-task-user-id="{{ $taskUser->id }}"
-                                         data-user-id="{{ $taskUser->user_id }}"
-                                         data-task-type="regular_task"
-                                         data-sidebar-task-type="regular"
-                                         data-sidebar-task-user-id="{{ $taskUser->id }}"
-                                         data-initial-minutes="{{ $actualMinutes }}"
-                                         data-started-at="{{ $startedAt }}"
-                                         data-status="{{ $taskUser->status }}"
-                                         title="@if(!$canDragRegular) {{ $isApprovedRegular ? 'تم اعتماد هذه المهمة - لا يمكنك تغيير حالتها' : ($isTransferredFromRegular ? 'تم نقل هذه المهمة من حسابك - لا يمكنك تغيير حالتها' : 'هذه المهمة مخصصة لمستخدم آخر - لا يمكنك تحريكها') }} @endif">
+                                        } else {
+                                        if (($taskUser->approved_revisions_count ?? 0) > 0 && ($taskUser->rejected_revisions_count ?? 0) == 0) {
+                                        $revisionsStatus = 'approved';
+                                        } elseif (($taskUser->rejected_revisions_count ?? 0) > 0 && ($taskUser->approved_revisions_count ?? 0) == 0) {
+                                        $revisionsStatus = 'rejected';
+                                        } else {
+                                        $revisionsStatus = 'mixed';
+                                        }
+                                        }
 
-                                        <!-- Task Title -->
-                                        <h6>{{ $task->name }}</h6>
+                                        $tooltipText = $taskUser->revisions_count . ' تعديلات';
+                                        if ($taskUser->pending_revisions_count > 0) {
+                                        $tooltipText .= ' - ' . $taskUser->pending_revisions_count . ' معلق';
+                                        }
+                                        if (($taskUser->approved_revisions_count ?? 0) > 0) {
+                                        $tooltipText .= ' - ' . $taskUser->approved_revisions_count . ' مقبول';
+                                        }
+                                        if (($taskUser->rejected_revisions_count ?? 0) > 0) {
+                                        $tooltipText .= ' - ' . $taskUser->rejected_revisions_count . ' مرفوض';
+                                        }
+                                        @endphp
+                                        <span class="task-revisions-badge {{ $revisionsStatus }}" title="{{ $tooltipText }}">
+                                            <i class="fas fa-edit"></i>
+                                            <span class="revisions-count">{{ $taskUser->revisions_count }}</span>
+                                        </span>
+                                        @endif
+                                    </div>
 
-                                        <!-- Regular Task Badge and Notes Indicator -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <div class="d-flex align-items-center gap-1">
-                                                <span class="badge bg-primary">📋 مهمة</span>
-                                                @if($isApprovedRegular)
-                                                    <span class="badge bg-success"><i class="fas fa-shield-check me-1"></i>معتمدة</span>
-                                                @endif
-                                                @if($isTransferredFromRegular)
-                                                    <span class="badge bg-danger">تم نقلها</span>
-                                                @endif
-                                                @if($isTransferredToRegular)
-                                                    <span class="badge bg-success">منقولة إليك</span>
-                                                    <span class="badge bg-info text-dark">إضافية</span>
-                                                @endif
+                                    <!-- Task Description -->
+                                    @if($task->description)
+                                    <div class="task-description">
+                                        <div class="text-muted fw-semibold">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            <span>وصف المهمة</span>
+                                        </div>
+                                        <p>{{ $task->description }}</p>
+                                    </div>
+                                    @endif
+
+                                    @if($isHRUser && $taskUser->user)
+                                    <!-- User Info -->
+                                    <div class="user-info">
+                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                                            class="user-info-circle">
+                                            <i class="fas fa-user text-white user-info-icon"></i>
+                                        </div>
+                                        <span class="text-dark fw-semibold">{{ $taskUser->user->name }}</span>
+                                    </div>
+                                    @endif
+
+                                    <!-- Time Information -->
+                                    <div class="time-info">
+                                        <div class="time-row estimated">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-clock me-2"></i>
+                                                <span>الوقت المقدر</span>
                                             </div>
-                                            @if($taskUser->notes_count > 0)
-                                                <span class="task-notes-indicator" title="{{ $taskUser->notes_count }} ملاحظات">
-                                                    <i class="fas fa-sticky-note"></i>
-                                                    <span class="notes-count">{{ $taskUser->notes_count }}</span>
-                                                </span>
-                                            @endif
-                                            @if($taskUser->revisions_count > 0)
+                                            <span>{{ $taskUser->estimated_hours }}س {{ sprintf('%02d', $taskUser->estimated_minutes) }}د</span>
+                                        </div>
+                                        <div class="time-row actual">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-stopwatch me-2"></i>
+                                                <span>الوقت الفعلي</span>
+                                            </div>
+                                            <span>
                                                 @php
-                                                    $revisionsStatus = 'pending'; // Default
-                                                    if ($taskUser->pending_revisions_count > 0) {
-                                                        if (($taskUser->approved_revisions_count ?? 0) > 0 || ($taskUser->rejected_revisions_count ?? 0) > 0) {
-                                                            $revisionsStatus = 'mixed';
-                                                        } else {
-                                                            $revisionsStatus = 'pending';
-                                                        }
-                                                    } else {
-                                                        if (($taskUser->approved_revisions_count ?? 0) > 0 && ($taskUser->rejected_revisions_count ?? 0) == 0) {
-                                                            $revisionsStatus = 'approved';
-                                                        } elseif (($taskUser->rejected_revisions_count ?? 0) > 0 && ($taskUser->approved_revisions_count ?? 0) == 0) {
-                                                            $revisionsStatus = 'rejected';
-                                                        } else {
-                                                            $revisionsStatus = 'mixed';
-                                                        }
-                                                    }
-
-                                                    $tooltipText = $taskUser->revisions_count . ' تعديلات';
-                                                    if ($taskUser->pending_revisions_count > 0) {
-                                                        $tooltipText .= ' - ' . $taskUser->pending_revisions_count . ' معلق';
-                                                    }
-                                                    if (($taskUser->approved_revisions_count ?? 0) > 0) {
-                                                        $tooltipText .= ' - ' . $taskUser->approved_revisions_count . ' مقبول';
-                                                    }
-                                                    if (($taskUser->rejected_revisions_count ?? 0) > 0) {
-                                                        $tooltipText .= ' - ' . $taskUser->rejected_revisions_count . ' مرفوض';
-                                                    }
+                                                $actualHours = intval($actualMinutes / 60);
+                                                $remainingMinutes = $actualMinutes % 60;
                                                 @endphp
-                                                <span class="task-revisions-badge {{ $revisionsStatus }}" title="{{ $tooltipText }}">
-                                                    <i class="fas fa-edit"></i>
-                                                    <span class="revisions-count">{{ $taskUser->revisions_count }}</span>
-                                                </span>
-                                            @endif
+                                                {{ $actualHours }}س {{ sprintf('%02d', $remainingMinutes) }}د
+                                            </span>
                                         </div>
+                                    </div>
 
-                                        <!-- Task Description -->
-                                        @if($task->description)
-                                            <div class="task-description">
-                                                <div class="text-muted fw-semibold">
-                                                    <i class="fas fa-file-alt me-2"></i>
-                                                    <span>وصف المهمة</span>
-                                                </div>
-                                                <p>{{ $task->description }}</p>
-                                            </div>
-                                        @endif
+                                    <!-- Deadline Information -->
+                                    @if($taskUser->due_date)
+                                    @php
+                                    $now = now();
+                                    $isOverdue = $taskUser->due_date->isPast() && $taskUser->status !== 'completed';
+                                    $isDueSoon = $taskUser->due_date->isFuture() && $taskUser->due_date->diffInHours($now) <= 24 && $taskUser->status !== 'completed';
 
-                                        @if($isHRUser && $taskUser->user)
-                                        <!-- User Info -->
-                                        <div class="user-info">
-                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
-                                                 class="user-info-circle">
-                                                <i class="fas fa-user text-white user-info-icon"></i>
+                                        if ($taskUser->status === 'completed') {
+                                        $deadlineClass = 'success';
+                                        } elseif ($isOverdue) {
+                                        $deadlineClass = 'danger';
+                                        } elseif ($isDueSoon) {
+                                        $deadlineClass = 'warning';
+                                        } else {
+                                        $deadlineClass = 'primary';
+                                        }
+                                        @endphp
+                                        <div class="deadline-info {{ $deadlineClass }}">
+                                            <div class="rounded-circle">
+                                                <i class="fas fa-calendar"></i>
                                             </div>
-                                            <span class="text-dark fw-semibold">{{ $taskUser->user->name }}</span>
-                                        </div>
-                                        @endif
-
-                                        <!-- Time Information -->
-                                        <div class="time-info">
-                                            <div class="time-row estimated">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-clock me-2"></i>
-                                                    <span>الوقت المقدر</span>
-                                                </div>
-                                                <span>{{ $taskUser->estimated_hours }}س {{ sprintf('%02d', $taskUser->estimated_minutes) }}د</span>
-                                            </div>
-                                            <div class="time-row actual">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-stopwatch me-2"></i>
-                                                    <span>الوقت الفعلي</span>
-                                                </div>
-                                                <span>
-                                                    @php
-                                                        $actualHours = intval($actualMinutes / 60);
-                                                        $remainingMinutes = $actualMinutes % 60;
-                                                    @endphp
-                                                    {{ $actualHours }}س {{ sprintf('%02d', $remainingMinutes) }}د
-                                                </span>
+                                            <div>
+                                                <strong>{{ $taskUser->due_date->format('d/m/Y') }}</strong><br>
+                                                <small>
+                                                    @if($isOverdue)
+                                                    متأخر {{ $taskUser->due_date->diffForHumans() }}
+                                                    @elseif($isDueSoon)
+                                                    ينتهي {{ $taskUser->due_date->diffForHumans() }}
+                                                    @elseif($taskUser->status === 'completed')
+                                                    مكتمل في الموعد
+                                                    @else
+                                                    {{ $taskUser->due_date->diffForHumans() }}
+                                                    @endif
+                                                </small>
                                             </div>
                                         </div>
-
-                                        <!-- Deadline Information -->
-                                        @if($taskUser->due_date)
-                                            @php
-                                                $now = now();
-                                                $isOverdue = $taskUser->due_date->isPast() && $taskUser->status !== 'completed';
-                                                $isDueSoon = $taskUser->due_date->isFuture() && $taskUser->due_date->diffInHours($now) <= 24 && $taskUser->status !== 'completed';
-
-                                                if ($taskUser->status === 'completed') {
-                                                    $deadlineClass = 'success';
-                                                } elseif ($isOverdue) {
-                                                    $deadlineClass = 'danger';
-                                                } elseif ($isDueSoon) {
-                                                    $deadlineClass = 'warning';
-                                                } else {
-                                                    $deadlineClass = 'primary';
-                                                }
-                                            @endphp
-                                            <div class="deadline-info {{ $deadlineClass }}">
-                                                <div class="rounded-circle">
-                                                    <i class="fas fa-calendar"></i>
-                                                </div>
-                                                <div>
-                                                    <strong>{{ $taskUser->due_date->format('d/m/Y') }}</strong><br>
-                                                    <small>
-                                                        @if($isOverdue)
-                                                            متأخر {{ $taskUser->due_date->diffForHumans() }}
-                                                        @elseif($isDueSoon)
-                                                            ينتهي {{ $taskUser->due_date->diffForHumans() }}
-                                                        @elseif($taskUser->status === 'completed')
-                                                            مكتمل في الموعد
-                                                        @else
-                                                            {{ $taskUser->due_date->diffForHumans() }}
-                                                        @endif
-                                                    </small>
-                                                </div>
-                                            </div>
                                         @endif
 
                                         <!-- Timer and Actions -->
                                         <div class="task-actions">
                                             <span class="timer" id="kanban-timer-regular-{{ $taskUser->id }}">{{ $formattedTime }}</span>
                                             @php
-                                                // ✅ تحديد إمكانية النقل أو التعديل
-                                                $canShowTransferBtn = false;
-                                                $transferBtnMode = 'transfer';
-                                                $transferBtnTitle = 'نقل المهمة';
-                                                $transferBtnIcon = 'fas fa-exchange-alt';
+                                            // ✅ تحديد إمكانية النقل أو التعديل
+                                            $canShowTransferBtn = false;
+                                            $transferBtnMode = 'transfer';
+                                            $transferBtnTitle = 'نقل المهمة';
+                                            $transferBtnIcon = 'fas fa-exchange-alt';
 
-                                                // الشروط الأساسية: المهمة ليست مكتملة أو ملغاة
-                                                if (!in_array($taskUser->status, ['completed', 'cancelled'])) {
-                                                    // ❌ منع ظهور الزر للمهام الأصلية المنقولة
-                                                    if ($isTransferredFromRegular) {
-                                                        $canShowTransferBtn = false;
-                                                    }
-                                                    // ✅ السماح بتعديل المستلم للمهام المنقولة (للشخص الحالي أو HR)
-                                                    elseif ($isTransferredToRegular && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id())) {
-                                                        $canShowTransferBtn = true;
-                                                        $transferBtnMode = 'reassign';
-                                                        $transferBtnTitle = 'تعديل المستلم';
-                                                        $transferBtnIcon = 'fas fa-user-edit';
-                                                    }
-                                                    // ✅ السماح بالنقل للمهام الأصلية غير المنقولة
-                                                    elseif (!$isTransferredFromRegular && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id() || $canOriginalOwnerTransferRegular)) {
-                                                        $canShowTransferBtn = true;
-                                                        $transferBtnMode = 'transfer';
-                                                        $transferBtnTitle = 'نقل المهمة';
-                                                        $transferBtnIcon = 'fas fa-exchange-alt';
-                                                    }
-                                                }
+                                            // الشروط الأساسية: المهمة ليست مكتملة أو ملغاة والمشروع لم يتم إلغاؤه
+                                            if (!in_array($taskUser->status, ['completed', 'cancelled']) && !$isProjectCancelled) {
+                                            // ❌ منع ظهور الزر للمهام الأصلية المنقولة
+                                            if ($isTransferredFromRegular) {
+                                            $canShowTransferBtn = false;
+                                            }
+                                            // ✅ السماح بتعديل المستلم للمهام المنقولة (للشخص الحالي أو HR)
+                                            elseif ($isTransferredToRegular && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id())) {
+                                            $canShowTransferBtn = true;
+                                            $transferBtnMode = 'reassign';
+                                            $transferBtnTitle = 'تعديل المستلم';
+                                            $transferBtnIcon = 'fas fa-user-edit';
+                                            }
+                                            // ✅ السماح بالنقل للمهام الأصلية غير المنقولة
+                                            elseif (!$isTransferredFromRegular && (auth()->user()->hasRole('hr') || $taskUser->user_id === auth()->id() || $canOriginalOwnerTransferRegular)) {
+                                            $canShowTransferBtn = true;
+                                            $transferBtnMode = 'transfer';
+                                            $transferBtnTitle = 'نقل المهمة';
+                                            $transferBtnIcon = 'fas fa-exchange-alt';
+                                            }
+                                            }
                                             @endphp
 
                                             @if($canShowTransferBtn)
-                                                <button class="transfer-btn {{ $transferBtnMode === 'reassign' ? 'reassign-btn' : '' }}"
-                                                        data-task-type="task"
-                                                        data-task-id="{{ $taskUser->id }}"
-                                                        data-task-name="{{ $task->name ?? 'مهمة' }}"
-                                                        data-user-name="{{ $taskUser->user->name ?? auth()->user()->name }}"
-                                                        data-mode="{{ $transferBtnMode }}"
-                                                        onclick="event.stopPropagation(); openTransferModal(this.dataset.taskType, this.dataset.taskId, this.dataset.taskName, this.dataset.userName, this.dataset.mode)"
-                                                        title="{{ $transferBtnTitle }}">
-                                                    <i class="{{ $transferBtnIcon }}"></i>
-                                                </button>
+                                            <button class="transfer-btn {{ $transferBtnMode === 'reassign' ? 'reassign-btn' : '' }}"
+                                                data-task-type="task"
+                                                data-task-id="{{ $taskUser->id }}"
+                                                data-task-name="{{ $task->name ?? 'مهمة' }}"
+                                                data-user-name="{{ $taskUser->user->name ?? auth()->user()->name }}"
+                                                data-mode="{{ $transferBtnMode }}"
+                                                onclick="event.stopPropagation(); openTransferModal(this.dataset.taskType, this.dataset.taskId, this.dataset.taskName, this.dataset.userName, this.dataset.mode)"
+                                                title="{{ $transferBtnTitle }}">
+                                                <i class="{{ $transferBtnIcon }}"></i>
+                                            </button>
+                                            @elseif($isProjectCancelled)
+                                            <button class="transfer-btn" disabled title="لا يمكن نقل المهام التابعة لمشروع ملغي">
+                                                <i class="fas fa-exchange-alt"></i>
+                                            </button>
                                             @endif
 
                                             {{-- زر إلغاء النقل للمهام المنقولة --}}
                                             @if($isTransferredToRegular && !in_array($taskUser->status, ['completed', 'cancelled']) &&
-                                               (auth()->user()->hasRole('hr') || auth()->user()->hasRole('admin') || $taskUser->user_id === auth()->id()))
-                                                <button class="cancel-transfer-task btn btn-sm btn-danger"
-                                                        data-task-type="regular"
-                                                        data-task-id="{{ $taskUser->id }}"
-                                                        data-task-name="{{ $task->name ?? 'مهمة' }}"
-                                                        title="إلغاء النقل"
-                                                        style="padding: 4px 8px; font-size: 12px; border-radius: 4px;">
-                                                    <i class="fas fa-undo"></i>
-                                                </button>
+                                            (auth()->user()->hasRole('hr') || auth()->user()->hasRole('admin') || $taskUser->user_id === auth()->id()))
+                                            <button class="cancel-transfer-task btn btn-sm btn-danger"
+                                                data-task-type="regular"
+                                                data-task-id="{{ $taskUser->id }}"
+                                                data-task-name="{{ $task->name ?? 'مهمة' }}"
+                                                title="إلغاء النقل"
+                                                style="padding: 4px 8px; font-size: 12px; border-radius: 4px;">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
                                             @endif
                                         </div>
 
-                                    </div>
-                                    @endif
-                                @endforeach
                                 </div>
+                                @endif
+                                @endforeach
                             </div>
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -723,4 +739,3 @@
 <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeTaskSidebar()"></div>
 
 <script src="{{ asset('js/projects/task-sidebar.js') }}"></script>
-

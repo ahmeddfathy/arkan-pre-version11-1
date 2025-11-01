@@ -7,17 +7,21 @@ function addDragDropToCard(cardElement) {
         return;
     }
 
-    // ✅ التحقق من المهام المنقولة والمعتمدة - منع السحب
+    // ✅ التحقق من المهام المنقولة والمعتمدة والمشاريع الملغاة - منع السحب
     const isTransferred = cardElement.attr('data-is-transferred') === 'true';
     const isAdditionalTask = cardElement.attr('data-is-additional-task') === 'true';
     const isApproved = cardElement.attr('data-is-approved') === 'true';
+    const projectStatus = cardElement.attr('data-project-status') || '';
+    const isProjectCancelled = projectStatus === 'ملغي';
 
-    // إذا كانت مهمة منقولة أو معتمدة، لا تفعّل السحب
-    if (isTransferred || isAdditionalTask || isApproved) {
+    // إذا كانت مهمة منقولة أو معتمدة أو المشروع ملغي، لا تفعّل السحب
+    if (isTransferred || isAdditionalTask || isApproved || isProjectCancelled) {
         cardElement.attr('draggable', 'false');
         cardElement.css('cursor', 'not-allowed');
 
-        if (isApproved) {
+        if (isProjectCancelled) {
+            console.log('🚫 منع السحب - المشروع ملغي:', cardElement.attr('data-task-id'));
+        } else if (isApproved) {
             console.log('🔒 منع السحب - مهمة معتمدة:', cardElement.attr('data-task-id'));
         } else {
             console.log('🚫 منع السحب - مهمة منقولة:', cardElement.attr('data-task-id'));
@@ -38,15 +42,29 @@ function addDragDropToCard(cardElement) {
 
     // إضافة event listeners
     element.addEventListener('dragstart', function(e) {
-        // ✅ التحقق من المهام المنقولة والمعتمدة عند محاولة السحب
+        // ✅ التحقق من المهام المنقولة والمعتمدة والمشاريع الملغاة عند محاولة السحب
         const isTransferred = this.getAttribute('data-is-transferred') === 'true';
         const isAdditionalTask = this.getAttribute('data-is-additional-task') === 'true';
         const isApproved = this.getAttribute('data-is-approved') === 'true';
+        const projectStatus = this.getAttribute('data-project-status') || '';
+        const isProjectCancelled = projectStatus === 'ملغي';
 
-        if (isTransferred || isAdditionalTask || isApproved) {
+        if (isTransferred || isAdditionalTask || isApproved || isProjectCancelled) {
             e.preventDefault();
 
-            if (isApproved) {
+            if (isProjectCancelled) {
+                console.log('🚫 ممنوع السحب - المشروع ملغي');
+                // عرض رسالة للمستخدم
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'المشروع تم إلغاؤه',
+                        text: 'لا يمكن تحديث حالة المهمة لأن المشروع تم إلغاؤه',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            } else if (isApproved) {
                 console.log('🔒 ممنوع السحب - مهمة معتمدة');
                 // عرض رسالة للمستخدم
                 if (typeof Swal !== 'undefined') {
@@ -197,10 +215,34 @@ async function updateMyTaskStatus(dragData, newStatus, cardElement) {
             // معالجة الأخطاء بشكل صحيح
             const errorMessage = result.message || 'حدث خطأ أثناء تحديث حالة المهمة';
 
+            // التحقق إذا كان الخطأ متعلق بالمشروع الملغي
+            const isProjectCancelledError = errorMessage.includes('المشروع تم إلغاؤه') || 
+                                          errorMessage.includes('إلغاؤه') ||
+                                          result.code === 403;
+
             // عرض البنود المعلقة إذا كانت موجودة
             if (result.pending_items && result.pending_items.length > 0) {
                 const itemsList = result.pending_items.map(item => `• ${item.title}`).join('\n');
                 throw new Error(`${errorMessage}\n\nالبنود المتبقية:\n${itemsList}`);
+            }
+
+            // إذا كان الخطأ متعلق بالمشروع الملغي، نعرض رسالة خاصة
+            if (isProjectCancelledError && typeof Swal !== 'undefined') {
+                window.myTasksAlertShown = true;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'المشروع تم إلغاؤه',
+                    html: errorMessage.replace(/\n/g, '<br>'),
+                    confirmButtonText: 'حسناً',
+                    customClass: {
+                        popup: 'text-end'
+                    }
+                }).then(() => {
+                    setTimeout(() => {
+                        window.myTasksAlertShown = false;
+                    }, 100);
+                });
+                return; // لا نرمي error لأننا عرضنا الرسالة بالفعل
             }
 
             throw new Error(errorMessage);

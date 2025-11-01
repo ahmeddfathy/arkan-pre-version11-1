@@ -1195,3 +1195,17 @@ body.sidebar-open {
     font-size: 11px;
     line-height: 1.3;
 }
+
+
+
+.kanban-task.project-cancelled h6::after {
+    content: ' (المشروع ملغي)';
+    color: #dc3545;
+    font-size: 0.85em;
+    font-weight: normal;
+}
+
+.kanban-task.project-cancelled .transfer-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

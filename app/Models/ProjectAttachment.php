@@ -75,7 +75,7 @@ class ProjectAttachment extends Model implements Auditable
 
     public function replies()
     {
-        return $this->hasMany(ProjectAttachment::class, 'parent_attachment_id');
+        return $this->hasMany(ProjectAttachment::class, 'parent_attachment_id')->orderBy('created_at', 'desc');
     }
 
 
@@ -175,6 +175,6 @@ class ProjectAttachment extends Model implements Auditable
             $query->where('service_type', $serviceType);
         }
 
-        return $query->with('replies.user', 'user')->get();
+        return $query->with('replies.user', 'user')->orderBy('created_at', 'desc')->get();
     }
 }

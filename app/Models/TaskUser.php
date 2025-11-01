@@ -130,14 +130,26 @@ class TaskUser extends Model implements Auditable
     {
         return LogOptions::defaults()
             ->logOnly([
-                'task_id', 'user_id', 'season_id', 'role', 'status',
-                'estimated_hours', 'estimated_minutes', 'actual_hours', 'actual_minutes',
-                'start_date', 'due_date', 'completed_date', 'is_approved', 'awarded_points',
-                'is_transferred', 'transfer_reason'
+                'task_id',
+                'user_id',
+                'season_id',
+                'role',
+                'status',
+                'estimated_hours',
+                'estimated_minutes',
+                'actual_hours',
+                'actual_minutes',
+                'start_date',
+                'due_date',
+                'completed_date',
+                'is_approved',
+                'awarded_points',
+                'is_transferred',
+                'transfer_reason'
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+            ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => 'تم تعيين مهمة لمستخدم',
                 'updated' => 'تم تحديث مهمة المستخدم',
                 'deleted' => 'تم حذف تعيين المهمة',
@@ -265,7 +277,7 @@ class TaskUser extends Model implements Auditable
      */
     public function getTaskSourceTextAttribute(): string
     {
-        return match($this->task_source) {
+        return match ($this->task_source) {
             'transferred' => 'منقولة',
             'assigned' => 'مخصصة',
             default => 'غير محدد'
@@ -292,7 +304,7 @@ class TaskUser extends Model implements Auditable
     public function scopeOriginalTasks($query)
     {
         return $query->where('task_source', 'assigned')
-                    ->orWhereNull('task_source');
+            ->orWhereNull('task_source');
     }
 
     /**
@@ -332,7 +344,7 @@ class TaskUser extends Model implements Auditable
      */
     public function attachments()
     {
-        return $this->hasMany(TaskAttachment::class);
+        return $this->hasMany(TaskAttachment::class)->orderBy('created_at', 'desc');
     }
 
     /**
@@ -584,8 +596,8 @@ class TaskUser extends Model implements Auditable
         }
 
         return $this->due_date->isFuture() &&
-               $this->due_date->diffInHours(now()) <= 24 &&
-               $this->status !== 'completed';
+            $this->due_date->diffInHours(now()) <= 24 &&
+            $this->status !== 'completed';
     }
 
     /**
@@ -658,8 +670,8 @@ class TaskUser extends Model implements Auditable
     public function scopeOverdue($query)
     {
         return $query->whereNotNull('due_date')
-                    ->where('due_date', '<', now())
-                    ->where('status', '!=', 'completed');
+            ->where('due_date', '<', now())
+            ->where('status', '!=', 'completed');
     }
 
     /**
@@ -668,9 +680,9 @@ class TaskUser extends Model implements Auditable
     public function scopeDueSoon($query)
     {
         return $query->whereNotNull('due_date')
-                    ->where('due_date', '>', now())
-                    ->where('due_date', '<=', now()->addHours(24))
-                    ->where('status', '!=', 'completed');
+            ->where('due_date', '>', now())
+            ->where('due_date', '<=', now()->addHours(24))
+            ->where('status', '!=', 'completed');
     }
 
     /**
@@ -695,8 +707,8 @@ class TaskUser extends Model implements Auditable
     public function notes()
     {
         return $this->hasMany(TaskNote::class, 'task_user_id')
-                    ->where('task_type', 'regular')
-                    ->orderBy('created_at', 'desc');
+            ->where('task_type', 'regular')
+            ->orderBy('created_at', 'desc');
     }
 
     /**
@@ -713,7 +725,7 @@ class TaskUser extends Model implements Auditable
     public function timeLogs()
     {
         return $this->hasMany(TaskTimeLog::class, 'task_user_id')
-                    ->orderBy('started_at', 'desc');
+            ->orderBy('started_at', 'desc');
     }
 
     /**
@@ -722,8 +734,8 @@ class TaskUser extends Model implements Auditable
     public function activeTimeLog()
     {
         return $this->hasOne(TaskTimeLog::class, 'task_user_id')
-                    ->whereNull('stopped_at')
-                    ->latest('started_at');
+            ->whereNull('stopped_at')
+            ->latest('started_at');
     }
 
     /**
@@ -743,8 +755,8 @@ class TaskUser extends Model implements Auditable
 
         // إيقاف أي جلسة نشطة للمستخدم
         TaskTimeLog::where('user_id', $this->user_id)
-                  ->whereNull('stopped_at')
-                  ->update(['stopped_at' => $now]);
+            ->whereNull('stopped_at')
+            ->update(['stopped_at' => $now]);
 
         return TaskTimeLog::create([
             'task_user_id' => $this->id,
@@ -756,7 +768,7 @@ class TaskUser extends Model implements Auditable
         ]);
     }
 
-        /**
+    /**
      * إيقاف الجلسة النشطة (time logs منفصل عن النظام الأصلي)
      */
     public function stopActiveTimeLog(): ?TaskTimeLog
@@ -782,9 +794,9 @@ class TaskUser extends Model implements Auditable
         $today = $this->getCurrentCairoTime()->toDateString();
 
         return $this->timeLogs()
-                   ->where('work_date', $today)
-                   ->whereNotNull('stopped_at')
-                   ->sum('duration_minutes') ?? 0;
+            ->where('work_date', $today)
+            ->whereNotNull('stopped_at')
+            ->sum('duration_minutes') ?? 0;
     }
 
     /**

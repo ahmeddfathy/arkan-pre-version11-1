@@ -197,7 +197,7 @@ class ProjectServiceWorkflowService
      */
     private function getStatusClass(string $status): string
     {
-        return match($status) {
+        return match ($status) {
             'مكتملة', 'تسليم نهائي' => 'step-completed',
             'تسليم مسودة' => 'step-draft',
             'قيد التنفيذ' => 'step-current',
@@ -212,7 +212,7 @@ class ProjectServiceWorkflowService
      */
     private function getStatusIcon(string $status): string
     {
-        return match($status) {
+        return match ($status) {
             'مكتملة', 'تسليم نهائي' => '✅',
             'تسليم مسودة' => '📋',
             'قيد التنفيذ' => '🔄',
@@ -227,7 +227,7 @@ class ProjectServiceWorkflowService
      */
     private function getStatusLabel(string $status): string
     {
-        return match($status) {
+        return match ($status) {
             'مكتملة' => 'مكتملة',
             'تسليم نهائي' => 'تسليم نهائي ✓',
             'تسليم مسودة' => 'تسليم مسودة',
@@ -260,11 +260,11 @@ class ProjectServiceWorkflowService
                 ->get();
 
             // التعديلات المرتبطة بـ task_user_id (عن طريق TaskUser -> Task -> service_id)
-            $taskUserRevisions = TaskRevision::whereHas('taskUser.task', function($query) use ($projectId, $serviceId) {
+            $taskUserRevisions = TaskRevision::whereHas('taskUser.task', function ($query) use ($projectId, $serviceId) {
                 $query->where('project_id', $projectId)
-                      ->where('service_id', $serviceId);
+                    ->where('service_id', $serviceId);
             })
-            ->get();
+                ->get();
 
             $allRevisions = $allRevisions->merge($directTaskRevisions)->merge($taskUserRevisions);
         }
@@ -279,9 +279,9 @@ class ProjectServiceWorkflowService
         if (!empty($serviceUserIds)) {
             $projectRevisions = TaskRevision::where('revision_type', 'project')
                 ->where('project_id', $projectId)
-                ->where(function($query) use ($serviceUserIds) {
+                ->where(function ($query) use ($serviceUserIds) {
                     $query->whereIn('responsible_user_id', $serviceUserIds)
-                          ->orWhereIn('executor_user_id', $serviceUserIds);
+                        ->orWhereIn('executor_user_id', $serviceUserIds);
                 })
                 ->get();
 
@@ -291,10 +291,10 @@ class ProjectServiceWorkflowService
         // 4. التعديلات على مهام القوالب المرتبطة بهذه الخدمة
         $templateTaskUserIds = DB::table('template_task_user')
             ->where('project_id', $projectId)
-            ->whereIn('template_task_id', function($query) use ($serviceId) {
+            ->whereIn('template_task_id', function ($query) use ($serviceId) {
                 $query->select('id')
                     ->from('template_tasks')
-                    ->whereIn('task_template_id', function($subQuery) use ($serviceId) {
+                    ->whereIn('task_template_id', function ($subQuery) use ($serviceId) {
                         $subQuery->select('id')
                             ->from('task_templates')
                             ->where('service_id', $serviceId);
@@ -327,4 +327,3 @@ class ProjectServiceWorkflowService
         ];
     }
 }
-

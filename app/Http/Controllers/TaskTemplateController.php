@@ -499,6 +499,25 @@ class TaskTemplateController extends Controller
             ], 403);
         }
 
+        // التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
+        if (!$task->canUpdateStatus()) {
+            $errorMessage = $task->getStatusUpdateErrorMessage();
+            
+            Log::warning('Blocked template task status update due to cancelled project', [
+                'template_task_user_id' => $templateTaskUserId,
+                'project_id' => $task->project_id,
+                'project_status' => $task->project?->status,
+                'attempted_status' => $request->input('status'),
+                'user_id' => $request->user()->id
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $errorMessage ?: 'لا يمكن تحديث حالة المهمة لأن المشروع تم إلغاؤه',
+                'no_change' => true
+            ], 403);
+        }
+
         $status = $request->input('status');
         $validStatuses = ['new', 'in_progress', 'paused', 'completed'];
 

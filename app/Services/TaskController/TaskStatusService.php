@@ -36,6 +36,25 @@ class TaskStatusService
 
     public function changeTaskStatus(Task $task, string $newStatus): array
     {
+        // التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
+        if (!$task->canUpdateStatus()) {
+            $errorMessage = $task->getStatusUpdateErrorMessage();
+
+            Log::warning('Blocked task status update due to cancelled project', [
+                'task_id' => $task->id,
+                'project_id' => $task->project_id,
+                'project_status' => $task->project?->status,
+                'attempted_status' => $newStatus,
+                'user_id' => Auth::id()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => $errorMessage ?: 'لا يمكن تحديث حالة المهمة لأن المشروع تم إلغاؤه',
+                'code' => 403
+            ];
+        }
+
         $previousStatus = $task->status;
         $user = Auth::user();
 
@@ -47,10 +66,12 @@ class TaskStatusService
         if ($newStatus === 'completed' && $previousStatus !== 'completed') {
             $completionResult = $this->taskCompletionService->processTaskCompletion($task, $user);
 
-            if (is_array($completionResult) && isset($completionResult['success']) && $completionResult['success'] &&
+            if (
+                is_array($completionResult) && isset($completionResult['success']) && $completionResult['success'] &&
                 isset($completionResult['data']) && is_array($completionResult['data']) &&
                 !empty($completionResult['data']['is_promotion']) &&
-                !empty($completionResult['data']['badge'])) {
+                !empty($completionResult['data']['badge'])
+            ) {
 
                 $badge = $completionResult['data']['badge'] ?? null;
                 $result['message'] = 'تم تغيير حالة المهمة وترقية الشارة إلى: ' . ($badge ? $badge->name : 'غير معروف');
@@ -76,6 +97,28 @@ class TaskStatusService
     {
         try {
             $taskUser = TaskUser::findOrFail($taskUserId);
+
+            // التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
+            $task = $taskUser->task;
+            if ($task && !$task->canUpdateStatus()) {
+                $errorMessage = $task->getStatusUpdateErrorMessage();
+
+                Log::warning('Blocked task user status update due to cancelled project', [
+                    'task_user_id' => $taskUserId,
+                    'task_id' => $task->id,
+                    'project_id' => $task->project_id,
+                    'project_status' => $task->project?->status,
+                    'attempted_status' => $status,
+                    'user_id' => Auth::id()
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => $errorMessage ?: 'لا يمكن تحديث حالة المهمة لأن المشروع تم إلغاؤه',
+                    'no_change' => true,
+                    'code' => 403
+                ];
+            }
 
             if ($taskUser->user_id != Auth::id()) {
                 Log::warning('Unauthorized task status update attempt', [
@@ -227,8 +270,7 @@ class TaskStatusService
                     'total_minutes' => $totalMinutes
                 ]);
             }
-        }
-        elseif (in_array($previousStatus, ['new', 'paused']) && $newStatus === 'in_progress') {
+        } elseif (in_array($previousStatus, ['new', 'paused']) && $newStatus === 'in_progress') {
             $taskUser->start_date = $currentTime;
         }
 
@@ -287,9 +329,9 @@ class TaskStatusService
                 ELSE NULL
             END) as avg_estimated_minutes
         ')
-        ->groupBy('status')
-        ->get()
-        ->keyBy('status');
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status');
 
         return [
             'new' => $stats->get('new', (object)['count' => 0, 'avg_estimated_minutes' => 0]),
@@ -305,7 +347,7 @@ class TaskStatusService
         $query = TaskUser::where('user_id', $userId);
 
         if ($projectId) {
-            $query->whereHas('task', function($q) use ($projectId) {
+            $query->whereHas('task', function ($q) use ($projectId) {
                 $q->where('project_id', $projectId);
             });
         }
@@ -316,9 +358,9 @@ class TaskStatusService
             SUM(actual_hours * 60 + actual_minutes) as total_actual_minutes,
             AVG(estimated_hours * 60 + estimated_minutes) as avg_estimated_minutes
         ')
-        ->groupBy('status')
-        ->get()
-        ->keyBy('status');
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status');
 
         return [
             'new' => $stats->get('new', (object)['count' => 0, 'total_actual_minutes' => 0, 'avg_estimated_minutes' => 0]),
@@ -340,8 +382,10 @@ class TaskStatusService
             'cancelled' => ['new']
         ];
 
-        if (!isset($validTransitions[$task->status]) ||
-            !in_array($newStatus, $validTransitions[$task->status])) {
+        if (
+            !isset($validTransitions[$task->status]) ||
+            !in_array($newStatus, $validTransitions[$task->status])
+        ) {
             return [
                 'can_change' => false,
                 'message' => 'لا يمكن تغيير الحالة من ' . $task->status . ' إلى ' . $newStatus
@@ -371,7 +415,7 @@ class TaskStatusService
             ->whereIn('status', ['new', 'in_progress', 'paused']);
 
         if ($userId) {
-            $query->whereHas('users', function($q) use ($userId) {
+            $query->whereHas('users', function ($q) use ($userId) {
                 $q->where('users.id', $userId);
             });
         }
@@ -389,7 +433,7 @@ class TaskStatusService
             ->whereIn('status', ['new', 'in_progress', 'paused']);
 
         if ($userId) {
-            $query->whereHas('users', function($q) use ($userId) {
+            $query->whereHas('users', function ($q) use ($userId) {
                 $q->where('users.id', $userId);
             });
         }
