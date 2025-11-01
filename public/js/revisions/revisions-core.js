@@ -273,7 +273,7 @@ function loadMyCreatedRevisions(page = 1, filters = {}) {
 
 function renderStats(stats) {
     const html = `
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 mb-4">
             <div class="stats-card">
                 <h5 class="mb-3"><i class="fas fa-chart-bar me-2"></i>الإحصائيات العامة</h5>
                 <div class="row">
@@ -310,44 +310,7 @@ function renderStats(stats) {
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="stats-card">
-                <h5 class="mb-3"><i class="fas fa-tasks me-2"></i>التعديلات المسندة إلي</h5>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.total}</div>
-                            <div>إجمالي المسندة</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.new || 0}</div>
-                            <div>في الانتظار</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.in_progress || 0}</div>
-                            <div>جاري العمل</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.paused || 0}</div>
-                            <div>متوقفة</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="stats-item">
-                            <div class="stats-number">${stats.my_assigned_revisions.completed || 0}</div>
-                            <div>مكتملة</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 mb-4">
             <div class="stats-card">
                 <h5 class="mb-3"><i class="fas fa-user-edit me-2"></i>التعديلات التي أضفتها</h5>
                 <div class="row">
@@ -1132,6 +1095,8 @@ function applyFilters(type) {
         filters.revision_type = $('#allRevisionTypeFilter').val();
         filters.revision_source = $('#allRevisionSourceFilter').val();
         filters.status = $('#allStatusFilter').val();
+        filters.deadline_from = $('#allDeadlineFrom').val();
+        filters.deadline_to = $('#allDeadlineTo').val();
         loadAllRevisions(1, filters);
     } else if (type === 'my') {
         filters.search = $('#mySearchInput').val();
@@ -1140,6 +1105,8 @@ function applyFilters(type) {
         filters.revision_type = $('#myRevisionTypeFilter').val();
         filters.revision_source = $('#myRevisionSourceFilter').val();
         filters.status = $('#myStatusFilter').val();
+        filters.deadline_from = $('#myDeadlineFrom').val();
+        filters.deadline_to = $('#myDeadlineTo').val();
         loadMyRevisions(1, filters);
     } else if (type === 'myCreated') {
         filters.search = $('#myCreatedSearchInput').val();
@@ -1148,6 +1115,8 @@ function applyFilters(type) {
         filters.revision_type = $('#myCreatedRevisionTypeFilter').val();
         filters.revision_source = $('#myCreatedRevisionSourceFilter').val();
         filters.status = $('#myCreatedStatusFilter').val();
+        filters.deadline_from = $('#myCreatedDeadlineFrom').val();
+        filters.deadline_to = $('#myCreatedDeadlineTo').val();
         loadMyCreatedRevisions(1, filters);
     }
 
@@ -1168,6 +1137,8 @@ function clearFilters(type) {
         $('#allRevisionTypeFilter').val('');
         $('#allRevisionSourceFilter').val('');
         $('#allStatusFilter').val('');
+        $('#allDeadlineFrom').val('');
+        $('#allDeadlineTo').val('');
         loadAllRevisions();
     } else if (type === 'my') {
         $('#mySearchInput').val('');
@@ -1176,6 +1147,8 @@ function clearFilters(type) {
         $('#myRevisionTypeFilter').val('');
         $('#myRevisionSourceFilter').val('');
         $('#myStatusFilter').val('');
+        $('#myDeadlineFrom').val('');
+        $('#myDeadlineTo').val('');
         loadMyRevisions();
     } else if (type === 'myCreated') {
         $('#myCreatedSearchInput').val('');
@@ -1184,6 +1157,8 @@ function clearFilters(type) {
         $('#myCreatedRevisionTypeFilter').val('');
         $('#myCreatedRevisionSourceFilter').val('');
         $('#myCreatedStatusFilter').val('');
+        $('#myCreatedDeadlineFrom').val('');
+        $('#myCreatedDeadlineTo').val('');
         loadMyCreatedRevisions();
     }
 }
@@ -1199,6 +1174,8 @@ function loadPage(page, type) {
         filters.revision_type = $('#allRevisionTypeFilter').val();
         filters.revision_source = $('#allRevisionSourceFilter').val();
         filters.status = $('#allStatusFilter').val();
+        filters.deadline_from = $('#allDeadlineFrom').val();
+        filters.deadline_to = $('#allDeadlineTo').val();
         loadAllRevisions(page, filters);
     } else if (type === 'my') {
         filters.search = $('#mySearchInput').val();
@@ -1207,6 +1184,8 @@ function loadPage(page, type) {
         filters.revision_type = $('#myRevisionTypeFilter').val();
         filters.revision_source = $('#myRevisionSourceFilter').val();
         filters.status = $('#myStatusFilter').val();
+        filters.deadline_from = $('#myDeadlineFrom').val();
+        filters.deadline_to = $('#myDeadlineTo').val();
         loadMyRevisions(page, filters);
     } else if (type === 'myCreated') {
         filters.search = $('#myCreatedSearchInput').val();
@@ -1215,6 +1194,8 @@ function loadPage(page, type) {
         filters.revision_type = $('#myCreatedRevisionTypeFilter').val();
         filters.revision_source = $('#myCreatedRevisionSourceFilter').val();
         filters.status = $('#myCreatedStatusFilter').val();
+        filters.deadline_from = $('#myCreatedDeadlineFrom').val();
+        filters.deadline_to = $('#myCreatedDeadlineTo').val();
         loadMyCreatedRevisions(page, filters);
     }
 }

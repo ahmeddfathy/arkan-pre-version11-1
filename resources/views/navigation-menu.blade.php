@@ -46,8 +46,8 @@ use Illuminate\Support\Facades\Auth;
 
 
                     <!-- Revisions Link -->
-                    <x-nav-link href="{{ route('revision.page') }}" :active="request()->routeIs('revision.*')">
-                        {{ __('التعديلات') }}
+                    <x-nav-link href="{{ route('revision.my-revisions-page') }}" :active="request()->routeIs('revision.my-revisions-page') || request()->routeIs('revision.page')">
+                        {{ __('تعديلاتي') }}
                     </x-nav-link>
 
                     <x-nav-link href="{{ route('meetings.index') }}" :active="request()->routeIs('meetings.*')">
@@ -263,8 +263,8 @@ use Illuminate\Support\Facades\Auth;
             </x-responsive-nav-link>
 
             <!-- Responsive Revisions Link -->
-            <x-responsive-nav-link href="{{ route('revision.page') }}" :active="request()->routeIs('revision.*')">
-                {{ __('التعديلات') }}
+            <x-responsive-nav-link href="{{ route('revision.my-revisions-page') }}" :active="request()->routeIs('revision.my-revisions-page') || request()->routeIs('revision.page')">
+                {{ __('تعديلاتي') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link href="{{ route('meetings.index') }}" :active="request()->routeIs('meetings.*')">

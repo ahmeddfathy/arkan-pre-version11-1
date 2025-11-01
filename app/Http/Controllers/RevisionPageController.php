@@ -24,6 +24,52 @@ class RevisionPageController extends Controller
         $this->revisionStatsService = $revisionStatsService;
     }
 
+
+    private function applyPersonalDeadlineFilter($query, $fromDate, $toDate, $userId)
+    {
+        if (!$fromDate && !$toDate) {
+            return $query;
+        }
+
+        // فلتر ديدلاينات المنفذ والمراجع الخاصة بالمستخدم فقط
+        $query->whereHas('deadlines', function ($deadlineQuery) use ($fromDate, $toDate, $userId) {
+            $deadlineQuery->where('user_id', $userId);
+
+            if ($fromDate) {
+                $deadlineQuery->whereDate('deadline_date', '>=', $fromDate);
+            }
+
+            if ($toDate) {
+                $deadlineQuery->whereDate('deadline_date', '<=', $toDate);
+            }
+        });
+
+        return $query;
+    }
+
+    /**
+     * فلتر الديدلاين العام للتعديل
+     * يُستخدم في تبويب "جميع التعديلات" و "التعديلات التي أضفتها"
+     */
+    private function applyGeneralDeadlineFilter($query, $fromDate, $toDate)
+    {
+        if (!$fromDate && !$toDate) {
+            return $query;
+        }
+
+        $query->whereNotNull('revision_deadline');
+
+        if ($fromDate) {
+            $query->whereDate('revision_deadline', '>=', $fromDate);
+        }
+
+        if ($toDate) {
+            $query->whereDate('revision_deadline', '<=', $toDate);
+        }
+
+        return $query;
+    }
+
     /**
      * عرض صفحة التعديلات
      */
@@ -53,6 +99,37 @@ class RevisionPageController extends Controller
         $revisionTransferStats = $this->revisionStatsService->getRevisionTransferStats(Auth::id(), null);
 
         return view('revisions.page', compact('projects', 'revisionTransferStats'));
+    }
+
+    /**
+     * عرض صفحة تعديلاتي (صفحة منفصلة)
+     */
+    public function myRevisionsPage()
+    {
+        // تسجيل نشاط دخول صفحة تعديلاتي
+        if (Auth::check()) {
+            activity()
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'action_type' => 'view_my_revisions_page',
+                    'page' => 'my_revisions',
+                    'viewed_at' => now()->toDateTimeString(),
+                    'user_agent' => request()->userAgent(),
+                    'ip_address' => request()->ip()
+                ])
+                ->log('دخل على صفحة تعديلاتي');
+        }
+
+        // جلب المشاريع للـ sidebar (مع الكود)
+        $projects = \App\Models\Project::select('id', 'name', 'code')
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get();
+
+        // إحصائيات التعديلات المنقولة
+        $revisionTransferStats = $this->revisionStatsService->getRevisionTransferStats(Auth::id(), null);
+
+        return view('revisions.my-revisions', compact('projects', 'revisionTransferStats'));
     }
 
     /**
@@ -100,7 +177,7 @@ class RevisionPageController extends Controller
 
             // فلترة حسب كود المشروع (مع مراعاة الفلترة الهرمية)
             if ($request->filled('project_code')) {
-                $query->whereHas('project', function($q) use ($request) {
+                $query->whereHas('project', function ($q) use ($request) {
                     $q->where('code', 'like', '%' . $request->project_code . '%');
                 });
             }
@@ -108,26 +185,34 @@ class RevisionPageController extends Controller
             // فلترة حسب الشهر
             if ($request->filled('month')) {
                 $query->whereYear('revision_date', substr($request->month, 0, 4))
-                      ->whereMonth('revision_date', substr($request->month, 5, 2));
+                    ->whereMonth('revision_date', substr($request->month, 5, 2));
             }
 
             // البحث في العنوان والوصف
             if ($request->filled('search')) {
                 $search = $request->search;
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
+            // فلتر الديدلاين العام للتعديل فقط
+            if ($request->filled('deadline_from') || $request->filled('deadline_to')) {
+                $query = $this->applyGeneralDeadlineFilter(
+                    $query,
+                    $request->deadline_from,
+                    $request->deadline_to
+                );
+            }
+
             $revisions = $query->latest('revision_date')
-                              ->paginate(15);
+                ->paginate(15);
 
             return response()->json([
                 'success' => true,
                 'revisions' => $revisions
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching all revisions', [
                 'error' => $e->getMessage(),
@@ -188,7 +273,7 @@ class RevisionPageController extends Controller
 
             // فلترة حسب كود المشروع (مع مراعاة الفلترة الهرمية)
             if ($request->filled('project_code')) {
-                $query->whereHas('project', function($q) use ($request) {
+                $query->whereHas('project', function ($q) use ($request) {
                     $q->where('code', 'like', '%' . $request->project_code . '%');
                 });
             }
@@ -196,26 +281,35 @@ class RevisionPageController extends Controller
             // فلترة حسب الشهر
             if ($request->filled('month')) {
                 $query->whereYear('revision_date', substr($request->month, 0, 4))
-                      ->whereMonth('revision_date', substr($request->month, 5, 2));
+                    ->whereMonth('revision_date', substr($request->month, 5, 2));
             }
 
             // البحث في العنوان والوصف
             if ($request->filled('search')) {
                 $search = $request->search;
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
+            // فلتر الديدلاين الشخصي (ديدلايني كمنفذ أو مراجع)
+            if ($request->filled('deadline_from') || $request->filled('deadline_to')) {
+                $query = $this->applyPersonalDeadlineFilter(
+                    $query,
+                    $request->deadline_from,
+                    $request->deadline_to,
+                    $userId
+                );
+            }
+
             $revisions = $query->latest('revision_date')
-                              ->paginate(15);
+                ->paginate(15);
 
             return response()->json([
                 'success' => true,
                 'revisions' => $revisions
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching user revisions', [
                 'user_id' => Auth::id(),
@@ -278,7 +372,7 @@ class RevisionPageController extends Controller
 
             // فلترة حسب كود المشروع (مع مراعاة الفلترة الهرمية)
             if ($request->filled('project_code')) {
-                $query->whereHas('project', function($q) use ($request) {
+                $query->whereHas('project', function ($q) use ($request) {
                     $q->where('code', 'like', '%' . $request->project_code . '%');
                 });
             }
@@ -286,26 +380,34 @@ class RevisionPageController extends Controller
             // فلترة حسب الشهر
             if ($request->filled('month')) {
                 $query->whereYear('revision_date', substr($request->month, 0, 4))
-                      ->whereMonth('revision_date', substr($request->month, 5, 2));
+                    ->whereMonth('revision_date', substr($request->month, 5, 2));
             }
 
             // البحث في العنوان والوصف
             if ($request->filled('search')) {
                 $search = $request->search;
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
+            // فلتر الديدلاين العام للتعديل فقط
+            if ($request->filled('deadline_from') || $request->filled('deadline_to')) {
+                $query = $this->applyGeneralDeadlineFilter(
+                    $query,
+                    $request->deadline_from,
+                    $request->deadline_to
+                );
+            }
+
             $revisions = $query->latest('revision_date')
-                              ->paginate(15);
+                ->paginate(15);
 
             return response()->json([
                 'success' => true,
                 'revisions' => $revisions
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching user created revisions', [
                 'user_id' => Auth::id(),
@@ -339,14 +441,14 @@ class RevisionPageController extends Controller
             $completedRevisions = (clone $allRevisionsQuery)->where('status', 'completed')->count();
 
             // إحصائيات التعديلات المسندة للمستخدم (مباشرة أو عبر TaskUser أو TemplateTaskUser)
-            $myAssignedQuery = TaskRevision::where(function($q) use ($userId) {
+            $myAssignedQuery = TaskRevision::where(function ($q) use ($userId) {
                 $q->where('assigned_to', $userId)
-                  ->orWhereHas('taskUser', function($taskUserQuery) use ($userId) {
-                      $taskUserQuery->where('user_id', $userId);
-                  })
-                  ->orWhereHas('templateTaskUser', function($templateTaskUserQuery) use ($userId) {
-                      $templateTaskUserQuery->where('user_id', $userId);
-                  });
+                    ->orWhereHas('taskUser', function ($taskUserQuery) use ($userId) {
+                        $taskUserQuery->where('user_id', $userId);
+                    })
+                    ->orWhereHas('templateTaskUser', function ($templateTaskUserQuery) use ($userId) {
+                        $templateTaskUserQuery->where('user_id', $userId);
+                    });
             });
 
             $myAssignedRevisions = (clone $myAssignedQuery)->count();
@@ -354,6 +456,15 @@ class RevisionPageController extends Controller
             $myAssignedInProgress = (clone $myAssignedQuery)->where('status', 'in_progress')->count();
             $myAssignedPaused = (clone $myAssignedQuery)->where('status', 'paused')->count();
             $myAssignedCompleted = (clone $myAssignedQuery)->where('status', 'completed')->count();
+
+            // إحصائيات التعديلات التي المستخدم مسؤول عنها (responsible_user_id)
+            $myResponsibleQuery = TaskRevision::where('responsible_user_id', $userId);
+
+            $myResponsibleRevisions = $myResponsibleQuery->count();
+            $myResponsibleNew = (clone $myResponsibleQuery)->where('status', 'new')->count();
+            $myResponsibleInProgress = (clone $myResponsibleQuery)->where('status', 'in_progress')->count();
+            $myResponsiblePaused = (clone $myResponsibleQuery)->where('status', 'paused')->count();
+            $myResponsibleCompleted = (clone $myResponsibleQuery)->where('status', 'completed')->count();
 
             // إحصائيات التعديلات التي أنشأها المستخدم
             $myCreatedQuery = TaskRevision::where('created_by', $userId);
@@ -386,6 +497,13 @@ class RevisionPageController extends Controller
                         'paused' => $myAssignedPaused,
                         'completed' => $myAssignedCompleted
                     ],
+                    'my_responsible_revisions' => [
+                        'total' => $myResponsibleRevisions,
+                        'new' => $myResponsibleNew,
+                        'in_progress' => $myResponsibleInProgress,
+                        'paused' => $myResponsiblePaused,
+                        'completed' => $myResponsibleCompleted
+                    ],
                     'my_created_revisions' => [
                         'total' => $myCreatedRevisions,
                         'new' => $myCreatedNew,
@@ -395,7 +513,6 @@ class RevisionPageController extends Controller
                     ]
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching revision stats', [
                 'user_id' => Auth::id(),
@@ -459,7 +576,6 @@ class RevisionPageController extends Controller
                 'success' => true,
                 'revision' => $revision
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching revision details', [
                 'revision_id' => $revisionId,
@@ -523,7 +639,7 @@ class RevisionPageController extends Controller
             if ($request->filled('month')) {
                 $month = $request->month;
                 $query->whereYear('created_at', substr($month, 0, 4))
-                      ->whereMonth('created_at', substr($month, 5, 2));
+                    ->whereMonth('created_at', substr($month, 5, 2));
             }
 
             // فلترة حسب نوع التعيين (executor أو reviewer)
@@ -533,7 +649,7 @@ class RevisionPageController extends Controller
 
             // فلترة حسب المشروع
             if ($request->filled('project_id')) {
-                $query->whereHas('revision', function($q) use ($request) {
+                $query->whereHas('revision', function ($q) use ($request) {
                     $q->where('project_id', $request->project_id);
                 });
             }
@@ -541,9 +657,9 @@ class RevisionPageController extends Controller
             // فلترة حسب المستخدم (من أو إلى)
             if ($request->filled('user_id')) {
                 $userId = $request->user_id;
-                $query->where(function($q) use ($userId) {
+                $query->where(function ($q) use ($userId) {
                     $q->where('from_user_id', $userId)
-                      ->orWhere('to_user_id', $userId);
+                        ->orWhere('to_user_id', $userId);
                 });
             }
 
@@ -557,13 +673,12 @@ class RevisionPageController extends Controller
             }
 
             $records = $query->latest('created_at')
-                            ->paginate(20);
+                ->paginate(20);
 
             return response()->json([
                 'success' => true,
                 'records' => $records
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching transfer records', [
                 'error' => $e->getMessage(),
@@ -589,7 +704,7 @@ class RevisionPageController extends Controller
             if ($request->filled('month')) {
                 $month = $request->month;
                 $query->whereYear('created_at', substr($month, 0, 4))
-                      ->whereMonth('created_at', substr($month, 5, 2));
+                    ->whereMonth('created_at', substr($month, 5, 2));
             }
 
             if ($request->filled('from_date')) {
@@ -601,16 +716,16 @@ class RevisionPageController extends Controller
             }
 
             if ($request->filled('project_id')) {
-                $query->whereHas('revision', function($q) use ($request) {
+                $query->whereHas('revision', function ($q) use ($request) {
                     $q->where('project_id', $request->project_id);
                 });
             }
 
             if ($request->filled('user_id')) {
                 $userId = $request->user_id;
-                $query->where(function($q) use ($userId) {
+                $query->where(function ($q) use ($userId) {
                     $q->where('from_user_id', $userId)
-                      ->orWhere('to_user_id', $userId);
+                        ->orWhere('to_user_id', $userId);
                 });
             }
 
@@ -622,15 +737,15 @@ class RevisionPageController extends Controller
             // أكثر المستخدمين نقلاً منه
             $topFromUsers = \App\Models\RevisionAssignment::select('from_user_id', DB::raw('count(*) as transfer_count'))
                 ->whereNotNull('from_user_id')
-                ->when($request->filled('month'), function($q) use ($request) {
+                ->when($request->filled('month'), function ($q) use ($request) {
                     $month = $request->month;
                     $q->whereYear('created_at', substr($month, 0, 4))
-                      ->whereMonth('created_at', substr($month, 5, 2));
+                        ->whereMonth('created_at', substr($month, 5, 2));
                 })
-                ->when($request->filled('from_date'), function($q) use ($request) {
+                ->when($request->filled('from_date'), function ($q) use ($request) {
                     $q->whereDate('created_at', '>=', $request->from_date);
                 })
-                ->when($request->filled('to_date'), function($q) use ($request) {
+                ->when($request->filled('to_date'), function ($q) use ($request) {
                     $q->whereDate('created_at', '<=', $request->to_date);
                 })
                 ->groupBy('from_user_id')
@@ -641,15 +756,15 @@ class RevisionPageController extends Controller
 
             // أكثر المستخدمين نقلاً إليه
             $topToUsers = \App\Models\RevisionAssignment::select('to_user_id', DB::raw('count(*) as transfer_count'))
-                ->when($request->filled('month'), function($q) use ($request) {
+                ->when($request->filled('month'), function ($q) use ($request) {
                     $month = $request->month;
                     $q->whereYear('created_at', substr($month, 0, 4))
-                      ->whereMonth('created_at', substr($month, 5, 2));
+                        ->whereMonth('created_at', substr($month, 5, 2));
                 })
-                ->when($request->filled('from_date'), function($q) use ($request) {
+                ->when($request->filled('from_date'), function ($q) use ($request) {
                     $q->whereDate('created_at', '>=', $request->from_date);
                 })
-                ->when($request->filled('to_date'), function($q) use ($request) {
+                ->when($request->filled('to_date'), function ($q) use ($request) {
                     $q->whereDate('created_at', '<=', $request->to_date);
                 })
                 ->groupBy('to_user_id')
@@ -668,7 +783,6 @@ class RevisionPageController extends Controller
                     'top_to_users' => $topToUsers
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching transfer stats', [
                 'error' => $e->getMessage(),
@@ -690,24 +804,23 @@ class RevisionPageController extends Controller
         try {
             // جلب جميع المشاريع التي لها كود
             $projects = \App\Models\Project::whereNotNull('code')
-                             ->where('code', '!=', '')
-                             ->select('id', 'name', 'code')
-                             ->orderBy('code')
-                             ->get()
-                             ->map(function($project) {
-                                 return [
-                                     'id' => $project->id,
-                                     'code' => $project->code,
-                                     'name' => $project->name,
-                                     'display' => $project->code . ' - ' . $project->name
-                                 ];
-                             });
+                ->where('code', '!=', '')
+                ->select('id', 'name', 'code')
+                ->orderBy('code')
+                ->get()
+                ->map(function ($project) {
+                    return [
+                        'id' => $project->id,
+                        'code' => $project->code,
+                        'name' => $project->name,
+                        'display' => $project->code . ' - ' . $project->name
+                    ];
+                });
 
             return response()->json([
                 'success' => true,
                 'projects' => $projects
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching projects list', [
                 'user_id' => Auth::id(),

@@ -720,6 +720,7 @@ Route::prefix('revisions-by-source')->middleware('auth')->group(function () {
 
 Route::prefix('revision-page')->middleware('auth')->group(function () {
     Route::get('/', [RevisionPageController::class, 'index'])->name('revision.page');
+    Route::get('/my-revisions-page', [RevisionPageController::class, 'myRevisionsPage'])->name('revision.my-revisions-page');
     Route::get('/all-revisions', [RevisionPageController::class, 'getAllRevisions'])->name('revision.page.all');
     Route::get('/my-revisions', [RevisionPageController::class, 'getMyRevisions'])->name('revision.page.my');
     Route::get('/my-created-revisions', [RevisionPageController::class, 'getMyCreatedRevisions'])->name('revision.page.created');

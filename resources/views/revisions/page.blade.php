@@ -609,6 +609,10 @@
                         </button>
                     </div>
 
+                    <a href="{{ route('revision.my-revisions-page') }}" class="btn btn-primary">
+                        <i class="fas fa-tasks me-1"></i>
+                        تعديلاتي
+                    </a>
                     <a href="{{ route('revision.transfer-statistics') }}" class="btn btn-info">
                         <i class="fas fa-exchange-alt me-1"></i>
                         إحصائيات النقل
@@ -719,14 +723,6 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="my-revisions-tab" data-bs-toggle="pill"
-                            data-bs-target="#my-revisions" type="button" role="tab">
-                        <i class="fas fa-tasks me-2"></i>
-                        تعديلاتي
-                        <span class="badge bg-light text-primary ms-2" id="myRevisionsCount">0</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="my-created-revisions-tab" data-bs-toggle="pill"
                             data-bs-target="#my-created-revisions" type="button" role="tab">
                         <i class="fas fa-user-edit me-2"></i>
@@ -794,6 +790,19 @@
                                 <option value="rejected">مرفوض</option>
                             </optgroup>
                         </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">ديدلاين من</label>
+                        <input type="date" class="form-control" id="allDeadlineFrom"
+                               title="فلتر حسب الديدلاين العام للتعديل">
+                        <small class="text-muted d-block mt-1">
+                            <i class="fas fa-info-circle"></i> الديدلاين العام للتعديل
+                        </small>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">ديدلاين إلى</label>
+                        <input type="date" class="form-control" id="allDeadlineTo"
+                               title="فلتر حسب الديدلاين العام للتعديل">
                     </div>
                     <div class="col-md-1 mb-3">
                         <label class="form-label">&nbsp;</label>
@@ -881,86 +890,6 @@
             </div>
         </div>
 
-        <!-- My Revisions Tab -->
-        <div class="tab-pane fade" id="my-revisions" role="tabpanel">
-            <!-- Filters -->
-            <div class="filter-section">
-                <div class="row">
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">البحث</label>
-                        <input type="text" class="form-control" id="mySearchInput"
-                               placeholder="البحث في العنوان والوصف...">
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">المشروع</label>
-                        <input type="text" class="form-control" id="myProjectCodeFilter"
-                               list="myProjectsList" placeholder="اختر المشروع...">
-                        <datalist id="myProjectsList">
-                            <!-- Will be populated by JavaScript -->
-                        </datalist>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">الشهر</label>
-                        <input type="month" class="form-control" id="myMonthFilter">
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">نوع التعديل</label>
-                        <select class="form-select" id="myRevisionTypeFilter">
-                            <option value="">الكل</option>
-                            <option value="project">مشروع</option>
-                            <option value="task">مهمة</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">المصدر</label>
-                        <select class="form-select" id="myRevisionSourceFilter">
-                            <option value="">الكل</option>
-                            <option value="internal">داخلي</option>
-                            <option value="external">خارجي</option>
-                        </select>
-                    </div>
-                    <div class="col-md-1 mb-3">
-                        <label class="form-label">الحالة</label>
-                        <select class="form-select" id="myStatusFilter">
-                            <option value="">الكل</option>
-                            <optgroup label="حالة العمل">
-                                <option value="new">جديد</option>
-                                <option value="in_progress">جاري العمل</option>
-                                <option value="paused">متوقف</option>
-                                <option value="completed">مكتمل</option>
-                            </optgroup>
-                            <optgroup label="حالة الموافقة">
-                                <option value="pending">في الانتظار</option>
-                                <option value="approved">موافق عليه</option>
-                                <option value="rejected">مرفوض</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div class="col-md-1 mb-3">
-                        <label class="form-label">&nbsp;</label>
-                        <div class="d-flex flex-column gap-2">
-                            <button class="btn btn-primary w-100" onclick="applyFilters('my')" title="تطبيق الفلتر">
-                                <i class="fas fa-filter"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters('my')" title="مسح">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Revisions List -->
-            <div id="myRevisionsContainer">
-                <!-- Will be populated by JavaScript -->
-            </div>
-
-            <!-- Pagination -->
-            <div id="myRevisionsPagination" class="d-flex justify-content-center mt-4">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
-
         <!-- My Created Revisions Tab -->
         <div class="tab-pane fade" id="my-created-revisions" role="tabpanel">
             <!-- Filters -->
@@ -1015,6 +944,19 @@
                                 <option value="rejected">مرفوض</option>
                             </optgroup>
                         </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">ديدلاين من</label>
+                        <input type="date" class="form-control" id="myCreatedDeadlineFrom"
+                               title="فلتر حسب الديدلاين العام للتعديلات">
+                        <small class="text-success d-block mt-1">
+                            <i class="fas fa-calendar-check"></i> الديدلاين العام للتعديل
+                        </small>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">ديدلاين إلى</label>
+                        <input type="date" class="form-control" id="myCreatedDeadlineTo"
+                               title="فلتر حسب الديدلاين العام للتعديلات">
                     </div>
                     <div class="col-md-1 mb-3">
                         <label class="form-label">&nbsp;</label>

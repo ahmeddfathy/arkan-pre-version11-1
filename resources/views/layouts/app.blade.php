@@ -214,6 +214,12 @@
             </li>
             @endif
             <li>
+                <a href="{{ route('revision.my-revisions-page') }}" class="{{ request()->routeIs('revision.my-revisions-page') ? 'active' : '' }}">
+                    <i class="fas fa-user-edit"></i>
+                    <span>تعديلاتي</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('revision.page') }}" class="{{ request()->routeIs('revision.page') ? 'active' : '' }}">
                     <i class="fas fa-edit"></i>
                     <span>التعديلات</span>

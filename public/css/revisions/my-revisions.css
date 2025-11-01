@@ -1,0 +1,392 @@
+/* ====================================
+   🎯 My Revisions Page CSS
+   ==================================== */
+
+/* إخفاء scrollbar من الصفحة */
+html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* SweetAlert RTL Support */
+.rtl-swal {
+    direction: rtl;
+    text-align: right;
+}
+
+.swal2-html-container {
+    text-align: right !important;
+}
+
+/* Revisions Table */
+.revisions-table {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+    overflow: hidden;
+    margin-bottom: 3rem;
+}
+
+.revisions-table table {
+    margin: 0;
+    border: none;
+}
+
+.table-responsive {
+    border-radius: 12px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.table-responsive::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
+
+.revisions-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.revisions-table thead th {
+    border: none;
+    padding: 15px 12px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.revisions-table tbody tr {
+    border-bottom: 1px solid #f5f5f5;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.revisions-table tbody tr:hover {
+    background: #f8f9fa;
+    transform: scale(1.001);
+}
+
+.revisions-table tbody tr.active {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.revisions-table tbody td {
+    border: none;
+    padding: 12px;
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+/* Revision Sidebar */
+.revision-sidebar {
+    position: fixed;
+    top: 0;
+    right: -500px;
+    width: 480px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+    z-index: 1050;
+    overflow-y: auto;
+    transition: right 0.3s ease;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.revision-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .revision-sidebar {
+        width: 90%;
+        right: -90%;
+    }
+}
+
+.revision-sidebar.active {
+    right: 0;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar-content {
+    padding: 20px;
+    direction: rtl;
+    text-align: right;
+}
+
+.sidebar-content * {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+.sidebar-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    float: right;
+    line-height: 1;
+}
+
+/* Detail Section */
+.detail-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.detail-section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.detail-section h6 {
+    margin-bottom: 15px;
+    color: #495057;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+    text-align: right;
+    direction: rtl;
+}
+
+.detail-section h6 i {
+    color: #667eea;
+}
+
+.detail-section p {
+    margin: 0;
+    color: #666;
+    line-height: 1.5;
+    text-align: right;
+    direction: rtl;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-new {
+    background: #e9ecef;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.status-in_progress {
+    background: #cfe2ff;
+    color: #084298;
+    border: 1px solid #b6d4fe;
+}
+
+.status-paused {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffecb5;
+}
+
+.status-completed {
+    background: #d1eddc;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Stats */
+.stats-card {
+    background: white;
+    color: #333;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.stats-item {
+    text-align: center;
+    padding: 18px;
+    border-radius: 12px;
+    margin: 5px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.stats-number {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #667eea;
+}
+
+/* Filter Section */
+.filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.empty-state i {
+    font-size: 4em;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Source Badges */
+.source-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.source-internal {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.source-external {
+    background: #fff8e1;
+    color: #f57c00;
+}
+
+/* Revision Timer */
+.revision-timer {
+    font-family: 'Courier New', monospace !important;
+    font-weight: bold !important;
+    color: #059669 !important;
+    padding: 4px 8px !important;
+    background: #dcfce7 !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    border: 1px solid #bbf7d0 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    border: 2px solid white;
+}
+
+/* Kanban Board Styles */
+#myRevisionsKanbanBoard {
+    min-height: 500px;
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+#myRevisionsKanbanBoard .kanban-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    direction: rtl;
+}
+
+#myRevisionsKanbanBoard .kanban-column {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+}
+
+#myRevisionsKanbanBoard .revision-kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
