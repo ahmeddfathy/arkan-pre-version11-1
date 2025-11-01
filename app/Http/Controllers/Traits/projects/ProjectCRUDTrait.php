@@ -199,28 +199,16 @@ trait ProjectCRUDTrait
         $project = Project::with(['services', 'client'])->findOrFail($id);
         $user = Auth::user();
 
-        // الحصول على المستوى الهرمي للمستخدم
-        $userHierarchyLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
-
-        // التحقق من عضوية المستخدم في المشروع
-        $isProjectMember = DB::table('project_service_user')
-            ->where('project_id', $project->id)
-            ->where('user_id', $user->id)
-            ->exists();
+        // التحقق من رول general_reviewer
+        $isGeneralReviewer = $this->roleCheckService->userHasRole(['general_reviewer']);
 
         // تحديد صلاحيات المستخدم
         $canEdit = false;
-        $canViewAll = false;
+        $canViewAll = true; // الكل يشوف كل شي
 
-        // Level 5+ يشوف كل التابات لكن مش يملأ
-        if ($userHierarchyLevel >= 5) {
-            $canViewAll = true;
-            $canEdit = false;
-        }
-        // Level 2 & 3 يملأوا البيانات (لو في المشروع)
-        elseif (($userHierarchyLevel == 2 || $userHierarchyLevel == 3) && $isProjectMember) {
+        // فقط general_reviewer يمكنه التعديل
+        if ($isGeneralReviewer) {
             $canEdit = true;
-            $canViewAll = false;
         }
 
         // جلب خدمات المشروع مع الحقول الديناميكية
@@ -232,32 +220,16 @@ trait ProjectCRUDTrait
         foreach ($projectServices as $projectService) {
             $service = CompanyService::with('dataFields')->find($projectService->service_id);
             if ($service) {
-                // التحقق من صلاحية عرض هذه الخدمة
-                $canViewService = $canViewAll;
-
-                // إذا لم يكن يشوف كل شي، تحقق من أنه مشارك في هذه الخدمة
-                if (!$canViewAll) {
-                    $userInService = DB::table('project_service_user')
-                        ->where('project_id', $project->id)
-                        ->where('service_id', $projectService->service_id)
-                        ->where('user_id', $user->id)
-                        ->exists();
-
-                    $canViewService = $userInService;
-                }
-
-                // إضافة الخدمة فقط إذا كان لديه صلاحية عرضها
-                if ($canViewService) {
-                    $servicesWithData[] = [
-                        'service' => $service,
-                        'service_data' => json_decode($projectService->service_data, true) ?? [],
-                        'service_status' => $projectService->service_status
-                    ];
-                }
+                // الكل يشوف كل الخدمات
+                $servicesWithData[] = [
+                    'service' => $service,
+                    'service_data' => json_decode($projectService->service_data, true) ?? [],
+                    'service_status' => $projectService->service_status
+                ];
             }
         }
 
-        return view('projects.service-data', compact('project', 'servicesWithData', 'canEdit', 'canViewAll', 'userHierarchyLevel'));
+        return view('projects.service-data', compact('project', 'servicesWithData', 'canEdit', 'canViewAll'));
     }
 
     /**
@@ -268,49 +240,13 @@ trait ProjectCRUDTrait
         try {
             $user = Auth::user();
 
-            // 1. التحقق من المستوى الهرمي للمستخدم
-            $userHierarchyLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
+            // التحقق من رول general_reviewer فقط
+            $isGeneralReviewer = $this->roleCheckService->userHasRole(['general_reviewer']);
 
-            // 2. Level 5+ لا يمكنهم التعديل (view only)
-            if ($userHierarchyLevel >= 5) {
+            if (!$isGeneralReviewer) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'غير مسموح لك بتعديل البيانات. صلاحيتك للعرض فقط.'
-                ], 403);
-            }
-
-            // 3. التحقق من أن المستخدم في المشروع
-            $isProjectMember = DB::table('project_service_user')
-                ->where('project_id', $projectId)
-                ->where('user_id', $user->id)
-                ->exists();
-
-            if (!$isProjectMember) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'يجب أن تكون عضواً في المشروع لتعديل البيانات'
-                ], 403);
-            }
-
-            // 4. التحقق من أن المستخدم له hierarchy level 2 أو 3
-            if ($userHierarchyLevel != 2 && $userHierarchyLevel != 3) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'غير مسموح لك بتعديل بيانات الخدمات. صلاحيتك غير كافية.'
-                ], 403);
-            }
-
-            // 5. التحقق من أن المستخدم مشارك في هذه الخدمة بالذات
-            $userInService = DB::table('project_service_user')
-                ->where('project_id', $projectId)
-                ->where('service_id', $serviceId)
-                ->where('user_id', $user->id)
-                ->exists();
-
-            if (!$userInService) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'غير مسموح لك بتعديل بيانات هذه الخدمة'
+                    'message' => 'غير مسموح لك بتعديل البيانات. فقط المراجع العام يمكنه التعديل.'
                 ], 403);
             }
 
@@ -368,7 +304,6 @@ trait ProjectCRUDTrait
                 'success' => true,
                 'message' => 'تم حفظ البيانات بنجاح'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error updating service data', [
                 'error' => $e->getMessage(),
@@ -412,7 +347,6 @@ trait ProjectCRUDTrait
                     'service_status' => $projectService->service_status
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error getting service data', [
                 'error' => $e->getMessage(),
@@ -467,11 +401,11 @@ trait ProjectCRUDTrait
                     $monthEnd = \Carbon\Carbon::create($year, $month, 1)->endOfMonth()->endOfDay();
 
                     // Find projects where preparation period overlaps with selected month
-                    $query->where(function($q) use ($monthStart, $monthEnd) {
+                    $query->where(function ($q) use ($monthStart, $monthEnd) {
                         // Preparation starts before or during month AND ends during or after month
-                        $q->where(function($innerQ) use ($monthStart, $monthEnd) {
+                        $q->where(function ($innerQ) use ($monthStart, $monthEnd) {
                             $innerQ->where('preparation_start_date', '<=', $monthEnd)
-                                   ->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) >= ?', [$monthStart]);
+                                ->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) >= ?', [$monthStart]);
                         });
                     });
                 }
@@ -485,7 +419,7 @@ trait ProjectCRUDTrait
                     case 'active':
                         // جارية حالياً
                         $query->whereRaw('preparation_start_date <= ?', [$today])
-                              ->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) >= ?', [$today]);
+                            ->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) >= ?', [$today]);
                         break;
 
                     case 'pending':
@@ -503,12 +437,12 @@ trait ProjectCRUDTrait
             // Search
             if (request('search')) {
                 $search = request('search');
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%")
-                      ->orWhereHas('client', function($clientQuery) use ($search) {
-                          $clientQuery->where('name', 'like', "%{$search}%");
-                      });
+                        ->orWhere('code', 'like', "%{$search}%")
+                        ->orWhereHas('client', function ($clientQuery) use ($search) {
+                            $clientQuery->where('name', 'like', "%{$search}%");
+                        });
                 });
             }
 
@@ -563,13 +497,13 @@ trait ProjectCRUDTrait
 
             // البحث إذا تم إدخال نص
             if ($search) {
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%");
+                        ->orWhere('code', 'like', "%{$search}%");
                 });
             }
 
-            $projects = $query->limit(100)->get()->map(function($project) {
+            $projects = $query->limit(100)->get()->map(function ($project) {
                 return [
                     'id' => $project->id,
                     'name' => $project->name,
@@ -584,7 +518,6 @@ trait ProjectCRUDTrait
                 'success' => true,
                 'projects' => $projects
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error getting projects list for preparation', [
                 'error' => $e->getMessage(),
@@ -659,7 +592,6 @@ trait ProjectCRUDTrait
             return redirect()
                 ->route('projects.preparation-period')
                 ->with('success', 'تم تفعيل فترة التحضير للمشروع "' . $project->name . '" بنجاح');
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withErrors($e->errors())
@@ -757,7 +689,6 @@ trait ProjectCRUDTrait
                 'pendingProjects',
                 'overdueProjects'
             ));
-
         } catch (\Exception $e) {
             Log::error('Error in client deliveries page', [
                 'error' => $e->getMessage(),
@@ -840,7 +771,6 @@ trait ProjectCRUDTrait
 
             return redirect()->route('projects.show', $project)
                 ->with('success', 'تم حفظ البيانات الإضافية بنجاح');
-
         } catch (\Exception $e) {
             Log::error('Error updating custom fields: ' . $e->getMessage());
             return back()->withInput()
@@ -877,18 +807,17 @@ trait ProjectCRUDTrait
             $totalProjects = $projects->count();
             $activeProjects = $projects->where('status', 'جاري التنفيذ')->count();
             $completedProjects = $projects->where('status', 'مكتمل')->count();
-            $totalServices = $projects->sum(function($project) {
+            $totalServices = $projects->sum(function ($project) {
                 return $project->services->count();
             });
 
-        return view('projects.project-services-overview', compact(
-            'projects',
-            'totalProjects',
-            'activeProjects',
-            'completedProjects',
-            'totalServices'
-        ));
-
+            return view('projects.project-services-overview', compact(
+                'projects',
+                'totalProjects',
+                'activeProjects',
+                'completedProjects',
+                'totalServices'
+            ));
         } catch (\Exception $e) {
             Log::error('Error in simple overview', [
                 'error' => $e->getMessage()
@@ -939,10 +868,10 @@ trait ProjectCRUDTrait
         // البحث
         if (request('search')) {
             $search = request('search');
-            $projectsQuery->where(function($q) use ($search) {
+            $projectsQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
