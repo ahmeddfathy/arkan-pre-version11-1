@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="limits-container">
-    <div class="container">
+    <div class="container-fluid px-4">
         <!-- Page Header -->
         <div class="page-header-limits">
             <h1>✏️ تعديل حد شهري</h1>
@@ -39,13 +39,13 @@
                             </label>
                             <div style="background: linear-gradient(135deg, #f9fafb, #ffffff); border: 2px solid #e5e7eb; border-radius: 10px; padding: 0.75rem 1rem; font-weight: 600;">
                                 @if($projectLimit->limit_type === 'company')
-                                    🏢 {{ $projectLimit->limit_type_text }}
+                                🏢 {{ $projectLimit->limit_type_text }}
                                 @elseif($projectLimit->limit_type === 'department')
-                                    🏛️ {{ $projectLimit->limit_type_text }}
+                                🏛️ {{ $projectLimit->limit_type_text }}
                                 @elseif($projectLimit->limit_type === 'team')
-                                    👥 {{ $projectLimit->limit_type_text }}
+                                👥 {{ $projectLimit->limit_type_text }}
                                 @else
-                                    👤 {{ $projectLimit->limit_type_text }}
+                                👤 {{ $projectLimit->limit_type_text }}
                                 @endif
                             </div>
                             <input type="hidden" name="limit_type" value="{{ $projectLimit->limit_type }}">
@@ -73,31 +73,31 @@
                                 <option value="12" {{ $projectLimit->month == 12 ? 'selected' : '' }}>ديسمبر</option>
                             </select>
                             @error('month')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <!-- الكيان (للعرض فقط) -->
                         @if($projectLimit->limit_type !== 'company')
-                            <div class="mb-4">
-                                <label class="form-label-modern">
-                                    @if($projectLimit->limit_type === 'department')
-                                        <i class="fas fa-sitemap"></i>
-                                        القسم
-                                    @elseif($projectLimit->limit_type === 'team')
-                                        <i class="fas fa-users"></i>
-                                        الفريق
-                                    @else
-                                        <i class="fas fa-user"></i>
-                                        الموظف
-                                    @endif
-                                </label>
-                                <div style="background: linear-gradient(135deg, #f9fafb, #ffffff); border: 2px solid #e5e7eb; border-radius: 10px; padding: 0.75rem 1rem; font-weight: 600;">
-                                    {{ $projectLimit->entity_display_name }}
-                                </div>
-                                <input type="hidden" name="entity_id" value="{{ $projectLimit->entity_id }}">
-                                <input type="hidden" name="entity_name" value="{{ $projectLimit->entity_name }}">
+                        <div class="mb-4">
+                            <label class="form-label-modern">
+                                @if($projectLimit->limit_type === 'department')
+                                <i class="fas fa-sitemap"></i>
+                                القسم
+                                @elseif($projectLimit->limit_type === 'team')
+                                <i class="fas fa-users"></i>
+                                الفريق
+                                @else
+                                <i class="fas fa-user"></i>
+                                الموظف
+                                @endif
+                            </label>
+                            <div style="background: linear-gradient(135deg, #f9fafb, #ffffff); border: 2px solid #e5e7eb; border-radius: 10px; padding: 0.75rem 1rem; font-weight: 600;">
+                                {{ $projectLimit->entity_display_name }}
                             </div>
+                            <input type="hidden" name="entity_id" value="{{ $projectLimit->entity_id }}">
+                            <input type="hidden" name="entity_name" value="{{ $projectLimit->entity_name }}">
+                        </div>
                         @endif
 
                         <!-- الحد الشهري -->
@@ -107,18 +107,18 @@
                                 الحد الشهري للمشاريع <span class="text-danger">*</span>
                             </label>
                             <input type="number"
-                                   name="monthly_limit"
-                                   class="form-control-modern form-control @error('monthly_limit') is-invalid @enderror"
-                                   value="{{ old('monthly_limit', $projectLimit->monthly_limit) }}"
-                                   min="0"
-                                   style="font-size: 1.2rem; font-weight: 600;"
-                                   required>
+                                name="monthly_limit"
+                                class="form-control-modern form-control @error('monthly_limit') is-invalid @enderror"
+                                value="{{ old('monthly_limit', $projectLimit->monthly_limit) }}"
+                                min="0"
+                                style="font-size: 1.2rem; font-weight: 600;"
+                                required>
                             <small class="text-muted" style="display: block; margin-top: 0.5rem;">
                                 <i class="fas fa-info-circle"></i>
                                 عدد المشاريع المسموح بها شهرياً
                             </small>
                             @error('monthly_limit')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -129,11 +129,11 @@
                                 ملاحظات
                             </label>
                             <textarea name="notes"
-                                      class="form-control-modern form-control @error('notes') is-invalid @enderror"
-                                      rows="4"
-                                      placeholder="ملاحظات إضافية (اختياري)">{{ old('notes', $projectLimit->notes) }}</textarea>
+                                class="form-control-modern form-control @error('notes') is-invalid @enderror"
+                                rows="4"
+                                placeholder="ملاحظات إضافية (اختياري)">{{ old('notes', $projectLimit->notes) }}</textarea>
                             @error('notes')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -142,12 +142,12 @@
                             <div class="form-check form-switch">
                                 <input type="hidden" name="is_active" value="0">
                                 <input class="form-check-input"
-                                       type="checkbox"
-                                       name="is_active"
-                                       id="isActive"
-                                       value="1"
-                                       style="width: 3rem; height: 1.5rem; cursor: pointer;"
-                                       {{ old('is_active', $projectLimit->is_active) ? 'checked' : '' }}>
+                                    type="checkbox"
+                                    name="is_active"
+                                    id="isActive"
+                                    value="1"
+                                    style="width: 3rem; height: 1.5rem; cursor: pointer;"
+                                    {{ old('is_active', $projectLimit->is_active) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="isActive" style="margin-right: 1rem; cursor: pointer;">
                                     <strong style="font-size: 1.1rem;">✅ تفعيل هذا الحد</strong>
                                     <small class="d-block text-muted" style="margin-top: 0.5rem;">

@@ -25,9 +25,9 @@
 <body class="d-flex flex-column min-vh-100 {{ auth()->user() ? 'user-logged-in' : 'user-guest' }}" x-data x-cloak>
     <div class="page-transition">
         @if(auth()->user())
-            @livewire('navigation-menu')
+        @livewire('navigation-menu')
         @else
-            @include('layouts.navigation')
+        @include('layouts.navigation')
         @endif
     </div>
 
@@ -51,7 +51,7 @@
 
         <div class="sidebar-category">القائمة الرئيسية</div>
         <ul class="sidebar-menu">
-            @if(Auth::user()->hasAnyRole(['hr', 'admin', 'company_manager', 'project_manager']))
+            @if(Auth::user()->hasAnyRole(['hr', 'company_manager', 'project_manager']))
             <li>
                 <a href="{{ route('service-data.index') }}" class="{{ request()->routeIs('service-data.*') ? 'active' : '' }}">
                     <i class="fas fa-database"></i>
@@ -72,34 +72,34 @@
                 </a>
             </li>
             @php
-                $userHierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
-                $currentUser = Auth::user();
-                $dashboardUrl = null;
-                $isActive = false;
+            $userHierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
+            $currentUser = Auth::user();
+            $dashboardUrl = null;
+            $isActive = false;
 
-                if ($userHierarchyLevel == 3) {
-                    // Level 3: رابط مباشر لـ dashboard الفريق
-                    $userTeam = DB::table('teams')->where('user_id', $currentUser->id)->first();
-                    if ($userTeam) {
-                        $dashboardUrl = route('departments.teams.show', [
-                            'department' => urlencode($currentUser->department ?? 'Unknown'),
-                            'teamId' => $userTeam->id
-                        ]);
-                        $isActive = request()->routeIs('departments.teams.show');
-                    }
-                } elseif ($userHierarchyLevel == 4) {
-                    // Level 4: رابط مباشر لـ dashboard القسم
-                    if ($currentUser->department) {
-                        $dashboardUrl = route('departments.show', [
-                            'department' => urlencode($currentUser->department)
-                        ]);
-                        $isActive = request()->routeIs('departments.show');
-                    }
-                } elseif ($userHierarchyLevel >= 5) {
-                    // Level 5+: الرابط العادي للـ main dashboard
-                    $dashboardUrl = route('company-projects.dashboard');
-                    $isActive = request()->routeIs('company-projects.dashboard');
-                }
+            if ($userHierarchyLevel == 3) {
+            // Level 3: رابط مباشر لـ dashboard الفريق
+            $userTeam = DB::table('teams')->where('user_id', $currentUser->id)->first();
+            if ($userTeam) {
+            $dashboardUrl = route('departments.teams.show', [
+            'department' => urlencode($currentUser->department ?? 'Unknown'),
+            'teamId' => $userTeam->id
+            ]);
+            $isActive = request()->routeIs('departments.teams.show');
+            }
+            } elseif ($userHierarchyLevel == 4) {
+            // Level 4: رابط مباشر لـ dashboard القسم
+            if ($currentUser->department) {
+            $dashboardUrl = route('departments.show', [
+            'department' => urlencode($currentUser->department)
+            ]);
+            $isActive = request()->routeIs('departments.show');
+            }
+            } elseif ($userHierarchyLevel >= 5) {
+            // Level 5+: الرابط العادي للـ main dashboard
+            $dashboardUrl = route('company-projects.dashboard');
+            $isActive = request()->routeIs('company-projects.dashboard');
+            }
             @endphp
             @if($userHierarchyLevel >= 3 && $dashboardUrl)
             <li>
@@ -159,7 +159,12 @@
                     <span>للفريق التنفيذي (مواعيد التسليم مع العملاء)</span>
                 </a>
             </li>
-            @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr']))
+            <li>
+                <a href="{{ route('projects.internal-delivery.index') }}" class="{{ request()->routeIs('projects.internal-delivery.*') ? 'active' : '' }}">
+                    <span>التسليم الداخلي للمشاريع</span>
+                </a>
+            </li>
+            @if(Auth::user()->hasRole('hr'))
             <li>
                 <a href="{{ route('project-fields.index') }}" class="{{ request()->routeIs('project-fields.*') ? 'active' : '' }}">
                     <i class="fas fa-sliders-h"></i>
@@ -193,13 +198,13 @@
                     <span>تسليمات المشاريع</span>
                 </a>
             </li>
-            @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr', 'project_manager']))
             <li>
                 <a href="{{ route('task-deliveries.index') }}" class="{{ request()->routeIs('task-deliveries.*') ? 'active' : '' }}">
                     <i class="fas fa-clipboard-check"></i>
                     <span>تسليمات التاسكات</span>
                 </a>
             </li>
+            @if(Auth::user()->hasRole(['hr', 'project_manager']))
             <li>
                 <a href="{{ route('task-templates.index') }}" class="{{ request()->routeIs('task-templates.*') ? 'active' : '' }}">
                     <i class="fas fa-clipboard-list"></i>
@@ -279,7 +284,7 @@
                     <span>مهامي الإضافية</span>
                 </a>
             </li>
-            @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr', 'project_manager']))
+            @if(Auth::user()->hasRole(['hr', 'project_manager']))
             <li>
                 <a href="{{ route('additional-tasks.applications') }}" class="{{ request()->routeIs('additional-tasks.applications') ? 'active' : '' }}">
                     <i class="fas fa-file-contract"></i>
@@ -289,7 +294,7 @@
             @endif
         </ul>
 
-        @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr', 'project_manager']))
+        @if(Auth::user()->hasRole(['hr', 'project_manager']))
         <div class="sidebar-category">أدوات إدارة المهام</div>
         <ul class="sidebar-menu">
             <li>
@@ -379,12 +384,12 @@
 
         <!-- النظام الديناميكي لإدارة التقييمات -->
         @php
-            $canAccessDynamicEvaluation = Auth::user()->hasRole(['hr', 'admin', 'super-admin']) ||
-                                         Auth::user()->hasRole(['technical_team_leader', 'technical_department_manager',
-                                                               'marketing_team_leader', 'marketing_department_manager',
-                                                               'customer_service_team_leader', 'customer_service_department_manager',
-                                                               'coordination_team_leader', 'coordination_department_manager',
-                                                               'project_manager']);
+        $canAccessDynamicEvaluation = Auth::user()->hasRole('hr') ||
+        Auth::user()->hasRole(['technical_team_leader', 'technical_department_manager',
+        'marketing_team_leader', 'marketing_department_manager',
+        'customer_service_team_leader', 'customer_service_department_manager',
+        'coordination_team_leader', 'coordination_department_manager',
+        'project_manager']);
         @endphp
 
         @if($canAccessDynamicEvaluation)
@@ -402,7 +407,7 @@
                     <span>سجل تقييمات KPI</span>
                 </a>
             </li>
-            @if(Auth::user()->hasRole(['hr', 'admin', 'super-admin']))
+            @if(Auth::user()->hasRole('hr'))
             <li>
                 <a href="{{ route('evaluation-criteria.index') }}" class="{{ request()->routeIs('evaluation-criteria.*') ? 'active' : '' }}">
                     <i class="fas fa-list-check"></i>
@@ -582,7 +587,7 @@
         </ul>
         @endif
 
-        @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr', 'project_manager']))
+        @if(Auth::user()->hasRole(['hr', 'project_manager']))
         <div class="sidebar-category">إدارة المشاريع الإضافية</div>
         <ul class="sidebar-menu">
             <li>
@@ -600,7 +605,7 @@
         </ul>
         @endif
 
-        @if(Auth::user()->hasRole(['admin', 'super-admin', 'hr']))
+        @if(Auth::user()->hasRole('hr'))
         <!-- المواسم -->
         <div class="sidebar-category">المواسم</div>
         <ul class="sidebar-menu">
@@ -653,7 +658,7 @@
                 </a>
             </li>
             <li>
-                 <a href="{{ route('call-logs.index') }}" class="{{ request()->routeIs('call-logs.*') ? 'active' : '' }}">
+                <a href="{{ route('call-logs.index') }}" class="{{ request()->routeIs('call-logs.*') ? 'active' : '' }}">
                     <i class="fas fa-phone"></i>
                     <span>سجلات المكالمات</span>
                 </a>

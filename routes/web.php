@@ -81,10 +81,10 @@ Route::middleware([
         Route::get('/{user}/following', [UserProfileController::class, 'following'])->name('following');
     });
 
-        Route::get('/users/assign-work-shifts', [UserController::class, 'assignWorkShifts'])->name('users.assign-work-shifts')->middleware('role:manager');
-        Route::post('/users/save-single-work-shift', [UserController::class, 'saveSingleWorkShift'])->name('users.save-single-work-shift')->middleware('role:manager');
+    Route::get('/users/assign-work-shifts', [UserController::class, 'assignWorkShifts'])->name('users.assign-work-shifts')->middleware('role:manager');
+    Route::post('/users/save-single-work-shift', [UserController::class, 'saveSingleWorkShift'])->name('users.save-single-work-shift')->middleware('role:manager');
 
-        Route::get('/users/all', [UserController::class, 'getAllUsersForRevision'])->name('users.all-for-revision');
+    Route::get('/users/all', [UserController::class, 'getAllUsersForRevision'])->name('users.all-for-revision');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -114,8 +114,8 @@ Route::middleware(['auth', 'role:manager'])->group(function () {
         'as' => 'admin'
     ]);
 
-Route::resource('users', UserController::class)->except(['destroy']);
-Route::post('user/import', [UserController::class, 'import'])->name('user.import');;
+    Route::resource('users', UserController::class)->except(['destroy']);
+    Route::post('user/import', [UserController::class, 'import'])->name('user.import');;
 
 
     Route::resource('work-shifts', WorkShiftController::class);
@@ -142,35 +142,35 @@ Route::post('user/import', [UserController::class, 'import'])->name('user.import
     Route::get('/salary-sheets', [SalarySheetController::class, 'index'])->name('salary-sheets.index');
     Route::post('/salary-sheets/upload', [SalarySheetController::class, 'upload'])->name('salary-sheets.upload');
     Route::get('/users/{user}/forbidden-permissions', [UserController::class, 'getForbiddenPermissions'])
-    ->name('users.forbidden-permissions');
+        ->name('users.forbidden-permissions');
 
-Route::get('/users/{user}/additional-permissions', [UserController::class, 'getAdditionalPermissions']);
+    Route::get('/users/{user}/additional-permissions', [UserController::class, 'getAdditionalPermissions']);
 
-Route::get('/roles/{role}/permissions', [UserController::class, 'getRolePermissions'])
-    ->name('roles.permissions');
+    Route::get('/roles/{role}/permissions', [UserController::class, 'getRolePermissions'])
+        ->name('roles.permissions');
 
     Route::get('/audit-log', [App\Http\Controllers\AuditLogController::class, 'index'])
-    ->name('audit-log.index')
-    ->middleware(['auth', 'verified']);
+        ->name('audit-log.index')
+        ->middleware(['auth', 'verified']);
 
     Route::resource('special-cases', SpecialCaseController::class);
-Route::post('special-cases/import', [SpecialCaseController::class, 'import'])->name('special-cases.import');
+    Route::post('special-cases/import', [SpecialCaseController::class, 'import'])->name('special-cases.import');
 
 
 
-Route::post('/users/{user}/roles-permissions', [UserController::class, 'updateRolesAndPermissions'])
-    ->name('users.roles-permissions');
-Route::get('/roles/{role}/permissions', [UserController::class, 'getRolePermissions'])
-    ->name('roles.permissions')
-    ->middleware('auth');
-Route::post('/users/{user}/remove-roles', [UserController::class, 'removeRolesAndPermissions'])
-    ->name('users.remove-roles');
-Route::post('/users/{user}/reset-to-employee', [UserController::class, 'resetToEmployee'])
-    ->name('users.reset-to-employee');
-Route::get('/users-without-role', [UserController::class, 'getEmployeesWithoutRole'])
-    ->name('users.without-role');
-Route::post('/assign-employee-role', [UserController::class, 'assignEmployeeRole'])
-    ->name('users.assign-employee-role');
+    Route::post('/users/{user}/roles-permissions', [UserController::class, 'updateRolesAndPermissions'])
+        ->name('users.roles-permissions');
+    Route::get('/roles/{role}/permissions', [UserController::class, 'getRolePermissions'])
+        ->name('roles.permissions')
+        ->middleware('auth');
+    Route::post('/users/{user}/remove-roles', [UserController::class, 'removeRolesAndPermissions'])
+        ->name('users.remove-roles');
+    Route::post('/users/{user}/reset-to-employee', [UserController::class, 'resetToEmployee'])
+        ->name('users.reset-to-employee');
+    Route::get('/users-without-role', [UserController::class, 'getEmployeesWithoutRole'])
+        ->name('users.without-role');
+    Route::post('/assign-employee-role', [UserController::class, 'assignEmployeeRole'])
+        ->name('users.assign-employee-role');
 });
 
 Route::middleware(['auth', 'role:manager,employee'])->group(function () {
@@ -364,7 +364,6 @@ Route::middleware(['auth'])->prefix('attendance-system')->name('attendance.')->g
     Route::get('/', [AttendanceController::class, 'index'])
         ->name('index')
         ->middleware('role:manager');
-
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -440,7 +439,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/client-tickets/{clientTicket}/add-user', [App\Http\Controllers\ClientTicketController::class, 'addUser'])->name('client-tickets.add-user');
     Route::post('/client-tickets/{clientTicket}/remove-user', [App\Http\Controllers\ClientTicketController::class, 'removeUser'])->name('client-tickets.remove-user');
 
-Route::get('/client-tickets/{clientTicket}/team-members', [App\Http\Controllers\ClientTicketController::class, 'getTeamMembers'])->name('client-tickets.team-members');
+    Route::get('/client-tickets/{clientTicket}/team-members', [App\Http\Controllers\ClientTicketController::class, 'getTeamMembers'])->name('client-tickets.team-members');
     Route::get('/projects-archive', [App\Http\Controllers\ProjectController::class, 'archive'])->name('projects.archive');
 
     Route::get('/projects/{project}/custom-fields/edit', [App\Http\Controllers\ProjectController::class, 'editCustomFields'])->name('projects.custom-fields.edit');
@@ -458,6 +457,10 @@ Route::get('/client-tickets/{clientTicket}/team-members', [App\Http\Controllers\
     Route::get('/projects/{project}/deliveries-history', [App\Http\Controllers\ProjectDeliveryController::class, 'getDeliveriesHistory'])->name('projects.deliveries.history');
     Route::get('/projects/{project}/services-status', [App\Http\Controllers\ProjectDeliveryController::class, 'getProjectServices'])->name('projects.services.status');
     Route::post('/projects/{project}/deliver', [App\Http\Controllers\ProjectDeliveryController::class, 'deliver'])->name('projects.deliver');
+
+    Route::get('/projects-internal-delivery', [App\Http\Controllers\ProjectController::class, 'changeStatusIndex'])->name('projects.internal-delivery.index');
+    Route::get('/projects/{project}/internal-delivery/change-status', [App\Http\Controllers\ProjectController::class, 'changeStatus'])->name('projects.internal-delivery.change-status');
+    Route::post('/projects/{project}/internal-delivery/update-status', [App\Http\Controllers\ProjectController::class, 'updateStatus'])->name('projects.internal-delivery.update-status');
     Route::delete('/deliveries/{delivery}', [App\Http\Controllers\ProjectDeliveryController::class, 'destroy'])->name('deliveries.destroy');
     Route::get('/projects/{project}/deliveries', [App\Http\Controllers\ProjectDeliveryController::class, 'projectDeliveries'])->name('projects.deliveries.show');
 
@@ -537,25 +540,25 @@ Route::get('/client-tickets/{clientTicket}/team-members', [App\Http\Controllers\
     Route::get('/tasks/{taskType}/{taskId}/errors', [App\Http\Controllers\ProjectController::class, 'getTaskErrors'])->name('tasks.errors');
     Route::get('/tasks/{taskType}/{taskId}/revisions', [App\Http\Controllers\ProjectController::class, 'getTaskRevisions'])->name('tasks.revisions');
 
-Route::prefix('service-data')->name('service-data.')->group(function () {
-    Route::get('/', [App\Http\Controllers\ServiceDataManagementController::class, 'index'])->name('index');
-    Route::get('/{service}/manage', [App\Http\Controllers\ServiceDataManagementController::class, 'manageService'])->name('manage');
-    Route::get('/{service}/create-field', [App\Http\Controllers\ServiceDataManagementController::class, 'createField'])->name('create-field');
-    Route::post('/{service}/store-field', [App\Http\Controllers\ServiceDataManagementController::class, 'storeField'])->name('store-field');
-    Route::get('/fields/{field}/edit', [App\Http\Controllers\ServiceDataManagementController::class, 'editField'])->name('edit-field');
-    Route::put('/fields/{field}', [App\Http\Controllers\ServiceDataManagementController::class, 'updateField'])->name('update-field');
-    Route::delete('/fields/{field}', [App\Http\Controllers\ServiceDataManagementController::class, 'deleteField'])->name('delete-field');
-    Route::post('/fields/{field}/toggle-status', [App\Http\Controllers\ServiceDataManagementController::class, 'toggleFieldStatus'])->name('toggle-field-status');
-    Route::post('/{service}/reorder-fields', [App\Http\Controllers\ServiceDataManagementController::class, 'reorderFields'])->name('reorder-fields');
-    Route::post('/{service}/copy-fields', [App\Http\Controllers\ServiceDataManagementController::class, 'copyFieldsFromService'])->name('copy-fields');
-});
+    Route::prefix('service-data')->name('service-data.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ServiceDataManagementController::class, 'index'])->name('index');
+        Route::get('/{service}/manage', [App\Http\Controllers\ServiceDataManagementController::class, 'manageService'])->name('manage');
+        Route::get('/{service}/create-field', [App\Http\Controllers\ServiceDataManagementController::class, 'createField'])->name('create-field');
+        Route::post('/{service}/store-field', [App\Http\Controllers\ServiceDataManagementController::class, 'storeField'])->name('store-field');
+        Route::get('/fields/{field}/edit', [App\Http\Controllers\ServiceDataManagementController::class, 'editField'])->name('edit-field');
+        Route::put('/fields/{field}', [App\Http\Controllers\ServiceDataManagementController::class, 'updateField'])->name('update-field');
+        Route::delete('/fields/{field}', [App\Http\Controllers\ServiceDataManagementController::class, 'deleteField'])->name('delete-field');
+        Route::post('/fields/{field}/toggle-status', [App\Http\Controllers\ServiceDataManagementController::class, 'toggleFieldStatus'])->name('toggle-field-status');
+        Route::post('/{service}/reorder-fields', [App\Http\Controllers\ServiceDataManagementController::class, 'reorderFields'])->name('reorder-fields');
+        Route::post('/{service}/copy-fields', [App\Http\Controllers\ServiceDataManagementController::class, 'copyFieldsFromService'])->name('copy-fields');
+    });
 
-Route::prefix('performance-analysis')->name('performance-analysis.')->group(function () {
-    Route::get('/', [App\Http\Controllers\PerformanceAnalysisController::class, 'index'])->name('index');
-    Route::get('/{id}', [App\Http\Controllers\PerformanceAnalysisController::class, 'show'])->name('show');
-    Route::post('/search-by-code', [App\Http\Controllers\PerformanceAnalysisController::class, 'searchByCode'])->name('search-by-code');
-    Route::get('/export/excel', [App\Http\Controllers\PerformanceAnalysisController::class, 'export'])->name('export');
-});
+    Route::prefix('performance-analysis')->name('performance-analysis.')->group(function () {
+        Route::get('/', [App\Http\Controllers\PerformanceAnalysisController::class, 'index'])->name('index');
+        Route::get('/{id}', [App\Http\Controllers\PerformanceAnalysisController::class, 'show'])->name('show');
+        Route::post('/search-by-code', [App\Http\Controllers\PerformanceAnalysisController::class, 'searchByCode'])->name('search-by-code');
+        Route::get('/export/excel', [App\Http\Controllers\PerformanceAnalysisController::class, 'export'])->name('export');
+    });
 
     Route::resource('packages', App\Http\Controllers\PackageController::class);
 });
@@ -648,7 +651,7 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/projects/{project}/remove-participant', [App\Http\Controllers\ProjectController::class, 'removeParticipant'])
     ->name('projects.removeParticipant');
 
-Route::get('/users/{user}/info', function(\App\Models\User $user) {
+Route::get('/users/{user}/info', function (\App\Models\User $user) {
     return response()->json([
         'id' => $user->id,
         'name' => $user->name
@@ -930,7 +933,7 @@ Route::prefix('tracking-employee')->name('tracking-employee.')->middleware(['aut
 Route::prefix('admin/team-leader-assignments')->name('team-leader-assignments.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/statistics', [App\Http\Controllers\TeamLeaderAssignmentController::class, 'statistics'])->name('statistics');
     Route::post('/reset', [App\Http\Controllers\TeamLeaderAssignmentController::class, 'resetRoundRobin'])->name('reset');
-   Route::post('/{project}/assign', [App\Http\Controllers\TeamLeaderAssignmentController::class, 'assignSpecific'])->name('assign-specific');
+    Route::post('/{project}/assign', [App\Http\Controllers\TeamLeaderAssignmentController::class, 'assignSpecific'])->name('assign-specific');
 });
 
 Route::prefix('admin/teams')->name('admin.teams.')->middleware(['auth', 'verified'])->group(function () {
@@ -952,7 +955,3 @@ Route::prefix('employee/projects')->name('employee.projects.')->middleware(['aut
     Route::get('/quick-stats', [App\Http\Controllers\EmployeeProjectController::class, 'quickStats'])->name('quick-stats');
     Route::post('/service/{projectId}/{serviceId}/update-status', [App\Http\Controllers\EmployeeProjectController::class, 'updateServiceStatus'])->name('service.update-status');
 });
-
-
-
-

@@ -54,6 +54,8 @@ class Project extends Model implements Auditable
         'team_delivery_date',
         'actual_delivery_date',
         'client_agreed_delivery_date',
+        'delivery_type',
+        'delivery_notes',
         'status',
         'is_urgent',
         'total_points',
@@ -75,7 +77,7 @@ class Project extends Model implements Auditable
     protected $casts = [
         'start_date' => 'date',
         'team_delivery_date' => 'date',
-        'actual_delivery_date' => 'date',
+        'actual_delivery_date' => 'datetime',
         'client_agreed_delivery_date' => 'date',
         'is_urgent' => 'boolean',
         'custom_fields_data' => 'array',
@@ -279,8 +281,8 @@ class Project extends Model implements Auditable
     public function services()
     {
         return $this->belongsToMany(CompanyService::class, 'project_service', 'project_id', 'service_id')
-                    ->withPivot('service_status', 'service_data')
-                    ->withTimestamps();
+            ->withPivot('service_status', 'service_data')
+            ->withTimestamps();
     }
 
     // علاقة المشروع مع الباقة
@@ -298,8 +300,8 @@ class Project extends Model implements Auditable
     public function participants()
     {
         return $this->belongsToMany(User::class, 'project_service_user', 'project_id', 'user_id')
-                    ->select('users.id', 'users.name', 'users.email')
-                    ->distinct();
+            ->select('users.id', 'users.name', 'users.email')
+            ->distinct();
     }
 
     public function serviceParticipants()
@@ -321,7 +323,7 @@ class Project extends Model implements Auditable
     public function tasks()
     {
         return $this->hasMany(Task::class)
-                    ->orderBy('order');
+            ->orderBy('order');
     }
 
     /**
@@ -400,8 +402,8 @@ class Project extends Model implements Auditable
     public function notes()
     {
         return $this->hasMany(ProjectNote::class)
-                    ->orderBy('is_pinned', 'desc')
-                    ->orderBy('created_at', 'desc');
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('created_at', 'desc');
     }
 
     /**
@@ -652,7 +654,7 @@ class Project extends Model implements Auditable
     public function projectRevisions()
     {
         return $this->hasMany(TaskRevision::class, 'project_id')
-                    ->where('revision_type', 'project');
+            ->where('revision_type', 'project');
     }
 
     /**
@@ -883,12 +885,12 @@ class Project extends Model implements Auditable
     public function scopeInPreparationPeriod($query)
     {
         return $query->where('preparation_enabled', true)
-                     ->whereNotNull('preparation_start_date')
-                     ->whereNotNull('preparation_days')
-                     ->whereRaw('preparation_start_date <= CURDATE()')
-                     ->where(function($q) {
-                         $q->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) >= CURDATE()');
-                     });
+            ->whereNotNull('preparation_start_date')
+            ->whereNotNull('preparation_days')
+            ->whereRaw('preparation_start_date <= CURDATE()')
+            ->where(function ($q) {
+                $q->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) >= CURDATE()');
+            });
     }
 
     /**
@@ -897,9 +899,9 @@ class Project extends Model implements Auditable
     public function scopePreparationPeriodEnded($query)
     {
         return $query->where('preparation_enabled', true)
-                     ->whereNotNull('preparation_start_date')
-                     ->whereNotNull('preparation_days')
-                     ->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) < CURDATE()');
+            ->whereNotNull('preparation_start_date')
+            ->whereNotNull('preparation_days')
+            ->whereRaw('DATE_ADD(preparation_start_date, INTERVAL preparation_days DAY) < CURDATE()');
     }
 
     /**
@@ -908,9 +910,9 @@ class Project extends Model implements Auditable
     public function scopePreparationPeriodPending($query)
     {
         return $query->where('preparation_enabled', true)
-                     ->whereNotNull('preparation_start_date')
-                     ->whereNotNull('preparation_days')
-                     ->whereRaw('preparation_start_date > CURDATE()');
+            ->whereNotNull('preparation_start_date')
+            ->whereNotNull('preparation_days')
+            ->whereRaw('preparation_start_date > CURDATE()');
     }
 
     /**
@@ -1049,7 +1051,6 @@ class Project extends Model implements Auditable
 
             \Illuminate\Support\Facades\DB::commit();
             return true;
-
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
             \Illuminate\Support\Facades\Log::error('Error pausing project', [
@@ -1082,7 +1083,6 @@ class Project extends Model implements Auditable
 
             \Illuminate\Support\Facades\DB::commit();
             return true;
-
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
             \Illuminate\Support\Facades\Log::error('Error resuming project', [

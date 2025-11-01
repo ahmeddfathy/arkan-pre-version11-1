@@ -139,7 +139,9 @@ class ProjectPauseService
 
         // فلتر حسب سبب التوقيف
         if (!empty($filters['pause_reason'])) {
-            $query->where('pause_reason', $filters['pause_reason']);
+            $query->whereHas('activePause', function($q) use ($filters) {
+                $q->where('pause_reason', $filters['pause_reason']);
+            });
         }
 
         // فلتر حسب المدير

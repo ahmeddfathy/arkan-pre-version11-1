@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\Models\Project;
 use App\Models\ProjectAttachment;
 use App\Models\Client;
@@ -29,6 +31,7 @@ use App\Services\ProjectManagement\ProjectSidebarService;
 use App\Services\ProjectManagement\ProjectValidationService;
 use App\Services\Auth\RoleCheckService;
 use App\Traits\SeasonAwareTrait;
+use App\Traits\HasNTPTime;
 use App\Http\Controllers\Traits\Projects\ProjectCRUDTrait;
 use App\Http\Controllers\Traits\Projects\ProjectAnalyticsTrait;
 use App\Http\Controllers\Traits\Projects\ProjectAttachmentsTrait;
@@ -45,6 +48,7 @@ use Illuminate\Support\Facades\Log;
 class ProjectController extends Controller
 {
     use SeasonAwareTrait;
+    use HasNTPTime;
     use ProjectCRUDTrait;
     use ProjectAnalyticsTrait;
     use ProjectAttachmentsTrait;
@@ -121,8 +125,94 @@ class ProjectController extends Controller
         $this->roleCheckService = $roleCheckService;
     }
 
+    /**
+     * عرض صفحة قائمة المشاريع لتغيير الحالة
+     */
+    public function changeStatusIndex(Request $request)
+    {
+        // جلب جميع المشاريع للقائمة المنسدلة (مرتبة من الأحدث)
+        $allProjects = Project::with('client')
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'name', 'code', 'status', 'created_at']);
 
+        $query = Project::query()->with('client');
 
+        // فلتر بالحالة
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
+        // إذا تم اختيار مشروع محدد من القائمة
+        if ($request->filled('project_id')) {
+            $query->where('id', $request->project_id);
+        }
 
+        $projects = $query->orderBy('created_at', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('projects.internal-delivery.index', compact('projects', 'allProjects'));
+    }
+
+    /**
+     * عرض صفحة تغيير حالة المشروع
+     */
+    public function changeStatus(Project $project)
+    {
+        return view('projects.internal-delivery.change-status', compact('project'));
+    }
+
+    /**
+     * تحديث حالة المشروع
+     */
+    public function updateStatus(Request $request, Project $project)
+    {
+        $request->validate([
+            'status' => 'required|string|in:جديد,جاري التنفيذ,مكتمل,ملغي',
+            'delivery_type' => 'required|string|in:مسودة,كامل',
+            'delivery_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $oldStatus = $project->status;
+        $newStatus = $request->status;
+        $oldDeliveryType = $project->delivery_type;
+        $newDeliveryType = $request->delivery_type;
+
+        // الحصول على التاريخ والوقت الحالي من NTP
+        $currentDateTime = $this->getCurrentCairoTime();
+
+        // تحديث البيانات
+        $project->status = $newStatus;
+        $project->actual_delivery_date = $currentDateTime;
+        $project->delivery_type = $request->delivery_type;
+
+        if ($request->has('delivery_notes')) {
+            $project->delivery_notes = $request->delivery_notes;
+        }
+
+        $project->save();
+
+        // تسجيل النشاط
+        $properties = [
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
+            'changed_by' => Auth::user()->name,
+            'delivery_date' => $currentDateTime->format('Y-m-d H:i:s'),
+            'old_delivery_type' => $oldDeliveryType,
+            'new_delivery_type' => $newDeliveryType,
+        ];
+
+        activity()
+            ->performedOn($project)
+            ->causedBy(Auth::user())
+            ->withProperties($properties)
+            ->log('تم تحديث التسليم الداخلي للمشروع');
+
+        $message = 'تم تحديث حالة المشروع "' . $project->name . '" بنجاح من "' . $oldStatus . '" إلى "' . $newStatus . '"';
+        $message .= ' - نوع التسليم: ' . $newDeliveryType;
+        $message .= ' - تاريخ التسليم: ' . $currentDateTime->format('Y-m-d H:i:s');
+
+        return redirect()->route('projects.internal-delivery.index')
+            ->with('success', $message);
+    }
 }

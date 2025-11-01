@@ -16,9 +16,9 @@
                 <p>عرض سريع وبسيط لجميع المشاريع وخدماتها</p>
             </div>
             <button onclick="openRevisionGuide()"
-                    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3); transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;"
-                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(99, 102, 241, 0.4)'"
-                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(99, 102, 241, 0.3)'">
+                style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3); transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(99, 102, 241, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(99, 102, 241, 0.3)'">
                 <i class="fas fa-book-open"></i>
                 <span>📖 دليل ألوان التعديلات</span>
             </button>
@@ -104,7 +104,7 @@
                         <th>المشروع</th>
                         <th>العميل</th>
                         <th>الحالة</th>
-                        <th>التاريخ</th>
+                        <th >التاريخ المتفق  الفريق</th>
                         <th>الخدمات</th>
                     </tr>
                 </thead>
@@ -113,14 +113,14 @@
                     <tr class="project-row"
                         data-project-id="{{ $project->id }}"
                         data-project-code="{{ $project->code ?? '' }}"
-                        data-project-date="{{ $project->created_at ? \Carbon\Carbon::parse($project->created_at)->format('Y-m-d') : '' }}">
+                        data-project-date="{{ $project->team_delivery_date ? \Carbon\Carbon::parse($project->team_delivery_date)->format('Y-m-d') : '' }}">
                         <td>
                             <div class="project-info">
                                 <button class="project-details-btn"
-                                        data-project-id="{{ $project->id }}"
-                                        data-project-name="{{ $project->name }}"
-                                        onclick="openProjectSidebar(this)"
-                                        title="عرض تفاصيل المشروع">
+                                    data-project-id="{{ $project->id }}"
+                                    data-project-name="{{ $project->name }}"
+                                    onclick="openProjectSidebar(this)"
+                                    title="عرض تفاصيل المشروع">
                                     <i class="fas fa-info-circle"></i>
                                 </button>
                                 <div class="project-avatar">
@@ -128,11 +128,11 @@
                                 </div>
                                 <div class="project-details">
                                     @if($project->code)
-                                        <div class="project-code-display">{{ $project->code }}</div>
+                                    <div class="project-code-display">{{ $project->code }}</div>
                                     @endif
                                     <h4>
                                         @if($project->is_urgent)
-                                            <span class="urgent-indicator">🚨 مستعجل</span>
+                                        <span class="urgent-indicator">🚨 مستعجل</span>
                                         @endif
                                         {{ $project->name }}
                                     </h4>
@@ -147,13 +147,13 @@
                         </td>
                         <td>
                             @php
-                                $statusClasses = [
-                                    'جديد' => 'status-new',
-                                    'جاري التنفيذ' => 'status-in-progress',
-                                    'مكتمل' => 'status-completed',
-                                    'ملغي' => 'status-cancelled'
-                                ];
-                                $statusClass = $statusClasses[$project->status] ?? 'status-new';
+                            $statusClasses = [
+                            'جديد' => 'status-new',
+                            'جاري التنفيذ' => 'status-in-progress',
+                            'مكتمل' => 'status-completed',
+                            'ملغي' => 'status-cancelled'
+                            ];
+                            $statusClass = $statusClasses[$project->status] ?? 'status-new';
                             @endphp
                             <span class="status-badge {{ $statusClass }}">
                                 {{ $project->status }}
@@ -161,203 +161,211 @@
                         </td>
                         <td>
                             <div style="color: #6b7280; font-size: 0.9rem;">
-                                {{ $project->created_at->format('Y/m/d') }}
+                                @if($project->team_delivery_date)
+                                {{ $project->team_delivery_date->format('Y/m/d') }}
+                                <small style="display: block; color: #9ca3af; font-size: 0.75rem; margin-top: 0.2rem;">
+                                    <i class="fas fa-calendar-check"></i>
+                                    تاريخ تسليم الفريق
+                                </small>
+                                @else
+                                <span style="color: #9ca3af; font-style: italic;">غير محدد</span>
+                                @endif
                             </div>
                         </td>
                         <td>
                             @php
-                                // استخدام الـ Workflow Service
-                                $workflowService = app(\App\Services\ProjectManagement\ProjectServiceWorkflowService::class);
-                                $workflow = $workflowService->getProjectServicesWorkflow($project->id);
+                            // استخدام الـ Workflow Service
+                            $workflowService = app(\App\Services\ProjectManagement\ProjectServiceWorkflowService::class);
+                            $workflow = $workflowService->getProjectServicesWorkflow($project->id);
 
-                                $projectServices = $workflow['services'];
-                                $totalServices = $workflow['total'];
-                                $completedServices = $workflow['completed'];
-                                $progressPercentage = $workflow['progress_percentage'];
+                            $projectServices = $workflow['services'];
+                            $totalServices = $workflow['total'];
+                            $completedServices = $workflow['completed'];
+                            $progressPercentage = $workflow['progress_percentage'];
                             @endphp
 
                             <div style="width: 100%; margin: 0 auto;">
                                 <!-- Workflow Progress Bar - Grouped by Level -->
                                 <div class="workflow-container" style="margin-bottom: 0.3rem;">
                                     @php
-                                        // تجميع الخدمات حسب المستوى
-                                        $servicesByLevel = collect($projectServices)->groupBy('execution_order')->sortKeys();
+                                    // تجميع الخدمات حسب المستوى
+                                    $servicesByLevel = collect($projectServices)->groupBy('execution_order')->sortKeys();
                                     @endphp
 
                                     @foreach($servicesByLevel as $level => $levelServices)
-                                        <div style="margin-bottom: 0.3rem;">
-                                            <!-- Level Header -->
-                                            <div style="font-size: 0.65rem; color: #6b7280; margin-bottom: 0.2rem; font-weight: 600;">
-                                                المستوى {{ $level }}
-                                            </div>
-
-                                            <!-- Services in this level -->
-                                            <div class="workflow-steps" style="display: flex; gap: 0.3rem; align-items: stretch; flex-wrap: wrap;">
-                                                @foreach($levelServices as $index => $service)
-                                                    @php
-                                                        $serviceData = (object) $service;
-                                                        $serviceParticipants = $serviceData->participants ?? [];
-                                                    @endphp
-
-                                                    <div class="workflow-step-container" style="flex: 0 1 auto; min-width: 150px;">
-                                                        <div class="workflow-step {{ $serviceData->status_class }}"
-                                                             style="text-align: center; padding: 0.3rem 0.4rem; border-radius: 5px; font-size: 0.7rem; font-weight: 500; margin-bottom: 0.2rem; position: relative;">
-                                                            <div style="font-size: 0.9rem; margin-bottom: 0.1rem;">{{ $serviceData->status_icon }}</div>
-                                                            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $serviceData->name }}">
-                                                                {{ Str::limit($serviceData->name, 12) }}
-                                                            </div>
-
-                                                            @if(isset($serviceData->revisions_count) && $serviceData->revisions_count > 0)
-                                                                @php
-                                                                    $revisionsData = $serviceData->revisions_data ?? [];
-                                                                    $internal = $revisionsData['internal'] ?? 0;
-                                                                    $external = $revisionsData['external'] ?? 0;
-                                                                    $byStatus = $revisionsData['by_status'] ?? [];
-
-                                                                    // تحديد الحالة السائدة
-                                                                    $newCount = $byStatus['new'] ?? 0;
-                                                                    $inProgressCount = $byStatus['in_progress'] ?? 0;
-                                                                    $pausedCount = $byStatus['paused'] ?? 0;
-                                                                    $completedCount = $byStatus['completed'] ?? 0;
-
-                                                                    // تحديد لون الدائرة حسب الحالة السائدة
-                                                                    $badgeColor = '#9ca3af'; // رمادي (افتراضي)
-                                                                    $badgeBorderColor = '#6b7280';
-                                                                    $dominantStatusIcon = '🚨';
-                                                                    $statusLabel = '';
-
-                                                                    if ($pausedCount > 0) {
-                                                                        // واقف - له أولوية قصوى
-                                                                        $badgeColor = '#ef4444'; // أحمر
-                                                                        $badgeBorderColor = '#dc2626';
-                                                                        $dominantStatusIcon = '⏸️';
-                                                                        $statusLabel = 'واقف';
-                                                                    } elseif ($inProgressCount > 0) {
-                                                                        // جاري
-                                                                        $badgeColor = '#3b82f6'; // أزرق
-                                                                        $badgeBorderColor = '#2563eb';
-                                                                        $dominantStatusIcon = '🔄';
-                                                                        $statusLabel = 'جاري';
-                                                                    } elseif ($newCount > 0) {
-                                                                        // جديد
-                                                                        $badgeColor = '#f97316'; // برتقالي
-                                                                        $badgeBorderColor = '#ea580c';
-                                                                        $dominantStatusIcon = '🆕';
-                                                                        $statusLabel = 'جديد';
-                                                                    } elseif ($completedCount > 0) {
-                                                                        // مكتمل
-                                                                        $badgeColor = '#22c55e'; // أخضر
-                                                                        $badgeBorderColor = '#16a34a';
-                                                                        $dominantStatusIcon = '✅';
-                                                                        $statusLabel = 'مكتمل';
-                                                                    }
-
-                                                                    // تحديد المصدر (داخلي/خارجي/مختلط)
-                                                                    $sourceIcon = '';
-                                                                    $sourceLabel = '';
-                                                                    if ($internal > 0 && $external > 0) {
-                                                                        $sourceIcon = '🔀'; // مختلط
-                                                                        $sourceLabel = 'داخلي+خارجي';
-                                                                    } elseif ($internal > 0) {
-                                                                        $sourceIcon = '🏢'; // داخلي فقط
-                                                                        $sourceLabel = 'داخلي';
-                                                                    } elseif ($external > 0) {
-                                                                        $sourceIcon = '🌐'; // خارجي فقط
-                                                                        $sourceLabel = 'خارجي';
-                                                                    }
-
-                                                                    // بناء النص التوضيحي
-                                                                    $tooltipText = "عدد التعديلات: {$serviceData->revisions_count}\n";
-                                                                    $tooltipText .= "الحالة: {$statusLabel}\n";
-                                                                    $tooltipText .= "المصدر: {$sourceLabel}\n\n";
-                                                                    if ($internal > 0) $tooltipText .= "• داخلي: {$internal}\n";
-                                                                    if ($external > 0) $tooltipText .= "• خارجي: {$external}\n";
-                                                                    $tooltipText .= "\nتفصيل الحالات:\n";
-                                                                    if ($newCount > 0) $tooltipText .= "🆕 جديد: {$newCount}\n";
-                                                                    if ($inProgressCount > 0) $tooltipText .= "🔄 جاري: {$inProgressCount}\n";
-                                                                    if ($pausedCount > 0) $tooltipText .= "⏸️ واقف: {$pausedCount}\n";
-                                                                    if ($completedCount > 0) $tooltipText .= "✅ مكتمل: {$completedCount}";
-                                                                @endphp
-
-                                                                <div class="revision-badge-wrapper" style="position: absolute; top: -8px; left: -8px;">
-                                                                    <!-- الدائرة الرئيسية بلون حسب الحالة -->
-                                                                    <div class="revision-badge"
-                                                                         style="background: {{ $badgeColor }}; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; border: 2.5px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); cursor: help;"
-                                                                         title="{{ $tooltipText }}">
-                                                                        {{ $serviceData->revisions_count }}
-                                                                    </div>
-
-                                                                    <!-- أيقونة المصدر (داخلي/خارجي/مختلط) -->
-                                                                    @if($sourceIcon)
-                                                                        <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 2px solid {{ $badgeBorderColor }}; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                                                                            {{ $sourceIcon }}
-                                                                        </div>
-                                                                    @endif
-                                                                </div>
-                                                            @endif
-                                                        </div>
-
-                                                        <!-- سهم يشير للموظفين -->
-                                                        @if(count($serviceParticipants) > 0)
-                                                            <div style="text-align: center; margin: 0.1rem 0; color: #9ca3af; font-size: 0.8rem; line-height: 1;">
-                                                                ↓
-                                                            </div>
-
-                                                            <!-- عنوان المشاركين -->
-                                                            <div style="text-align: center; font-size: 0.6rem; color: #6b7280; font-weight: 600; margin-bottom: 0.2rem; padding: 0.15rem 0.25rem; background: #f3f4f6; border-radius: 3px;">
-                                                                👥 الموظفين
-                                                            </div>
-                                                        @endif
-
-                                                        <!-- عرض المشاركين في الخدمة -->
-                                                        @if(count($serviceParticipants) > 0)
-                                                            <div class="service-participants-compact" style="display: flex; flex-direction: column; gap: 0.15rem; padding: 0.15rem;">
-                                                                @foreach($serviceParticipants as $participant)
-                                                                    @php
-                                                                        // تحديد اللون حسب حالة الموظف
-                                                                        $participantColor = match($participant['status']) {
-                                                                            'تم تسليم نهائي' => '#10b981',      // أخضر
-                                                                            'تسليم مسودة' => '#f59e0b',       // برتقالي
-                                                                            'جاري' => '#3b82f6',              // أزرق
-                                                                            'موقوف', 'واقف ع النموذج', 'واقف ع الأسئلة', 'واقف ع العميل', 'واقف ع مكالمة' => '#ec4899', // وردي
-                                                                            default => '#9ca3af'              // رمادي
-                                                                        };
-
-                                                                        $participantBgColor = match($participant['status']) {
-                                                                            'تم تسليم نهائي' => '#d1fae5',
-                                                                            'تسليم مسودة' => '#fef3c7',
-                                                                            'جاري' => '#dbeafe',
-                                                                            'موقوف', 'واقف ع النموذج', 'واقف ع الأسئلة', 'واقف ع العميل', 'واقف ع مكالمة' => '#fce7f3',
-                                                                            default => '#f3f4f6'
-                                                                        };
-                                                                    @endphp
-
-                                                                    <div class="participant-mini-card"
-                                                                         style="background: {{ $participantBgColor }}; border-right: 2px solid {{ $participantColor }};"
-                                                                         title="{{ $participant['name'] }} - {{ $participant['status'] }}">
-                                                                        <span class="participant-icon" style="font-size: 0.65rem;">{{ $participant['status_icon'] }}</span>
-                                                                        <span class="participant-name" style="font-size: 0.6rem; color: #374151;">
-                                                                            {{ Str::limit($participant['name'], 10) }}
-                                                                        </span>
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
-                                                        @else
-                                                            <div style="font-size: 0.6rem; color: #9ca3af; text-align: center; padding: 0.2rem; font-style: italic;">
-                                                                لا يوجد موظفين
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-                                            </div>
+                                    <div style="margin-bottom: 0.3rem;">
+                                        <!-- Level Header -->
+                                        <div style="font-size: 0.65rem; color: #6b7280; margin-bottom: 0.2rem; font-weight: 600;">
+                                            المستوى {{ $level }}
                                         </div>
 
-                                        @if(!$loop->last)
-                                            <!-- السهم بين المستويات -->
-                                            <div style="text-align: center; margin: 0.2rem 0; color: #9ca3af; font-size: 1.2rem;">
-                                                ↓
+                                        <!-- Services in this level -->
+                                        <div class="workflow-steps" style="display: flex; gap: 0.3rem; align-items: stretch; flex-wrap: wrap;">
+                                            @foreach($levelServices as $index => $service)
+                                            @php
+                                            $serviceData = (object) $service;
+                                            $serviceParticipants = $serviceData->participants ?? [];
+                                            @endphp
+
+                                            <div class="workflow-step-container" style="flex: 0 1 auto; min-width: 150px;">
+                                                <div class="workflow-step {{ $serviceData->status_class }}"
+                                                    style="text-align: center; padding: 0.3rem 0.4rem; border-radius: 5px; font-size: 0.7rem; font-weight: 500; margin-bottom: 0.2rem; position: relative;">
+                                                    <div style="font-size: 0.9rem; margin-bottom: 0.1rem;">{{ $serviceData->status_icon }}</div>
+                                                    <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $serviceData->name }}">
+                                                        {{ Str::limit($serviceData->name, 12) }}
+                                                    </div>
+
+                                                    @if(isset($serviceData->revisions_count) && $serviceData->revisions_count > 0)
+                                                    @php
+                                                    $revisionsData = $serviceData->revisions_data ?? [];
+                                                    $internal = $revisionsData['internal'] ?? 0;
+                                                    $external = $revisionsData['external'] ?? 0;
+                                                    $byStatus = $revisionsData['by_status'] ?? [];
+
+                                                    // تحديد الحالة السائدة
+                                                    $newCount = $byStatus['new'] ?? 0;
+                                                    $inProgressCount = $byStatus['in_progress'] ?? 0;
+                                                    $pausedCount = $byStatus['paused'] ?? 0;
+                                                    $completedCount = $byStatus['completed'] ?? 0;
+
+                                                    // تحديد لون الدائرة حسب الحالة السائدة
+                                                    $badgeColor = '#9ca3af'; // رمادي (افتراضي)
+                                                    $badgeBorderColor = '#6b7280';
+                                                    $dominantStatusIcon = '🚨';
+                                                    $statusLabel = '';
+
+                                                    if ($pausedCount > 0) {
+                                                    // واقف - له أولوية قصوى
+                                                    $badgeColor = '#ef4444'; // أحمر
+                                                    $badgeBorderColor = '#dc2626';
+                                                    $dominantStatusIcon = '⏸️';
+                                                    $statusLabel = 'واقف';
+                                                    } elseif ($inProgressCount > 0) {
+                                                    // جاري
+                                                    $badgeColor = '#3b82f6'; // أزرق
+                                                    $badgeBorderColor = '#2563eb';
+                                                    $dominantStatusIcon = '🔄';
+                                                    $statusLabel = 'جاري';
+                                                    } elseif ($newCount > 0) {
+                                                    // جديد
+                                                    $badgeColor = '#f97316'; // برتقالي
+                                                    $badgeBorderColor = '#ea580c';
+                                                    $dominantStatusIcon = '🆕';
+                                                    $statusLabel = 'جديد';
+                                                    } elseif ($completedCount > 0) {
+                                                    // مكتمل
+                                                    $badgeColor = '#22c55e'; // أخضر
+                                                    $badgeBorderColor = '#16a34a';
+                                                    $dominantStatusIcon = '✅';
+                                                    $statusLabel = 'مكتمل';
+                                                    }
+
+                                                    // تحديد المصدر (داخلي/خارجي/مختلط)
+                                                    $sourceIcon = '';
+                                                    $sourceLabel = '';
+                                                    if ($internal > 0 && $external > 0) {
+                                                    $sourceIcon = '🔀'; // مختلط
+                                                    $sourceLabel = 'داخلي+خارجي';
+                                                    } elseif ($internal > 0) {
+                                                    $sourceIcon = '🏢'; // داخلي فقط
+                                                    $sourceLabel = 'داخلي';
+                                                    } elseif ($external > 0) {
+                                                    $sourceIcon = '🌐'; // خارجي فقط
+                                                    $sourceLabel = 'خارجي';
+                                                    }
+
+                                                    // بناء النص التوضيحي
+                                                    $tooltipText = "عدد التعديلات: {$serviceData->revisions_count}\n";
+                                                    $tooltipText .= "الحالة: {$statusLabel}\n";
+                                                    $tooltipText .= "المصدر: {$sourceLabel}\n\n";
+                                                    if ($internal > 0) $tooltipText .= "• داخلي: {$internal}\n";
+                                                    if ($external > 0) $tooltipText .= "• خارجي: {$external}\n";
+                                                    $tooltipText .= "\nتفصيل الحالات:\n";
+                                                    if ($newCount > 0) $tooltipText .= "🆕 جديد: {$newCount}\n";
+                                                    if ($inProgressCount > 0) $tooltipText .= "🔄 جاري: {$inProgressCount}\n";
+                                                    if ($pausedCount > 0) $tooltipText .= "⏸️ واقف: {$pausedCount}\n";
+                                                    if ($completedCount > 0) $tooltipText .= "✅ مكتمل: {$completedCount}";
+                                                    @endphp
+
+                                                    <div class="revision-badge-wrapper" style="position: absolute; top: -8px; left: -8px;">
+                                                        <!-- الدائرة الرئيسية بلون حسب الحالة -->
+                                                        <div class="revision-badge"
+                                                            style="background: {{ $badgeColor }}; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; border: 2.5px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); cursor: help;"
+                                                            title="{{ $tooltipText }}">
+                                                            {{ $serviceData->revisions_count }}
+                                                        </div>
+
+                                                        <!-- أيقونة المصدر (داخلي/خارجي/مختلط) -->
+                                                        @if($sourceIcon)
+                                                        <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 2px solid {{ $badgeBorderColor }}; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                            {{ $sourceIcon }}
+                                                        </div>
+                                                        @endif
+                                                    </div>
+                                                    @endif
+                                                </div>
+
+                                                <!-- سهم يشير للموظفين -->
+                                                @if(count($serviceParticipants) > 0)
+                                                <div style="text-align: center; margin: 0.1rem 0; color: #9ca3af; font-size: 0.8rem; line-height: 1;">
+                                                    ↓
+                                                </div>
+
+                                                <!-- عنوان المشاركين -->
+                                                <div style="text-align: center; font-size: 0.6rem; color: #6b7280; font-weight: 600; margin-bottom: 0.2rem; padding: 0.15rem 0.25rem; background: #f3f4f6; border-radius: 3px;">
+                                                    👥 الموظفين
+                                                </div>
+                                                @endif
+
+                                                <!-- عرض المشاركين في الخدمة -->
+                                                @if(count($serviceParticipants) > 0)
+                                                <div class="service-participants-compact" style="display: flex; flex-direction: column; gap: 0.15rem; padding: 0.15rem;">
+                                                    @foreach($serviceParticipants as $participant)
+                                                    @php
+                                                    // تحديد اللون حسب حالة الموظف
+                                                    $participantColor = match($participant['status']) {
+                                                    'تم تسليم نهائي' => '#10b981', // أخضر
+                                                    'تسليم مسودة' => '#f59e0b', // برتقالي
+                                                    'جاري' => '#3b82f6', // أزرق
+                                                    'موقوف', 'واقف ع النموذج', 'واقف ع الأسئلة', 'واقف ع العميل', 'واقف ع مكالمة' => '#ec4899', // وردي
+                                                    default => '#9ca3af' // رمادي
+                                                    };
+
+                                                    $participantBgColor = match($participant['status']) {
+                                                    'تم تسليم نهائي' => '#d1fae5',
+                                                    'تسليم مسودة' => '#fef3c7',
+                                                    'جاري' => '#dbeafe',
+                                                    'موقوف', 'واقف ع النموذج', 'واقف ع الأسئلة', 'واقف ع العميل', 'واقف ع مكالمة' => '#fce7f3',
+                                                    default => '#f3f4f6'
+                                                    };
+                                                    @endphp
+
+                                                    <div class="participant-mini-card"
+                                                        style="background: {{ $participantBgColor }}; border-right: 2px solid {{ $participantColor }};"
+                                                        title="{{ $participant['name'] }} - {{ $participant['status'] }}">
+                                                        <span class="participant-icon" style="font-size: 0.65rem;">{{ $participant['status_icon'] }}</span>
+                                                        <span class="participant-name" style="font-size: 0.6rem; color: #374151;">
+                                                            {{ Str::limit($participant['name'], 10) }}
+                                                        </span>
+                                                    </div>
+                                                    @endforeach
+                                                </div>
+                                                @else
+                                                <div style="font-size: 0.6rem; color: #9ca3af; text-align: center; padding: 0.2rem; font-style: italic;">
+                                                    لا يوجد موظفين
+                                                </div>
+                                                @endif
                                             </div>
-                                        @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    @if(!$loop->last)
+                                    <!-- السهم بين المستويات -->
+                                    <div style="text-align: center; margin: 0.2rem 0; color: #9ca3af; font-size: 1.2rem;">
+                                        ↓
+                                    </div>
+                                    @endif
                                     @endforeach
                                 </div>
 
@@ -371,79 +379,79 @@
                                         {{ $progressPercentage }}%
                                     </span>
                                     <button class="services-btn" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;"
-                                            data-project-id="{{ $project->id }}"
-                                            data-project-name="{{ $project->name }}"
-                                            onclick="toggleServices(this)">
+                                        data-project-id="{{ $project->id }}"
+                                        data-project-name="{{ $project->name }}"
+                                        onclick="toggleServices(this)">
                                         <i class="fas fa-list"></i>
                                         تفاصيل
                                     </button>
                                 </div>
 
                                 @php
-                                    // حساب إجمالي التعديلات للمشروع
-                                    $totalRevisions = collect($projectServices)->sum('revisions_count');
-                                    $totalInternal = collect($projectServices)->sum('revisions_data.internal');
-                                    $totalExternal = collect($projectServices)->sum('revisions_data.external');
-                                    $totalNew = collect($projectServices)->sum('revisions_data.by_status.new');
-                                    $totalInProgress = collect($projectServices)->sum('revisions_data.by_status.in_progress');
-                                    $totalPaused = collect($projectServices)->sum('revisions_data.by_status.paused');
-                                    $totalCompleted = collect($projectServices)->sum('revisions_data.by_status.completed');
+                                // حساب إجمالي التعديلات للمشروع
+                                $totalRevisions = collect($projectServices)->sum('revisions_count');
+                                $totalInternal = collect($projectServices)->sum('revisions_data.internal');
+                                $totalExternal = collect($projectServices)->sum('revisions_data.external');
+                                $totalNew = collect($projectServices)->sum('revisions_data.by_status.new');
+                                $totalInProgress = collect($projectServices)->sum('revisions_data.by_status.in_progress');
+                                $totalPaused = collect($projectServices)->sum('revisions_data.by_status.paused');
+                                $totalCompleted = collect($projectServices)->sum('revisions_data.by_status.completed');
                                 @endphp
                                 @if($totalRevisions > 0)
-                                    <div style="margin-top: 0.3rem; display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; align-items: center;">
-                                        <!-- إجمالي التعديلات -->
-                                        <span class="badge" style="background: #fef2f2; color: #dc2626; font-size: 0.65rem; padding: 0.2rem 0.5rem; border: 1px solid #fee2e2; border-radius: 4px;">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                            تعديلات: {{ $totalRevisions }}
-                                        </span>
+                                <div style="margin-top: 0.3rem; display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; align-items: center;">
+                                    <!-- إجمالي التعديلات -->
+                                    <span class="badge" style="background: #fef2f2; color: #dc2626; font-size: 0.65rem; padding: 0.2rem 0.5rem; border: 1px solid #fee2e2; border-radius: 4px;">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        تعديلات: {{ $totalRevisions }}
+                                    </span>
 
-                                        <!-- داخلي/خارجي -->
-                                        @if($totalInternal > 0)
-                                            <span class="badge" style="background: #dbeafe; color: #1e40af; font-size: 0.6rem; padding: 0.15rem 0.4rem; border: 1px solid #bfdbfe; border-radius: 4px;">
-                                                🏢 داخلي: {{ $totalInternal }}
-                                            </span>
-                                        @endif
-                                        @if($totalExternal > 0)
-                                            <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.6rem; padding: 0.15rem 0.4rem; border: 1px solid #fde68a; border-radius: 4px;">
-                                                🌐 خارجي: {{ $totalExternal }}
-                                            </span>
-                                        @endif
+                                    <!-- داخلي/خارجي -->
+                                    @if($totalInternal > 0)
+                                    <span class="badge" style="background: #dbeafe; color: #1e40af; font-size: 0.6rem; padding: 0.15rem 0.4rem; border: 1px solid #bfdbfe; border-radius: 4px;">
+                                        🏢 داخلي: {{ $totalInternal }}
+                                    </span>
+                                    @endif
+                                    @if($totalExternal > 0)
+                                    <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.6rem; padding: 0.15rem 0.4rem; border: 1px solid #fde68a; border-radius: 4px;">
+                                        🌐 خارجي: {{ $totalExternal }}
+                                    </span>
+                                    @endif
 
-                                        <!-- الحالات -->
-                                        @if($totalPaused > 0)
-                                            <span class="badge" style="background: #fee2e2; color: #dc2626; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #fecaca;">
-                                                ⏸️ {{ $totalPaused }}
-                                            </span>
-                                        @endif
-                                        @if($totalInProgress > 0)
-                                            <span class="badge" style="background: #dbeafe; color: #2563eb; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #bfdbfe;">
-                                                🔄 {{ $totalInProgress }}
-                                            </span>
-                                        @endif
-                                        @if($totalNew > 0)
-                                            <span class="badge" style="background: #ffedd5; color: #ea580c; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #fed7aa;">
-                                                🆕 {{ $totalNew }}
-                                            </span>
-                                        @endif
-                                        @if($totalCompleted > 0)
-                                            <span class="badge" style="background: #dcfce7; color: #16a34a; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #bbf7d0;">
-                                                ✅ {{ $totalCompleted }}
-                                            </span>
-                                        @endif
-                                    </div>
+                                    <!-- الحالات -->
+                                    @if($totalPaused > 0)
+                                    <span class="badge" style="background: #fee2e2; color: #dc2626; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #fecaca;">
+                                        ⏸️ {{ $totalPaused }}
+                                    </span>
+                                    @endif
+                                    @if($totalInProgress > 0)
+                                    <span class="badge" style="background: #dbeafe; color: #2563eb; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #bfdbfe;">
+                                        🔄 {{ $totalInProgress }}
+                                    </span>
+                                    @endif
+                                    @if($totalNew > 0)
+                                    <span class="badge" style="background: #ffedd5; color: #ea580c; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #fed7aa;">
+                                        🆕 {{ $totalNew }}
+                                    </span>
+                                    @endif
+                                    @if($totalCompleted > 0)
+                                    <span class="badge" style="background: #dcfce7; color: #16a34a; font-size: 0.55rem; padding: 0.15rem 0.35rem; border-radius: 3px; border: 1px solid #bbf7d0;">
+                                        ✅ {{ $totalCompleted }}
+                                    </span>
+                                    @endif
+                                </div>
 
                                 @endif
 
                                 @php
-                                    $overviewPreparationPeriodsCount = \App\Models\ProjectPreparationHistory::getPreparationPeriodsCount($project->id);
+                                $overviewPreparationPeriodsCount = \App\Models\ProjectPreparationHistory::getPreparationPeriodsCount($project->id);
                                 @endphp
                                 @if($overviewPreparationPeriodsCount > 0)
-                                    <div style="margin-top: 0.3rem; text-align: center;">
-                                        <span class="badge bg-info text-white" style="font-size: 0.6rem; padding: 0.2rem 0.4rem;">
-                                            <i class="fas fa-history"></i>
-                                            فترات تحضير: {{ $overviewPreparationPeriodsCount }}
-                                        </span>
-                                    </div>
+                                <div style="margin-top: 0.3rem; text-align: center;">
+                                    <span class="badge bg-info text-white" style="font-size: 0.6rem; padding: 0.2rem 0.4rem;">
+                                        <i class="fas fa-history"></i>
+                                        فترات تحضير: {{ $overviewPreparationPeriodsCount }}
+                                    </span>
+                                </div>
                                 @endif
                             </div>
                         </td>
