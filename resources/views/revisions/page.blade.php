@@ -11,15 +11,20 @@
 <link rel="stylesheet" href="{{ asset('css/revisions/revisions-modern.css') }}?v={{ time() }}">
 <style>
     /* إخفاء scrollbar من الصفحة الرئيسية */
-    html, body {
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE and Edge */
+    html,
+    body {
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
     }
 
     html::-webkit-scrollbar,
     body::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera */
+        display: none;
+        /* Chrome, Safari, Opera */
     }
+
     /* SweetAlert RTL Support */
     .rtl-swal {
         direction: rtl;
@@ -29,13 +34,15 @@
     .swal2-html-container {
         text-align: right !important;
     }
+
     .revisions-table {
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         border: 1px solid #eee;
         overflow: hidden;
-        margin-bottom: 3rem; /* زيادة المسافة بين الجدول والفوتر */
+        margin-bottom: 3rem;
+        /* زيادة المسافة بين الجدول والفوتر */
     }
 
     .revisions-table table {
@@ -47,12 +54,15 @@
         border-radius: 12px;
         overflow-x: auto;
         /* Hide scrollbar for Chrome, Safari and Opera */
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* Internet Explorer 10+ */
     }
 
     .table-responsive::-webkit-scrollbar {
-        display: none; /* Chrome, Safari and Opera */
+        display: none;
+        /* Chrome, Safari and Opera */
     }
 
     .revisions-table thead {
@@ -97,17 +107,20 @@
         width: 480px;
         height: 100vh;
         background: white;
-        box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
         z-index: 1050;
         overflow-y: auto;
         transition: right 0.3s ease;
         /* إخفاء scrollbar مع الحفاظ على الـ scroll */
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
     }
 
     .revision-sidebar::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera */
+        display: none;
+        /* Chrome, Safari, Opera */
     }
 
     @media (max-width: 768px) {
@@ -127,7 +140,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 1040;
         opacity: 0;
         visibility: hidden;
@@ -308,7 +321,7 @@
 
     .revision-actions .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
     /* Table action buttons */
@@ -321,7 +334,7 @@
 
     .revisions-table tbody td .btn-sm:hover {
         transform: scale(1.1);
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
     .revisions-table tbody tr:hover {
@@ -339,7 +352,7 @@
         font-size: 12px !important;
         text-align: center !important;
         border: 1px solid #bbf7d0 !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
         transition: all 0.3s ease !important;
     }
 
@@ -350,9 +363,17 @@
 
     /* Timer animation for active revisions */
     @keyframes timerPulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.7; }
-        100% { opacity: 1; }
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.7;
+        }
+
+        100% {
+            opacity: 1;
+        }
     }
 
     .revision-timer {
@@ -382,7 +403,7 @@
         border-radius: 15px;
         padding: 25px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         border: 1px solid #e9ecef;
         transition: all 0.3s ease;
     }
@@ -398,7 +419,7 @@
         border: 1px solid #e9ecef;
         transition: all 0.3s ease;
         background: #fff;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
         transform: translateY(-2px);
     }
 
@@ -415,7 +436,7 @@
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .nav-pills .nav-link {
@@ -481,7 +502,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -597,34 +618,34 @@
 
         <!-- Header Actions -->
         <div class="d-flex gap-2 mt-3" style="position: relative; z-index: 5;">
-                    <!-- أزرار التبديل بين Table و Kanban -->
-                    <div class="btn-group kanban-view-toggle" role="group">
-                        <button type="button" class="btn btn-outline-primary active" id="tableViewBtn">
-                            <i class="fas fa-table me-1"></i>
-                            جدول
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" id="kanbanViewBtn">
-                            <i class="fas fa-columns me-1"></i>
-                            كانبان
-                        </button>
-                    </div>
+            <!-- أزرار التبديل بين Table و Kanban -->
+            <div class="btn-group kanban-view-toggle" role="group">
+                <button type="button" class="btn btn-outline-primary active" id="tableViewBtn">
+                    <i class="fas fa-table me-1"></i>
+                    جدول
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="kanbanViewBtn">
+                    <i class="fas fa-columns me-1"></i>
+                    كانبان
+                </button>
+            </div>
 
-                    <a href="{{ route('revision.my-revisions-page') }}" class="btn btn-primary">
-                        <i class="fas fa-tasks me-1"></i>
-                        تعديلاتي
-                    </a>
-                    <a href="{{ route('revision.transfer-statistics') }}" class="btn btn-info">
-                        <i class="fas fa-exchange-alt me-1"></i>
-                        إحصائيات النقل
-                    </a>
-                    <button class="btn btn-success" onclick="showAddRevisionModal()">
-                        <i class="fas fa-plus me-1"></i>
-                        إضافة تعديل جديد
-                    </button>
-                    <button class="btn btn-primary" onclick="refreshData()">
-                        <i class="fas fa-sync-alt me-1"></i>
-                        تحديث
-                    </button>
+            <a href="{{ route('revision.my-revisions-page') }}" class="btn btn-primary">
+                <i class="fas fa-tasks me-1"></i>
+                تعديلاتي
+            </a>
+            <a href="{{ route('revision.transfer-statistics') }}" class="btn btn-info">
+                <i class="fas fa-exchange-alt me-1"></i>
+                إحصائيات النقل
+            </a>
+            <button class="btn btn-success" onclick="showAddRevisionModal()">
+                <i class="fas fa-plus me-1"></i>
+                إضافة تعديل جديد
+            </button>
+            <button class="btn btn-primary" onclick="refreshData()">
+                <i class="fas fa-sync-alt me-1"></i>
+                تحديث
+            </button>
         </div>
     </div>
 
@@ -716,7 +737,7 @@
             <ul class="nav nav-pills nav-justified mb-4" id="revisionTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="all-revisions-tab" data-bs-toggle="pill"
-                            data-bs-target="#all-revisions" type="button" role="tab">
+                        data-bs-target="#all-revisions" type="button" role="tab">
                         <i class="fas fa-list me-2"></i>
                         جميع التعديلات
                         <span class="badge bg-light text-primary ms-2" id="allRevisionsCount">0</span>
@@ -724,7 +745,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="my-created-revisions-tab" data-bs-toggle="pill"
-                            data-bs-target="#my-created-revisions" type="button" role="tab">
+                        data-bs-target="#my-created-revisions" type="button" role="tab">
                         <i class="fas fa-user-edit me-2"></i>
                         التعديلات التي أضفتها
                         <span class="badge bg-light text-primary ms-2" id="myCreatedRevisionsCount">0</span>
@@ -744,12 +765,12 @@
                     <div class="col-md-2 mb-3">
                         <label class="form-label">البحث</label>
                         <input type="text" class="form-control" id="allSearchInput"
-                               placeholder="البحث في العنوان والوصف...">
+                            placeholder="البحث في العنوان والوصف...">
                     </div>
                     <div class="col-md-2 mb-3">
                         <label class="form-label">المشروع</label>
                         <input type="text" class="form-control" id="allProjectCodeFilter"
-                               list="allProjectsList" placeholder="اختر المشروع...">
+                            list="allProjectsList" placeholder="اختر المشروع...">
                         <datalist id="allProjectsList">
                             <!-- Will be populated by JavaScript -->
                         </datalist>
@@ -791,18 +812,29 @@
                             </optgroup>
                         </select>
                     </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">ديدلاين من</label>
-                        <input type="date" class="form-control" id="allDeadlineFrom"
-                               title="فلتر حسب الديدلاين العام للتعديل">
-                        <small class="text-muted d-block mt-1">
-                            <i class="fas fa-info-circle"></i> الديدلاين العام للتعديل
-                        </small>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">ديدلاين إلى</label>
-                        <input type="date" class="form-control" id="allDeadlineTo"
-                               title="فلتر حسب الديدلاين العام للتعديل">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            الديدلاين العام للتعديل
+                        </label>
+                        <div class="alert alert-warning p-2 mb-2" style="font-size: 0.85rem; line-height: 1.5; border-right: 3px solid #ffc107;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <strong>ملاحظة مهمة:</strong> هذا الفلتر يفلتر حسب <strong>التاريخ النهائي للديدلاين العام</strong> للتعديل ككل (revision_deadline)، وليس الديدلاين الشخصي (ديدلاينك كمنفذ أو مراجع).
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="date" class="form-control" id="allDeadlineFrom"
+                                    placeholder="من تاريخ"
+                                    title="تاريخ البداية للديدلاين العام">
+                                <small class="text-muted d-block mt-1">من</small>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" class="form-control" id="allDeadlineTo"
+                                    placeholder="إلى تاريخ"
+                                    title="تاريخ النهاية للديدلاين العام">
+                                <small class="text-muted d-block mt-1">إلى</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-1 mb-3">
                         <label class="form-label">&nbsp;</label>
@@ -898,12 +930,12 @@
                     <div class="col-md-2 mb-3">
                         <label class="form-label">البحث</label>
                         <input type="text" class="form-control" id="myCreatedSearchInput"
-                               placeholder="البحث في العنوان والوصف...">
+                            placeholder="البحث في العنوان والوصف...">
                     </div>
                     <div class="col-md-2 mb-3">
                         <label class="form-label">المشروع</label>
                         <input type="text" class="form-control" id="myCreatedProjectCodeFilter"
-                               list="myCreatedProjectsList" placeholder="اختر المشروع...">
+                            list="myCreatedProjectsList" placeholder="اختر المشروع...">
                         <datalist id="myCreatedProjectsList">
                             <!-- Will be populated by JavaScript -->
                         </datalist>
@@ -948,7 +980,7 @@
                     <div class="col-md-2 mb-3">
                         <label class="form-label">ديدلاين من</label>
                         <input type="date" class="form-control" id="myCreatedDeadlineFrom"
-                               title="فلتر حسب الديدلاين العام للتعديلات">
+                            title="فلتر حسب الديدلاين العام للتعديلات">
                         <small class="text-success d-block mt-1">
                             <i class="fas fa-calendar-check"></i> الديدلاين العام للتعديل
                         </small>
@@ -956,7 +988,7 @@
                     <div class="col-md-2 mb-3">
                         <label class="form-label">ديدلاين إلى</label>
                         <input type="date" class="form-control" id="myCreatedDeadlineTo"
-                               title="فلتر حسب الديدلاين العام للتعديلات">
+                            title="فلتر حسب الديدلاين العام للتعديلات">
                     </div>
                     <div class="col-md-1 mb-3">
                         <label class="form-label">&nbsp;</label>
@@ -1018,7 +1050,7 @@
             <i class="fas fa-plus-circle me-2"></i>
             إضافة تعديل جديد
         </h5>
-                        </div>
+    </div>
     <div class="sidebar-content" style="padding: 20px;">
         <!-- Add Revision Form -->
         <form id="addRevisionForm" onsubmit="event.preventDefault(); saveNewRevision();">
@@ -1054,18 +1086,18 @@
                     المشروع <span class="text-danger">*</span>
                 </label>
                 <input type="text"
-                       id="newRevisionProjectSearch"
-                       class="form-control datalist-input"
-                       list="projectsList"
-                       placeholder="ابحث عن المشروع..."
-                       autocomplete="off"
-                       oninput="handleProjectSelection()">
+                    id="newRevisionProjectSearch"
+                    class="form-control datalist-input"
+                    list="projectsList"
+                    placeholder="ابحث عن المشروع..."
+                    autocomplete="off"
+                    oninput="handleProjectSelection()">
                 <datalist id="projectsList">
                     @if(isset($projects))
-                        @foreach($projects as $project)
-                            <option value="{{ ($project->code ? $project->code . ' - ' : '') . $project->name }}" data-project-id="{{ $project->id }}">
-                            </option>
-                        @endforeach
+                    @foreach($projects as $project)
+                    <option value="{{ ($project->code ? $project->code . ' - ' : '') . $project->name }}" data-project-id="{{ $project->id }}">
+                    </option>
+                    @endforeach
                     @endif
                 </datalist>
                 <input type="hidden" id="newRevisionProjectId">
@@ -1084,12 +1116,12 @@
                         <span class="text-muted" style="font-size: 11px;">(اللي هيتحاسب)</span>
                     </label>
                     <input type="text"
-                           id="newResponsibleUserSearch"
-                           class="form-control datalist-input"
-                           list="responsibleUsersList"
-                           placeholder="ابحث عن المسؤول..."
-                           autocomplete="off"
-                           oninput="handleResponsibleSelection()">
+                        id="newResponsibleUserSearch"
+                        class="form-control datalist-input"
+                        list="responsibleUsersList"
+                        placeholder="ابحث عن المسؤول..."
+                        autocomplete="off"
+                        oninput="handleResponsibleSelection()">
                     <datalist id="responsibleUsersList">
                         <!-- Will be populated by JavaScript -->
                     </datalist>
@@ -1099,7 +1131,7 @@
                         ابدأ بكتابة اسم الموظف - الموجودون في المشروع معلمون بـ
                         <span class="badge bg-success" style="font-size: 10px;">من المشروع</span>
                     </small>
-            </div>
+                </div>
 
                 <!-- المنفذ (اللي هيصلح) -->
                 <div class="mb-3">
@@ -1108,12 +1140,12 @@
                         <span class="text-muted" style="font-size: 11px;">(اللي هيصلح الغلط)</span>
                     </label>
                     <input type="text"
-                           id="newExecutorUserSearch"
-                           class="form-control datalist-input"
-                           list="executorUsersList"
-                           placeholder="ابحث عن المنفذ..."
-                           autocomplete="off"
-                           oninput="handleExecutorSelection()">
+                        id="newExecutorUserSearch"
+                        class="form-control datalist-input"
+                        list="executorUsersList"
+                        placeholder="ابحث عن المنفذ..."
+                        autocomplete="off"
+                        oninput="handleExecutorSelection()">
                     <datalist id="executorUsersList">
                         <!-- Will be populated by JavaScript -->
                     </datalist>
@@ -1132,10 +1164,10 @@
                         <span class="text-muted" style="font-size: 11px;">(اختياري)</span>
                     </label>
                     <input type="datetime-local"
-                           id="newExecutorDeadline"
-                           class="form-control"
-                           min=""
-                           onchange="validateExecutorDeadlineOrder()">
+                        id="newExecutorDeadline"
+                        class="form-control"
+                        min=""
+                        onchange="validateExecutorDeadlineOrder()">
                     <small class="text-muted">
                         <i class="fas fa-clock me-1"></i>
                         تاريخ ووقت الانتهاء المتوقع للمنفذ (يجب أن يكون قبل المراجع الأول)
@@ -1184,22 +1216,22 @@
                         <span class="text-muted" style="font-size: 11px;">(سبب التعديل)</span>
                     </label>
                     <textarea id="newResponsibilityNotes" class="form-control" rows="2"
-                              placeholder="اذكر سبب التعديل والخطأ الذي حدث..." maxlength="2000"></textarea>
+                        placeholder="اذكر سبب التعديل والخطأ الذي حدث..." maxlength="2000"></textarea>
                     <small class="text-muted">توثيق سبب الخطأ الذي أدى للتعديل</small>
                 </div>
             </div>
 
-                <!-- ديدلاين التعديل العام -->
+            <!-- ديدلاين التعديل العام -->
             <div class="mb-3">
                 <label class="form-label fw-bold">
                     <i class="fas fa-calendar-times me-1"></i>
                     ديدلاين التعديل <span class="text-muted" style="font-size: 11px;">(اختياري)</span>
                 </label>
                 <input type="datetime-local"
-                       id="newRevisionDeadline"
-                       class="form-control"
-                       min=""
-                       onchange="validateRevisionDeadlineOrder()">
+                    id="newRevisionDeadline"
+                    class="form-control"
+                    min=""
+                    onchange="validateRevisionDeadlineOrder()">
                 <small class="text-muted">
                     <i class="fas fa-info-circle me-1"></i>
                     تاريخ ووقت الانتهاء المتوقع للتعديل ككل (يجب أن يكون بعد جميع الديدلاينات الأخرى)
@@ -1213,9 +1245,9 @@
                     عنوان التعديل <span class="text-danger">*</span>
                 </label>
                 <input type="text" id="newRevisionTitle" class="form-control"
-                       placeholder="مثال: تعديل ألوان الشعار" required maxlength="255">
+                    placeholder="مثال: تعديل ألوان الشعار" required maxlength="255">
                 <small class="text-muted">الحد الأقصى 255 حرف</small>
-        </div>
+            </div>
 
             <!-- الوصف -->
             <div class="mb-3">
@@ -1224,7 +1256,7 @@
                     وصف التعديل <span class="text-danger">*</span>
                 </label>
                 <textarea id="newRevisionDescription" class="form-control" rows="4"
-                          placeholder="اكتب وصف تفصيلي للتعديل المطلوب..." required maxlength="5000"></textarea>
+                    placeholder="اكتب وصف تفصيلي للتعديل المطلوب..." required maxlength="5000"></textarea>
                 <small class="text-muted">الحد الأقصى 5000 حرف</small>
             </div>
 
@@ -1235,8 +1267,8 @@
                     ملاحظات إضافية
                 </label>
                 <textarea id="newRevisionNotes" class="form-control" rows="3"
-                          placeholder="أي ملاحظات أخرى..." maxlength="2000"></textarea>
-        </div>
+                    placeholder="أي ملاحظات أخرى..." maxlength="2000"></textarea>
+            </div>
 
             <!-- المرفقات -->
             <div class="mb-3">
@@ -1249,14 +1281,14 @@
                 <div class="mb-2" id="attachmentTypeOptions" style="display: none;">
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="newAttachmentType"
-                               id="newAttachmentTypeFile" value="file" checked onchange="toggleNewAttachmentType('file')">
+                            id="newAttachmentTypeFile" value="file" checked onchange="toggleNewAttachmentType('file')">
                         <label class="form-check-label" for="newAttachmentTypeFile">
                             ملف
                         </label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="newAttachmentType"
-                               id="newAttachmentTypeLink" value="link" onchange="toggleNewAttachmentType('link')">
+                            id="newAttachmentTypeLink" value="link" onchange="toggleNewAttachmentType('link')">
                         <label class="form-check-label" for="newAttachmentTypeLink">
                             رابط
                         </label>
@@ -1266,14 +1298,14 @@
                 <!-- File Upload (للمهام فقط) -->
                 <div id="newFileContainer">
                     <input type="file" id="newRevisionAttachment" class="form-control"
-                           accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
+                        accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
                     <small class="text-muted">الحد الأقصى: 10 ميجابايت</small>
                 </div>
 
                 <!-- Link Input (للمشاريع فقط) -->
                 <div id="newLinkContainer" style="display: none;">
                     <input type="url" id="newRevisionAttachmentLink" class="form-control"
-                           placeholder="https://example.com/file">
+                        placeholder="https://example.com/file">
                     <small class="text-muted">أدخل رابط خارجي للمرفق</small>
                 </div>
             </div>
@@ -1288,10 +1320,10 @@
                     <i class="fas fa-times me-1"></i>
                     إلغاء
                 </button>
-                    </div>
-        </form>
-                </div>
             </div>
+        </form>
+    </div>
+</div>
 
 <!-- Add Revision Sidebar Overlay -->
 <div class="sidebar-overlay" id="addRevisionOverlay" onclick="closeAddRevisionSidebar()" style="visibility: hidden; opacity: 0;"></div>
