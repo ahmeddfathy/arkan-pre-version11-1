@@ -81,7 +81,6 @@ class TaskController extends Controller
             $isGraphicOnlyUser = $this->determineIfGraphicOnlyUser();
 
             return view('tasks.index', array_merge($tasksData, $supportData, compact('isGraphicOnlyUser')));
-
         } catch (\Exception $e) {
             Log::error('Error in tasks index method', [
                 'error' => $e->getMessage(),
@@ -120,8 +119,8 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-        // التحقق من صلاحية المستخدم للقسم والخدمة المختارة
-        if (!$this->taskHierarchyService->canUserAccessService($request->service_id)) {
+        // التحقق من صلاحية المستخدم للقسم والخدمة المختارة (فقط إذا تم تحديد خدمة)
+        if ($request->service_id && !$this->taskHierarchyService->canUserAccessService($request->service_id)) {
             return redirect()->back()
                 ->with('error', 'غير مسموح لك بإنشاء مهام لهذه الخدمة. تأكد من أن دورك مرتبط بقسمك.')
                 ->withInput();
@@ -140,7 +139,7 @@ class TaskController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'project_id' => 'nullable|exists:projects,id',
-            'service_id' => 'required|exists:company_services,id',
+            'service_id' => 'nullable|exists:company_services,id',
             'graphic_task_type_id' => 'nullable|exists:graphic_task_types,id',
             'points' => 'nullable|integer|min:0|max:1000',
             'due_date' => 'nullable|date',
@@ -555,7 +554,7 @@ class TaskController extends Controller
         }
     }
 
-        public function edit($id)
+    public function edit($id)
     {
         try {
             // تسجيل محاولة التعديل للتشخيص
@@ -615,8 +614,8 @@ class TaskController extends Controller
                         if (!isset($user['pivot'])) {
                             // إذا لم تكن بيانات pivot موجودة، أحضرها يدوياً
                             $taskUser = TaskUser::where('task_id', $task->id)
-                                              ->where('user_id', $user['id'])
-                                              ->first();
+                                ->where('user_id', $user['id'])
+                                ->first();
 
                             if ($taskUser) {
                                 $taskData['users'][$key]['pivot'] = [
@@ -705,7 +704,8 @@ class TaskController extends Controller
                 ->withInput();
         }
 
-        if (!$this->taskHierarchyService->canUserAccessService($request->service_id)) {
+        // التحقق من صلاحية الوصول للخدمة (فقط إذا تم تحديد خدمة)
+        if ($request->service_id && !$this->taskHierarchyService->canUserAccessService($request->service_id)) {
             return redirect()->back()
                 ->with('error', 'غير مسموح لك بتعديل مهام لهذه الخدمة. تأكد من أن دورك مرتبط بقسمك.')
                 ->withInput();
@@ -715,7 +715,7 @@ class TaskController extends Controller
         $flexibleTimeValue = $request->input('is_flexible_time', 'false');
         $isFlexible = filter_var($flexibleTimeValue, FILTER_VALIDATE_BOOLEAN) || $flexibleTimeValue === 'true';
 
-        // الحصول على قيمة is_additional_task
+
         $additionalTaskValue = $request->input('is_additional_task', 'false');
         $isAdditionalTask = filter_var($additionalTaskValue, FILTER_VALIDATE_BOOLEAN) || $additionalTaskValue === 'true';
 
@@ -723,7 +723,7 @@ class TaskController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'project_id' => 'nullable|exists:projects,id',
-            'service_id' => 'required|exists:company_services,id',
+            'service_id' => 'nullable|exists:company_services,id',
             'graphic_task_type_id' => 'nullable|exists:graphic_task_types,id',
             'status' => 'required|in:new,cancelled',
             'due_date' => 'nullable|date',
@@ -820,7 +820,7 @@ class TaskController extends Controller
                     ['hours' => $request->estimated_hours, 'minutes' => $request->estimated_minutes],
                     $isAdditionalTask
                 );
-                    } else {
+            } else {
                 $this->taskUserAssignmentService->removeAllUserAssignments($task->id);
             }
 
@@ -971,7 +971,7 @@ class TaskController extends Controller
 
 
 
-                        // إنشاء collection مع حماية
+            // إنشاء collection مع حماية
             $allTasks = collect($allTasksArray);
 
             // ترتيب المهام حسب التاريخ مع حماية إضافية
@@ -983,7 +983,6 @@ class TaskController extends Controller
             $projects = $this->taskFilterService->getUserProjects($userId) ?? collect([]);
 
             return view('tasks.my-tasks', compact('allTasks', 'tasks', 'templateTasks', 'projects', 'user'));
-
         } catch (\Exception $e) {
             Log::error('Error in myTasks method', [
                 'user_id' => Auth::id(),
@@ -1012,9 +1011,9 @@ class TaskController extends Controller
 
     public function updateTaskUserStatus(Request $request, $taskUserId)
     {
-            $validated = $request->validate([
-                'status' => 'required|string|in:new,in_progress,paused,completed',
-            ]);
+        $validated = $request->validate([
+            'status' => 'required|string|in:new,in_progress,paused,completed',
+        ]);
 
         $result = $this->taskStatusService->updateTaskUserStatus($taskUserId, $validated['status']);
 
@@ -1161,7 +1160,6 @@ class TaskController extends Controller
 
             return view('tasks.edit', compact('templateTaskUser', 'projects', 'services', 'users', 'roles'))
                 ->with('isTemplate', true);
-
         } catch (\Exception $e) {
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
@@ -1271,7 +1269,6 @@ class TaskController extends Controller
 
             return redirect()->route('tasks.index')
                 ->with('success', 'تم تحديث مهمة القالب بنجاح');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
@@ -1383,19 +1380,19 @@ class TaskController extends Controller
             $users = collect();
 
             if ($userRole) {
-                $users = User::whereHas('roles', function($query) use ($userRole) {
+                $users = User::whereHas('roles', function ($query) use ($userRole) {
                     $query->where('name', $userRole);
                 })->get(['id', 'name']);
             } else {
                 // Fallback: get users with any of the assigned user's roles
                 $assignedUserRoles = $assignedUser->roles->pluck('name')->toArray();
-                $users = User::whereHas('roles', function($query) use ($assignedUserRoles) {
+                $users = User::whereHas('roles', function ($query) use ($assignedUserRoles) {
                     $query->whereIn('name', $assignedUserRoles);
                 })->get(['id', 'name']);
             }
 
             // Mark the assigned user
-            $users = $users->map(function($user) use ($assignedUser) {
+            $users = $users->map(function ($user) use ($assignedUser) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -1408,7 +1405,6 @@ class TaskController extends Controller
                 'users' => $users,
                 'assigned_user_id' => $assignedUser->id
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error getting task user role users', [
                 'error' => $e->getMessage(),
@@ -1421,6 +1417,4 @@ class TaskController extends Controller
             ], 500);
         }
     }
-
-
 }

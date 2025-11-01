@@ -18,6 +18,23 @@
                 <i class="fas fa-layer-group me-1"></i>مهمة قالب
             </span>
         </div>
+
+        <!-- ✅ تنبيه المشروع الملغى -->
+        <div id="cancelledProjectWarning" style="display: none; margin-top: 16px; padding: 12px 16px; background: linear-gradient(135deg, #fef3f3 0%, #ffe8e8 100%); border: 1px solid #f5c6c6; border-right: 4px solid #dc3545; border-radius: 8px;">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px; background: rgba(220, 53, 69, 0.15); flex-shrink: 0;">
+                    <i class="fas fa-ban text-danger" style="font-size: 16px;"></i>
+                </div>
+                <div>
+                    <div class="fw-semibold text-danger mb-1" style="font-size: 13px;">
+                        <i class="fas fa-exclamation-circle me-1"></i>مشروع ملغى
+                    </div>
+                    <small class="text-muted" style="font-size: 11px; line-height: 1.4;">
+                        هذه المهمة مرتبطة بمشروع ملغى. يرجى مراجعة حالة المشروع قبل العمل على المهمة.
+                    </small>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="taskSidebarContent" style="padding: 0; min-height: calc(100vh - 140px);">

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->unsignedBigInteger('project_id'); // Related project
-            $table->unsignedBigInteger('service_id'); // Related service
+            $table->unsignedBigInteger('service_id')->nullable(); // Related service (nullable for HR tasks)
             $table->enum('status', ['new', 'in_progress', 'paused', 'completed', 'cancelled'])->default('new');
             $table->integer('estimated_hours')->default(0);
             $table->integer('estimated_minutes')->default(0);
@@ -31,14 +31,14 @@ return new class extends Migration
 
             // Foreign key constraints
             $table->foreign('project_id')
-                  ->references('id')
-                  ->on('projects')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('projects')
+                ->onDelete('cascade');
 
             $table->foreign('service_id')
-                  ->references('id')
-                  ->on('company_services')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('company_services')
+                ->onDelete('set null');
         });
     }
 

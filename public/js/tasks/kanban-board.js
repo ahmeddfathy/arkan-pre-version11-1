@@ -1,5 +1,4 @@
-
-let currentView = 'table';
+let currentView = "table";
 
 // ⏱️ نظام التايمرات للمهام
 let taskTimers = {};
@@ -8,29 +7,29 @@ let timerIntervals = {};
 window.currentView = currentView;
 
 function generateUserColor(userId) {
-    if (!userId) return { bg: '#6b7280', text: '#ffffff', border: '#4b5563' };
+    if (!userId) return { bg: "#6b7280", text: "#ffffff", border: "#4b5563" };
 
     const colorPalettes = [
-        { bg: '#3b82f6', text: '#ffffff', border: '#1d4ed8' },
-        { bg: '#22c55e', text: '#ffffff', border: '#15803d' },
-        { bg: '#f59e0b', text: '#ffffff', border: '#d97706' },
-        { bg: '#ec4899', text: '#ffffff', border: '#be185d' },
-        { bg: '#8b5cf6', text: '#ffffff', border: '#7c3aed' },
-        { bg: '#ef4444', text: '#ffffff', border: '#dc2626' },
-        { bg: '#10b981', text: '#ffffff', border: '#059669' },
-        { bg: '#0ea5e9', text: '#ffffff', border: '#0369a1' },
-        { bg: '#f97316', text: '#ffffff', border: '#ea580c' },
-        { bg: '#64748b', text: '#ffffff', border: '#475569' },
-        { bg: '#c026d3', text: '#ffffff', border: '#a21caf' },
-        { bg: '#14b8a6', text: '#ffffff', border: '#0d9488' },
-        { bg: '#eab308', text: '#ffffff', border: '#ca8a04' },
-        { bg: '#6366f1', text: '#ffffff', border: '#4f46e5' },
-        { bg: '#84cc16', text: '#ffffff', border: '#65a30d' },
-        { bg: '#f43f5e', text: '#ffffff', border: '#e11d48' },
-        { bg: '#06b6d4', text: '#ffffff', border: '#0891b2' },
-        { bg: '#8b5cf6', text: '#ffffff', border: '#7c3aed' },
-        { bg: '#fb7185', text: '#ffffff', border: '#f43f5e' },
-        { bg: '#34d399', text: '#ffffff', border: '#10b981' },
+        { bg: "#3b82f6", text: "#ffffff", border: "#1d4ed8" },
+        { bg: "#22c55e", text: "#ffffff", border: "#15803d" },
+        { bg: "#f59e0b", text: "#ffffff", border: "#d97706" },
+        { bg: "#ec4899", text: "#ffffff", border: "#be185d" },
+        { bg: "#8b5cf6", text: "#ffffff", border: "#7c3aed" },
+        { bg: "#ef4444", text: "#ffffff", border: "#dc2626" },
+        { bg: "#10b981", text: "#ffffff", border: "#059669" },
+        { bg: "#0ea5e9", text: "#ffffff", border: "#0369a1" },
+        { bg: "#f97316", text: "#ffffff", border: "#ea580c" },
+        { bg: "#64748b", text: "#ffffff", border: "#475569" },
+        { bg: "#c026d3", text: "#ffffff", border: "#a21caf" },
+        { bg: "#14b8a6", text: "#ffffff", border: "#0d9488" },
+        { bg: "#eab308", text: "#ffffff", border: "#ca8a04" },
+        { bg: "#6366f1", text: "#ffffff", border: "#4f46e5" },
+        { bg: "#84cc16", text: "#ffffff", border: "#65a30d" },
+        { bg: "#f43f5e", text: "#ffffff", border: "#e11d48" },
+        { bg: "#06b6d4", text: "#ffffff", border: "#0891b2" },
+        { bg: "#8b5cf6", text: "#ffffff", border: "#7c3aed" },
+        { bg: "#fb7185", text: "#ffffff", border: "#f43f5e" },
+        { bg: "#34d399", text: "#ffffff", border: "#10b981" },
     ];
 
     const colorIndex = parseInt(userId) % colorPalettes.length;
@@ -38,70 +37,95 @@ function generateUserColor(userId) {
 }
 
 function applyUserColors() {
-    $('.creator-badge').each(function() {
-        const creatorId = $(this).data('creator-id');
+    $(".creator-badge").each(function () {
+        const creatorId = $(this).data("creator-id");
         const colors = generateUserColor(creatorId);
 
         $(this).css({
-            'background': colors.bg,
-            'color': colors.text,
-            'border-color': colors.border,
-            'border-width': '2px',
-            'border-style': 'solid',
-            'box-shadow': '0 2px 4px rgba(0,0,0,0.1)'
+            background: colors.bg,
+            color: colors.text,
+            "border-color": colors.border,
+            "border-width": "2px",
+            "border-style": "solid",
+            "box-shadow": "0 2px 4px rgba(0,0,0,0.1)",
         });
     });
 
-    $('.kanban-card-creator').each(function() {
-        const creatorId = $(this).data('creator-id');
+    $(".kanban-card-creator").each(function () {
+        const creatorId = $(this).data("creator-id");
         const colors = generateUserColor(creatorId);
 
         $(this).css({
-            'background': colors.bg,
-            'color': colors.text,
-            'border-color': colors.border,
-            'border-width': '2px',
-            'border-style': 'solid',
-            'box-shadow': '0 2px 4px rgba(0,0,0,0.1)'
+            background: colors.bg,
+            color: colors.text,
+            "border-color": colors.border,
+            "border-width": "2px",
+            "border-style": "solid",
+            "box-shadow": "0 2px 4px rgba(0,0,0,0.1)",
         });
     });
 }
 
 function checkAndApplyShowAllPreference() {
-
-
     // يمكن الاحتفاظ بهذا فقط للتسجيل
-    const showAllPreference = localStorage.getItem('tasksShowAllPreference');
+    const showAllPreference = localStorage.getItem("tasksShowAllPreference");
     const currentShowAll = window.isShowAllView || false;
 
-    console.log('Show All Preference:', showAllPreference, 'Current State:', currentShowAll);
+    console.log(
+        "Show All Preference:",
+        showAllPreference,
+        "Current State:",
+        currentShowAll
+    );
 }
 
 function applyStoredViewPreference() {
-    if (currentView === 'kanban') {
+    if (currentView === "kanban") {
         window.currentView = currentView;
-        $('.table-responsive').hide();
-        $('#kanbanBoard').show();
-        $('#tableViewBtn').removeClass('active');
-        $('#kanbanViewBtn').addClass('active');
+        $(".table-responsive").hide();
+        $("#kanbanBoard").show();
+        $("#calendarBoard").hide();
+        $("#tableViewBtn").removeClass("active");
+        $("#kanbanViewBtn").addClass("active");
+        $("#calendarViewBtn").removeClass("active");
 
         setTimeout(() => {
             loadTasksIntoKanban();
             // ✅ تطبيق الفلاتر الموجودة عند تحميل الصفحة بالكانبان
-            if (typeof window.filterTasks === 'function') {
+            if (typeof window.filterTasks === "function") {
                 window.filterTasks();
+            }
+        }, 150);
+    } else if (currentView === "calendar") {
+        window.currentView = currentView;
+        $(".table-responsive").hide();
+        $("#kanbanBoard").hide();
+        $("#calendarBoard").show();
+        $("#tableViewBtn").removeClass("active");
+        $("#kanbanViewBtn").removeClass("active");
+        $("#calendarViewBtn").addClass("active");
+
+        // ✅ تحميل التقويم عند تحميل الصفحة
+        setTimeout(() => {
+            if (
+                typeof window.tasksIndexCalendar !== "undefined" &&
+                window.tasksIndexCalendar.refresh
+            ) {
+                window.tasksIndexCalendar.refresh();
             }
         }, 150);
     } else {
         window.currentView = currentView;
-        $('.table-responsive').show();
-        $('#kanbanBoard').hide();
-        $('#tableViewBtn').addClass('active');
-        $('#kanbanViewBtn').removeClass('active');
+        $(".table-responsive").show();
+        $("#kanbanBoard").hide();
+        $("#calendarBoard").hide();
+        $("#tableViewBtn").addClass("active");
+        $("#kanbanViewBtn").removeClass("active");
+        $("#calendarViewBtn").removeClass("active");
 
         // ✅ تطبيق الفلاتر الموجودة عند تحميل الصفحة بالجدول
         setTimeout(() => {
-            if (typeof window.filterTasks === 'function') {
+            if (typeof window.filterTasks === "function") {
                 window.filterTasks();
             }
         }, 100);
@@ -111,51 +135,79 @@ function applyStoredViewPreference() {
 }
 
 function updateTaskCountDisplay() {
-    const totalTasks = $('#tasksTable tbody tr').length - 1;
+    const totalTasks = $("#tasksTable tbody tr").length - 1;
     const isShowAll = window.isShowAllView || false;
 }
 
 function switchToTableView() {
-    currentView = 'table';
+    currentView = "table";
     window.currentView = currentView;
-    $('.table-responsive').show();
-    $('#kanbanBoard').hide();
-    $('#tableViewBtn').addClass('active');
-    $('#kanbanViewBtn').removeClass('active');
+    $(".table-responsive").show();
+    $("#kanbanBoard").hide();
+    $("#calendarBoard").hide();
+    $("#tableViewBtn").addClass("active");
+    $("#kanbanViewBtn").removeClass("active");
+    $("#calendarViewBtn").removeClass("active");
 
-    localStorage.setItem('tasksViewPreference', 'table');
+    localStorage.setItem("tasksViewPreference", "table");
 
     // ✅ تطبيق الفلاتر الموجودة على الجدول بعد التبديل
     setTimeout(() => {
         applyUserColors();
-        if (typeof window.filterTasks === 'function') {
+        if (typeof window.filterTasks === "function") {
             window.filterTasks();
         }
     }, 100);
 }
 
 function switchToKanbanView() {
-    currentView = 'kanban';
+    currentView = "kanban";
     window.currentView = currentView;
-    $('.table-responsive').hide();
-    $('#kanbanBoard').show();
-    $('#tableViewBtn').removeClass('active');
-    $('#kanbanViewBtn').addClass('active');
+    $(".table-responsive").hide();
+    $("#kanbanBoard").hide();
+    $("#calendarBoard").hide();
+    $("#kanbanBoard").show();
+    $("#tableViewBtn").removeClass("active");
+    $("#kanbanViewBtn").addClass("active");
+    $("#calendarViewBtn").removeClass("active");
 
-    localStorage.setItem('tasksViewPreference', 'kanban');
+    localStorage.setItem("tasksViewPreference", "kanban");
 
     loadTasksIntoKanban();
 
     // ✅ تطبيق الفلاتر الموجودة على الكانبان بعد التبديل
     setTimeout(() => {
-        if (typeof window.filterTasks === 'function') {
+        if (typeof window.filterTasks === "function") {
             window.filterTasks();
         }
     }, 150);
 }
 
+function switchToCalendarView() {
+    currentView = "calendar";
+    window.currentView = currentView;
+    $(".table-responsive").hide();
+    $("#kanbanBoard").hide();
+    $("#calendarBoard").show();
+    $("#tableViewBtn").removeClass("active");
+    $("#kanbanViewBtn").removeClass("active");
+    $("#calendarViewBtn").addClass("active");
+
+    localStorage.setItem("tasksViewPreference", "calendar");
+
+    // ✅ تحميل وتحديث التقويم
+    if (
+        typeof window.tasksIndexCalendar !== "undefined" &&
+        window.tasksIndexCalendar.refresh
+    ) {
+        window.tasksIndexCalendar.refresh();
+    }
+
+    console.log("📅 Switched to Calendar View");
+}
+
 function initializeKanbanBoard() {
-    console.log('🚀 Initializing Kanban Board...');
+    console.log("🚀 Initializing Kanban Board...");
 
     // البيانات الآن تُعرض مباشرة من PHP في HTML
     // لا نحتاج لتحميل البيانات من JavaScript
@@ -163,14 +215,14 @@ function initializeKanbanBoard() {
     // فقط تهيئة التايمرات للمهام الموجودة
     initializeTaskTimers();
 
-    console.log('✅ Kanban Board initialized successfully');
+    console.log("✅ Kanban Board initialized successfully");
 }
 
 function loadTasksIntoKanban() {
     // البيانات الآن تُعرض مباشرة من PHP في HTML
     // هذه الدالة لم تعد مطلوبة، لكن نتركها للتوافق مع الكود الموجود
 
-    console.log('📋 Kanban data is now loaded directly from PHP in HTML');
+    console.log("📋 Kanban data is now loaded directly from PHP in HTML");
 
     setTimeout(() => {
         applyUserColors();
@@ -182,10 +234,12 @@ function loadTasksIntoKanban() {
 // 🔄 تهيئة التايمرات للمهام قيد التنفيذ
 function initializeTaskTimers() {
     // البحث عن جميع المهام قيد التنفيذ في الكانبان
-    const inProgressCards = document.querySelectorAll('.kanban-card[data-status="in_progress"]');
+    const inProgressCards = document.querySelectorAll(
+        '.kanban-card[data-status="in_progress"]'
+    );
 
-    inProgressCards.forEach(card => {
-        const taskId = card.getAttribute('data-task-id');
+    inProgressCards.forEach((card) => {
+        const taskId = card.getAttribute("data-task-id");
         if (taskId) {
             startTaskTimer(taskId);
         }
@@ -196,11 +250,11 @@ function initializeTaskTimers() {
 
 function getStatusText(status) {
     const statusMap = {
-        'new': 'جديدة',
-        'in_progress': 'قيد التنفيذ',
-        'paused': 'متوقفة',
-        'completed': 'مكتملة',
-        'cancelled': 'ملغاة'
+        new: "جديدة",
+        in_progress: "قيد التنفيذ",
+        paused: "متوقفة",
+        completed: "مكتملة",
+        cancelled: "ملغاة",
     };
     return statusMap[status] || status;
 }
@@ -227,23 +281,24 @@ function getRevisionStatusTooltip(task) {
 }
 
 function getDueDateClass(dueDate) {
-    if (!dueDate || dueDate === 'غير محدد') return '';
+    if (!dueDate || dueDate === "غير محدد") return "";
 
     const today = new Date();
     const due = new Date(dueDate);
     const diffTime = due - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return 'text-danger';
-    if (diffDays <= 2) return 'text-warning';
-    return 'text-muted';
+    if (diffDays < 0) return "text-danger";
+    if (diffDays <= 2) return "text-warning";
+    return "text-muted";
 }
 
 function initializeKanbanSystem() {
     // إيقاف جميع التايمرات السابقة
     stopAllTimers();
 
-    currentView = localStorage.getItem('tasksViewPreference') || 'table';
+    // ✅ دعم ثلاث عروض: table, kanban, calendar
+    currentView = localStorage.getItem("tasksViewPreference") || "table";
 
     checkAndApplyShowAllPreference();
 
@@ -254,66 +309,80 @@ function initializeKanbanSystem() {
     // ✅ تهيئة Page Visibility Handler لحل مشكلة توقف التايمر
     initializeTasksPageVisibilityHandler();
 
-    $('.modal').on('hidden.bs.modal', function () {
+    $(".modal").on("hidden.bs.modal", function () {
         setTimeout(() => {
             applyUserColors();
         }, 200);
     });
 
-    $(document).on('click', '#showAllBtn', function(e) {
+    $(document).on("click", "#showAllBtn", function (e) {
         e.preventDefault();
-        localStorage.setItem('tasksShowAllPreference', 'true');
-        window.location.href = $(this).attr('href');
+        localStorage.setItem("tasksShowAllPreference", "true");
+        window.location.href = $(this).attr("href");
     });
 
-    $(document).on('click', '#showPaginatedBtn', function(e) {
+    $(document).on("click", "#showPaginatedBtn", function (e) {
         e.preventDefault();
-        localStorage.setItem('tasksShowAllPreference', 'false');
-        window.location.href = $(this).attr('href');
+        localStorage.setItem("tasksShowAllPreference", "false");
+        window.location.href = $(this).attr("href");
     });
 
-    $('#tableViewBtn').click(function() {
-        if (currentView !== 'table') {
+    $("#tableViewBtn").click(function () {
+        if (currentView !== "table") {
             switchToTableView();
         }
     });
 
-    $('#kanbanViewBtn').click(function() {
-        if (currentView !== 'kanban') {
+    $("#kanbanViewBtn").click(function () {
+        if (currentView !== "kanban") {
             switchToKanbanView();
         }
     });
 
-    $(document).on('filtersApplied', function() {
+    $("#calendarViewBtn").click(function () {
+        if (currentView !== "calendar") {
+            switchToCalendarView();
+        }
+    });
+
+    $(document).on("filtersApplied", function () {
         setTimeout(() => {
             applyUserColors();
             // إعادة تهيئة التايمرات بعد الفلترة
-            if (currentView === 'kanban') {
+            if (currentView === "kanban") {
                 stopAllTimers();
                 initializeTaskTimers();
             }
         }, 50);
     });
 
-    $(document).on('click', '.kanban-card .view-task', function(e) {
+    $(document).on("click", ".kanban-card .view-task", function (e) {
         e.stopPropagation();
-        const taskId = $(this).data('id');
-        const taskUserId = $(this).data('task-user-id') || taskId;
-        const isTemplate = $(this).attr('data-is-template') || $(this).data('is-template') || $(this).closest('.kanban-card').attr('data-is-template') || $(this).closest('.kanban-card').data('is-template');
+        const taskId = $(this).data("id");
+        const taskUserId = $(this).data("task-user-id") || taskId;
+        const isTemplate =
+            $(this).attr("data-is-template") ||
+            $(this).data("is-template") ||
+            $(this).closest(".kanban-card").attr("data-is-template") ||
+            $(this).closest(".kanban-card").data("is-template");
 
         // استخدم نفس الطريقة الموجودة في modals.js
-        const taskType = (isTemplate === 'true' || isTemplate === true) ? 'template' : 'regular';
+        const taskType =
+            isTemplate === "true" || isTemplate === true
+                ? "template"
+                : "regular";
 
         // محاولة الحصول على البيانات من العنصر الأب إذا لم تكن متاحة
-        const $card = $(this).closest('.kanban-card');
-        const finalTaskId = taskId || $card.data('task-id');
-        const finalTaskUserId = taskUserId || $card.data('task-user-id') || finalTaskId;
-        const finalIsTemplate = isTemplate || $card.data('is-template');
+        const $card = $(this).closest(".kanban-card");
+        const finalTaskId = taskId || $card.data("task-id");
+        const finalTaskUserId =
+            taskUserId || $card.data("task-user-id") || finalTaskId;
+        const finalIsTemplate = isTemplate || $card.data("is-template");
 
         // ✅ استخدم TaskUser ID دائماً (سواء عادية أو قالب)
         const targetId = finalTaskUserId;
 
-        console.log('🔍 Opening task sidebar from kanban-board.js:', {
+        console.log("🔍 Opening task sidebar from kanban-board.js:", {
             originalTaskId: taskId,
             originalTaskUserId: taskUserId,
             finalTaskId: finalTaskId,
@@ -322,88 +391,102 @@ function initializeKanbanSystem() {
             targetId: targetId,
             isTemplate: finalIsTemplate,
             parentCard: $card.length > 0,
-            parentCardData: $card.data()
+            parentCardData: $card.data(),
         });
 
         // التأكد من وجود المعاملات المطلوبة
         if (!targetId) {
-            console.error('❌ Missing targetId:', {
+            console.error("❌ Missing targetId:", {
                 originalTaskId: taskId,
                 originalTaskUserId: taskUserId,
                 finalTaskId: finalTaskId,
                 finalTaskUserId: finalTaskUserId,
                 taskType: taskType,
                 parentCard: $card.length > 0,
-                parentCardData: $card.data()
+                parentCardData: $card.data(),
             });
-            alert('خطأ: لم يتم العثور على معرف المهمة');
+            alert("خطأ: لم يتم العثور على معرف المهمة");
             return;
         }
 
-        if (typeof openTaskSidebar === 'function') {
+        if (typeof openTaskSidebar === "function") {
             openTaskSidebar(taskType, targetId);
         } else {
-            console.error('❌ openTaskSidebar function not found');
+            console.error("❌ openTaskSidebar function not found");
         }
     });
 
-    $(document).on('click', '.kanban-card .edit-task', function(e) {
+    $(document).on("click", ".kanban-card .edit-task", function (e) {
         e.stopPropagation();
-        const taskId = $(this).data('id');
-        if (typeof loadTaskForEdit === 'function') {
+        const taskId = $(this).data("id");
+        if (typeof loadTaskForEdit === "function") {
             loadTaskForEdit(taskId);
         }
     });
 
-    $(document).on('click', '.kanban-card .transfer-task', function(e) {
+    $(document).on("click", ".kanban-card .transfer-task", function (e) {
         e.stopPropagation();
-        const taskType = $(this).data('task-type');
-        const taskId = $(this).data('task-id');
-        const taskUserId = $(this).data('task-user-id');
-        const taskName = $(this).data('task-name');
-        const currentUser = $(this).data('current-user');
-        const mode = $(this).data('mode') || 'transfer';
+        const taskType = $(this).data("task-type");
+        const taskId = $(this).data("task-id");
+        const taskUserId = $(this).data("task-user-id");
+        const taskName = $(this).data("task-name");
+        const currentUser = $(this).data("current-user");
+        const mode = $(this).data("mode") || "transfer";
 
-        console.log('📤 نقل مهمة من kanban:', {taskType, taskId, taskUserId, taskName, currentUser, mode});
+        console.log("📤 نقل مهمة من kanban:", {
+            taskType,
+            taskId,
+            taskUserId,
+            taskName,
+            currentUser,
+            mode,
+        });
 
-        if (typeof openTransferModal === 'function') {
-            openTransferModal(taskType, taskId, taskName, currentUser, mode, taskUserId);
+        if (typeof openTransferModal === "function") {
+            openTransferModal(
+                taskType,
+                taskId,
+                taskName,
+                currentUser,
+                mode,
+                taskUserId
+            );
         } else {
-            console.error('openTransferModal function not found');
+            console.error("openTransferModal function not found");
         }
     });
 
-    $(document).on('click', '.kanban-card', function(e) {
-        if (!$(e.target).closest('.kanban-card-actions').length) {
-            const taskId = $(this).data('task-id');
-            const isTemplate = $(this).data('is-template');
+    $(document).on("click", ".kanban-card", function (e) {
+        if (!$(e.target).closest(".kanban-card-actions").length) {
+            const taskId = $(this).data("task-id");
+            const isTemplate = $(this).data("is-template");
 
-            if (typeof loadTaskDetails === 'function') {
+            if (typeof loadTaskDetails === "function") {
                 loadTaskDetails(taskId, isTemplate);
             }
         }
     });
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     initializeKanbanSystem();
 });
 
 // 🧹 تنظيف التايمرات عند مغادرة الصفحة
-$(window).on('beforeunload', function() {
+$(window).on("beforeunload", function () {
     stopAllTimers();
 });
 
 // ⏰ دوال التايمر المساعدة
 function formatTime(seconds) {
-    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const s = String(seconds % 60).padStart(2, '0');
+    const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const s = String(seconds % 60).padStart(2, "0");
     return `${h}:${m}:${s}`;
 }
 
 function calculateElapsedSeconds(startedAtTimestamp) {
-    if (!startedAtTimestamp || startedAtTimestamp === 'null') return 0;
+    if (!startedAtTimestamp || startedAtTimestamp === "null") return 0;
     const startedAt = parseInt(startedAtTimestamp);
     if (isNaN(startedAt)) return 0;
     const now = new Date().getTime();
@@ -414,7 +497,7 @@ function calculateElapsedSeconds(startedAtTimestamp) {
 // ✅ إضافة Page Visibility API لحل مشكلة توقف التايمر في صفحة Tasks Index
 function initializeTasksPageVisibilityHandler() {
     // الكشف عن تغيير حالة الصفحة (نشطة/غير نشطة)
-    document.addEventListener('visibilitychange', function() {
+    document.addEventListener("visibilitychange", function () {
         if (!document.hidden) {
             // المستخدم عاد للتاب - نحديث جميع التايمرات
             syncAllTaskTimersWithRealTime();
@@ -422,14 +505,14 @@ function initializeTasksPageVisibilityHandler() {
     });
 
     // تحديث التايمرات كل 10 ثوان كـ backup عندما التاب نشط
-    setInterval(function() {
+    setInterval(function () {
         if (!document.hidden) {
             syncAllTaskTimersWithRealTime();
         }
     }, 10000);
 
     // تحديث التايمرات عند النقر على أي مكان في الصفحة
-    document.addEventListener('click', function() {
+    document.addEventListener("click", function () {
         if (!document.hidden) {
             setTimeout(() => {
                 syncAllTaskTimersWithRealTime();
@@ -440,17 +523,26 @@ function initializeTasksPageVisibilityHandler() {
 
 function syncAllTaskTimersWithRealTime() {
     // ✅ تحديث جميع التايمرات النشطة بالوقت الفعلي
-    const inProgressCards = document.querySelectorAll('.kanban-card[data-status="in_progress"]');
+    const inProgressCards = document.querySelectorAll(
+        '.kanban-card[data-status="in_progress"]'
+    );
 
-    inProgressCards.forEach(card => {
-        const taskId = card.getAttribute('data-task-id');
-        const startedAtTimestamp = card.getAttribute('data-started-at');
-        const initialMinutes = parseInt(card.getAttribute('data-initial-minutes') || '0');
+    inProgressCards.forEach((card) => {
+        const taskId = card.getAttribute("data-task-id");
+        const startedAtTimestamp = card.getAttribute("data-started-at");
+        const initialMinutes = parseInt(
+            card.getAttribute("data-initial-minutes") || "0"
+        );
 
-        if (taskId && startedAtTimestamp && startedAtTimestamp !== 'null' && startedAtTimestamp !== '') {
+        if (
+            taskId &&
+            startedAtTimestamp &&
+            startedAtTimestamp !== "null" &&
+            startedAtTimestamp !== ""
+        ) {
             // ✅ حساب الوقت الفعلي من البداية
             const elapsedSeconds = calculateElapsedSeconds(startedAtTimestamp);
-            const totalSeconds = (initialMinutes * 60) + elapsedSeconds;
+            const totalSeconds = initialMinutes * 60 + elapsedSeconds;
 
             // تحديث التايمر المحلي
             taskTimers[taskId] = totalSeconds;
@@ -461,20 +553,22 @@ function syncAllTaskTimersWithRealTime() {
 
 // 🚀 إدارة التايمرات
 function startTaskTimer(taskId) {
-    const taskElement = document.querySelector(`.kanban-card[data-task-id="${taskId}"]`);
+    const taskElement = document.querySelector(
+        `.kanban-card[data-task-id="${taskId}"]`
+    );
     if (!taskElement) return;
 
     // الحصول على البيانات المحفوظة
-    const initialMinutes = parseInt(taskElement.dataset.initialMinutes || '0');
+    const initialMinutes = parseInt(taskElement.dataset.initialMinutes || "0");
     let totalSeconds = initialMinutes * 60;
 
     // ✅ التأكد من وجود timestamp صحيح عند بدء المهمة
     let startedAt = taskElement.dataset.startedAt;
-    if (!startedAt || startedAt === 'null' || startedAt === '') {
+    if (!startedAt || startedAt === "null" || startedAt === "") {
         // إذا لم يوجد timestamp، نضعه الآن
         startedAt = new Date().getTime().toString();
         taskElement.dataset.startedAt = startedAt;
-        taskElement.setAttribute('data-started-at', startedAt);
+        taskElement.setAttribute("data-started-at", startedAt);
     }
 
     const elapsedSeconds = calculateElapsedSeconds(startedAt);
@@ -503,7 +597,7 @@ function stopTaskTimer(taskId) {
 }
 
 function stopAllTimers() {
-    Object.keys(timerIntervals).forEach(taskId => {
+    Object.keys(timerIntervals).forEach((taskId) => {
         clearInterval(timerIntervals[taskId]);
     });
     timerIntervals = {};
@@ -519,23 +613,25 @@ function updateTaskTimerDisplay(taskId, seconds) {
 
 // 🔄 تحديث حالة المهمة مع التايمر
 function updateTaskStatus(taskId, newStatus) {
-    const taskElement = document.querySelector(`.kanban-card[data-task-id="${taskId}"]`);
+    const taskElement = document.querySelector(
+        `.kanban-card[data-task-id="${taskId}"]`
+    );
     if (!taskElement) return;
 
-    if (newStatus === 'in_progress') {
+    if (newStatus === "in_progress") {
         // بدء التايمر عند بدء العمل
         taskElement.dataset.startedAt = new Date().getTime();
         startTaskTimer(taskId);
-        taskElement.classList.add('task-in-progress');
+        taskElement.classList.add("task-in-progress");
     } else {
         // إيقاف التايمر عند التوقف/الانتهاء
         stopTaskTimer(taskId);
-        taskElement.classList.remove('task-in-progress');
+        taskElement.classList.remove("task-in-progress");
 
-        if (newStatus === 'completed') {
-            taskElement.classList.add('task-completed');
-        } else if (newStatus === 'paused') {
-            taskElement.classList.add('task-paused');
+        if (newStatus === "completed") {
+            taskElement.classList.add("task-completed");
+        } else if (newStatus === "paused") {
+            taskElement.classList.add("task-paused");
         }
     }
 
@@ -545,6 +641,9 @@ function updateTaskStatus(taskId, newStatus) {
 window.initializeKanbanSystem = initializeKanbanSystem;
 window.applyUserColors = applyUserColors;
 window.loadTasksIntoKanban = loadTasksIntoKanban;
+window.switchToTableView = switchToTableView;
+window.switchToKanbanView = switchToKanbanView;
+window.switchToCalendarView = switchToCalendarView;
 window.currentView = () => currentView;
 window.startTaskTimer = startTaskTimer;
 window.stopTaskTimer = stopTaskTimer;

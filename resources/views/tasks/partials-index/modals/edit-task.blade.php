@@ -23,7 +23,7 @@
                                 <select class="form-control" id="edit_project_id" name="project_id">
                                     <option value="">اختر المشروع (اختياري)</option>
                                     @foreach($projects as $project)
-                                        <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                    <option value="{{ $project->id }}">{{ $project->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -33,12 +33,12 @@
                         <div class="{{ $isGraphicOnlyUser ? 'col-md-12' : 'col-md-6' }}">
                             <div class="form-group">
                                 <label for="edit_service_id">الخدمة</label>
-                                <select class="form-control" id="edit_service_id" name="service_id" required>
+                                <select class="form-control" id="edit_service_id" name="service_id">
                                     @if(!$isGraphicOnlyUser)
-                                        <option value="">اختر الخدمة</option>
+                                    <option value="">اختر الخدمة</option>
                                     @endif
                                     @foreach($services as $service)
-                                        <option value="{{ $service->id }}" data-service-name="{{ $service->name }}">{{ $service->name }}</option>
+                                    <option value="{{ $service->id }}" data-service-name="{{ $service->name }}">{{ $service->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -50,7 +50,7 @@
                                 <select class="form-control" id="edit_role_filter">
                                     <option value="">جميع الأدوار</option>
                                     @foreach($roles as $role)
-                                        <option value="{{ $role->name }}">{{ $role->name }}</option>
+                                    <option value="{{ $role->name }}">{{ $role->name }}</option>
                                     @endforeach
                                 </select>
                                 <small class="text-muted">اختياري: لعرض الموظفين حسب دور معين</small>
@@ -70,14 +70,14 @@
                                 <select class="form-control" id="edit_graphic_task_type_id" name="graphic_task_type_id">
                                     <option value="">اختر نوع المهمة الجرافيكية</option>
                                     @foreach($graphicTaskTypes as $graphicType)
-                                        <option value="{{ $graphicType->id }}"
-                                                data-points="{{ $graphicType->points }}"
-                                                data-min-time="{{ $graphicType->min_minutes }}"
-                                                data-max-time="{{ $graphicType->max_minutes }}"
-                                                data-avg-time="{{ $graphicType->average_minutes }}">
-                                            {{ $graphicType->name }}
-                                            ({{ $graphicType->points }} نقطة - {{ $graphicType->average_time_formatted }})
-                                        </option>
+                                    <option value="{{ $graphicType->id }}"
+                                        data-points="{{ $graphicType->points }}"
+                                        data-min-time="{{ $graphicType->min_minutes }}"
+                                        data-max-time="{{ $graphicType->max_minutes }}"
+                                        data-avg-time="{{ $graphicType->average_minutes }}">
+                                        {{ $graphicType->name }}
+                                        ({{ $graphicType->points }} نقطة - {{ $graphicType->average_time_formatted }})
+                                    </option>
                                     @endforeach
                                 </select>
                                 <div class="mt-2">
@@ -145,8 +145,8 @@
                             </div>
                         </div>
                         @php
-                            $userMaxLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
-                            $canMarkAsAdditional = $userMaxLevel && $userMaxLevel >= 3;
+                        $userMaxLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
+                        $canMarkAsAdditional = $userMaxLevel && $userMaxLevel >= 3;
                         @endphp
                         @if($canMarkAsAdditional)
                         <div class="col-md-6">

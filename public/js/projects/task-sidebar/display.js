@@ -1,62 +1,113 @@
 // Task Display Functions
 
 function displayTaskDetails(task) {
-    const content = document.getElementById('taskSidebarContent');
-    const title = document.getElementById('taskSidebarTitle');
-    const subtitle = document.getElementById('taskSidebarSubtitle');
-    const badge = document.getElementById('taskSidebarBadge');
+    const content = document.getElementById("taskSidebarContent");
+    const title = document.getElementById("taskSidebarTitle");
+    const subtitle = document.getElementById("taskSidebarSubtitle");
+    const badge = document.getElementById("taskSidebarBadge");
 
     // Update header
-    title.textContent = task.name || task.title || 'مهمة بدون عنوان';
-    subtitle.textContent = task.project ? task.project.name : 'مشروع غير معروف';
+    title.textContent = task.name || task.title || "مهمة بدون عنوان";
+    // ✅ عرض كود المشروع مع اسم المشروع
+    subtitle.textContent = task.project
+        ? `${task.project.code ? `[${task.project.code}] ` : ""}${
+              task.project.name
+          }`
+        : "مشروع غير معروف";
+
+    // ✅ إضافة تنبيه المشروع الملغى في السايد بار
+    const cancelledWarning = document.getElementById("cancelledProjectWarning");
+    if (cancelledWarning) {
+        if (task.project && task.project.status === "ملغي") {
+            cancelledWarning.style.display = "block";
+        } else {
+            cancelledWarning.style.display = "none";
+        }
+    }
 
     // Update badge
     const badgeColors = {
-        'template': {bg: '#e8f5e8', color: '#2d7d2d', icon: 'fa-layer-group'},
-        'regular': {bg: '#e8f0ff', color: '#0066cc', icon: 'fa-tasks'}
+        template: { bg: "#e8f5e8", color: "#2d7d2d", icon: "fa-layer-group" },
+        regular: { bg: "#e8f0ff", color: "#0066cc", icon: "fa-tasks" },
     };
     const badgeStyle = badgeColors[task.type] || badgeColors.regular;
     badge.style.background = badgeStyle.bg;
     badge.style.color = badgeStyle.color;
-    badge.innerHTML = `<i class="fas ${badgeStyle.icon} me-1"></i>${task.type === 'template' ? 'مهمة قالب' : 'مهمة عادية'}`;
+    badge.innerHTML = `<i class="fas ${badgeStyle.icon} me-1"></i>${
+        task.type === "template" ? "مهمة قالب" : "مهمة عادية"
+    }`;
 
     // Generate deadline HTML
-    let deadlineHtml = '';
+    let deadlineHtml = "";
     if (task.deadline || task.due_date) {
         const deadline = task.deadline || task.due_date;
         const deadlineDate = new Date(deadline);
         const now = new Date();
-        const isOverdue = deadlineDate < now && task.status !== 'completed';
-        const isDueSoon = deadlineDate > now && (deadlineDate - now) <= 24*60*60*1000 && task.status !== 'completed';
+        const isOverdue = deadlineDate < now && task.status !== "completed";
+        const isDueSoon =
+            deadlineDate > now &&
+            deadlineDate - now <= 24 * 60 * 60 * 1000 &&
+            task.status !== "completed";
 
-        let badgeClass = 'primary';
-        let iconClass = 'calendar-check';
-        let statusText = 'في الموعد';
+        let badgeClass = "primary";
+        let iconClass = "calendar-check";
+        let statusText = "في الموعد";
 
-        if (task.status === 'completed') {
-            badgeClass = 'success';
-            iconClass = 'check-circle';
-            statusText = 'مكتملة';
+        if (task.status === "completed") {
+            badgeClass = "success";
+            iconClass = "check-circle";
+            statusText = "مكتملة";
         } else if (isOverdue) {
-            badgeClass = 'danger';
-            iconClass = 'exclamation-triangle';
-            statusText = 'متأخرة';
+            badgeClass = "danger";
+            iconClass = "exclamation-triangle";
+            statusText = "متأخرة";
         } else if (isDueSoon) {
-            badgeClass = 'warning';
-            iconClass = 'hourglass-half';
-            statusText = 'تنتهي قريباً';
+            badgeClass = "warning";
+            iconClass = "hourglass-half";
+            statusText = "تنتهي قريباً";
         }
 
         deadlineHtml = `
             <div class="mb-4">
                 <label class="form-label fw-semibold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">الموعد النهائي</label>
-                <div class="d-flex align-items-center p-3 rounded" style="background: rgba(${badgeClass === 'success' ? '25, 135, 84' : badgeClass === 'danger' ? '220, 53, 69' : badgeClass === 'warning' ? '255, 193, 7' : '13, 110, 253'}, 0.1); border: 1px solid rgba(${badgeClass === 'success' ? '25, 135, 84' : badgeClass === 'danger' ? '220, 53, 69' : badgeClass === 'warning' ? '255, 193, 7' : '13, 110, 253'}, 0.2);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(${badgeClass === 'success' ? '25, 135, 84' : badgeClass === 'danger' ? '220, 53, 69' : badgeClass === 'warning' ? '255, 193, 7' : '13, 110, 253'}, 0.2);">
+                <div class="d-flex align-items-center p-3 rounded" style="background: rgba(${
+                    badgeClass === "success"
+                        ? "25, 135, 84"
+                        : badgeClass === "danger"
+                        ? "220, 53, 69"
+                        : badgeClass === "warning"
+                        ? "255, 193, 7"
+                        : "13, 110, 253"
+                }, 0.1); border: 1px solid rgba(${
+            badgeClass === "success"
+                ? "25, 135, 84"
+                : badgeClass === "danger"
+                ? "220, 53, 69"
+                : badgeClass === "warning"
+                ? "255, 193, 7"
+                : "13, 110, 253"
+        }, 0.2);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(${
+                        badgeClass === "success"
+                            ? "25, 135, 84"
+                            : badgeClass === "danger"
+                            ? "220, 53, 69"
+                            : badgeClass === "warning"
+                            ? "255, 193, 7"
+                            : "13, 110, 253"
+                    }, 0.2);">
                         <i class="fas fa-${iconClass} text-${badgeClass}" style="font-size: 16px;"></i>
                     </div>
                     <div class="flex-grow-1">
                         <div class="fw-semibold text-dark mb-1" style="font-size: 14px;">
-                            ${deadlineDate.toLocaleDateString('ar-EG', {weekday: 'short', month: 'short', day: 'numeric'})} - ${deadlineDate.toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'})}
+                            ${deadlineDate.toLocaleDateString("ar-EG", {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                            })} - ${deadlineDate.toLocaleTimeString("ar-EG", {
+            hour: "2-digit",
+            minute: "2-digit",
+        })}
                         </div>
                         <div class="d-flex align-items-center">
                             <div class="status-dot me-2" style="width: 8px; height: 8px; border-radius: 50%; background: var(--bs-${badgeClass});"></div>
@@ -70,18 +121,18 @@ function displayTaskDetails(task) {
 
     // Define status colors and texts
     const statusColors = {
-        'new': 'secondary',
-        'in_progress': 'primary',
-        'paused': 'warning',
-        'completed': 'success',
-        'cancelled': 'danger'
+        new: "secondary",
+        in_progress: "primary",
+        paused: "warning",
+        completed: "success",
+        cancelled: "danger",
     };
     const statusTexts = {
-        'new': 'جديدة',
-        'in_progress': 'قيد التنفيذ',
-        'paused': 'متوقفة مؤقتاً',
-        'completed': 'مكتملة',
-        'cancelled': 'ملغية'
+        new: "جديدة",
+        in_progress: "قيد التنفيذ",
+        paused: "متوقفة مؤقتاً",
+        completed: "مكتملة",
+        cancelled: "ملغية",
     };
 
     content.innerHTML = `
@@ -93,22 +144,75 @@ function displayTaskDetails(task) {
                     <label class="form-label fw-semibold text-muted mb-0" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">الحالة</label>
                 </div>
                 <div class="status-dropdown-wrapper">
-                    <div class="d-flex align-items-center p-3 rounded" style="background: rgba(${statusColors[task.status] === 'primary' ? '13, 110, 253' : statusColors[task.status] === 'success' ? '25, 135, 84' : statusColors[task.status] === 'danger' ? '220, 53, 69' : statusColors[task.status] === 'warning' ? '255, 193, 7' : '108, 117, 125'}, 0.1); border: 1px solid rgba(${statusColors[task.status] === 'primary' ? '13, 110, 253' : statusColors[task.status] === 'success' ? '25, 135, 84' : statusColors[task.status] === 'danger' ? '220, 53, 69' : statusColors[task.status] === 'warning' ? '255, 193, 7' : '108, 117, 125'}, 0.2);">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(${statusColors[task.status] === 'primary' ? '13, 110, 253' : statusColors[task.status] === 'success' ? '25, 135, 84' : statusColors[task.status] === 'danger' ? '220, 53, 69' : statusColors[task.status] === 'warning' ? '255, 193, 7' : '108, 117, 125'}, 0.2);">
-                            <i class="fas fa-${task.status === 'in_progress' ? 'play' : task.status === 'completed' ? 'check' : task.status === 'cancelled' ? 'times' : task.status === 'paused' ? 'pause' : 'circle'} text-${statusColors[task.status]}" style="font-size: 16px;"></i>
+                    <div class="d-flex align-items-center p-3 rounded" style="background: rgba(${
+                        statusColors[task.status] === "primary"
+                            ? "13, 110, 253"
+                            : statusColors[task.status] === "success"
+                            ? "25, 135, 84"
+                            : statusColors[task.status] === "danger"
+                            ? "220, 53, 69"
+                            : statusColors[task.status] === "warning"
+                            ? "255, 193, 7"
+                            : "108, 117, 125"
+                    }, 0.1); border: 1px solid rgba(${
+        statusColors[task.status] === "primary"
+            ? "13, 110, 253"
+            : statusColors[task.status] === "success"
+            ? "25, 135, 84"
+            : statusColors[task.status] === "danger"
+            ? "220, 53, 69"
+            : statusColors[task.status] === "warning"
+            ? "255, 193, 7"
+            : "108, 117, 125"
+    }, 0.2);">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(${
+                            statusColors[task.status] === "primary"
+                                ? "13, 110, 253"
+                                : statusColors[task.status] === "success"
+                                ? "25, 135, 84"
+                                : statusColors[task.status] === "danger"
+                                ? "220, 53, 69"
+                                : statusColors[task.status] === "warning"
+                                ? "255, 193, 7"
+                                : "108, 117, 125"
+                        }, 0.2);">
+                            <i class="fas fa-${
+                                task.status === "in_progress"
+                                    ? "play"
+                                    : task.status === "completed"
+                                    ? "check"
+                                    : task.status === "cancelled"
+                                    ? "times"
+                                    : task.status === "paused"
+                                    ? "pause"
+                                    : "circle"
+                            } text-${
+        statusColors[task.status]
+    }" style="font-size: 16px;"></i>
                         </div>
                         <div class="flex-grow-1">
                             <div class="fw-semibold text-dark mb-1" style="font-size: 14px;">
                                 ${statusTexts[task.status] || task.status}
                             </div>
-                            ${task.status === 'new' ? `
+                            ${
+                                task.status === "new"
+                                    ? `
                                 <div class="d-flex align-items-center">
                                     <div class="status-dot me-2" style="width: 8px; height: 8px; border-radius: 50%; background: #6c757d;"></div>
                                     <small class="text-secondary fw-semibold" style="font-size: 12px;">
-                                        ${canUserStartTask(task, window.currentUserId) ? 'جاهزة للبدء - اضغط بدء لتشغيلها' : 'مخصصة لمستخدم آخر'}
+                                        ${
+                                            canUserStartTask(
+                                                task,
+                                                window.currentUserId
+                                            )
+                                                ? "جاهزة للبدء - اضغط بدء لتشغيلها"
+                                                : "مخصصة لمستخدم آخر"
+                                        }
                                     </small>
                                 </div>
-                            ` : ''}
+                            `
+                                    : ""
+                            }
                         </div>
                     </div>
                 </div>
@@ -117,38 +221,56 @@ function displayTaskDetails(task) {
             ${deadlineHtml}
 
             <!-- Description Section -->
-            ${task.description ? `
+            ${
+                task.description
+                    ? `
                 <div class="mb-4">
                     <label class="form-label fw-semibold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">الوصف</label>
                     <div class="p-3 rounded" style="background: #f8f9fa; border: 1px solid #e9ecef; color: #495057; line-height: 1.5;">
                         ${task.description}
                     </div>
                 </div>
-            ` : ''}
+            `
+                    : ""
+            }
 
             <!-- Time Tracking Section -->
             <div class="mb-4">
                 <label class="form-label fw-semibold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">تتبع الوقت</label>
                 <div class="row g-2">
-                    ${task.estimated_hours !== undefined ? `
+                    ${
+                        task.estimated_hours !== undefined
+                            ? `
                         <div class="col-6">
                             <div class="p-3 rounded text-center" style="background: #f8f9fa; border: 1px solid #e9ecef;">
                                 <div class="fw-bold text-primary mb-1" style="font-size: 18px; font-family: monospace;">
-                                    ${task.estimated_hours || 0}:${(task.estimated_minutes || 0).toString().padStart(2, '0')}
+                                    ${task.estimated_hours || 0}:${(
+                                  task.estimated_minutes || 0
+                              )
+                                  .toString()
+                                  .padStart(2, "0")}
                                 </div>
                                 <small class="text-muted" style="font-size: 11px;">الوقت المقدر</small>
                             </div>
                         </div>
-                    ` : ''}
+                    `
+                            : ""
+                    }
                     <div class="col-6">
                         <div class="p-3 rounded text-center" style="background: #e8f5e8; border: 1px solid #c3e6c3;">
                             <div class="fw-bold text-success mb-1" style="font-size: 18px; font-family: monospace;">
-                                ${Math.floor((task.actual_minutes || 0) / 60)}:${((task.actual_minutes || 0) % 60).toString().padStart(2, '0')}
+                                ${Math.floor(
+                                    (task.actual_minutes || 0) / 60
+                                )}:${((task.actual_minutes || 0) % 60)
+        .toString()
+        .padStart(2, "0")}
                             </div>
                             <small class="text-muted" style="font-size: 11px;">الوقت الفعلي</small>
                         </div>
                     </div>
-                    ${task.status === 'in_progress' ? `
+                    ${
+                        task.status === "in_progress"
+                            ? `
                         <div class="col-12 mt-3">
                             <div class="p-3 rounded text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 1px solid #5a67d8;">
                                 <div class="d-flex align-items-center justify-content-center mb-2">
@@ -166,7 +288,9 @@ function displayTaskDetails(task) {
                                 </div>
                             </div>
                         </div>
-                    ` : task.status === 'new' ? `
+                    `
+                            : task.status === "new"
+                            ? `
                         <div class="col-12 mt-3">
                             <div class="p-3 rounded text-center" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); border: 1px solid #6c757d;">
                                 <div class="d-flex align-items-center justify-content-center mb-2">
@@ -182,7 +306,9 @@ function displayTaskDetails(task) {
                                 </div>
                             </div>
                         </div>
-                    ` : task.status === 'paused' ? `
+                    `
+                            : task.status === "paused"
+                            ? `
                         <div class="col-12 mt-3">
                             <div class="p-3 rounded text-center" style="background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%); border: 1px solid #fd7e14;">
                                 <div class="d-flex align-items-center justify-content-center mb-2">
@@ -190,7 +316,11 @@ function displayTaskDetails(task) {
                                     <small class="text-white" style="font-size: 11px; font-weight: 500;">متوقف مؤقتاً</small>
                                 </div>
                                 <div class="fw-bold text-white mb-1" style="font-size: 18px; font-family: monospace;">
-                                    ${Math.floor((task.actual_minutes || 0) / 60)}:${((task.actual_minutes || 0) % 60).toString().padStart(2, '0')}:00
+                                    ${Math.floor(
+                                        (task.actual_minutes || 0) / 60
+                                    )}:${((task.actual_minutes || 0) % 60)
+                                  .toString()
+                                  .padStart(2, "0")}:00
                                 </div>
                                 <div class="d-flex align-items-center justify-content-center">
                                     <i class="fas fa-play text-white me-1" style="font-size: 8px; opacity: 0.9;"></i>
@@ -198,42 +328,62 @@ function displayTaskDetails(task) {
                                 </div>
                             </div>
                         </div>
-                    ` : ''}
+                    `
+                            : ""
+                    }
                 </div>
             </div>
 
             <!-- Assignee Section -->
-            ${task.user ? `
+            ${
+                task.user
+                    ? `
                 <div class="mb-4">
                     <label class="form-label fw-semibold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">المُعين للمهمة</label>
                     <div class="d-flex align-items-center p-3 rounded" style="background: #f8f9fa; border: 1px solid #e9ecef;">
                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <span class="text-white fw-bold" style="font-size: 14px;">${task.user.name.charAt(0).toUpperCase()}</span>
+                            <span class="text-white fw-bold" style="font-size: 14px;">${task.user.name
+                                .charAt(0)
+                                .toUpperCase()}</span>
                         </div>
                         <div>
-                            <div class="fw-semibold text-dark mb-1" style="font-size: 14px;">${task.user.name}</div>
-                            <small class="text-muted" style="font-size: 12px;">${task.user.email}</small>
+                            <div class="fw-semibold text-dark mb-1" style="font-size: 14px;">${
+                                task.user.name
+                            }</div>
+                            <small class="text-muted" style="font-size: 12px;">${
+                                task.user.email
+                            }</small>
                         </div>
                     </div>
                 </div>
-            ` : ''}
+            `
+                    : ""
+            }
 
             <!-- Project & Service Info -->
             <div class="mb-4">
                 <label class="form-label fw-semibold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">معلومات إضافية</label>
                 <div class="p-3 rounded" style="background: #f8f9fa; border: 1px solid #e9ecef;">
-                    ${task.project ? `
+                    ${
+                        task.project
+                            ? `
                         <div class="d-flex align-items-center mb-2">
                             <i class="fas fa-folder text-primary me-2" style="font-size: 14px;"></i>
                             <span class="fw-semibold text-dark" style="font-size: 13px;">${task.project.name}</span>
                         </div>
-                    ` : ''}
-                    ${task.service ? `
+                    `
+                            : ""
+                    }
+                    ${
+                        task.service
+                            ? `
                         <div class="d-flex align-items-center">
                             <i class="fas fa-cogs text-info me-2" style="font-size: 14px;"></i>
                             <span class="text-muted" style="font-size: 13px;">${task.service.name}</span>
                         </div>
-                    ` : ''}
+                    `
+                            : ""
+                    }
                 </div>
             </div>
 
@@ -243,11 +393,18 @@ function displayTaskDetails(task) {
                     <label class="form-label fw-semibold text-muted mb-0" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
                         <i class="fas fa-list-check me-1"></i>بنود المهمة
                     </label>
-                    ${(task.created_by && task.created_by == window.currentUserId) || (task.created_by_user && task.created_by_user.id == window.currentUserId) ? `
+                    ${
+                        (task.created_by &&
+                            task.created_by == window.currentUserId) ||
+                        (task.created_by_user &&
+                            task.created_by_user.id == window.currentUserId)
+                            ? `
                         <button class="btn btn-sm btn-outline-primary" onclick="showAddItemForm('${task.type}', '${task.id}')" style="font-size: 11px; padding: 4px 8px;">
                             <i class="fas fa-plus me-1"></i>إضافة بند
                         </button>
-                    ` : ''}
+                    `
+                            : ""
+                    }
                 </div>
 
                 <div id="taskItemsContainer" class="task-items-container">
@@ -283,13 +440,20 @@ function displayTaskDetails(task) {
             </div>
 
             <!-- Notes Section - Only show for assigned users -->
-            ${canUserStartTask(task, window.currentUserId) || (task.user && task.user.id == window.currentUserId) ? `
+            ${
+                canUserStartTask(task, window.currentUserId) ||
+                (task.user && task.user.id == window.currentUserId)
+                    ? `
                 <div class="notes-section mb-4">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <label class="form-label fw-semibold text-muted mb-0" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
                             <i class="fas fa-sticky-note me-1"></i>ملاحظاتي
                         </label>
-                        <button class="btn btn-sm btn-outline-primary" onclick="showAddNoteForm('${task.type}', '${task.pivot_id || task.id}')" style="font-size: 11px; padding: 4px 8px;">
+                        <button class="btn btn-sm btn-outline-primary" onclick="showAddNoteForm('${
+                            task.type
+                        }', '${
+                          task.pivot_id || task.id
+                      }')" style="font-size: 11px; padding: 4px 8px;">
                             <i class="fas fa-plus me-1"></i>إضافة ملاحظة
                         </button>
                     </div>
@@ -321,7 +485,9 @@ function displayTaskDetails(task) {
                         </div>
                     </div>
                 </div>
-            ` : ''}
+            `
+                    : ""
+            }
 
             <!-- Task Revisions Section -->
             <div class="revisions-section mb-4">
@@ -329,11 +495,19 @@ function displayTaskDetails(task) {
                     <label class="form-label fw-semibold text-muted mb-0" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
                         <i class="fas fa-history me-1"></i>تعديلات المهمة
                     </label>
-                    ${window.location.pathname.includes('/tasks') ? `
-                        <button class="btn btn-sm btn-outline-success" onclick="showAddRevisionForm('${task.type}', '${task.pivot_id || task.id}', '${task.task_user_id || ''}')" style="font-size: 11px; padding: 4px 8px;">
+                    ${
+                        window.location.pathname.includes("/tasks")
+                            ? `
+                        <button class="btn btn-sm btn-outline-success" onclick="showAddRevisionForm('${
+                            task.type
+                        }', '${task.pivot_id || task.id}', '${
+                                  task.task_user_id || ""
+                              }')" style="font-size: 11px; padding: 4px 8px;">
                             <i class="fas fa-plus me-1"></i>إضافة تعديل
                         </button>
-                    ` : '<!-- زر إضافة التعديل متاح فقط في صفحة المهام -->'}
+                    `
+                            : "<!-- زر إضافة التعديل متاح فقط في صفحة المهام -->"
+                    }
                 </div>
 
                 <div id="revisionsContainer" class="revisions-container">
@@ -442,7 +616,9 @@ function displayTaskDetails(task) {
             </div>
 
             <!-- Attachments Section for Standalone Tasks -->
-            ${!task.project ? `
+            ${
+                !task.project
+                    ? `
                 <div class="mb-4" id="attachmentsSection">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <label class="form-label fw-semibold text-muted mb-0" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -453,7 +629,9 @@ function displayTaskDetails(task) {
                         </span>
                     </div>
 
-                    ${!task.is_unassigned ? `
+                    ${
+                        !task.is_unassigned
+                            ? `
                         <!-- Upload Area -->
                         <div class="mb-3 p-3 rounded border-2 border-dashed text-center"
                              id="attachmentDropZone"
@@ -468,7 +646,9 @@ function displayTaskDetails(task) {
                         <div id="uploadProgressArea" style="display: none;">
                             <div class="upload-queue"></div>
                         </div>
-                    ` : ''}
+                    `
+                            : ""
+                    }
 
                     <!-- Existing Attachments -->
                     <div id="attachmentsList">
@@ -480,36 +660,70 @@ function displayTaskDetails(task) {
                         </div>
                     </div>
                 </div>
-            ` : ''}
+            `
+                    : ""
+            }
 
             <!-- Action Buttons -->
             <div class="d-flex gap-2 pt-3" style="border-top: 1px solid #e9ecef;">
-                ${task.is_unassigned ? `
+                ${
+                    task.is_unassigned
+                        ? `
                     <div class="alert alert-warning py-2 px-3 mb-0" style="font-size: 12px; border-radius: 6px;">
                         <i class="fas fa-info-circle me-1"></i>
                         هذه المهمة غير مُعيَّنة لأي مستخدم ولا يمكن العمل عليها
                     </div>
-                ` : task.status === 'new' && canUserStartTask(task, window.currentUserId) ? `
-                    <button class="btn btn-primary px-4 py-2" onclick="startTask(event, '${task.type}', '${task.task_user_id || task.id}')" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
+                `
+                        : task.status === "new" &&
+                          canUserStartTask(task, window.currentUserId)
+                        ? `
+                    <button class="btn btn-primary px-4 py-2" onclick="startTask(event, '${
+                        task.type
+                    }', '${
+                              task.task_user_id || task.id
+                          }')" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
                         <i class="fas fa-play me-1"></i>
                         بدء المهمة
                     </button>
-                ` : task.status === 'new' && !canUserStartTask(task, window.currentUserId) ? `
+                `
+                        : task.status === "new" &&
+                          !canUserStartTask(task, window.currentUserId)
+                        ? `
                     <div class="alert alert-info py-2 px-3 mb-0" style="font-size: 12px; border-radius: 6px;">
                         <i class="fas fa-info-circle me-1"></i>
-                        ${task.user ? `هذه المهمة مخصصة لـ ${task.user.name}` : 'هذه المهمة غير مخصصة لك'}
+                        ${
+                            task.user
+                                ? `هذه المهمة مخصصة لـ ${task.user.name}`
+                                : "هذه المهمة غير مخصصة لك"
+                        }
                     </div>
-                ` : task.status === 'paused' && canUserStartTask(task, window.currentUserId) ? `
-                    <button class="btn btn-warning px-4 py-2" onclick="resumeTask(event, '${task.type}', '${task.task_user_id || task.id}')" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
+                `
+                        : task.status === "paused" &&
+                          canUserStartTask(task, window.currentUserId)
+                        ? `
+                    <button class="btn btn-warning px-4 py-2" onclick="resumeTask(event, '${
+                        task.type
+                    }', '${
+                              task.task_user_id || task.id
+                          }')" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
                         <i class="fas fa-play me-1"></i>
                         استئناف المهمة
                     </button>
-                ` : task.status === 'paused' && !canUserStartTask(task, window.currentUserId) ? `
+                `
+                        : task.status === "paused" &&
+                          !canUserStartTask(task, window.currentUserId)
+                        ? `
                     <div class="alert alert-warning py-2 px-3 mb-0" style="font-size: 12px; border-radius: 6px;">
                         <i class="fas fa-pause-circle me-1"></i>
-                        ${task.user ? `هذه المهمة متوقفة ومخصصة لـ ${task.user.name}` : 'هذه المهمة متوقفة وغير مخصصة لك'}
+                        ${
+                            task.user
+                                ? `هذه المهمة متوقفة ومخصصة لـ ${task.user.name}`
+                                : "هذه المهمة متوقفة وغير مخصصة لك"
+                        }
                     </div>
-                ` : ''}
+                `
+                        : ""
+                }
 
                 <button class="btn btn-outline-secondary px-4 py-2" onclick="closeTaskSidebar()" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
                     إغلاق
@@ -519,43 +733,46 @@ function displayTaskDetails(task) {
     `;
 
     // Start sidebar timer if task is in progress
-    if (task.status === 'in_progress') {
+    if (task.status === "in_progress") {
         startSidebarTimer(task);
     }
 
     // Load task items (only if items container exists)
     setTimeout(() => {
-        const itemsContainer = document.getElementById('taskItemsContainer');
+        const itemsContainer = document.getElementById("taskItemsContainer");
         if (itemsContainer) {
             // تحديد نوع المستخدم
-            const isTaskCreator = (task.created_by && task.created_by == window.currentUserId) ||
-                                 (task.created_by_user && task.created_by_user.id == window.currentUserId);
-            const isTaskAssignee = (task.user && task.user.id == window.currentUserId) ||
-                                  canUserStartTask(task, window.currentUserId);
+            const isTaskCreator =
+                (task.created_by && task.created_by == window.currentUserId) ||
+                (task.created_by_user &&
+                    task.created_by_user.id == window.currentUserId);
+            const isTaskAssignee =
+                (task.user && task.user.id == window.currentUserId) ||
+                canUserStartTask(task, window.currentUserId);
 
             let taskId, userType;
 
             if (isTaskCreator) {
                 // منشئ المهمة: يحمل البنود الأساسية من المهمة
                 taskId = task.id;
-                userType = 'creator';
+                userType = "creator";
             } else if (isTaskAssignee) {
                 // صاحب المهمة: يحمل البنود مع حالاتها
                 taskId = task.pivot_id || task.task_user_id || task.id;
-                userType = 'assignee';
+                userType = "assignee";
             } else {
                 // مستخدم عادي: يحمل البنود الأساسية فقط
                 taskId = task.id;
-                userType = 'viewer';
+                userType = "viewer";
             }
 
-            console.log('🔍 Loading task items for:', {
+            console.log("🔍 Loading task items for:", {
                 taskType: task.type,
                 taskId,
                 userType,
                 isTaskCreator,
                 isTaskAssignee,
-                taskData: task
+                taskData: task,
             });
             loadTaskItems(task.type, taskId, userType);
         }
@@ -563,7 +780,7 @@ function displayTaskDetails(task) {
 
     // Load task notes (only if notes container exists)
     setTimeout(() => {
-        const notesContainer = document.getElementById('notesContainer');
+        const notesContainer = document.getElementById("notesContainer");
         if (notesContainer) {
             loadTaskNotes(task.type, task.pivot_id || task.id);
         }
@@ -571,9 +788,14 @@ function displayTaskDetails(task) {
 
     // Load task revisions (only if revisions container exists)
     setTimeout(() => {
-        const revisionsContainer = document.getElementById('revisionsContainer');
+        const revisionsContainer =
+            document.getElementById("revisionsContainer");
         if (revisionsContainer) {
-            loadTaskRevisions(task.type, task.pivot_id || task.id, task.task_user_id);
+            loadTaskRevisions(
+                task.type,
+                task.pivot_id || task.id,
+                task.task_user_id
+            );
         }
     }, 100); // تأخير صغير لضمان إنشاء العناصر
 
@@ -591,7 +813,7 @@ function displayTaskDetails(task) {
  * Utility functions
  */
 function escapeHtml(text) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
 }
@@ -602,7 +824,7 @@ function formatDateTime(dateString) {
     const diffInSeconds = Math.floor((now - date) / 1000);
 
     if (diffInSeconds < 60) {
-        return 'الآن';
+        return "الآن";
     } else if (diffInSeconds < 3600) {
         const minutes = Math.floor(diffInSeconds / 60);
         return `منذ ${minutes} دقيقة`;
@@ -610,12 +832,12 @@ function formatDateTime(dateString) {
         const hours = Math.floor(diffInSeconds / 3600);
         return `منذ ${hours} ساعة`;
     } else {
-        return date.toLocaleDateString('ar-EG', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+        return date.toLocaleDateString("ar-EG", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
         });
     }
 }
