@@ -210,7 +210,11 @@ class ProjectSlackService extends BaseSlackService
         $projectUrl = url("/projects/{$delivery->project_id}");
         $deliveryUrl = route('deliveries.index');
 
-        $serviceName = $delivery->service ? $delivery->service->name : 'غير محدد';
+        // ✅ التأكد من عدم وجود قيم null أو فارغة
+        $serviceName = ($delivery->service && $delivery->service->name) ? $delivery->service->name : 'غير محدد';
+        $projectName = ($delivery->project && $delivery->project->name) ? $delivery->project->name : 'غير محدد';
+        $userName = ($delivery->user && $delivery->user->name) ? $delivery->user->name : 'غير محدد';
+
         $deliveredAt = $delivery->delivered_at ?
             $delivery->delivered_at->format('d/m/Y H:i') :
             now()->format('d/m/Y H:i');
@@ -221,25 +225,28 @@ class ProjectSlackService extends BaseSlackService
             $this->buildActionButton('🔗 عرض المشروع', $projectUrl)
         ];
 
+        // ✅ تقسيم الـ fields لتجنب مشاكل Slack API
+        // استخدام section واحدة مع 2 fields (Slack يفضل هذا)
+        $blocks = [
+            $this->buildHeader("📋 تسليمة جديدة بانتظار الاعتماد {$typeArabic}"),
+            $this->buildInfoSection([
+                "*المشروع:*\n{$projectName}",
+                "*الموظف:*\n{$userName}"
+            ]),
+            $this->buildInfoSection([
+                "*الخدمة:*\n{$serviceName}",
+                "*تاريخ التسليم:*\n{$deliveredAt}"
+            ]),
+            $this->buildTextSection("*نوع الاعتماد المطلوب:* {$typeArabic}\n*الحالة:* في انتظار الاعتماد"),
+            $this->buildTextSection("⏰ *يرجى مراجعة التسليمة واتخاذ الإجراء المناسب في أقرب وقت*"),
+            $this->buildTextSection("📝 *ملاحظة:* يمكنك مراجعة تفاصيل التسليمة والموافقة عليها أو طلب تعديلات"),
+            $this->buildActionsSection($buttons),
+            $this->buildContextSection()
+        ];
+
         return [
             'text' => "تسليمة جديدة بانتظار اعتمادك {$typeArabic}",
-            'blocks' => [
-                $this->buildHeader("📋 تسليمة جديدة بانتظار الاعتماد {$typeArabic}"),
-                $this->buildInfoSection([
-                    "*المشروع:*\n{$delivery->project->name}",
-                    "*الموظف:*\n{$delivery->user->name}",
-                    "*الخدمة:*\n{$serviceName}"
-                ]),
-                $this->buildInfoSection([
-                    "*تاريخ التسليم:*\n{$deliveredAt}",
-                    "*نوع الاعتماد المطلوب:*\n{$typeArabic}",
-                    "*الحالة:*\nفي انتظار الاعتماد"
-                ]),
-                $this->buildTextSection("⏰ *يرجى مراجعة التسليمة واتخاذ الإجراء المناسب في أقرب وقت*"),
-                $this->buildTextSection("📝 *ملاحظة:* يمكنك مراجعة تفاصيل التسليمة والموافقة عليها أو طلب تعديلات"),
-                $this->buildActionsSection($buttons),
-                $this->buildContextSection()
-            ]
+            'blocks' => $blocks
         ];
     }
 
