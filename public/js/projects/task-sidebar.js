@@ -41,7 +41,7 @@ async function loadTaskSidebarModules() {
 
         // Load other modules in parallel (they're not critical for initial load)
         const modulePromises = [
-            loadScript('/js/projects/task-sidebar/display.js').then(() => {
+            loadScript('/js/projects/task-sidebar/display.js?v=' + Date.now()).then(() => {
                 console.log('✅ Display module loaded');
                 if (typeof displayTaskDetails !== 'undefined') {
                     window.displayTaskDetails = displayTaskDetails;

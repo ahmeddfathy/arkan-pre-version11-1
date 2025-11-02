@@ -11,7 +11,7 @@
 body {
     background-color: #f8f9fa;
     min-height: 100vh;
-    font-family: 'Cairo', sans-serif;
+    font-family: "Cairo", sans-serif;
     overflow-y: auto;
 }
 
@@ -126,7 +126,7 @@ body {
     padding: 2rem 1.5rem;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid #e5e7eb;
     transition: all 0.3s ease;
     cursor: default;
@@ -136,14 +136,30 @@ body {
     opacity: 0;
 }
 
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
-.stat-card:nth-child(5) { animation-delay: 0.5s; }
-.stat-card:nth-child(6) { animation-delay: 0.6s; }
-.stat-card:nth-child(7) { animation-delay: 0.7s; }
-.stat-card:nth-child(8) { animation-delay: 0.8s; }
+.stat-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+.stat-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.stat-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+.stat-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+.stat-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+.stat-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
+.stat-card:nth-child(7) {
+    animation-delay: 0.7s;
+}
+.stat-card:nth-child(8) {
+    animation-delay: 0.8s;
+}
 
 @keyframes fadeInUp {
     from {
@@ -157,7 +173,7 @@ body {
 }
 
 .stat-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -168,7 +184,6 @@ body {
     transition: opacity 0.3s ease;
 }
 
-
 .stat-number {
     font-size: 2.5rem;
     font-weight: 700;
@@ -176,7 +191,6 @@ body {
     line-height: 1;
     transition: transform 0.3s ease;
 }
-
 
 .stat-label {
     color: #6b7280;
@@ -268,7 +282,7 @@ body {
 .meetings-table-container {
     background: white;
     border-radius: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     margin: 0 0 2rem 0;
     border: 1px solid #e5e7eb;
@@ -483,7 +497,7 @@ body {
 .form-container {
     background: white;
     border-radius: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     margin: 0 2rem 2rem 2rem;
     border: 1px solid #e5e7eb;
@@ -591,7 +605,7 @@ body {
 .detail-container {
     background: white;
     border-radius: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     margin: 0 2rem 2rem 2rem;
     border: 1px solid #e5e7eb;
@@ -709,7 +723,7 @@ body {
     border-radius: 10px;
     padding: 1rem;
     border-right: 4px solid #667eea;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .note-header {
@@ -914,4 +928,3 @@ body {
         transform: translateY(0);
     }
 }
-

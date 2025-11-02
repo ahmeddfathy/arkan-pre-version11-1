@@ -8,11 +8,13 @@ use App\Models\Season;
 use App\Models\User;
 use App\Models\DepartmentRole;
 use App\Services\AdditionalTasks\AdditionalTaskFilterService;
+use App\Services\AdditionalTasks\CreateRegularTaskFromAdditionalService;
 use App\Services\Notifications\AdditionalTaskNotificationService;
 use App\Services\TaskController\TaskHierarchyService;
 use App\Services\Auth\RoleCheckService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class AdditionalTaskController extends Controller
@@ -20,16 +22,18 @@ class AdditionalTaskController extends Controller
     protected $filterService;
     protected $roleCheckService;
     protected $notificationService;
+    protected $createRegularTaskService;
 
     public function __construct(
         AdditionalTaskFilterService $filterService,
         RoleCheckService $roleCheckService,
-        AdditionalTaskNotificationService $notificationService
-    )
-    {
+        AdditionalTaskNotificationService $notificationService,
+        CreateRegularTaskFromAdditionalService $createRegularTaskService
+    ) {
         $this->filterService = $filterService;
         $this->roleCheckService = $roleCheckService;
         $this->notificationService = $notificationService;
+        $this->createRegularTaskService = $createRegularTaskService;
     }
     /**
      * عرض قائمة المهام الإضافية
@@ -56,14 +60,14 @@ class AdditionalTaskController extends Controller
 
         if (!$createCheck['can_create']) {
             return redirect()->route('additional-tasks.user-tasks')
-                           ->with('info', 'تم توجيهك لصفحة المهام الإضافية المتاحة لك');
+                ->with('info', 'تم توجيهك لصفحة المهام الإضافية المتاحة لك');
         }
 
         // التحقق من صحة ربط الأدوار - فقط للمستخدمين الذين يحتاجون إنشاء مهام
         $errorMessage = $this->filterService->getDepartmentRoleErrorMessage($user);
         if ($errorMessage) {
             return redirect()->route('dashboard')
-                           ->with('error', $errorMessage);
+                ->with('error', $errorMessage);
         }
 
         $tasksQuery = $this->filterService->getTasksForIndex();
@@ -99,7 +103,7 @@ class AdditionalTaskController extends Controller
         $createCheck = $this->filterService->canCreateTask();
         if (!$createCheck['can_create']) {
             return redirect()->route('additional-tasks.index')
-                           ->with('error', $createCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لإنشاء مهام جديدة');
+                ->with('error', $createCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لإنشاء مهام جديدة');
         }
 
         $seasons = Season::orderBy('created_at', 'desc')->get();
@@ -117,7 +121,7 @@ class AdditionalTaskController extends Controller
         $createCheck = $this->filterService->canCreateTask();
         if (!$createCheck['can_create']) {
             return redirect()->route('additional-tasks.index')
-                           ->with('error', $createCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لإنشاء مهام جديدة');
+                ->with('error', $createCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لإنشاء مهام جديدة');
         }
 
         // التحقق من إعداد المهمة المرنة
@@ -139,14 +143,14 @@ class AdditionalTaskController extends Controller
         // التحقق من صحة نوع الهدف حسب الصلاحيات
         if ($request->target_type === 'all' && !$createCheck['can_target_all']) {
             return redirect()->back()
-                           ->withInput()
-                           ->with('error', 'لا تملك الصلاحيات لإنشاء مهام عامة');
+                ->withInput()
+                ->with('error', 'لا تملك الصلاحيات لإنشاء مهام عامة');
         }
 
         if ($request->target_type === 'department' && !in_array($request->target_department, $createCheck['available_departments'])) {
             return redirect()->back()
-                           ->withInput()
-                           ->with('error', 'لا تملك الصلاحيات لإنشاء مهام لهذا القسم');
+                ->withInput()
+                ->with('error', 'لا تملك الصلاحيات لإنشاء مهام لهذا القسم');
         }
 
         // إضافة قاعدة المدة إذا لم تكن المهمة مرنة
@@ -198,7 +202,7 @@ class AdditionalTaskController extends Controller
         }
 
         return redirect()->route('additional-tasks.index')
-                        ->with('success', $message);
+            ->with('success', $message);
     }
 
     /**
@@ -227,10 +231,10 @@ class AdditionalTaskController extends Controller
         $stats = $additionalTask->getCompletionStats();
 
         $taskUsers = $additionalTask->taskUsers()
-                                   ->with('user')
-                                   ->orderBy('status')
-                                   ->orderBy('applied_at', 'desc')
-                                   ->paginate(20);
+            ->with('user')
+            ->orderBy('status')
+            ->orderBy('applied_at', 'desc')
+            ->paginate(20);
 
         return view('additional-tasks.show', compact('additionalTask', 'stats', 'taskUsers'));
     }
@@ -244,7 +248,7 @@ class AdditionalTaskController extends Controller
         $editCheck = $this->filterService->canEditTask($additionalTask);
         if (!$editCheck['can_edit']) {
             return redirect()->route('additional-tasks.index')
-                           ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتعديل هذه المهمة');
+                ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتعديل هذه المهمة');
         }
 
         $seasons = Season::orderBy('created_at', 'desc')->get();
@@ -263,7 +267,7 @@ class AdditionalTaskController extends Controller
         $editCheck = $this->filterService->canEditTask($additionalTask);
         if (!$editCheck['can_edit']) {
             return redirect()->route('additional-tasks.index')
-                           ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتعديل هذه المهمة');
+                ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتعديل هذه المهمة');
         }
 
         $createCheck = $this->filterService->canCreateTask();
@@ -284,14 +288,14 @@ class AdditionalTaskController extends Controller
         // التحقق من صحة نوع الهدف حسب الصلاحيات
         if ($request->target_type === 'all' && !$createCheck['can_target_all']) {
             return redirect()->back()
-                           ->withInput()
-                           ->with('error', 'لا تملك الصلاحيات لجعل المهمة عامة');
+                ->withInput()
+                ->with('error', 'لا تملك الصلاحيات لجعل المهمة عامة');
         }
 
         if ($request->target_type === 'department' && !in_array($request->target_department, $createCheck['available_departments'])) {
             return redirect()->back()
-                           ->withInput()
-                           ->with('error', 'لا تملك الصلاحيات لتخصيص المهمة لهذا القسم');
+                ->withInput()
+                ->with('error', 'لا تملك الصلاحيات لتخصيص المهمة لهذا القسم');
         }
 
         $additionalTask->update([
@@ -314,7 +318,7 @@ class AdditionalTaskController extends Controller
         }
 
         return redirect()->route('additional-tasks.show', $additionalTask)
-                        ->with('success', 'تم تحديث المهمة بنجاح');
+            ->with('success', 'تم تحديث المهمة بنجاح');
     }
 
     /**
@@ -326,14 +330,14 @@ class AdditionalTaskController extends Controller
         $editCheck = $this->filterService->canEditTask($additionalTask);
         if (!$editCheck['can_edit']) {
             return redirect()->route('additional-tasks.index')
-                           ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لحذف هذه المهمة');
+                ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لحذف هذه المهمة');
         }
 
         $title = $additionalTask->title;
         $additionalTask->delete();
 
         return redirect()->route('additional-tasks.index')
-                        ->with('success', "تم حذف المهمة '{$title}' بنجاح");
+            ->with('success', "تم حذف المهمة '{$title}' بنجاح");
     }
 
     /**
@@ -345,7 +349,7 @@ class AdditionalTaskController extends Controller
         $editCheck = $this->filterService->canEditTask($additionalTask);
         if (!$editCheck['can_edit']) {
             return redirect()->back()
-                           ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتمديد هذه المهمة');
+                ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتمديد هذه المهمة');
         }
 
         $request->validate([
@@ -355,17 +359,17 @@ class AdditionalTaskController extends Controller
 
         if (!$additionalTask->canBeExtended()) {
             return redirect()->back()
-                           ->with('error', 'لا يمكن تمديد هذه المهمة');
+                ->with('error', 'لا يمكن تمديد هذه المهمة');
         }
 
         $success = $additionalTask->extendTime((int)$request->additional_hours, $request->reason);
 
         if ($success) {
             return redirect()->back()
-                           ->with('success', "تم تمديد المهمة بـ {$request->additional_hours} ساعة إضافية");
+                ->with('success', "تم تمديد المهمة بـ {$request->additional_hours} ساعة إضافية");
         } else {
             return redirect()->back()
-                           ->with('error', 'فشل في تمديد المهمة');
+                ->with('error', 'فشل في تمديد المهمة');
         }
     }
 
@@ -378,7 +382,7 @@ class AdditionalTaskController extends Controller
         $editCheck = $this->filterService->canEditTask($additionalTask);
         if (!$editCheck['can_edit']) {
             return redirect()->back()
-                           ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتغيير حالة هذه المهمة');
+                ->with('error', $editCheck['message'] ?? 'لا تملك الصلاحيات اللازمة لتغيير حالة هذه المهمة');
         }
 
         $newStatus = $additionalTask->status === 'active' ? 'cancelled' : 'active';
@@ -389,7 +393,7 @@ class AdditionalTaskController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
-        /**
+    /**
      * عرض المهام للمستخدم
      */
     public function userTasks()
@@ -414,14 +418,14 @@ class AdditionalTaskController extends Controller
         $accessCheck = $this->filterService->checkMinimumLevel();
         if (!$accessCheck['has_access']) {
             return redirect()->route('dashboard')
-                           ->with('error', $accessCheck['message']);
+                ->with('error', $accessCheck['message']);
         }
 
         // التحقق من صحة ربط الأدوار - فقط للمستخدمين الذين يحتاجون صلاحيات خاصة
         $errorMessage = $this->filterService->getDepartmentRoleErrorMessage($user);
         if ($errorMessage) {
             return redirect()->route('dashboard')
-                           ->with('error', $errorMessage);
+                ->with('error', $errorMessage);
         }
 
         // المهام المتاحة (غير مُخصصة بعد) - باستخدام نظام الصلاحيات
@@ -429,21 +433,21 @@ class AdditionalTaskController extends Controller
 
         // المهام المقبولة/المُخصصة
         $acceptedTasks = AdditionalTaskUser::where('user_id', $user->id)
-                                        ->where('status', 'assigned')
-                                        ->with('additionalTask')
-                                        ->get();
+            ->where('status', 'assigned')
+            ->with('additionalTask')
+            ->get();
 
         // المهام في انتظار الموافقة
         $pendingTasks = AdditionalTaskUser::where('user_id', $user->id)
-                                         ->where('status', 'applied')
-                                         ->with('additionalTask')
-                                         ->get();
+            ->where('status', 'applied')
+            ->with('additionalTask')
+            ->get();
 
         // المهام المرفوضة
         $rejectedTasks = AdditionalTaskUser::where('user_id', $user->id)
-                                          ->where('status', 'rejected')
-                                          ->with('additionalTask')
-                                          ->get();
+            ->where('status', 'rejected')
+            ->with('additionalTask')
+            ->get();
 
         return view('additional-tasks.user-tasks', compact('availableTasks', 'acceptedTasks', 'pendingTasks', 'rejectedTasks'));
     }
@@ -458,13 +462,13 @@ class AdditionalTaskController extends Controller
         // التحقق من صلاحية المهمة
         if ($additionalTask->status !== 'active' || $additionalTask->isExpired()) {
             return redirect()->back()
-                           ->with('error', 'هذه المهمة غير متاحة');
+                ->with('error', 'هذه المهمة غير متاحة');
         }
 
         // التحقق من عدم وجود المهمة للمستخدم مسبقاً
         if ($additionalTask->users()->where('user_id', $user->id)->exists()) {
             return redirect()->back()
-                           ->with('error', 'لديك هذه المهمة بالفعل');
+                ->with('error', 'لديك هذه المهمة بالفعل');
         }
 
         // إنشاء تخصيص جديد
@@ -475,7 +479,7 @@ class AdditionalTaskController extends Controller
         ]);
 
         return redirect()->back()
-                        ->with('success', 'تم قبول المهمة بنجاح');
+            ->with('success', 'تم قبول المهمة بنجاح');
     }
 
 
@@ -491,25 +495,28 @@ class AdditionalTaskController extends Controller
         ]);
 
         // التحقق من صلاحية المهمة
-        if (!$additionalTask->requiresApplication() ||
+        if (
+            !$additionalTask->requiresApplication() ||
             $additionalTask->status !== 'active' ||
-            $additionalTask->isExpired()) {
+            $additionalTask->isExpired()
+        ) {
             return redirect()->back()
-                           ->with('error', 'هذه المهمة غير متاحة للتقديم');
+                ->with('error', 'هذه المهمة غير متاحة للتقديم');
         }
 
         // التحقق من عدم وجود تقديم سابق
         if (AdditionalTaskUser::where('additional_task_id', $additionalTask->id)
-                             ->where('user_id', $user->id)
-                             ->exists()) {
+            ->where('user_id', $user->id)
+            ->exists()
+        ) {
             return redirect()->back()
-                           ->with('error', 'لقد تقدمت على هذه المهمة مسبقاً');
+                ->with('error', 'لقد تقدمت على هذه المهمة مسبقاً');
         }
 
         // التحقق من وجود مقاعد متاحة
         if (!$additionalTask->canAcceptMoreParticipants()) {
             return redirect()->back()
-                           ->with('error', 'لا توجد مقاعد متاحة في هذه المهمة');
+                ->with('error', 'لا توجد مقاعد متاحة في هذه المهمة');
         }
 
         // إنشاء طلب التقديم
@@ -522,7 +529,7 @@ class AdditionalTaskController extends Controller
         ]);
 
         return redirect()->back()
-                        ->with('success', 'تم تقديم طلبك بنجاح! في انتظار الموافقة من الإدارة');
+            ->with('success', 'تم تقديم طلبك بنجاح! في انتظار الموافقة من الإدارة');
     }
 
     /**
@@ -535,14 +542,31 @@ class AdditionalTaskController extends Controller
         ]);
 
         if ($additionalTaskUser->approveApplication($request->admin_notes)) {
-            // إرسال إشعار للمستخدم بالموافقة
-            $this->notificationService->notifyUserApproved($additionalTaskUser);
+            // إنشاء مهمة عادية من المهمة الإضافية
+            $regularTask = $this->createRegularTaskService->createTaskFromAdditional($additionalTaskUser);
 
-            return redirect()->back()
-                           ->with('success', 'تم قبول الطلب بنجاح وإرسال إشعار للمستخدم');
+            if ($regularTask) {
+                // إرسال إشعار للمستخدم بالموافقة مع معلومات المهمة العادية
+                $this->notificationService->notifyUserApproved($additionalTaskUser, $regularTask);
+
+                return redirect()->back()
+                    ->with('success', 'تم قبول الطلب بنجاح وإنشاء المهمة العادية وإرسال إشعار للمستخدم');
+            } else {
+                // حتى لو فشل إنشاء المهمة العادية، نكمل العملية
+                Log::warning('Failed to create regular task but application approved', [
+                    'additional_task_user_id' => $additionalTaskUser->id
+                ]);
+
+                // إرسال إشعار للمستخدم بالموافقة (بدون مهمة عادية)
+                $this->notificationService->notifyUserApproved($additionalTaskUser, null);
+
+                return redirect()->back()
+                    ->with('success', 'تم قبول الطلب بنجاح وإرسال إشعار للمستخدم')
+                    ->with('warning', 'حدث خطأ في إنشاء المهمة العادية. يرجى التواصل مع الإدارة.');
+            }
         } else {
             return redirect()->back()
-                           ->with('error', 'لا يمكن قبول هذا الطلب');
+                ->with('error', 'لا يمكن قبول هذا الطلب');
         }
     }
 
@@ -560,10 +584,43 @@ class AdditionalTaskController extends Controller
             $this->notificationService->notifyUserRejected($additionalTaskUser);
 
             return redirect()->back()
-                           ->with('success', 'تم رفض الطلب وإرسال إشعار للمستخدم');
+                ->with('success', 'تم رفض الطلب وإرسال إشعار للمستخدم');
         } else {
             return redirect()->back()
-                           ->with('error', 'لا يمكن رفض هذا الطلب');
+                ->with('error', 'لا يمكن رفض هذا الطلب');
+        }
+    }
+
+    /**
+     * إلغاء الموافقة على طلب تقديم وإزالة المهمة العادية
+     */
+    public function revokeApproval(Request $request, AdditionalTaskUser $additionalTaskUser)
+    {
+        $request->validate([
+            'reason' => 'nullable|string|max:1000',
+        ]);
+
+        // التحقق من أن الحالة الحالية هي 'assigned'
+        if ($additionalTaskUser->status !== 'assigned') {
+            return redirect()->back()
+                ->with('error', 'لا يمكن إلغاء الموافقة - الحالة الحالية: ' . $additionalTaskUser->status);
+        }
+
+        // إلغاء الموافقة وحذف المهمة العادية
+        $success = $this->createRegularTaskService->revokeApproval(
+            $additionalTaskUser,
+            $request->reason
+        );
+
+        if ($success) {
+            // إرسال إشعار للمستخدم (اختياري)
+            // يمكن إضافة notifyUserApprovalRevoked في المستقبل
+
+            return redirect()->back()
+                ->with('success', 'تم إلغاء الموافقة بنجاح وحذف المهمة العادية المرتبطة');
+        } else {
+            return redirect()->back()
+                ->with('error', 'فشل في إلغاء الموافقة');
         }
     }
 
@@ -576,7 +633,7 @@ class AdditionalTaskController extends Controller
         $accessCheck = $this->filterService->checkMinimumLevel();
         if (!$accessCheck['has_access']) {
             return redirect()->route('dashboard')
-                           ->with('error', $accessCheck['message']);
+                ->with('error', $accessCheck['message']);
         }
 
         $user = Auth::user();
@@ -584,12 +641,12 @@ class AdditionalTaskController extends Controller
         $errorMessage = $this->filterService->getDepartmentRoleErrorMessage($user);
         if ($errorMessage) {
             return redirect()->route('dashboard')
-                           ->with('error', $errorMessage);
+                ->with('error', $errorMessage);
         }
 
         // فلترة الطلبات حسب الصلاحيات
         $query = AdditionalTaskUser::with(['additionalTask', 'user'])
-                                  ->where('status', 'applied');
+            ->where('status', 'applied');
 
         // فلترة حسب task_id إذا تم تمريره
         if ($request->has('task_id') && $request->task_id) {
@@ -606,12 +663,12 @@ class AdditionalTaskController extends Controller
                 // المستوى 4+ - كل الطلبات
             } elseif ($departmentLevel && $departmentLevel >= 2) {
                 // المستوى 2+ - طلبات القسم فقط + المهام التي أنشأها
-                $query->whereHas('additionalTask', function($q) use ($user) {
-                    $q->where(function($subQ) use ($user) {
+                $query->whereHas('additionalTask', function ($q) use ($user) {
+                    $q->where(function ($subQ) use ($user) {
                         $subQ->where('target_type', 'department')
-                             ->where('target_department', $user->department);
+                            ->where('target_department', $user->department);
                     })
-                    ->orWhere('created_by', $user->id);
+                        ->orWhere('created_by', $user->id);
                 });
             } else {
                 // أقل من المستوى 2 - لا طلبات

@@ -197,4 +197,93 @@ class SlackNotificationService
     {
         return $this->meetingSlackService->sendMeetingTimeUpdatedNotification($meeting, $participant, $updatedBy);
     }
+
+    /**
+     * إرسال إشعار إلغاء المهمة
+     */
+    public static function sendTaskCancelledNotification(string $slackUserId, string $taskName, string $cancelledBy): bool
+    {
+        try {
+            $slackWebhookUrl = env('SLACK_WEBHOOK_URL');
+
+            if (!$slackWebhookUrl) {
+                \Log::warning('SLACK_WEBHOOK_URL not configured');
+                return false;
+            }
+
+            $message = [
+                'text' => "🚫 *تم إلغاء مهمة*",
+                'blocks' => [
+                    [
+                        'type' => 'header',
+                        'text' => [
+                            'type' => 'plain_text',
+                            'text' => '🚫 تم إلغاء مهمة',
+                            'emoji' => true
+                        ]
+                    ],
+                    [
+                        'type' => 'section',
+                        'text' => [
+                            'type' => 'mrkdwn',
+                            'text' => "تم إلغاء المهمة التالية من قبل منشئ المهمة:"
+                        ]
+                    ],
+                    [
+                        'type' => 'section',
+                        'fields' => [
+                            [
+                                'type' => 'mrkdwn',
+                                'text' => "*المهمة:*\n{$taskName}"
+                            ],
+                            [
+                                'type' => 'mrkdwn',
+                                'text' => "*تم الإلغاء بواسطة:*\n{$cancelledBy}"
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => 'context',
+                        'elements' => [
+                            [
+                                'type' => 'mrkdwn',
+                                'text' => "⏰ " . now()->timezone('Africa/Cairo')->format('Y-m-d H:i:s')
+                            ]
+                        ]
+                    ]
+                ],
+                'channel' => $slackUserId
+            ];
+
+            $ch = curl_init($slackWebhookUrl);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                \Log::info('Task cancelled notification sent successfully', [
+                    'slack_user_id' => $slackUserId,
+                    'task_name' => $taskName
+                ]);
+                return true;
+            } else {
+                \Log::error('Failed to send task cancelled notification', [
+                    'http_code' => $httpCode,
+                    'result' => $result
+                ]);
+                return false;
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error sending task cancelled notification', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
+        }
+    }
 }

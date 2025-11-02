@@ -675,4 +675,76 @@ class TaskTemplateController extends Controller
 
         return ['valid' => true];
     }
+
+    /**
+     * إلغاء مهمة قالب لمستخدم محدد
+     */
+    public function cancelTemplateTaskUser($templateTaskUserId)
+    {
+        try {
+            $templateTaskUser = TemplateTaskUser::with(['templateTask', 'user', 'project'])->findOrFail($templateTaskUserId);
+            $currentUser = \Illuminate\Support\Facades\Auth::user();
+
+            // التحقق من أن المستخدم الحالي هو منشئ المشروع أو له صلاحية
+            if ($templateTaskUser->project && $templateTaskUser->project->created_by !== $currentUser->id) {
+                // يمكن إضافة فحص صلاحيات إضافية هنا
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مصرح لك بإلغاء هذه المهمة'
+                ], 403);
+            }
+
+            // حفظ الوقت المستخدم إذا كانت المهمة قيد التنفيذ
+            if ($templateTaskUser->status === 'in_progress' && $templateTaskUser->started_at) {
+                $startedAt = Carbon::parse($templateTaskUser->started_at);
+                $now = Carbon::now();
+                $minutesWorked = $startedAt->diffInMinutes($now);
+
+                // إضافة الوقت المستخدم إلى actual_minutes
+                $templateTaskUser->actual_minutes = ($templateTaskUser->actual_minutes ?? 0) + $minutesWorked;
+            }
+
+            // تحديث حالة المهمة
+            $templateTaskUser->status = 'cancelled';
+            $templateTaskUser->save();
+
+            // تسجيل النشاط
+            activity()
+                ->performedOn($templateTaskUser)
+                ->causedBy($currentUser)
+                ->withProperties([
+                    'template_task_user_id' => $templateTaskUser->id,
+                    'template_task_name' => $templateTaskUser->templateTask->name ?? 'غير محدد',
+                    'assigned_user' => $templateTaskUser->user->name ?? 'غير محدد',
+                    'cancelled_by' => $currentUser->name,
+                    'project_id' => $templateTaskUser->project_id
+                ])
+                ->log('تم إلغاء مهمة القالب');
+
+            // إرسال إشعار سلاك للمُسند له
+            if ($templateTaskUser->user && $templateTaskUser->user->slack_user_id) {
+                \App\Services\SlackNotificationService::sendTaskCancelledNotification(
+                    $templateTaskUser->user->slack_user_id,
+                    $templateTaskUser->templateTask->name ?? 'مهمة قالب',
+                    $currentUser->name
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إلغاء المهمة بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error cancelling template task user', [
+                'template_task_user_id' => $templateTaskUserId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إلغاء المهمة'
+            ], 500);
+        }
+    }
 }

@@ -362,7 +362,8 @@ trait ProjectParticipantsTrait
                     'started_at' => $taskUser->started_at,
                     'completed_at' => $taskUser->completed_at,
                     'is_approved' => $taskUser->is_approved,
-                    'awarded_points' => $taskUser->awarded_points
+                    'awarded_points' => $taskUser->awarded_points,
+                    'created_by' => $taskUser->project ? $taskUser->project->created_by : null
                 ];
             } else {
                 // أولاً محاولة البحث بـ TaskUser ID
@@ -515,7 +516,8 @@ trait ProjectParticipantsTrait
                     'started_at' => $taskUser->start_date, // إضافة started_at للتوافق مع المؤقت
                     'completed_date' => $taskUser->completed_date,
                     'is_approved' => $taskUser->is_approved,
-                    'awarded_points' => $taskUser->awarded_points
+                    'awarded_points' => $taskUser->awarded_points,
+                    'created_by' => $taskUser->task ? $taskUser->task->created_by : null
                 ];
             }
 

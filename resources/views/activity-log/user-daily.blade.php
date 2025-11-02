@@ -192,23 +192,6 @@
                                                         </div>
                                                     </div>
 
-                                                    @if($activity->properties && count($activity->properties) > 0)
-                                                        <div class="mt-3">
-                                                            <button class="btn btn-sm btn-outline-info"
-                                                                    data-toggle="collapse"
-                                                                    data-target="#details-{{ $activity->id }}">
-                                                                <i class="fas fa-info-circle"></i>
-                                                                عرض التفاصيل
-                                                            </button>
-                                                            <div class="collapse mt-2" id="details-{{ $activity->id }}">
-                                                                <div class="card">
-                                                                    <div class="card-body">
-                                                                        <pre class="mb-0 small">{{ json_encode($activity->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endif
                                                 </div>
                                             </div>
                                         </div>

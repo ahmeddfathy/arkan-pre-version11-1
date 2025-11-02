@@ -20,7 +20,7 @@ class AdditionalTaskUserObserver
     /**
      * Handle the AdditionalTaskUser "updated" event.
      */
-        public function updated(AdditionalTaskUser $additionalTaskUser)
+    public function updated(AdditionalTaskUser $additionalTaskUser)
     {
         // التحقق من أن الحالة تغيرت إلى مكتملة
         if ($additionalTaskUser->wasChanged('status') && $additionalTaskUser->status === 'completed') {
@@ -28,9 +28,11 @@ class AdditionalTaskUserObserver
             $this->notificationService->notifyTaskCompleted($additionalTaskUser);
         }
         // التحقق من إلغاء الإكمال
-        elseif ($additionalTaskUser->wasChanged('status') &&
-                $additionalTaskUser->getOriginal('status') === 'completed' &&
-                $additionalTaskUser->status !== 'completed') {
+        elseif (
+            $additionalTaskUser->wasChanged('status') &&
+            $additionalTaskUser->getOriginal('status') === 'completed' &&
+            $additionalTaskUser->status !== 'completed'
+        ) {
             $this->removePointsForUncompletedAdditionalTask($additionalTaskUser);
         }
 
@@ -43,7 +45,8 @@ class AdditionalTaskUserObserver
             switch ($newStatus) {
                 case 'approved':
                     if ($oldStatus === 'applied') {
-                        $this->notificationService->notifyUserApproved($additionalTaskUser);
+                        // في حالة الموافقة عبر Observer (نادر)، إرسال بدون معلومات المهمة العادية
+                        $this->notificationService->notifyUserApproved($additionalTaskUser, null);
                     }
                     break;
                 case 'rejected':
@@ -137,7 +140,6 @@ class AdditionalTaskUserObserver
 
                 // تحديث الشارة تلقائياً (سيتم عبر UserSeasonPointObserver)
             });
-
         } catch (\Exception $e) {
             Log::error('Error adding points for completed additional task', [
                 'additional_task_user_id' => $additionalTaskUser->id,
@@ -177,8 +179,8 @@ class AdditionalTaskUserObserver
             DB::transaction(function () use ($user, $season, $pointsToRemove, $additionalTask) {
                 // العثور على نقاط المستخدم
                 $userSeasonPoint = UserSeasonPoint::where('user_id', $user->id)
-                                                 ->where('season_id', $season->id)
-                                                 ->first();
+                    ->where('season_id', $season->id)
+                    ->first();
 
                 if ($userSeasonPoint) {
                     // التأكد من عدم جعل النقاط أو المهام سالبة
@@ -208,7 +210,6 @@ class AdditionalTaskUserObserver
                     ]);
                 }
             });
-
         } catch (\Exception $e) {
             Log::error('Error removing points for uncompleted additional task', [
                 'additional_task_user_id' => $additionalTaskUser->id,

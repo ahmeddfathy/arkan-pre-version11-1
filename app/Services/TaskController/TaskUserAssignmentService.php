@@ -25,7 +25,7 @@ class TaskUserAssignmentService
         $this->slackNotificationService = $slackNotificationService;
     }
 
-    public function assignUsersToTask(Task $task, array $assignedUsers, bool $isFlexible = false, bool $isAdditionalTask = false): array
+    public function assignUsersToTask(Task $task, array $assignedUsers, bool $isFlexible = false, bool $isAdditionalTask = false, ?int $additionalTaskUserId = null): array
     {
         $results = [];
         $seasonId = $this->getSeasonIdForTask($task);
@@ -57,7 +57,7 @@ class TaskUserAssignmentService
                     }
                 }
 
-                $taskUserData = $this->prepareTaskUserData($task, $assignedUser, $seasonId, $isFlexible, $isAdditionalTask);
+                $taskUserData = $this->prepareTaskUserData($task, $assignedUser, $seasonId, $isFlexible, $isAdditionalTask, $additionalTaskUserId);
 
                 Log::info("Creating TaskUser with data", [
                     'task_id' => $task->id,
@@ -232,7 +232,7 @@ class TaskUserAssignmentService
         ];
     }
 
-    private function prepareTaskUserData(Task $task, array $assignedUser, int $seasonId, bool $isFlexible, bool $isAdditionalTask = false): array
+    private function prepareTaskUserData(Task $task, array $assignedUser, int $seasonId, bool $isFlexible, bool $isAdditionalTask = false, ?int $additionalTaskUserId = null): array
     {
         $taskUserData = [
             'task_id' => $task->id,
@@ -245,6 +245,11 @@ class TaskUserAssignmentService
             'is_additional_task' => $isAdditionalTask,
             'task_source' => $isAdditionalTask ? 'additional' : 'assigned',
         ];
+
+        // إضافة ربط مباشر بالمهمة الإضافية إذا كان موجود
+        if ($additionalTaskUserId) {
+            $taskUserData['additional_task_user_id'] = $additionalTaskUserId;
+        }
 
         if (!$isFlexible) {
             $estimationData = $this->calculateUserEstimation($assignedUser, [

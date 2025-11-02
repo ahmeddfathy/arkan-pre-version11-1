@@ -1417,4 +1417,75 @@ class TaskController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * إلغاء مهمة مستخدم
+     */
+    public function cancelTaskUser($taskUserId)
+    {
+        try {
+            $taskUser = TaskUser::with(['task', 'user'])->findOrFail($taskUserId);
+            $currentUser = Auth::user();
+
+            // التحقق من أن المستخدم الحالي هو منشئ المهمة
+            if ($taskUser->task->created_by !== $currentUser->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مصرح لك بإلغاء هذه المهمة'
+                ], 403);
+            }
+
+            // حفظ الوقت المستخدم إذا كانت المهمة قيد التنفيذ
+            if ($taskUser->status === 'in_progress' && $taskUser->start_date) {
+                $startDate = Carbon::parse($taskUser->start_date);
+                $now = Carbon::now();
+                $minutesWorked = $startDate->diffInMinutes($now);
+
+                // إضافة الوقت المستخدم إلى actual_hours و actual_minutes
+                $totalMinutes = ($taskUser->actual_hours * 60) + $taskUser->actual_minutes + $minutesWorked;
+                $taskUser->actual_hours = floor($totalMinutes / 60);
+                $taskUser->actual_minutes = $totalMinutes % 60;
+            }
+
+            // تحديث حالة المهمة
+            $taskUser->status = 'cancelled';
+            $taskUser->save();
+
+            // تسجيل النشاط
+            activity()
+                ->performedOn($taskUser->task)
+                ->causedBy($currentUser)
+                ->withProperties([
+                    'task_user_id' => $taskUser->id,
+                    'assigned_user' => $taskUser->user->name,
+                    'cancelled_by' => $currentUser->name
+                ])
+                ->log('تم إلغاء المهمة');
+
+            // إرسال إشعار سلاك للمُسند له
+            if ($taskUser->user && $taskUser->user->slack_user_id) {
+                \App\Services\SlackNotificationService::sendTaskCancelledNotification(
+                    $taskUser->user->slack_user_id,
+                    $taskUser->task->name,
+                    $currentUser->name
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إلغاء المهمة بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error cancelling task user', [
+                'task_user_id' => $taskUserId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إلغاء المهمة'
+            ], 500);
+        }
+    }
 }

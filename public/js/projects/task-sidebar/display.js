@@ -1,6 +1,15 @@
 // Task Display Functions
 
 function displayTaskDetails(task) {
+    // Debug: Log task data to check created_by
+    console.log("🔍 Task Details:", {
+        created_by: task.created_by,
+        created_by_user: task.created_by_user,
+        currentUserId: window.currentUserId,
+        status: task.status,
+        type: task.type,
+    });
+
     const content = document.getElementById("taskSidebarContent");
     const title = document.getElementById("taskSidebarTitle");
     const subtitle = document.getElementById("taskSidebarSubtitle");
@@ -734,12 +743,18 @@ function displayTaskDetails(task) {
 
                 ${
                     // زر إلغاء المهمة - يظهر فقط لمنشئ المهمة ولو المهمة مش ملغية أو مكتملة
-                    ((task.created_by && task.created_by == window.currentUserId) ||
-                     (task.created_by_user && task.created_by_user.id == window.currentUserId)) &&
+                    ((task.created_by &&
+                        task.created_by == window.currentUserId) ||
+                        (task.created_by_user &&
+                            task.created_by_user.id == window.currentUserId)) &&
                     task.status !== "cancelled" &&
                     task.status !== "completed"
                         ? `
-                    <button class="btn btn-outline-danger px-4 py-2" onclick="cancelTask('${task.type}', '${task.task_user_id || task.pivot_id || task.id}', '${task.id}')" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
+                    <button class="btn btn-outline-danger px-4 py-2" onclick="cancelTask('${
+                        task.type
+                    }', '${task.task_user_id || task.pivot_id || task.id}', '${
+                              task.id
+                          }')" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
                         <i class="fas fa-ban me-1"></i>
                         إلغاء المهمة
                     </button>
@@ -863,3 +878,89 @@ function formatDateTime(dateString) {
         });
     }
 }
+
+/**
+ * إلغاء المهمة
+ */
+async function cancelTask(taskType, taskUserId, taskId) {
+    // تأكيد الإلغاء
+    const result = await Swal.fire({
+        title: "هل أنت متأكد؟",
+        text: "سيتم إلغاء هذه المهمة وإرسال إشعار للمُسند له",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "نعم، إلغاء المهمة",
+        cancelButtonText: "تراجع",
+        reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    try {
+        // Show loading
+        Swal.fire({
+            title: "جاري الإلغاء...",
+            html: "يرجى الانتظار",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+
+        const url =
+            taskType === "template"
+                ? `/template-tasks/${taskUserId}/cancel`
+                : `/task-users/${taskUserId}/cancel`;
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector(
+                    'meta[name="csrf-token"]'
+                ).content,
+                Accept: "application/json",
+            },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            await Swal.fire({
+                icon: "success",
+                title: "تم الإلغاء",
+                text: data.message || "تم إلغاء المهمة بنجاح",
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+            // إعادة تحميل تفاصيل المهمة
+            loadTaskDetails(taskType, taskUserId);
+
+            // إعادة تحميل الصفحة بعد ثانيتين
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "خطأ",
+                text: data.message || "حدث خطأ أثناء إلغاء المهمة",
+            });
+        }
+    } catch (error) {
+        console.error("Error cancelling task:", error);
+        Swal.fire({
+            icon: "error",
+            title: "خطأ",
+            text: "حدث خطأ في الاتصال بالخادم",
+        });
+    }
+}
+
+// Export the function
+window.cancelTask = cancelTask;

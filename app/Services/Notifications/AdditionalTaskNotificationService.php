@@ -5,6 +5,7 @@ namespace App\Services\Notifications;
 use App\Models\AdditionalTask;
 use App\Models\AdditionalTaskUser;
 use App\Models\User;
+use App\Models\Notification;
 use App\Services\Slack\AdditionalTaskSlackService;
 use App\Services\Notifications\Traits\HasSlackNotification;
 use App\Services\Notifications\Traits\HasFirebaseNotification;
@@ -45,6 +46,19 @@ class AdditionalTaskNotificationService
                 $task->id
             );
 
+            // إرسال إشعار Database (إشعار داخلي)
+            $this->sendDatabaseNotification(
+                $user,
+                'additional-task-assigned',
+                $message,
+                $task->id,
+                [
+                    'additional_task_id' => $task->id,
+                    'additional_task_title' => $task->title,
+                    'points' => $task->points,
+                ]
+            );
+
             // إرسال إشعار Slack للمستخدم (DM)
             if ($user->slack_user_id) {
                 $this->additionalTaskSlackService->sendAdditionalTaskNotification(
@@ -57,7 +71,6 @@ class AdditionalTaskNotificationService
 
             // إرسال إشعار Slack للقناة (HR Channel)
             $this->sendSlackChannelNotification($task, $user, 'تعيين');
-
         } catch (\Exception $e) {
             Log::error('Error sending additional task assignment notifications', [
                 'task_user_id' => $taskUser->id,
@@ -69,7 +82,7 @@ class AdditionalTaskNotificationService
     /**
      * إرسال إشعارات عند موافقة على طلب المهمة الإضافية
      */
-    public function notifyUserApproved(AdditionalTaskUser $taskUser): void
+    public function notifyUserApproved(AdditionalTaskUser $taskUser, ?\App\Models\Task $regularTask = null): void
     {
         try {
             $user = $taskUser->user;
@@ -79,7 +92,12 @@ class AdditionalTaskNotificationService
                 return;
             }
 
-            $message = "تمت الموافقة على طلبك للمهمة الإضافية: {$task->title}";
+            // تحسين الرسالة لتوضح أن المهمة تم إنشاؤها في التاسكات العادية
+            if ($regularTask) {
+                $message = "✅ تمت الموافقة على طلبك للمهمة الإضافية: {$task->title}\n📋 تم إنشاء المهمة في قائمة التاسكات العادية الخاصة بك";
+            } else {
+                $message = "✅ تمت الموافقة على طلبك للمهمة الإضافية: {$task->title}";
+            }
 
             // إرسال إشعار Firebase
             $this->sendTypedFirebaseNotification(
@@ -88,6 +106,21 @@ class AdditionalTaskNotificationService
                 'approved',
                 $message,
                 $task->id
+            );
+
+            // إرسال إشعار Database (إشعار داخلي)
+            $this->sendDatabaseNotification(
+                $user,
+                'additional-task-approved',
+                $message,
+                $task->id,
+                [
+                    'additional_task_id' => $task->id,
+                    'additional_task_title' => $task->title,
+                    'regular_task_id' => $regularTask?->id,
+                    'regular_task_name' => $regularTask?->name,
+                    'points' => $task->points,
+                ]
             );
 
             // إرسال إشعار Slack للمستخدم (DM)
@@ -102,7 +135,6 @@ class AdditionalTaskNotificationService
 
             // إرسال إشعار Slack للقناة (HR Channel)
             $this->sendSlackChannelNotification($task, $user, 'موافقة');
-
         } catch (\Exception $e) {
             Log::error('Error sending additional task approval notifications', [
                 'task_user_id' => $taskUser->id,
@@ -135,6 +167,19 @@ class AdditionalTaskNotificationService
                 $task->id
             );
 
+            // إرسال إشعار Database (إشعار داخلي)
+            $this->sendDatabaseNotification(
+                $user,
+                'additional-task-rejected',
+                $message,
+                $task->id,
+                [
+                    'additional_task_id' => $task->id,
+                    'additional_task_title' => $task->title,
+                    'admin_notes' => $taskUser->admin_notes,
+                ]
+            );
+
             // إرسال إشعار Slack للمستخدم (DM)
             if ($user->slack_user_id) {
                 $this->additionalTaskSlackService->sendAdditionalTaskNotification(
@@ -147,7 +192,6 @@ class AdditionalTaskNotificationService
 
             // إرسال إشعار Slack للقناة (HR Channel)
             $this->sendSlackChannelNotification($task, $user, 'رفض');
-
         } catch (\Exception $e) {
             Log::error('Error sending additional task rejection notifications', [
                 'task_user_id' => $taskUser->id,
@@ -181,6 +225,19 @@ class AdditionalTaskNotificationService
                 $task->id
             );
 
+            // إرسال إشعار Database (إشعار داخلي)
+            $this->sendDatabaseNotification(
+                $user,
+                'additional-task-completed',
+                $message,
+                $task->id,
+                [
+                    'additional_task_id' => $task->id,
+                    'additional_task_title' => $task->title,
+                    'points_earned' => $pointsEarned,
+                ]
+            );
+
             // إرسال إشعار Slack للمستخدم (DM)
             if ($user->slack_user_id) {
                 $this->additionalTaskSlackService->sendAdditionalTaskNotification(
@@ -193,7 +250,6 @@ class AdditionalTaskNotificationService
 
             // إرسال إشعار Slack للقناة (HR Channel)
             $this->sendSlackChannelNotification($task, $user, 'إكمال', $pointsEarned);
-
         } catch (\Exception $e) {
             Log::error('Error sending additional task completion notifications', [
                 'task_user_id' => $taskUser->id,
@@ -226,9 +282,22 @@ class AdditionalTaskNotificationService
                 $task->id
             );
 
+            // إرسال إشعار Database (إشعار داخلي)
+            $this->sendDatabaseNotification(
+                $user,
+                'additional-task-applied',
+                $message,
+                $task->id,
+                [
+                    'additional_task_id' => $task->id,
+                    'additional_task_title' => $task->title,
+                    'points' => $task->points,
+                    'user_notes' => $taskUser->user_notes,
+                ]
+            );
+
             // إرسال إشعار Slack للقناة (HR Channel) - للمراجعة
             $this->sendSlackChannelNotification($task, $user, 'طلب جديد');
-
         } catch (\Exception $e) {
             Log::error('Error sending additional task application notifications', [
                 'task_user_id' => $taskUser->id,
@@ -274,8 +343,20 @@ class AdditionalTaskNotificationService
                         $task->id
                     );
 
-                    $notifiedCount++;
+                    // إرسال إشعار Database (إشعار داخلي)
+                    $this->sendDatabaseNotification(
+                        $user,
+                        'additional-task-available',
+                        $message,
+                        $task->id,
+                        [
+                            'additional_task_id' => $task->id,
+                            'additional_task_title' => $task->title,
+                            'points' => $task->points,
+                        ]
+                    );
 
+                    $notifiedCount++;
                 } catch (\Exception $e) {
                     Log::error('Failed to notify user about new task', [
                         'user_id' => $user->id,
@@ -301,7 +382,6 @@ class AdditionalTaskNotificationService
                 'notified_count' => $notifiedCount,
                 'message' => "تم إرسال الإشعارات لـ {$notifiedCount} مستخدم"
             ];
-
         } catch (\Exception $e) {
             Log::error('Failed to send task notifications', [
                 'task_id' => $task->id,
@@ -328,8 +408,8 @@ class AdditionalTaskNotificationService
         } elseif ($task->target_type === 'department') {
             // مستخدمي القسم المحدد فقط
             return User::where('department', $task->target_department)
-                      ->where('employee_status', 'active')
-                      ->get();
+                ->where('employee_status', 'active')
+                ->get();
         }
 
         return collect();
@@ -354,13 +434,45 @@ class AdditionalTaskNotificationService
 
             $this->setHRNotificationContext('إشعار المهام الإضافية');
             $this->sendSlackNotification($message, $operation, $additionalData);
-
         } catch (\Exception $e) {
             Log::error('Error sending Slack channel notification for additional task', [
                 'task_id' => $task->id,
                 'user_id' => $user->id,
                 'operation' => $operation,
                 'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * إرسال إشعار Database (إشعار داخلي يحفظ في قاعدة البيانات)
+     */
+    private function sendDatabaseNotification(User $user, string $type, string $message, int $relatedId, array $data = []): void
+    {
+        try {
+            $notificationData = array_merge([
+                'message' => $message,
+                'notification_time' => now()->format('Y-m-d H:i:s'),
+            ], $data);
+
+            Notification::create([
+                'user_id' => $user->id,
+                'type' => $type,
+                'data' => $notificationData,
+                'related_id' => $relatedId,
+                'read_at' => null,
+            ]);
+
+            Log::info('Database notification created for additional task', [
+                'user_id' => $user->id,
+                'type' => $type,
+                'related_id' => $relatedId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creating database notification', [
+                'user_id' => $user->id,
+                'type' => $type,
+                'error' => $e->getMessage(),
             ]);
         }
     }

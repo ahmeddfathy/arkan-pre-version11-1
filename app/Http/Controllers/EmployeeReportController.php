@@ -11,6 +11,7 @@ use App\Models\AbsenceRequest;
 use App\Models\PermissionRequest;
 use App\Models\TaskRevision;
 use App\Models\ProjectServiceUser;
+use App\Models\Meeting;
 use App\Services\TimeTracking\TimeTrackingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -91,6 +92,12 @@ class EmployeeReportController extends Controller
             $shiftData = $this->getShiftData($selectedEmployeeId, $selectedDate, $taskData, $timeLogsData, $absenceData, $revisionsData);
         }
 
+        // الحصول على بيانات الاجتماعات للتاريخ المحدد
+        $meetingsData = null;
+        if ($selectedEmployeeId) {
+            $meetingsData = $this->getMeetingsData($selectedEmployeeId, $selectedDate);
+        }
+
         return view('employee-reports.index', compact(
             'employees',
             'selectedEmployeeId',
@@ -102,6 +109,7 @@ class EmployeeReportController extends Controller
             'permissionData',
             'revisionsData',
             'deliveredProjectsData',
+            'meetingsData',
             'isManager'
         ));
     }
@@ -1250,6 +1258,108 @@ class EmployeeReportController extends Controller
         return [
             'projects' => $processedProjects,
             'total_projects' => count($processedProjects),
+            'date' => $date->format('Y-m-d')
+        ];
+    }
+
+    /**
+     * الحصول على بيانات الاجتماعات التي شارك فيها الموظف في تاريخ محدد
+     */
+    private function getMeetingsData($employeeId, $date)
+    {
+        if (!$employeeId) {
+            return null;
+        }
+
+        // الحصول على الاجتماعات التي الموظف مشارك فيها أو منشئها في هذا اليوم
+        $meetings = Meeting::where(function($query) use ($employeeId) {
+                // منشئ الاجتماع
+                $query->where('created_by', $employeeId)
+                      // أو مشارك في الاجتماع
+                      ->orWhereHas('participants', function($subQuery) use ($employeeId) {
+                          $subQuery->where('user_id', $employeeId);
+                      });
+            })
+            ->whereDate('start_time', $date->format('Y-m-d'))
+            ->with(['creator', 'participants', 'client'])
+            ->orderBy('start_time', 'asc')
+            ->get();
+
+        if ($meetings->isEmpty()) {
+            return null;
+        }
+
+        $processedMeetings = [];
+        $totalMeetings = 0;
+        $upcomingCount = 0;
+        $currentCount = 0;
+        $completedCount = 0;
+
+        foreach ($meetings as $meeting) {
+            $now = Carbon::now();
+            $startTime = Carbon::parse($meeting->start_time);
+            $endTime = Carbon::parse($meeting->end_time);
+
+            // تحديد حالة الاجتماع
+            $status = 'upcoming';
+            $statusText = 'قادمة';
+            $statusBadge = 'info';
+            
+            if ($startTime <= $now && $endTime >= $now) {
+                $status = 'current';
+                $statusText = 'جارية';
+                $statusBadge = 'warning';
+                $currentCount++;
+            } elseif ($endTime < $now || $meeting->is_completed) {
+                $status = 'completed';
+                $statusText = 'مكتملة';
+                $statusBadge = 'success';
+                $completedCount++;
+            } else {
+                $upcomingCount++;
+            }
+
+            // التحقق إذا كان الموظف حضر
+            $attended = false;
+            if ($meeting->participants) {
+                $participant = $meeting->participants->firstWhere('id', $employeeId);
+                $attended = $participant && $participant->pivot->attended == 1;
+            }
+
+            $processedMeetings[] = [
+                'id' => $meeting->id,
+                'title' => $meeting->title,
+                'description' => $meeting->description,
+                'type' => $meeting->type,
+                'type_text' => $meeting->type === 'client' ? 'عميل' : 'داخلي',
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'start_time_formatted' => $startTime->format('H:i'),
+                'end_time_formatted' => $endTime->format('H:i'),
+                'duration' => $startTime->diffInMinutes($endTime),
+                'duration_formatted' => $this->formatMinutes($startTime->diffInMinutes($endTime)),
+                'location' => $meeting->location,
+                'status' => $status,
+                'status_text' => $statusText,
+                'status_badge' => $statusBadge,
+                'is_completed' => $meeting->is_completed,
+                'attended' => $attended,
+                'is_creator' => $meeting->created_by == $employeeId,
+                'creator' => $meeting->creator,
+                'participants_count' => $meeting->participants->count(),
+                'participants' => $meeting->participants,
+                'client' => $meeting->client,
+            ];
+
+            $totalMeetings++;
+        }
+
+        return [
+            'meetings' => $processedMeetings,
+            'total_meetings' => $totalMeetings,
+            'upcoming_count' => $upcomingCount,
+            'current_count' => $currentCount,
+            'completed_count' => $completedCount,
             'date' => $date->format('Y-m-d')
         ];
     }

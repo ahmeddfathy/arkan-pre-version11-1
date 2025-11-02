@@ -75,12 +75,6 @@
                 <div class="kanban-board kanban-board-external">
                     <div class="kanban-columns">
                         @php
-                        $statuses = [
-                        'new' => ['name' => 'جديدة', 'icon' => 'fas fa-circle-plus'],
-                        'in_progress' => ['name' => 'قيد التنفيذ', 'icon' => 'fas fa-play-circle'],
-                        'paused' => ['name' => 'متوقفة', 'icon' => 'fas fa-pause-circle'],
-                        'completed' => ['name' => 'مكتملة', 'icon' => 'fas fa-check-circle'],
-                        ];
                         $user = auth()->user();
 
                         $isHRUser = $user && $user->hasRole('hr');
@@ -115,6 +109,22 @@
                         ->where('user_id', $user->id)
                         ->get()
                         : collect();
+                        }
+
+                        // حساب عدد المهام الملغاة
+                        $cancelledTasksCount = $userTemplateTasks->where('status', 'cancelled')->count() + $userRegularTasks->where('status', 'cancelled')->count();
+
+                        // بناء مصفوفة الحالات (عمود ملغاة يظهر فقط لو فيه مهام ملغاة)
+                        $statuses = [
+                        'new' => ['name' => 'جديدة', 'icon' => 'fas fa-circle-plus'],
+                        'in_progress' => ['name' => 'قيد التنفيذ', 'icon' => 'fas fa-play-circle'],
+                        'paused' => ['name' => 'متوقفة', 'icon' => 'fas fa-pause-circle'],
+                        'completed' => ['name' => 'مكتملة', 'icon' => 'fas fa-check-circle'],
+                        ];
+
+                        // إضافة عمود ملغاة فقط لو فيه مهام ملغاة
+                        if ($cancelledTasksCount > 0) {
+                        $statuses['cancelled'] = ['name' => 'ملغاة', 'icon' => 'fas fa-times-circle'];
                         }
                         @endphp
 

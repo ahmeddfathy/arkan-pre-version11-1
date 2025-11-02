@@ -398,6 +398,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/additional-task-users/{additionalTaskUser}/approve', [App\Http\Controllers\AdditionalTaskController::class, 'approveApplication'])->name('additional-task-users.approve');
     Route::post('/additional-task-users/{additionalTaskUser}/reject', [App\Http\Controllers\AdditionalTaskController::class, 'rejectApplication'])->name('additional-task-users.reject');
+    Route::post('/additional-task-users/{additionalTaskUser}/revoke-approval', [App\Http\Controllers\AdditionalTaskController::class, 'revokeApproval'])->name('additional-task-users.revoke-approval');
 });
 
 
@@ -584,6 +585,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/template-tasks/{templateTask}/update-status', [App\Http\Controllers\TaskTemplateController::class, 'updateTaskStatus'])->name('template-tasks.update-status');
     Route::post('/task-users/{taskUser}/update-status', [App\Http\Controllers\TaskController::class, 'updateTaskUserStatus'])->name('task-users.update-status');
+
+    // إلغاء المهام
+    Route::post('/task-users/{taskUser}/cancel', [App\Http\Controllers\TaskController::class, 'cancelTaskUser'])->name('task-users.cancel');
+    Route::post('/template-tasks/{templateTaskUser}/cancel', [App\Http\Controllers\TaskTemplateController::class, 'cancelTemplateTaskUser'])->name('template-tasks.cancel');
 
     Route::get('/tasks/users', [App\Http\Controllers\TaskController::class, 'getAllUsers'])->name('tasks.users');
     Route::get('/tasks/get-task-user-role-users', [App\Http\Controllers\TaskController::class, 'getTaskUserRoleUsers'])->name('tasks.get-task-user-role-users');

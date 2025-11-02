@@ -86,6 +86,7 @@ class TaskUser extends Model implements Auditable
         'original_task_user_id',
         'is_additional_task',
         'task_source',
+        'additional_task_user_id',
         'is_flexible_time',
         // حقول الاعتماد الإداري والفني
         'administrative_approval',
