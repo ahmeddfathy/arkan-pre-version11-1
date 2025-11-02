@@ -80,7 +80,6 @@ abstract class BaseSlackService
 
             $this->setNotificationStatus(true, 'تم إضافة الإشعار للطابور بنجاح');
             return true;
-
         } catch (\Exception $e) {
             Log::error('Failed to queue Slack notification', [
                 'error' => $e->getMessage(),
@@ -188,7 +187,6 @@ abstract class BaseSlackService
             $this->setNotificationStatus($success, $success ? 'تم الإرسال بنجاح' : 'فشل إرسال الرسالة');
 
             return $success;
-
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // خطأ اتصال (timeout, network)
             Log::warning('Slack connection timeout/error - continuing', [
@@ -258,15 +256,25 @@ abstract class BaseSlackService
      */
     protected function buildActionButton(string $text, string $url, string $style = 'primary'): array
     {
-        return [
+        // ✅ Slack API يدعم فقط 'primary' أو 'danger'
+        // تحويل 'success' إلى 'primary' لأن Slack لا يدعم 'success'
+        $validStyle = in_array($style, ['primary', 'danger']) ? $style : 'primary';
+
+        $button = [
             'type' => 'button',
             'text' => [
                 'type' => 'plain_text',
                 'text' => $text
             ],
-            'url' => $url,
-            'style' => $style
+            'url' => $url
         ];
+
+        // إضافة style فقط إذا كان صحيح
+        if ($validStyle !== 'primary') {
+            $button['style'] = $validStyle;
+        }
+
+        return $button;
     }
 
     /**
@@ -276,7 +284,7 @@ abstract class BaseSlackService
     {
         return [
             'type' => 'section',
-            'fields' => array_map(function($field) {
+            'fields' => array_map(function ($field) {
                 return [
                     'type' => 'mrkdwn',
                     'text' => $field
@@ -342,4 +350,3 @@ abstract class BaseSlackService
         ];
     }
 }
-

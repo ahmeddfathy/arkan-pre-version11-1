@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Project;
 use App\Models\CompanyService;
 use App\Services\Notifications\Traits\HasFirebaseNotification;
+use App\Services\SlackNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,28 +16,23 @@ class ProjectNotificationService
 {
     use HasFirebaseNotification;
 
-    /**
-     * إشعار المستخدم بإضافته لمشروع جديد
-     *
-     * @param User
-     * @param Project
-     * @param CompanyService
-     * @param User|null
-     * @return void
-     */
+    protected $slackNotificationService;
+
+    public function __construct(SlackNotificationService $slackNotificationService)
+    {
+        $this->slackNotificationService = $slackNotificationService;
+    }
+
     public function notifyUserAddedToProject(User $user, Project $project, CompanyService $service, ?User $addedBy = null): void
     {
         try {
-            // تجنب إرسال إشعار للمستخدم إذا أضاف نفسه
             if ($addedBy && $user->id === $addedBy->id) {
                 return;
             }
 
             $addedByName = $addedBy ? $addedBy->name : 'المدير';
-
             $message = "تم إضافتك للمشروع \"{$project->name}\" في قسم \"{$service->name}\"";
 
-            // إنشاء سجل الإشعار في قاعدة البيانات
             $notification = Notification::create([
                 'user_id' => $user->id,
                 'type' => 'project_participant_added',
@@ -55,7 +51,6 @@ class ProjectNotificationService
                 'related_id' => $project->id
             ]);
 
-            // إرسال إشعار Firebase إذا كان لدى المستخدم FCM token
             if ($user->fcm_token) {
                 $this->sendTypedFirebaseNotification(
                     $user,
@@ -72,7 +67,6 @@ class ProjectNotificationService
                 'service_id' => $service->id,
                 'added_by' => $addedBy?->id
             ]);
-
         } catch (\Exception $e) {
             Log::error('خطأ في إرسال إشعار إضافة مستخدم للمشروع', [
                 'error' => $e->getMessage(),
@@ -83,17 +77,9 @@ class ProjectNotificationService
         }
     }
 
-    /**
-     * إشعار operation assistant بمشروع جديد
-     *
-     * @param Project $project المشروع الجديد
-     * @param User|null $createdBy المستخدم الذي أنشأ المشروع
-     * @return void
-     */
     public function notifyOperationAssistantNewProject(Project $project, ?User $createdBy = null): void
     {
         try {
-            // البحث عن جميع المستخدمين بدور operation_assistant
             $operationAssistants = User::whereHas('roles', function ($query) {
                 $query->where('name', 'operation_assistant');
             })->get();
@@ -102,7 +88,6 @@ class ProjectNotificationService
             $message = "مشروع جديد يحتاج إلى تعيين فريق العمل: \"{$project->name}\"";
 
             foreach ($operationAssistants as $assistant) {
-                // إنشاء سجل الإشعار
                 Notification::create([
                     'user_id' => $assistant->id,
                     'type' => 'new_project_assignment_needed',
@@ -120,7 +105,6 @@ class ProjectNotificationService
                     'related_id' => $project->id
                 ]);
 
-                // إرسال إشعار Firebase
                 if ($assistant->fcm_token) {
                     $this->sendTypedFirebaseNotification(
                         $assistant,
@@ -137,7 +121,6 @@ class ProjectNotificationService
                 'assistants_count' => $operationAssistants->count(),
                 'created_by' => $createdBy?->id
             ]);
-
         } catch (\Exception $e) {
             Log::error('خطأ في إرسال إشعار مشروع جديد لفريق العمليات', [
                 'error' => $e->getMessage(),
@@ -146,22 +129,12 @@ class ProjectNotificationService
         }
     }
 
-    /**
-     * إشعار المستخدم بإزالته من المشروع
-     *
-     * @param User $user المستخدم المزال
-     * @param Project $project المشروع
-     * @param CompanyService $service الخدمة
-     * @param User|null $removedBy المستخدم الذي أزاله
-     * @return void
-     */
     public function notifyUserRemovedFromProject(User $user, Project $project, CompanyService $service, ?User $removedBy = null): void
     {
         try {
             $removedByName = $removedBy ? $removedBy->name : 'المدير';
             $message = "تم إزالتك من المشروع \"{$project->name}\" في قسم \"{$service->name}\"";
 
-            // إنشاء سجل الإشعار
             Notification::create([
                 'user_id' => $user->id,
                 'type' => 'project_participant_removed',
@@ -178,7 +151,6 @@ class ProjectNotificationService
                 'related_id' => $project->id
             ]);
 
-            // إرسال إشعار Firebase
             if ($user->fcm_token) {
                 $this->sendTypedFirebaseNotification(
                     $user,
@@ -188,7 +160,6 @@ class ProjectNotificationService
                     $project->id
                 );
             }
-
         } catch (\Exception $e) {
             Log::error('خطأ في إرسال إشعار إزالة مستخدم من المشروع', [
                 'error' => $e->getMessage(),
@@ -198,26 +169,20 @@ class ProjectNotificationService
         }
     }
 
-    /**
-     * إشعار جميع المشاركين في المشروع برفع مرفق جديد في الفولدرات الثابتة
-     *
-     * @param Project $project المشروع
-     * @param string $folderName اسم الفولدر (مرفقات أولية، تقارير مكالمات، مرفقات من العميل)
-     * @param string $fileName اسم الملف المرفوع
-     * @param User|null $uploadedBy المستخدم الذي رفع الملف
-     * @return void
-     */
     public function notifyProjectParticipantsOfAttachment(Project $project, string $folderName, string $fileName, ?User $uploadedBy = null): void
     {
         try {
-
-            $notifiableFolders = ['مرفقات أولية', 'تقارير مكالمات', 'مرفقات من العميل'];
-
+            $notifiableFolders = [
+                'مرفقات أولية',
+                'تقارير مكالمات',
+                'مرفقات من العميل',
+                'الدراسه النهائيه',
+                'عقود'
+            ];
 
             if (!in_array($folderName, $notifiableFolders)) {
                 return;
             }
-
 
             $participants = DB::table('project_service_user')
                 ->where('project_id', $project->id)
@@ -268,6 +233,27 @@ class ProjectNotificationService
                         $project->id
                     );
                 }
+
+                // ✅ إشعار Slack - فقط إذا كان المستخدم لديه slack_user_id
+                if ($participant->slack_user_id && $uploadedBy) {
+                    try {
+                        $this->slackNotificationService->sendAttachmentUploadedNotification(
+                            $project,
+                            $participant,
+                            $uploadedBy,
+                            $folderName,
+                            $fileName
+                        );
+                    } catch (\Exception $e) {
+                        // تسجيل الخطأ فقط دون إيقاف عملية الإشعار
+                        Log::warning('خطأ في إرسال إشعار Slack لرفع مرفق', [
+                            'error' => $e->getMessage(),
+                            'participant_id' => $participant->id,
+                            'project_id' => $project->id,
+                            'folder_name' => $folderName
+                        ]);
+                    }
+                }
             }
 
             Log::info('تم إرسال إشعارات رفع مرفق لمشاركي المشروع', [
@@ -277,7 +263,6 @@ class ProjectNotificationService
                 'participants_count' => count($participants),
                 'uploaded_by' => $uploadedBy?->id
             ]);
-
         } catch (\Exception $e) {
             Log::error('خطأ في إرسال إشعارات رفع مرفق للمشروع', [
                 'error' => $e->getMessage(),
@@ -287,15 +272,6 @@ class ProjectNotificationService
         }
     }
 
-    /**
-     * إشعار المشاركين في خدمة بأن الخدمات التي تعتمد عليها قد اكتملت
-     *
-     * @param Project $project المشروع
-     * @param CompanyService $completedService الخدمة التي اكتملت
-     * @param array $usersToNotify المستخدمون الذين سيتم إشعارهم مع خدماتهم
-     * @param User|null $completedBy المستخدم الذي أكمل الخدمة
-     * @return void
-     */
     public function notifyDependentServiceParticipants(
         Project $project,
         CompanyService $completedService,
@@ -310,7 +286,6 @@ class ProjectNotificationService
             $projectCode = $project->code ?? 'غير محدد';
             $completedByName = $completedBy ? $completedBy->name : 'الفريق';
 
-            // تجميع المستخدمين حسب الخدمة لإرسال إشعار واحد لكل مستخدم
             $userNotifications = [];
             foreach ($usersToNotify as $item) {
                 $userId = $item['user']->id;
@@ -323,7 +298,6 @@ class ProjectNotificationService
                 $userNotifications[$userId]['services'][] = $item['service']->name;
             }
 
-            // إرسال إشعار لكل مستخدم
             foreach ($userNotifications as $userId => $data) {
                 $user = $data['user'];
                 $services = $data['services'];
@@ -335,7 +309,6 @@ class ProjectNotificationService
                 $message = "تم اكتمال خدمة \"{$completedService->name}\" في المشروع [{$projectCode}] - يمكنك الآن البدء في خدمة: {$servicesText}";
                 $detailedMessage = "قام {$completedByName} بإكمال خدمة \"{$completedService->name}\" في المشروع \"{$project->name}\" (كود: {$projectCode}). الخدمات التي يمكنك البدء فيها الآن: {$servicesText}";
 
-                // إنشاء سجل الإشعار
                 Notification::create([
                     'user_id' => $user->id,
                     'type' => 'service_dependency_completed',
@@ -355,7 +328,6 @@ class ProjectNotificationService
                     'related_id' => $project->id
                 ]);
 
-                // إرسال إشعار Firebase
                 if ($user->fcm_token) {
                     $this->sendTypedFirebaseNotification(
                         $user,
@@ -373,7 +345,6 @@ class ProjectNotificationService
                 'users_notified' => count($userNotifications),
                 'completed_by' => $completedBy?->id
             ]);
-
         } catch (\Exception $e) {
             Log::error('خطأ في إرسال إشعارات الخدمات المعتمد عليها', [
                 'error' => $e->getMessage(),

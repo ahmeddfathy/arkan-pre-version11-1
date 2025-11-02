@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\ProjectDelivery;
 use App\Models\Client;
+use App\Services\ProjectManagement\ProjectDeliveryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,13 @@ use Carbon\Carbon;
 
 class ProjectDeliveryController extends Controller
 {
+    protected $deliveryService;
+
+    public function __construct(ProjectDeliveryService $deliveryService)
+    {
+        $this->deliveryService = $deliveryService;
+    }
+
     /**
      * عرض صفحة إدارة تسليمات المشاريع
      */
@@ -73,37 +81,34 @@ class ProjectDeliveryController extends Controller
                 'notes' => 'nullable|string',
             ]);
 
-            DB::beginTransaction();
-
             $project = Project::findOrFail($projectId);
 
-            // إنشاء تسليم جديد
-            $delivery = ProjectDelivery::create([
-                'project_id' => $project->id,
-                'delivery_type' => $request->delivery_type,
-                'delivery_date' => now(),
-                'delivered_by' => Auth::id(),
-                'notes' => $request->notes,
-            ]);
+            // ✅ استخدام ProjectDeliveryService بدلاً من الكود المكرر
+            $result = $this->deliveryService->deliverProject(
+                $project,
+                $request->delivery_type,
+                $request->notes
+            );
 
-            // تسجيل النشاط
-            activity()
-                ->causedBy(Auth::user())
-                ->performedOn($project)
-                ->withProperties([
-                    'delivery_type' => $request->delivery_type,
-                    'delivery_id' => $delivery->id,
-                    'notes' => $request->notes,
-                ])
-                ->log('تسليم مشروع: ' . $project->name . ' - نوع التسليم: ' . $request->delivery_type);
+            if ($result['success']) {
+                // تسجيل النشاط
+                activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($project)
+                    ->withProperties([
+                        'delivery_type' => $request->delivery_type,
+                        'delivery_id' => $result['delivery']->id ?? null,
+                        'notes' => $request->notes,
+                    ])
+                    ->log('تسليم مشروع: ' . $project->name . ' - نوع التسليم: ' . $request->delivery_type);
 
-            DB::commit();
+                return redirect()->back()->with('success', $result['message']);
+            }
 
-            return redirect()->back()->with('success', 'تم تسليم المشروع بنجاح');
+            return redirect()->back()->with('error', $result['message']);
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Error delivering project: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'حدث خطأ أثناء تسليم المشروع');
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تسليم المشروع: ' . $e->getMessage());
         }
     }
 
@@ -277,4 +282,3 @@ class ProjectDeliveryController extends Controller
         ];
     }
 }
-

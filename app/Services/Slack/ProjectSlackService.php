@@ -63,6 +63,19 @@ class ProjectSlackService extends BaseSlackService
     }
 
     /**
+     * إرسال إشعار عند رفع مرفق جديد في المجلدات الثابتة
+     */
+    public function sendAttachmentUploadedNotification(Project $project, User $participant, User $uploadedBy, string $folderName, string $fileName): bool
+    {
+        $message = $this->buildAttachmentUploadedMessage($project, $uploadedBy, $folderName, $fileName);
+        $context = 'إشعار رفع مرفق مشروع';
+        $this->setNotificationContext($context);
+
+        // استخدام Queue لتقليل الضغط على النظام
+        return $this->sendSlackNotification($participant, $message, $context, true);
+    }
+
+    /**
      * بناء رسالة منشن ملاحظة المشروع
      */
     private function buildProjectNoteMentionMessage(ProjectNote $note, User $mentionedUser, User $author): array
@@ -187,7 +200,13 @@ class ProjectSlackService extends BaseSlackService
      */
     private function buildDeliveryAwaitingApprovalMessage(ProjectServiceUser $delivery, User $approver, string $approvalType): array
     {
-        $typeArabic = $approvalType === 'administrative' ? 'الإداري' : 'الفني';
+        // ✅ التعامل مع حالة 'combined' بشكل صحيح
+        if ($approvalType === 'combined') {
+            $typeArabic = 'الإداري والفني';
+        } else {
+            $typeArabic = $approvalType === 'administrative' ? 'الإداري' : 'الفني';
+        }
+
         $projectUrl = url("/projects/{$delivery->project_id}");
         $deliveryUrl = route('deliveries.index');
 
@@ -195,6 +214,12 @@ class ProjectSlackService extends BaseSlackService
         $deliveredAt = $delivery->delivered_at ?
             $delivery->delivered_at->format('d/m/Y H:i') :
             now()->format('d/m/Y H:i');
+
+        // ✅ إصلاح style الأزرار - Slack يدعم فقط 'primary' أو 'danger'
+        $buttons = [
+            $this->buildActionButton('🔍 مراجعة التسليمات', $deliveryUrl, 'primary'),
+            $this->buildActionButton('🔗 عرض المشروع', $projectUrl)
+        ];
 
         return [
             'text' => "تسليمة جديدة بانتظار اعتمادك {$typeArabic}",
@@ -212,11 +237,7 @@ class ProjectSlackService extends BaseSlackService
                 ]),
                 $this->buildTextSection("⏰ *يرجى مراجعة التسليمة واتخاذ الإجراء المناسب في أقرب وقت*"),
                 $this->buildTextSection("📝 *ملاحظة:* يمكنك مراجعة تفاصيل التسليمة والموافقة عليها أو طلب تعديلات"),
-                $this->buildActionsSection([
-                    $this->buildActionButton('🔍 مراجعة التسليمات', $deliveryUrl, 'primary'),
-                    $this->buildActionButton('🔗 عرض المشروع', $projectUrl),
-                    $this->buildActionButton('✅ اعتماد فوري', $deliveryUrl, 'success')
-                ]),
+                $this->buildActionsSection($buttons),
                 $this->buildContextSection()
             ]
         ];
@@ -314,6 +335,33 @@ class ProjectSlackService extends BaseSlackService
                 $this->buildActionsSection([
                     $this->buildActionButton('🔍 مراجعة التسليمات', $deliveryUrl, 'primary'),
                     $this->buildActionButton('🔗 عرض المشروع', $projectUrl)
+                ]),
+                $this->buildContextSection()
+            ]
+        ];
+    }
+
+    /**
+     * بناء رسالة رفع مرفق جديد
+     */
+    private function buildAttachmentUploadedMessage(Project $project, User $uploadedBy, string $folderName, string $fileName): array
+    {
+        $projectUrl = url("/projects/{$project->id}");
+        $projectCode = $project->code ?? 'غير محدد';
+
+        return [
+            'text' => "تم رفع مرفق جديد في المشروع [{$projectCode}]",
+            'blocks' => [
+                $this->buildHeader('📎 تم رفع مرفق جديد'),
+                $this->buildInfoSection([
+                    "*المشروع:*\n{$project->name}",
+                    "*الكود:*\n{$projectCode}",
+                    "*المجلد:*\n{$folderName}",
+                    "*اسم الملف:*\n{$fileName}",
+                    "*رفعه:*\n{$uploadedBy->name}"
+                ]),
+                $this->buildActionsSection([
+                    $this->buildActionButton('🔗 عرض المشروع', $projectUrl, 'primary')
                 ]),
                 $this->buildContextSection()
             ]

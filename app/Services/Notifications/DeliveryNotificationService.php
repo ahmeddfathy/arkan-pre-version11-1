@@ -45,10 +45,25 @@ class DeliveryNotificationService
                 $technicalApprovers = $this->getPotentialApprovers($delivery, 'technical');
             }
 
-            // تحديد المعتمدين المشتركين بين الإداري والفني
-            $commonApprovers = $administrativeApprovers->intersectByKeys($technicalApprovers->keyBy('id'));
-            $uniqueAdministrativeApprovers = $administrativeApprovers->diffKeys($technicalApprovers->keyBy('id'));
-            $uniqueTechnicalApprovers = $technicalApprovers->diffKeys($administrativeApprovers->keyBy('id'));
+            // ✅ تحديد المعتمدين المشتركين بشكل صحيح باستخدام IDs
+            $administrativeIds = $administrativeApprovers->pluck('id')->unique();
+            $technicalIds = $technicalApprovers->pluck('id')->unique();
+            $commonIds = $administrativeIds->intersect($technicalIds);
+
+            // تجميع المعتمدين المشتركين
+            $commonApprovers = $administrativeApprovers->filter(function ($approver) use ($commonIds) {
+                return $commonIds->contains($approver->id);
+            })->unique('id');
+
+            // المعتمدين الإداريين فقط (بدون المشتركين)
+            $uniqueAdministrativeApprovers = $administrativeApprovers->filter(function ($approver) use ($commonIds) {
+                return !$commonIds->contains($approver->id);
+            })->unique('id');
+
+            // المعتمدين الفنيين فقط (بدون المشتركين)
+            $uniqueTechnicalApprovers = $technicalApprovers->filter(function ($approver) use ($commonIds) {
+                return !$commonIds->contains($approver->id);
+            })->unique('id');
 
             // إرسال إشعارات للمعتمدين المشتركين (إشعار واحد فقط)
             foreach ($commonApprovers as $approver) {
@@ -74,7 +89,6 @@ class DeliveryNotificationService
                 'unique_technical_count' => $uniqueTechnicalApprovers->count(),
                 'total_notifications_sent' => $commonApprovers->count() + $uniqueAdministrativeApprovers->count() + $uniqueTechnicalApprovers->count()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Failed to send delivery approval notifications', [
                 'error' => $e->getMessage(),
@@ -368,7 +382,6 @@ class DeliveryNotificationService
                 'approved_by' => $approver->id,
                 'approval_type' => $approvalType
             ]);
-
         } catch (\Exception $e) {
             Log::error('Failed to send employee approval notification', [
                 'error' => $e->getMessage(),
@@ -475,7 +488,6 @@ class DeliveryNotificationService
                 'approvers_count' => $allApprovers->count(),
                 'approvers_ids' => $allApprovers->pluck('id')->toArray()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Failed to send undelivery notifications', [
                 'delivery_id' => $delivery->id,
@@ -539,4 +551,3 @@ class DeliveryNotificationService
         }
     }
 }
-

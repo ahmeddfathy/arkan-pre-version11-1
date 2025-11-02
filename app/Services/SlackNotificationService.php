@@ -63,6 +63,14 @@ class SlackNotificationService
     }
 
     /**
+     * إرسال إشعار عند رفع مرفق جديد في المجلدات الثابتة
+     */
+    public function sendAttachmentUploadedNotification(Project $project, User $participant, User $uploadedBy, string $folderName, string $fileName): bool
+    {
+        return $this->projectSlackService->sendAttachmentUploadedNotification($project, $participant, $uploadedBy, $folderName, $fileName);
+    }
+
+    /**
      * إرسال إشعار عند تعيين مهمة للمستخدم
      */
     public function sendTaskAssignmentNotification($task, User $assignedUser, User $author): bool

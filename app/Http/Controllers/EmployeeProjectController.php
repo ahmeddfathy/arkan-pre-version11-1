@@ -5,12 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ProjectServiceUser;
 use App\Models\Project;
+use App\Services\ProjectManagement\ProjectDeliveryService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EmployeeProjectController extends Controller
 {
+    protected $deliveryService;
+
+    public function __construct(ProjectDeliveryService $deliveryService)
+    {
+        $this->deliveryService = $deliveryService;
+    }
+
     /**
      * عرض صفحة المشاريع للموظف
      */
@@ -18,26 +26,24 @@ class EmployeeProjectController extends Controller
     {
         $user = Auth::user();
 
-        // التحقق من المستوى الهرمي للمستخدم
+
         $hierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
 
-        // إذا كان Team Leader (hierarchy_level = 3) فقط، نعرض له صفحة team-leader
-        // المستخدم بمستوى 2 يبقى في الصفحة العادية
+
         if ($hierarchyLevel == 3) {
             return $this->teamLeaderIndex($request);
         }
 
-        // بناء الاستعلام الأساسي للموظف العادي
+
         $query = ProjectServiceUser::query()
             ->with(['project', 'service', 'team', 'user'])
             ->forUser($user->id);
 
-        // الفلترة حسب الحالة
         if ($request->filled('status')) {
             $query->byStatus($request->status);
         }
 
-        // الفلترة حسب الديدلاين
+
         if ($request->filled('deadline_filter')) {
             switch ($request->deadline_filter) {
                 case 'today':
@@ -58,20 +64,17 @@ class EmployeeProjectController extends Controller
             }
         }
 
-        // الفلترة حسب المشروع
         if ($request->filled('project_id')) {
             $query->forProject($request->project_id);
         }
 
-        // البحث عن المشروع بالكود أو الاسم
         if ($request->filled('search')) {
-            $query->whereHas('project', function($q) use ($request) {
+            $query->whereHas('project', function ($q) use ($request) {
                 $q->where('code', 'like', '%' . $request->search . '%')
-                  ->orWhere('name', 'like', '%' . $request->search . '%');
+                    ->orWhere('name', 'like', '%' . $request->search . '%');
             });
         }
 
-        // الترتيب
         $sortBy = $request->get('sort_by', 'deadline');
         $sortOrder = $request->get('sort_order', 'asc');
 
@@ -81,11 +84,10 @@ class EmployeeProjectController extends Controller
             $query->orderBy('status', $sortOrder);
         } elseif ($sortBy === 'project_name') {
             $query->join('projects', 'project_service_user.project_id', '=', 'projects.id')
-                  ->orderBy('projects.name', $sortOrder)
-                  ->select('project_service_user.*');
+                ->orderBy('projects.name', $sortOrder)
+                ->select('project_service_user.*');
         }
 
-        // إحصائيات للموظف
         $stats = [
             'total' => ProjectServiceUser::forUser($user->id)->count(),
             'in_progress' => ProjectServiceUser::forUser($user->id)->byStatus(ProjectServiceUser::STATUS_IN_PROGRESS)->count(),
@@ -98,17 +100,15 @@ class EmployeeProjectController extends Controller
 
         $projects = $query->paginate(15)->withQueryString();
 
-        // قائمة المشاريع للفلتر
-        $allProjects = Project::whereHas('projectServiceUsers', function($q) use ($user) {
+
+        $allProjects = Project::whereHas('projectServiceUsers', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->get(['id', 'name', 'code']);
 
         return view('employee.projects.index', compact('projects', 'stats', 'allProjects'));
     }
 
-    /**
-     * تحديث حالة المشروع
-     */
+
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -117,7 +117,6 @@ class EmployeeProjectController extends Controller
 
         $projectServiceUser = ProjectServiceUser::findOrFail($id);
 
-        // التحقق من صلاحية المستخدم
         if ($projectServiceUser->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -128,13 +127,24 @@ class EmployeeProjectController extends Controller
         $oldStatus = $projectServiceUser->status;
         $projectServiceUser->updateStatus($request->status);
 
-        // التحقق من المستوى الهرمي للمستخدم وتحديث حالة الخدمة إذا كان المستخدم بمستوى 2
         $user = Auth::user();
         $hierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
         $serviceStatusUpdated = false;
 
+        // لوج عام لتحديث حالة الموظف
+        Log::info('Employee Status Updated', [
+            'project_service_user_id' => $projectServiceUser->id,
+            'project_id' => $projectServiceUser->project_id,
+            'service_id' => $projectServiceUser->service_id,
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'hierarchy_level' => $hierarchyLevel,
+            'old_status' => $oldStatus,
+            'new_status' => $request->status,
+            'timestamp' => now()->format('Y-m-d H:i:s')
+        ]);
+
         if ($hierarchyLevel == 2) {
-            // تحديث حالة الخدمة في المشروع (project_service pivot table)
             $project = Project::find($projectServiceUser->project_id);
             if ($project) {
                 $project->services()->updateExistingPivot($projectServiceUser->service_id, [
@@ -143,23 +153,31 @@ class EmployeeProjectController extends Controller
                 ]);
                 $serviceStatusUpdated = true;
 
-                Log::info('Service Status Updated by Hierarchy Level 2 User', [
+                // لوج خاص بالمستوى الهرمي 2 - تحديث حالة الخدمة بالكامل
+                Log::info('🔥 HIERARCHY LEVEL 2: Service Status Updated', [
+                    'action' => 'FULL_SERVICE_STATUS_UPDATE',
                     'project_id' => $projectServiceUser->project_id,
+                    'project_name' => $project->name,
                     'service_id' => $projectServiceUser->service_id,
+                    'service_name' => $projectServiceUser->service->name ?? 'N/A',
                     'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'user_email' => $user->email,
                     'hierarchy_level' => $hierarchyLevel,
+                    'old_status' => $oldStatus,
                     'new_status' => $request->status,
-                    'service_status_updated' => true
+                    'service_status_updated' => true,
+                    'pivot_table_updated' => true,
+                    'timestamp' => now()->format('Y-m-d H:i:s'),
+                    'impact' => 'يؤثر على حالة الخدمة بالكامل في المشروع'
                 ]);
             }
         }
 
-        // 🔔 إرسال إشعار سلاك للمشاركين في الخدمات التي تعتمد على هذه الخدمة
         try {
             $project = $projectServiceUser->project;
             $service = $projectServiceUser->service;
 
-            // جلب الخدمات التي تعتمد على الخدمة الحالية
             $dependentServices = DB::table('service_dependencies')
                 ->where('depends_on_service_id', $projectServiceUser->service_id)
                 ->pluck('service_id');
@@ -178,6 +196,10 @@ class EmployeeProjectController extends Controller
                     ->where('user_id', '!=', $user->id)
                     ->with(['user', 'service'])
                     ->get();
+
+                // مصفوفة لتخزين معلومات المستلمين للإشعارات
+                $notifiedUsers = [];
+                $usersWithoutSlack = [];
 
                 foreach ($dependentParticipants as $participant) {
                     if ($participant->user && $participant->user->slack_user_id) {
@@ -263,24 +285,102 @@ class EmployeeProjectController extends Controller
                             'تحديث حالة خدمة معتمد عليها'
                         );
 
-                        Log::info('Slack notification queued for dependent service participant', [
+                        // إضافة المستخدم للقائمة
+                        $notifiedUsers[] = [
+                            'user_id' => $participant->user_id,
+                            'user_name' => $participant->user->name,
+                            'user_email' => $participant->user->email,
+                            'service_id' => $participant->service_id,
+                            'service_name' => $participant->service->name ?? 'N/A',
+                            'slack_user_id' => $participant->user->slack_user_id
+                        ];
+
+                        Log::info('📧 Slack notification queued for participant', [
+                            'recipient_user_id' => $participant->user_id,
+                            'recipient_name' => $participant->user->name,
+                            'recipient_email' => $participant->user->email,
+                            'recipient_service' => $participant->service->name ?? 'N/A',
                             'project_id' => $project->id,
-                            'service_id' => $service->id,
-                            'participant_user_id' => $participant->user_id,
-                            'participant_service_id' => $participant->service_id,
-                            'updated_by_user_id' => $user->id
+                            'project_name' => $project->name,
+                            'updated_service' => $service->name,
+                            'updated_by' => $user->name,
+                            'status_change' => "{$oldStatus} → {$request->status}"
                         ]);
+                    } else {
+                        // المستخدم ليس لديه Slack ID - إرسال Database Notification
+                        if ($participant->user) {
+                            // بيانات الإشعار
+                            $projectDisplay = $project->code ?? $project->name; // كود المشروع أو اسمه كبديل
+                            $notificationData = [
+                                'title' => '📊 تحديث في خدمة يعتمد عليها عملك',
+                                'message' => "تم تحديث حالة خدمة {$service->name} في مشروع {$projectDisplay}",
+                                'project_id' => $project->id,
+                                'project_name' => $project->name,
+                                'project_code' => $project->code ?? null,
+                                'service_id' => $service->id,
+                                'service_name' => $service->name,
+                                'your_service_id' => $participant->service_id,
+                                'your_service_name' => $participant->service->name ?? 'N/A',
+                                'updated_by_user_id' => $user->id,
+                                'updated_by_name' => $user->name,
+                                'old_status' => $oldStatus,
+                                'new_status' => $request->status,
+                                'status_change' => "{$oldStatus} → {$request->status}",
+                                'url' => route('projects.show', $project->id),
+                                'type' => 'dependent_service_status_updated',
+                                'timestamp' => now()->format('Y-m-d H:i:s'),
+                                'icon' => '📊',
+                                'priority' => 'high'
+                            ];
+
+                            // إرسال Database Notification عبر Job
+                            \App\Jobs\SendDatabaseNotification::dispatch(
+                                $participant->user,
+                                $notificationData,
+                                'تحديث حالة خدمة معتمد عليها'
+                            );
+
+                            $usersWithoutSlack[] = [
+                                'user_id' => $participant->user_id,
+                                'user_name' => $participant->user->name,
+                                'user_email' => $participant->user->email,
+                                'service_name' => $participant->service->name ?? 'N/A',
+                                'notification_type' => 'database'
+                            ];
+
+                            Log::info('📬 Database notification queued for user without Slack', [
+                                'recipient_user_id' => $participant->user_id,
+                                'recipient_name' => $participant->user->name,
+                                'recipient_email' => $participant->user->email,
+                                'recipient_service' => $participant->service->name ?? 'N/A',
+                                'project_id' => $project->id,
+                                'project_name' => $project->name,
+                                'updated_service' => $service->name,
+                                'updated_by' => $user->name,
+                                'status_change' => "{$oldStatus} → {$request->status}",
+                                'notification_type' => 'database'
+                            ]);
+                        }
                     }
                 }
 
-                Log::info('Dependent services status update notifications queued', [
+                // لوج نهائي شامل بجميع المستلمين
+                Log::info('🔔 Slack Notifications Summary', [
+                    'action' => 'DEPENDENT_SERVICES_NOTIFICATION',
                     'project_id' => $projectServiceUser->project_id,
+                    'project_name' => $project->name,
                     'service_id' => $projectServiceUser->service_id,
-                    'user_id' => $user->id,
-                    'old_status' => $oldStatus,
-                    'new_status' => $request->status,
+                    'service_name' => $service->name,
+                    'updated_by_user_id' => $user->id,
+                    'updated_by_name' => $user->name,
+                    'status_change' => "{$oldStatus} → {$request->status}",
                     'dependent_services_count' => $dependentServices->count(),
-                    'notified_users' => $dependentParticipants->count()
+                    'total_participants' => $dependentParticipants->count(),
+                    'notified_users_count' => count($notifiedUsers),
+                    'users_without_slack_count' => count($usersWithoutSlack),
+                    'notified_users' => $notifiedUsers,
+                    'users_without_slack' => $usersWithoutSlack,
+                    'timestamp' => now()->format('Y-m-d H:i:s')
                 ]);
             }
         } catch (\Exception $e) {
@@ -375,13 +475,24 @@ class EmployeeProjectController extends Controller
             ], 400);
         }
 
-        $projectServiceUser->deliver();
+        // ✅ استخدام ProjectDeliveryService لإرسال الإشعارات للمعتمدين
+        $result = $this->deliveryService->deliverParticipantProject($id);
+
+        if ($result['success']) {
+            $projectServiceUser->refresh(); // تحديث البيانات بعد التسليم
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+                'delivered_at' => $projectServiceUser->delivered_at ? $projectServiceUser->delivered_at->format('Y/m/d h:i A') : null,
+                'participant' => $result['participant'] ?? null
+            ]);
+        }
 
         return response()->json([
-            'success' => true,
-            'message' => 'تم تسليم المشروع بنجاح',
-            'delivered_at' => $projectServiceUser->delivered_at->format('Y/m/d h:i A')
-        ]);
+            'success' => false,
+            'message' => $result['message']
+        ], $result['status_code'] ?? 500);
     }
 
     /**
@@ -389,30 +500,21 @@ class EmployeeProjectController extends Controller
      */
     public function undeliverProject(Request $request, $id)
     {
-        $projectServiceUser = ProjectServiceUser::findOrFail($id);
+        // ✅ استخدام ProjectDeliveryService لإرسال الإشعارات عند إلغاء التسليم
+        $result = $this->deliveryService->undeliverParticipantProject($id);
 
-        // التحقق من صلاحية المستخدم
-        if ($projectServiceUser->user_id !== Auth::id()) {
+        if ($result['success']) {
             return response()->json([
-                'success' => false,
-                'message' => 'غير مصرح لك بإلغاء تسليم هذا المشروع'
-            ], 403);
+                'success' => true,
+                'message' => $result['message'],
+                'participant' => $result['participant'] ?? null
+            ]);
         }
-
-        // التحقق من إمكانية إلغاء التسليم
-        if (!$projectServiceUser->canBeUndelivered()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'لا يمكن إلغاء التسليم لأنه تم اعتماد المشروع'
-            ], 400);
-        }
-
-        $projectServiceUser->undeliver();
 
         return response()->json([
-            'success' => true,
-            'message' => 'تم إلغاء تسليم المشروع بنجاح'
-        ]);
+            'success' => false,
+            'message' => $result['message']
+        ], $result['status_code'] ?? 500);
     }
 
     /**
@@ -428,7 +530,7 @@ class EmployeeProjectController extends Controller
         // الخطوة 1: جلب المشاريع والخدمات التي يعمل عليها Team Leader
         $myProjectServices = ProjectServiceUser::where('user_id', $user->id)
             ->get(['project_id', 'service_id'])
-            ->map(function($item) {
+            ->map(function ($item) {
                 return $item->project_id . '-' . $item->service_id;
             })
             ->unique()
@@ -459,16 +561,16 @@ class EmployeeProjectController extends Controller
                 'administrativeApprover',
                 'technicalApprover'
             ])
-            ->where(function($q) use ($user) {
+            ->where(function ($q) use ($user) {
                 // نجيب المشاريع والخدمات اللي Team Leader شغال عليها
                 $myProjects = ProjectServiceUser::where('user_id', $user->id)
                     ->select('project_id', 'service_id')
                     ->get();
 
                 foreach ($myProjects as $myProject) {
-                    $q->orWhere(function($subQ) use ($myProject) {
+                    $q->orWhere(function ($subQ) use ($myProject) {
                         $subQ->where('project_id', $myProject->project_id)
-                             ->where('service_id', $myProject->service_id);
+                            ->where('service_id', $myProject->service_id);
                     });
                 }
             });
@@ -506,9 +608,9 @@ class EmployeeProjectController extends Controller
 
         // البحث عن المشروع بالكود أو الاسم
         if ($request->filled('search')) {
-            $query->whereHas('project', function($q) use ($request) {
+            $query->whereHas('project', function ($q) use ($request) {
                 $q->where('code', 'like', '%' . $request->search . '%')
-                  ->orWhere('name', 'like', '%' . $request->search . '%');
+                    ->orWhere('name', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -516,9 +618,9 @@ class EmployeeProjectController extends Controller
         $projectServices = $query->get();
 
         // تجميع البيانات حسب المشروع والخدمة
-        $groupedProjects = $projectServices->groupBy(function($item) {
+        $groupedProjects = $projectServices->groupBy(function ($item) {
             return $item->project_id . '-' . $item->service_id;
-        })->map(function($serviceUsers, $key) use ($user) {
+        })->map(function ($serviceUsers, $key) use ($user) {
             $first = $serviceUsers->first();
 
             // حساب الإحصائيات للخدمة
@@ -527,7 +629,7 @@ class EmployeeProjectController extends Controller
                 'completed' => $serviceUsers->where('status', ProjectServiceUser::STATUS_FINAL_DELIVERY)->count(),
                 'in_progress' => $serviceUsers->where('status', ProjectServiceUser::STATUS_IN_PROGRESS)->count(),
                 'draft_delivery' => $serviceUsers->where('status', ProjectServiceUser::STATUS_DRAFT_DELIVERY)->count(),
-                'overdue' => $serviceUsers->filter(function($item) {
+                'overdue' => $serviceUsers->filter(function ($item) {
                     return $item->isOverdue() && $item->status != ProjectServiceUser::STATUS_FINAL_DELIVERY;
                 })->count(),
             ];
@@ -557,7 +659,7 @@ class EmployeeProjectController extends Controller
         $stats = [
             'total_services' => $groupedProjects->count(),
             'completed_services' => $groupedProjects->where('service_status', ProjectServiceUser::STATUS_FINAL_DELIVERY)->count(),
-            'overdue_services' => $groupedProjects->filter(function($service) {
+            'overdue_services' => $groupedProjects->filter(function ($service) {
                 return $service['stats']['overdue'] > 0;
             })->count(),
             'in_progress_services' => $groupedProjects->where('service_status', ProjectServiceUser::STATUS_IN_PROGRESS)->count(),
@@ -568,7 +670,7 @@ class EmployeeProjectController extends Controller
         ];
 
         // قائمة المشاريع للفلتر (المشاريع التي يعمل عليها Team Leader)
-        $allProjects = Project::whereHas('projectServiceUsers', function($q) use ($user) {
+        $allProjects = Project::whereHas('projectServiceUsers', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->get(['id', 'name', 'code']);
 
@@ -624,31 +726,75 @@ class EmployeeProjectController extends Controller
             ], 404);
         }
 
+        $oldStatus = $myRecord->status;
         $myRecord->status = $request->status;
         $myRecord->save();
 
         // تحديث حالة الخدمة في المشروع (project_service pivot table) فقط للمستوى الهرمي 2
         $serviceStatusUpdated = false;
+
+        // لوج عام لتحديث حالة الموظف
+        Log::info('Employee Status Updated via updateServiceStatus', [
+            'project_service_user_id' => $myRecord->id,
+            'project_id' => $projectId,
+            'service_id' => $serviceId,
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'hierarchy_level' => $hierarchyLevel,
+            'old_status' => $oldStatus,
+            'new_status' => $request->status,
+            'timestamp' => now()->format('Y-m-d H:i:s')
+        ]);
+
         if ($hierarchyLevel == 2) {
             $project = Project::find($projectId);
             if ($project) {
+                $service = $project->services()->find($serviceId);
+
                 $project->services()->updateExistingPivot($serviceId, [
                     'service_status' => $request->status,
                     'updated_at' => now()
                 ]);
                 $serviceStatusUpdated = true;
-            }
-        }
 
-        // Log للتأكد
-        Log::info('User Status Update', [
-            'project_id' => $projectId,
-            'service_id' => $serviceId,
-            'user_id' => $user->id,
-            'hierarchy_level' => $hierarchyLevel,
-            'new_status' => $request->status,
-            'service_status_updated' => $serviceStatusUpdated
-        ]);
+                // لوج خاص بالمستوى الهرمي 2 - تحديث حالة الخدمة بالكامل
+                Log::info('🔥 HIERARCHY LEVEL 2: Service Status Updated via updateServiceStatus', [
+                    'action' => 'FULL_SERVICE_STATUS_UPDATE_FROM_TEAM_LEADER_PAGE',
+                    'method' => 'updateServiceStatus',
+                    'project_id' => $projectId,
+                    'project_name' => $project->name,
+                    'project_code' => $project->code,
+                    'service_id' => $serviceId,
+                    'service_name' => $service->name ?? 'N/A',
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'user_email' => $user->email,
+                    'hierarchy_level' => $hierarchyLevel,
+                    'old_status' => $oldStatus,
+                    'new_status' => $request->status,
+                    'service_status_updated' => true,
+                    'pivot_table_updated' => true,
+                    'timestamp' => now()->format('Y-m-d H:i:s'),
+                    'impact' => 'يؤثر على حالة الخدمة بالكامل في المشروع (تم التحديث من صفحة قائد الفريق)'
+                ]);
+            }
+        } else {
+            // لوج للمستويات الأخرى (مثل Team Leader مستوى 3)
+            Log::info('Team Leader Personal Status Updated', [
+                'action' => 'PERSONAL_STATUS_UPDATE_ONLY',
+                'method' => 'updateServiceStatus',
+                'project_id' => $projectId,
+                'service_id' => $serviceId,
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'hierarchy_level' => $hierarchyLevel,
+                'old_status' => $oldStatus,
+                'new_status' => $request->status,
+                'service_status_updated' => false,
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+                'note' => 'تم تحديث الحالة الشخصية فقط - لا يؤثر على حالة الخدمة الكلية'
+            ]);
+        }
 
         // رسالة مختلفة حسب المستوى الهرمي
         $message = $serviceStatusUpdated

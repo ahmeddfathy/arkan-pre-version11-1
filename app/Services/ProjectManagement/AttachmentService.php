@@ -117,7 +117,36 @@ class AttachmentService
     public function confirmUpload($attachmentId)
     {
         $attachment = ProjectAttachment::findOrFail($attachmentId);
+
+        // التحقق من أن الملف لم يتم تأكيده مسبقاً
+        $wasAlreadyUploaded = $attachment->is_uploaded;
+
         $attachment->update(['is_uploaded' => true]);
+
+        // ✅ إرسال إشعارات لجميع المشاركين عند تأكيد رفع ملف في المجلدات الثابتة
+        // فقط إذا كان هذا أول تأكيد (لم يتم تأكيده مسبقاً) وليس رد على ملف
+        if (!$wasAlreadyUploaded && !$attachment->parent_attachment_id) {
+            try {
+                $project = Project::findOrFail($attachment->project_id);
+                $uploadedBy = \App\Models\User::find($attachment->uploaded_by);
+
+                $this->notificationService->notifyProjectParticipantsOfAttachment(
+                    $project,
+                    $attachment->service_type,
+                    $attachment->file_name,
+                    $uploadedBy
+                );
+            } catch (\Exception $e) {
+                // تسجيل الخطأ فقط دون إيقاف عملية التأكيد
+                Log::error('خطأ في إرسال إشعار رفع مرفق عند التأكيد', [
+                    'error' => $e->getMessage(),
+                    'attachment_id' => $attachmentId,
+                    'project_id' => $attachment->project_id,
+                    'service_type' => $attachment->service_type
+                ]);
+            }
+        }
+
         return $attachment;
     }
 
@@ -186,8 +215,6 @@ class AttachmentService
 
             $attachment = ProjectAttachment::create($attachmentData);
 
-            // إرسال إشعار لجميع المشاركين في المشروع عند رفع مرفق في الفولدرات الثابتة
-            // فقط للمرفقات الأساسية (ليست ردود)
             if (!$parentAttachmentId) {
                 try {
                     $this->notificationService->notifyProjectParticipantsOfAttachment(
