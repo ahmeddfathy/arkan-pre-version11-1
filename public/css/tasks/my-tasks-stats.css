@@ -32,7 +32,6 @@
     contain: layout style paint;
 }
 
-
 /* Card Header */
 .stats-card-header {
     display: flex;
@@ -86,7 +85,10 @@
     color: var(--value-color, #2c3e50);
     line-height: 1.2;
     text-align: right;
-    background: var(--value-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    background: var(
+        --value-gradient,
+        linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -119,7 +121,10 @@
 
 .stats-progress-fill {
     height: 100%;
-    background: var(--progress-gradient, linear-gradient(90deg, #667eea 0%, #764ba2 100%));
+    background: var(
+        --progress-gradient,
+        linear-gradient(90deg, #667eea 0%, #764ba2 100%)
+    );
     border-radius: 10px;
     transition: width 0.4s ease-out;
     /* GPU Acceleration */
@@ -348,4 +353,3 @@
 .stats-card:hover {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
-

@@ -174,7 +174,7 @@
         <!-- Projects Table -->
         <div class="projects-table-container">
             <div class="table-header">
-                <h2>📋 قائمة مشاريعي</h2>
+                <h2> قائمة مشاريعي</h2>
             </div>
 
             <table class="projects-table">

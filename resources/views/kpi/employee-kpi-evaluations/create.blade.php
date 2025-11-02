@@ -429,6 +429,9 @@
                 <button class="nav-link active" id="revisions-tab" data-bs-toggle="pill" data-bs-target="#revisions" type="button" role="tab">
                     <i class="fas fa-edit me-2"></i>التعديلات
                 </button>
+                <button class="nav-link" id="delivered-projects-tab" data-bs-toggle="pill" data-bs-target="#delivered-projects" type="button" role="tab">
+                    <i class="fas fa-check-circle me-2"></i>المشاريع المسلّمة
+                </button>
                 <button class="nav-link" id="errors-tab" data-bs-toggle="pill" data-bs-target="#errors" type="button" role="tab">
                     <i class="fas fa-exclamation-triangle me-2"></i>الأخطاء
                 </button>
@@ -458,6 +461,13 @@
             <div class="tab-pane fade show active" id="revisions" role="tabpanel">
                 <div class="tab-content-wrapper">
                     <div id="revisionsContent"></div>
+                </div>
+            </div>
+
+            <!-- المشاريع المسلّمة -->
+            <div class="tab-pane fade" id="delivered-projects" role="tabpanel">
+                <div class="tab-content-wrapper">
+                    <div id="deliveredProjectsContent"></div>
                 </div>
             </div>
 

@@ -41,9 +41,9 @@
                     @include('tasks.partials-index.calendar-view')
 
                     <div class="mt-4">
-                                                    @unless(request('show_all') == '1')
-                                {{ $tasks->links() }}
-                            @endunless
+                        @unless(request('show_all') == '1')
+                        {{ $tasks->links() }}
+                        @endunless
                     </div>
                 </div>
             </div>

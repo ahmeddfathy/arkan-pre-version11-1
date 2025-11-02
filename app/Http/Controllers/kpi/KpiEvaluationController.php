@@ -85,21 +85,21 @@ class KpiEvaluationController extends Controller
                 ->with('error', 'لا توجد بنود تقييم معرّفة لهذا الدور. يرجى إضافة بنود التقييم أولاً.');
         }
 
-        $usersWithRole = \App\Models\User::whereHas('roles', function($query) use ($selectedRoleId) {
+        $usersWithRole = \App\Models\User::whereHas('roles', function ($query) use ($selectedRoleId) {
             $query->where('roles.id', $selectedRoleId);
         })
-        ->when($user->department, function($query) use ($user) {
-            return $query->where('department', $user->department);
-        })
-        ->select('id', 'name', 'department')
-        ->get();
-
-        if ($usersWithRole->isEmpty()) {
-            $usersWithRole = \App\Models\User::whereHas('roles', function($query) use ($selectedRoleId) {
-                $query->where('roles.id', $selectedRoleId);
+            ->when($user->department, function ($query) use ($user) {
+                return $query->where('department', $user->department);
             })
             ->select('id', 'name', 'department')
             ->get();
+
+        if ($usersWithRole->isEmpty()) {
+            $usersWithRole = \App\Models\User::whereHas('roles', function ($query) use ($selectedRoleId) {
+                $query->where('roles.id', $selectedRoleId);
+            })
+                ->select('id', 'name', 'department')
+                ->get();
         }
 
         return view('kpi.employee-kpi-evaluations.create', compact(
@@ -256,7 +256,6 @@ class KpiEvaluationController extends Controller
                     $user->id
                 );
             }
-
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'حدث خطأ أثناء حفظ التقييم: ' . $e->getMessage()]);
         }
@@ -283,7 +282,7 @@ class KpiEvaluationController extends Controller
             $criteriaDetails = EvaluationCriteria::whereIn('id', array_keys($criteriaScores))
                 ->projectBased()
                 ->get()
-                ->mapWithKeys(function($criterion) use ($criteriaScores) {
+                ->mapWithKeys(function ($criterion) use ($criteriaScores) {
                     return [
                         $criterion->id => [
                             'name' => $criterion->criteria_name,
@@ -601,15 +600,15 @@ class KpiEvaluationController extends Controller
             return response()->json(['error' => 'معطيات غير صحيحة'], 400);
         }
 
-        $projects = \App\Models\Project::whereHas('serviceParticipants', function($query) use ($userId) {
+        $projects = \App\Models\Project::whereHas('serviceParticipants', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })
-        ->with(['client', 'serviceParticipants' => function($query) use ($userId) {
-            $query->where('user_id', $userId);
-        }])
-        ->where('status', '!=', 'ملغي') // استبعاد المشاريع الملغاة
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->with(['client', 'serviceParticipants' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }])
+            ->where('status', '!=', 'ملغي') // استبعاد المشاريع الملغاة
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $projectCriteria = EvaluationCriteria::forRole($roleId)
             ->projectBased()
@@ -619,7 +618,7 @@ class KpiEvaluationController extends Controller
 
         return response()->json([
             'success' => true,
-            'projects' => $projects->map(function($project) use ($userId, $roleId, $reviewMonth) {
+            'projects' => $projects->map(function ($project) use ($userId, $roleId, $reviewMonth) {
                 $isEvaluated = ProjectEvaluation::hasProjectEvaluation($userId, $project->id, $roleId, $reviewMonth);
                 $evaluation = null;
 
@@ -641,7 +640,7 @@ class KpiEvaluationController extends Controller
                     'evaluation_criteria_scores' => $evaluation ? $evaluation->criteria_scores : null,
                 ];
             }),
-            'criteria' => $projectCriteria->map(function($criteria) {
+            'criteria' => $projectCriteria->map(function ($criteria) {
                 return [
                     'id' => $criteria->id,
                     'name' => $criteria->criteria_name,
@@ -688,7 +687,7 @@ class KpiEvaluationController extends Controller
                 'created_at' => $kpiEvaluation->created_at->format('Y-m-d H:i'),
                 'reviewer_name' => $kpiEvaluation->reviewer->name ?? 'غير محدد',
                 'role_name' => $kpiEvaluation->role->display_name ?? $kpiEvaluation->role->name ?? 'غير محدد',
-                'criteria' => $criteriaWithScores->map(function($criterion) {
+                'criteria' => $criteriaWithScores->map(function ($criterion) {
                     return [
                         'id' => $criterion->id ?? null,
                         'criteria_name' => $criterion->criteria_name ?? 'غير محدد',
@@ -706,7 +705,6 @@ class KpiEvaluationController extends Controller
                 'success' => true,
                 'data' => $data
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -779,6 +777,13 @@ class KpiEvaluationController extends Controller
                 Log::error('Error getting transferred tasks: ' . $e->getMessage());
             }
 
+            $deliveredProjects = [];
+            try {
+                $deliveredProjects = $this->getDeliveredProjects($userId, $month, $evaluationType);
+            } catch (\Exception $e) {
+                Log::error('Error getting delivered projects: ' . $e->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -787,6 +792,7 @@ class KpiEvaluationController extends Controller
                     'delayed_tasks' => $delayedTasks,
                     'employee_errors' => $employeeErrors,
                     'transferred_tasks' => $transferredTasks,
+                    'delivered_projects' => $deliveredProjects,
                     'evaluation_type' => $evaluationType,
                     'user' => [
                         'id' => $user->id,
@@ -796,7 +802,6 @@ class KpiEvaluationController extends Controller
                     'month' => $month
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error in getUserDetails: ' . $e->getMessage());
             return response()->json([
@@ -822,7 +827,7 @@ class KpiEvaluationController extends Controller
                 ->orderBy('revision_date', 'desc')
                 ->get();
 
-            return $revisions->map(function($revision) {
+            return $revisions->map(function ($revision) {
                 return [
                     'id' => $revision->id,
                     'title' => $revision->title ?? 'بدون عنوان',
@@ -866,35 +871,35 @@ class KpiEvaluationController extends Controller
             $delayedProjectParticipations = \App\Models\ProjectServiceUser::with(['project.client'])
                 ->where('user_id', $userId)
                 ->whereNotNull('deadline')
-                ->where(function($query) use ($startDate, $endDate) {
+                ->where(function ($query) use ($startDate, $endDate) {
                     // الحالة 1: سلّم متأخر (delivered_at > deadline)
                     // يظهر إذا: التسليم ضمن الفترة OR الديدلاين ضمن الفترة
-                    $query->where(function($q) use ($startDate, $endDate) {
+                    $query->where(function ($q) use ($startDate, $endDate) {
                         $q->whereNotNull('delivered_at')
-                          ->whereRaw('delivered_at > deadline')
-                          ->where(function($sq) use ($startDate, $endDate) {
-                              $sq->whereBetween('delivered_at', [$startDate, $endDate])
-                                 ->orWhereBetween('deadline', [$startDate, $endDate]);
-                          });
+                            ->whereRaw('delivered_at > deadline')
+                            ->where(function ($sq) use ($startDate, $endDate) {
+                                $sq->whereBetween('delivered_at', [$startDate, $endDate])
+                                    ->orWhereBetween('deadline', [$startDate, $endDate]);
+                            });
                     })
-                    // الحالة 2: لم يسلم بعد والديدلاين فات (لسه متأخر)
-                    // يظهر إذا: الديدلاين ضمن الفترة OR الديدلاين فات وإحنا لسه في الفترة
-                    ->orWhere(function($q) use ($startDate, $endDate) {
-                        $q->whereNull('delivered_at')
-                          ->where('deadline', '<', now())
-                          ->where(function($sq) use ($startDate, $endDate) {
-                              $sq->whereBetween('deadline', [$startDate, $endDate])
-                                 ->orWhere(function($ssq) use ($startDate, $endDate) {
-                                     // الديدلاين فات قبل الفترة لكن لسه مش مسلم
-                                     $ssq->where('deadline', '<', $startDate)
-                                        ->where(DB::raw("'$endDate'"), '>=', DB::raw('CURDATE()'));
-                                 });
-                          });
-                    });
+                        // الحالة 2: لم يسلم بعد والديدلاين فات (لسه متأخر)
+                        // يظهر إذا: الديدلاين ضمن الفترة OR الديدلاين فات وإحنا لسه في الفترة
+                        ->orWhere(function ($q) use ($startDate, $endDate) {
+                            $q->whereNull('delivered_at')
+                                ->where('deadline', '<', now())
+                                ->where(function ($sq) use ($startDate, $endDate) {
+                                    $sq->whereBetween('deadline', [$startDate, $endDate])
+                                        ->orWhere(function ($ssq) use ($startDate, $endDate) {
+                                            // الديدلاين فات قبل الفترة لكن لسه مش مسلم
+                                            $ssq->where('deadline', '<', $startDate)
+                                                ->where(DB::raw("'$endDate'"), '>=', DB::raw('CURDATE()'));
+                                        });
+                                });
+                        });
                 })
                 ->get();
 
-            return $delayedProjectParticipations->map(function($participation) {
+            return $delayedProjectParticipations->map(function ($participation) {
                 $delayDays = 0;
                 $deliveryDate = null;
                 $isDelivered = !is_null($participation->delivered_at);
@@ -947,31 +952,31 @@ class KpiEvaluationController extends Controller
                     ->where('user_id', $userId)
                     ->where('is_transferred', '!=', 1) // استبعاد المهام المنقولة
                     ->whereNotNull('due_date')
-                    ->where(function($query) use ($startDate, $endDate) {
+                    ->where(function ($query) use ($startDate, $endDate) {
                         // الحالة 1: اكتملت متأخرة (completed_date > due_date)
-                        $query->where(function($q) use ($startDate, $endDate) {
+                        $query->where(function ($q) use ($startDate, $endDate) {
                             $q->where('status', 'completed')
-                              ->whereNotNull('completed_date')
-                              ->whereRaw('completed_date > due_date')
-                              ->where(function($sq) use ($startDate, $endDate) {
-                                  // تظهر إذا: الإكمال ضمن الفترة OR الـ due_date ضمن الفترة
-                                  $sq->whereBetween('completed_date', [$startDate, $endDate])
-                                     ->orWhereBetween('due_date', [$startDate, $endDate]);
-                              });
+                                ->whereNotNull('completed_date')
+                                ->whereRaw('completed_date > due_date')
+                                ->where(function ($sq) use ($startDate, $endDate) {
+                                    // تظهر إذا: الإكمال ضمن الفترة OR الـ due_date ضمن الفترة
+                                    $sq->whereBetween('completed_date', [$startDate, $endDate])
+                                        ->orWhereBetween('due_date', [$startDate, $endDate]);
+                                });
                         })
-                        // الحالة 2: لم تكتمل بعد والـ due_date فات
-                        ->orWhere(function($q) use ($startDate, $endDate) {
-                            $q->where('status', '!=', 'completed')
-                              ->where('due_date', '<', now())
-                              ->where(function($sq) use ($startDate, $endDate) {
-                                  $sq->whereBetween('due_date', [$startDate, $endDate])
-                                     ->orWhere(function($ssq) use ($startDate, $endDate) {
-                                         // الـ due_date فات قبل الفترة لكن لسه مش مكتملة
-                                         $ssq->where('due_date', '<', $startDate)
-                                            ->where(DB::raw("'$endDate'"), '>=', DB::raw('CURDATE()'));
-                                     });
-                              });
-                        });
+                            // الحالة 2: لم تكتمل بعد والـ due_date فات
+                            ->orWhere(function ($q) use ($startDate, $endDate) {
+                                $q->where('status', '!=', 'completed')
+                                    ->where('due_date', '<', now())
+                                    ->where(function ($sq) use ($startDate, $endDate) {
+                                        $sq->whereBetween('due_date', [$startDate, $endDate])
+                                            ->orWhere(function ($ssq) use ($startDate, $endDate) {
+                                                // الـ due_date فات قبل الفترة لكن لسه مش مكتملة
+                                                $ssq->where('due_date', '<', $startDate)
+                                                    ->where(DB::raw("'$endDate'"), '>=', DB::raw('CURDATE()'));
+                                            });
+                                    });
+                            });
                     })
                     ->get();
 
@@ -1015,31 +1020,31 @@ class KpiEvaluationController extends Controller
                     ->where('user_id', $userId)
                     ->where('is_transferred', '!=', 1) // استبعاد المهام المنقولة
                     ->whereNotNull('deadline')
-                    ->where(function($query) use ($startDate, $endDate) {
+                    ->where(function ($query) use ($startDate, $endDate) {
                         // الحالة 1: اكتملت متأخرة (completed_at > deadline)
-                        $query->where(function($q) use ($startDate, $endDate) {
+                        $query->where(function ($q) use ($startDate, $endDate) {
                             $q->where('status', 'completed')
-                              ->whereNotNull('completed_at')
-                              ->whereRaw('completed_at > deadline')
-                              ->where(function($sq) use ($startDate, $endDate) {
-                                  // تظهر إذا: الإكمال ضمن الفترة OR الـ deadline ضمن الفترة
-                                  $sq->whereBetween('completed_at', [$startDate, $endDate])
-                                     ->orWhereBetween('deadline', [$startDate, $endDate]);
-                              });
+                                ->whereNotNull('completed_at')
+                                ->whereRaw('completed_at > deadline')
+                                ->where(function ($sq) use ($startDate, $endDate) {
+                                    // تظهر إذا: الإكمال ضمن الفترة OR الـ deadline ضمن الفترة
+                                    $sq->whereBetween('completed_at', [$startDate, $endDate])
+                                        ->orWhereBetween('deadline', [$startDate, $endDate]);
+                                });
                         })
-                        // الحالة 2: لم تكتمل بعد والـ deadline فات
-                        ->orWhere(function($q) use ($startDate, $endDate) {
-                            $q->where('status', '!=', 'completed')
-                              ->where('deadline', '<', now())
-                              ->where(function($sq) use ($startDate, $endDate) {
-                                  $sq->whereBetween('deadline', [$startDate, $endDate])
-                                     ->orWhere(function($ssq) use ($startDate, $endDate) {
-                                         // الـ deadline فات قبل الفترة لكن لسه مش مكتملة
-                                         $ssq->where('deadline', '<', $startDate)
-                                            ->where(DB::raw("'$endDate'"), '>=', DB::raw('CURDATE()'));
-                                     });
-                              });
-                        });
+                            // الحالة 2: لم تكتمل بعد والـ deadline فات
+                            ->orWhere(function ($q) use ($startDate, $endDate) {
+                                $q->where('status', '!=', 'completed')
+                                    ->where('deadline', '<', now())
+                                    ->where(function ($sq) use ($startDate, $endDate) {
+                                        $sq->whereBetween('deadline', [$startDate, $endDate])
+                                            ->orWhere(function ($ssq) use ($startDate, $endDate) {
+                                                // الـ deadline فات قبل الفترة لكن لسه مش مكتملة
+                                                $ssq->where('deadline', '<', $startDate)
+                                                    ->where(DB::raw("'$endDate'"), '>=', DB::raw('CURDATE()'));
+                                            });
+                                    });
+                            });
                     })
                     ->get();
 
@@ -1144,7 +1149,6 @@ class KpiEvaluationController extends Controller
             }
 
             return $transferredTasks->sortByDesc('transferred_at')->values()->toArray();
-
         } catch (\Exception $e) {
             Log::error('getTransferredTasks error: ' . $e->getMessage());
             return [];
@@ -1169,7 +1173,7 @@ class KpiEvaluationController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            return $errors->map(function($error) {
+            return $errors->map(function ($error) {
                 return [
                     'id' => $error->id,
                     'title' => $error->title ?? 'خطأ بدون عنوان',
@@ -1184,9 +1188,74 @@ class KpiEvaluationController extends Controller
                     'created_at_human' => $error->created_at->locale('ar')->diffForHumans()
                 ];
             })->toArray();
-
         } catch (\Exception $e) {
             Log::error('Error in getUserErrors: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * جلب المشاريع المسلّمة في شهر محدد
+     */
+    private function getDeliveredProjects($userId, $month, $evaluationType = 'monthly')
+    {
+        try {
+            // استخدام الفترة الصحيحة حسب نوع التقييم
+            $period = \App\Models\KpiEvaluation::getEvaluationPeriod($month, $evaluationType);
+            $startDate = $period['start'] . ' 00:00:00';
+            $endDate = $period['end'] . ' 23:59:59';
+
+            $deliveredProjects = \App\Models\ProjectServiceUser::with([
+                'project.client',
+                'service',
+                'administrativeApprover',
+                'technicalApprover'
+            ])
+                ->where('user_id', $userId)
+                ->whereNotNull('delivered_at')
+                ->whereBetween('delivered_at', [$startDate, $endDate])
+                ->orderBy('delivered_at', 'desc')
+                ->get();
+
+            return $deliveredProjects->map(function ($participation) {
+                // الحصول على الاعتمادات المطلوبة
+                $requiredApprovals = $participation->getRequiredApprovals();
+
+                // ملاحظة الاعتماد الإداري (إن وجدت أو مطلوبة)
+                $administrativeNote = null;
+                if ($requiredApprovals['needs_administrative']) {
+                    $administrativeNote = $participation->administrative_notes ?? 'لا يوجد';
+                }
+
+                // ملاحظة الاعتماد الفني (إن وجدت أو مطلوبة)
+                $technicalNote = null;
+                if ($requiredApprovals['needs_technical']) {
+                    $technicalNote = $participation->technical_notes ?? 'لا يوجد';
+                }
+
+                return [
+                    'project_id' => $participation->project->id ?? null,
+                    'project_name' => $participation->project->name ?? 'مشروع بدون اسم',
+                    'project_code' => $participation->project->code ?? null,
+                    'client_name' => $participation->project->client->name ?? 'غير محدد',
+                    'service_name' => $participation->service->name ?? 'غير محدد',
+                    'delivered_at' => $participation->delivered_at ? $participation->delivered_at->format('Y-m-d H:i') : null,
+                    'delivered_at_formatted' => $participation->delivered_at ? $participation->delivered_at->locale('ar')->translatedFormat('d M Y - H:i') : null,
+                    'needs_administrative' => $requiredApprovals['needs_administrative'],
+                    'needs_technical' => $requiredApprovals['needs_technical'],
+                    'has_administrative_approval' => $participation->hasAdministrativeApproval(),
+                    'has_technical_approval' => $participation->hasTechnicalApproval(),
+                    'administrative_approval_at' => $participation->administrative_approval_at ? $participation->administrative_approval_at->format('Y-m-d H:i') : null,
+                    'technical_approval_at' => $participation->technical_approval_at ? $participation->technical_approval_at->format('Y-m-d H:i') : null,
+                    'administrative_approver_name' => $participation->administrativeApprover->name ?? null,
+                    'technical_approver_name' => $participation->technicalApprover->name ?? null,
+                    'administrative_note' => $administrativeNote,
+                    'technical_note' => $technicalNote,
+                    'has_all_approvals' => $participation->hasAllRequiredApprovals()
+                ];
+            })->toArray();
+        } catch (\Exception $e) {
+            Log::error('Error in getDeliveredProjects: ' . $e->getMessage());
             return [];
         }
     }

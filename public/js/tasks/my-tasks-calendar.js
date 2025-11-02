@@ -11,43 +11,48 @@ class MyTasksCalendar {
     }
 
     init() {
+        console.log("🔧 Initializing calendar...");
         this.bindEvents();
+        this.loadTasks(); // Load tasks before building calendar
         this.buildCalendar();
+        console.log("✅ Calendar initialized");
     }
 
     bindEvents() {
         // Calendar navigation
-        const prevBtn = document.getElementById('prevMonth');
-        const nextBtn = document.getElementById('nextMonth');
-        const todayBtn = document.getElementById('todayBtn');
+        const prevBtn = document.getElementById("prevMonth");
+        const nextBtn = document.getElementById("nextMonth");
+        const todayBtn = document.getElementById("todayBtn");
 
         if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
+            prevBtn.addEventListener("click", () => {
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
                 this.buildCalendar();
             });
         }
 
         if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
+            nextBtn.addEventListener("click", () => {
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
                 this.buildCalendar();
             });
         }
 
         if (todayBtn) {
-            todayBtn.addEventListener('click', () => {
+            todayBtn.addEventListener("click", () => {
                 this.currentDate = new Date();
                 this.buildCalendar();
             });
         }
 
         // Back to Table button
-        const backToTableBtn = document.getElementById('backToTableBtn');
+        const backToTableBtn = document.getElementById("backToTableBtn");
         if (backToTableBtn) {
-            backToTableBtn.addEventListener('click', () => {
+            backToTableBtn.addEventListener("click", () => {
                 // Switch back to table view
-                const tableViewBtn = document.getElementById('myTasksTableViewBtn');
+                const tableViewBtn = document.getElementById(
+                    "myTasksTableViewBtn"
+                );
                 if (tableViewBtn) {
                     tableViewBtn.click();
                 }
@@ -57,10 +62,15 @@ class MyTasksCalendar {
 
     loadTasks() {
         // Get all tasks from table rows
+        console.log("📋 Loading tasks for calendar...");
         this.tasks = [];
-        const tableRows = document.querySelectorAll('#myTasksTable tbody tr[data-task-id]');
+        const tableRows = document.querySelectorAll(
+            "#myTasksTable tbody tr[data-task-id]"
+        );
 
-        tableRows.forEach(row => {
+        console.log(`Found ${tableRows.length} table rows`);
+
+        tableRows.forEach((row) => {
             const taskData = {
                 id: row.dataset.taskId,
                 taskUserId: row.dataset.taskUserId,
@@ -69,41 +79,47 @@ class MyTasksCalendar {
                 projectName: row.dataset.projectName,
                 status: row.dataset.status,
                 dueDate: row.dataset.dueDate,
-                isTemplate: row.dataset.isTemplate === 'true',
+                isTemplate: row.dataset.isTemplate === "true",
                 points: parseInt(row.dataset.points) || 10,
-                userRole: row.dataset.userRole
+                userRole: row.dataset.userRole,
             };
 
             // Only include tasks with valid due dates
-            if (taskData.dueDate && taskData.dueDate !== 'غير محدد') {
+            if (taskData.dueDate && taskData.dueDate !== "غير محدد") {
                 try {
                     taskData.dueDateObj = new Date(taskData.dueDate);
                     if (!isNaN(taskData.dueDateObj.getTime())) {
                         // Ensure taskUserId is properly set for sidebar
-                        if (!taskData.taskUserId || taskData.taskUserId === 'undefined') {
+                        if (
+                            !taskData.taskUserId ||
+                            taskData.taskUserId === "undefined"
+                        ) {
                             taskData.taskUserId = taskData.id;
                         }
                         this.tasks.push(taskData);
                     }
                 } catch (e) {
-                    console.warn('Invalid date:', taskData.dueDate);
+                    console.warn("Invalid date:", taskData.dueDate);
                 }
             }
         });
 
+        console.log(`Loaded ${this.tasks.length} tasks with valid due dates`);
         this.applyFilters();
     }
 
     applyFilters() {
-        const projectFilter = document.getElementById('projectFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const searchFilter = document.getElementById('searchInput');
+        const projectFilter = document.getElementById("projectFilter");
+        const statusFilter = document.getElementById("statusFilter");
+        const searchFilter = document.getElementById("searchInput");
 
-        const projectValue = projectFilter ? projectFilter.value : '';
-        const statusValue = statusFilter ? statusFilter.value : '';
-        const searchValue = searchFilter ? searchFilter.value.toLowerCase() : '';
+        const projectValue = projectFilter ? projectFilter.value : "";
+        const statusValue = statusFilter ? statusFilter.value : "";
+        const searchValue = searchFilter
+            ? searchFilter.value.toLowerCase()
+            : "";
 
-        this.filteredTasks = this.tasks.filter(task => {
+        this.filteredTasks = this.tasks.filter((task) => {
             let matches = true;
 
             if (projectValue && task.projectId !== projectValue) {
@@ -130,11 +146,21 @@ class MyTasksCalendar {
 
         // Update header
         const monthNames = [
-            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+            "يناير",
+            "فبراير",
+            "مارس",
+            "أبريل",
+            "مايو",
+            "يونيو",
+            "يوليو",
+            "أغسطس",
+            "سبتمبر",
+            "أكتوبر",
+            "نوفمبر",
+            "ديسمبر",
         ];
 
-        const headerElement = document.getElementById('currentMonthYear');
+        const headerElement = document.getElementById("currentMonthYear");
         if (headerElement) {
             headerElement.textContent = `${monthNames[month]} ${year}`;
         }
@@ -143,12 +169,14 @@ class MyTasksCalendar {
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const firstCalendarDay = new Date(firstDay);
-        firstCalendarDay.setDate(firstCalendarDay.getDate() - firstDay.getDay());
+        firstCalendarDay.setDate(
+            firstCalendarDay.getDate() - firstDay.getDay()
+        );
 
-        const calendarDays = document.getElementById('calendarDays');
+        const calendarDays = document.getElementById("calendarDays");
         if (!calendarDays) return;
 
-        calendarDays.innerHTML = '';
+        calendarDays.innerHTML = "";
 
         // Generate 42 days (6 weeks)
         for (let i = 0; i < 42; i++) {
@@ -161,48 +189,50 @@ class MyTasksCalendar {
     }
 
     createDayElement(date, currentMonth) {
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'calendar-day';
+        const dayDiv = document.createElement("div");
+        dayDiv.className = "calendar-day";
 
         // Add classes for styling
         if (date.getMonth() !== currentMonth) {
-            dayDiv.classList.add('other-month');
+            dayDiv.classList.add("other-month");
         }
 
         const today = new Date();
         if (date.toDateString() === today.toDateString()) {
-            dayDiv.classList.add('today');
+            dayDiv.classList.add("today");
         }
 
         // Day number
-        const dayNumber = document.createElement('div');
-        dayNumber.className = 'calendar-day-number';
+        const dayNumber = document.createElement("div");
+        dayNumber.className = "calendar-day-number";
         dayNumber.textContent = date.getDate();
         dayDiv.appendChild(dayNumber);
 
         // Tasks container
-        const tasksContainer = document.createElement('div');
-        tasksContainer.className = 'calendar-tasks';
+        const tasksContainer = document.createElement("div");
+        tasksContainer.className = "calendar-tasks";
 
         // Find tasks for this date
-        const dateString = date.toISOString().split('T')[0];
-        const dayTasks = this.filteredTasks.filter(task => {
-            return task.dueDateObj.toISOString().split('T')[0] === dateString;
+        const dateString = date.toISOString().split("T")[0];
+        const dayTasks = this.filteredTasks.filter((task) => {
+            return task.dueDateObj.toISOString().split("T")[0] === dateString;
         });
 
         // Add tasks (limit to show max 3, then show "more" indicator)
         const maxVisibleTasks = 3;
-        dayTasks.slice(0, maxVisibleTasks).forEach(task => {
+        dayTasks.slice(0, maxVisibleTasks).forEach((task) => {
             const taskElement = this.createTaskElement(task);
             tasksContainer.appendChild(taskElement);
         });
 
         // Show overflow indicator if there are more tasks
         if (dayTasks.length > maxVisibleTasks) {
-            const overflowDiv = document.createElement('div');
-            overflowDiv.className = 'calendar-task-overflow';
-            overflowDiv.textContent = `+${dayTasks.length - maxVisibleTasks} أخرى`;
-            overflowDiv.style.cursor = 'pointer';
+            const overflowDiv = document.createElement("div");
+            overflowDiv.className = "calendar-task-overflow";
+            overflowDiv.textContent = `+${
+                dayTasks.length - maxVisibleTasks
+            } أخرى`;
+            overflowDiv.style.cursor = "pointer";
             overflowDiv.onclick = () => this.showDayTasks(date, dayTasks);
             tasksContainer.appendChild(overflowDiv);
         }
@@ -212,11 +242,11 @@ class MyTasksCalendar {
     }
 
     createTaskElement(task) {
-        const taskDiv = document.createElement('div');
+        const taskDiv = document.createElement("div");
         taskDiv.className = `calendar-task status-${task.status}`;
 
         if (task.isTemplate) {
-            taskDiv.classList.add('template-task');
+            taskDiv.classList.add("template-task");
         }
 
         taskDiv.textContent = task.name;
@@ -230,7 +260,7 @@ class MyTasksCalendar {
             const taskToOpen = {
                 ...task,
                 taskUserId: task.taskUserId || task.id,
-                id: task.id
+                id: task.id,
             };
 
             this.openTaskDetails(taskToOpen);
@@ -241,89 +271,103 @@ class MyTasksCalendar {
 
     openTaskDetails(task) {
         // Use existing task sidebar functionality - same pattern as modal-handlers.js
-        if (typeof openTaskSidebar === 'function') {
-            const taskType = task.isTemplate ? 'template' : 'regular';
+        if (typeof openTaskSidebar === "function") {
+            const taskType = task.isTemplate ? "template" : "regular";
             const taskUserId = task.taskUserId || task.id;
 
-            console.log('🔍 Calendar view task clicked - Opening Sidebar:', {
+            console.log("🔍 Calendar view task clicked - Opening Sidebar:", {
                 taskId: task.id,
                 taskUserId: taskUserId,
                 taskType: taskType,
-                isTemplate: task.isTemplate
+                isTemplate: task.isTemplate,
             });
 
             openTaskSidebar(taskType, taskUserId);
         } else {
             // Fallback to showing task info
-            alert(`مهمة: ${task.name}\nالمشروع: ${task.projectName}\nالحالة: ${this.getStatusText(task.status)}\nالموعد النهائي: ${task.dueDate}`);
+            alert(
+                `مهمة: ${task.name}\nالمشروع: ${
+                    task.projectName
+                }\nالحالة: ${this.getStatusText(
+                    task.status
+                )}\nالموعد النهائي: ${task.dueDate}`
+            );
         }
     }
 
     showDayTasks(date, tasks) {
-        const dateString = date.toLocaleDateString('ar-EG', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+        const dateString = date.toLocaleDateString("ar-EG", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
         });
 
         let content = `<h6 class="mb-3">مهام يوم ${dateString}</h6>`;
 
-        tasks.forEach(task => {
+        tasks.forEach((task) => {
             const statusText = this.getStatusText(task.status);
             const statusClass = `status-${task.status}`;
             const taskUserId = task.taskUserId || task.id;
-            const taskType = task.isTemplate ? 'template' : 'regular';
+            const taskType = task.isTemplate ? "template" : "regular";
 
             content += `
                 <div class="border-bottom pb-2 mb-2">
                     <div class="d-flex justify-content-between align-items-start">
                         <div style="cursor: pointer;" onclick="openTaskSidebar('${taskType}', '${taskUserId}'); Swal.close();">
                             <strong>${task.name}</strong>
-                            ${task.isTemplate ? '<span class="badge bg-info ms-1">قالب</span>' : ''}
+                            ${
+                                task.isTemplate
+                                    ? '<span class="badge bg-info ms-1">قالب</span>'
+                                    : ""
+                            }
                             <br>
-                            <small class="text-muted">${task.projectName} - ${task.userRole}</small>
+                            <small class="text-muted">${task.projectName} - ${
+                task.userRole
+            }</small>
                             <br>
                             <small class="text-primary"><i class="fas fa-eye me-1"></i>انقر لعرض التفاصيل</small>
                         </div>
-                        <span class="badge bg-${this.getStatusBootstrapClass(task.status)}">${statusText}</span>
+                        <span class="badge bg-${this.getStatusBootstrapClass(
+                            task.status
+                        )}">${statusText}</span>
                     </div>
                 </div>
             `;
         });
 
         // Show in SweetAlert
-        if (typeof Swal !== 'undefined') {
+        if (typeof Swal !== "undefined") {
             Swal.fire({
                 title: `مهام اليوم`,
                 html: content,
-                width: '500px',
+                width: "500px",
                 showCloseButton: true,
-                showConfirmButton: false
+                showConfirmButton: false,
             });
         }
     }
 
     getStatusText(status) {
         const statusTexts = {
-            'new': 'جديدة',
-            'in_progress': 'قيد التنفيذ',
-            'paused': 'متوقفة',
-            'completed': 'مكتملة',
-            'cancelled': 'ملغاة'
+            new: "جديدة",
+            in_progress: "قيد التنفيذ",
+            paused: "متوقفة",
+            completed: "مكتملة",
+            cancelled: "ملغاة",
         };
         return statusTexts[status] || status;
     }
 
     getStatusBootstrapClass(status) {
         const statusClasses = {
-            'new': 'info',
-            'in_progress': 'primary',
-            'paused': 'warning',
-            'completed': 'success',
-            'cancelled': 'danger'
+            new: "info",
+            in_progress: "primary",
+            paused: "warning",
+            completed: "success",
+            cancelled: "danger",
         };
-        return statusClasses[status] || 'secondary';
+        return statusClasses[status] || "secondary";
     }
 
     refresh() {
@@ -335,30 +379,39 @@ class MyTasksCalendar {
 let myTasksCalendar;
 
 function initializeMyTasksCalendar() {
-    myTasksCalendar = new MyTasksCalendar();
+    console.log("🚀 initializeMyTasksCalendar called");
+    if (myTasksCalendar) {
+        console.log("⚠️ Calendar already exists, refreshing instead");
+        myTasksCalendar.refresh();
+        return;
+    }
 
-    // Load tasks initially
-    myTasksCalendar.loadTasks();
+    try {
+        myTasksCalendar = new MyTasksCalendar();
+        console.log("✅ Calendar instance created");
 
-    // Refresh calendar when filters change
-    ['projectFilter', 'statusFilter', 'searchInput'].forEach(filterId => {
-        const element = document.getElementById(filterId);
-        if (element) {
-            element.addEventListener('change', () => myTasksCalendar.applyFilters());
-            element.addEventListener('input', () => myTasksCalendar.applyFilters());
-        }
-    });
+        // Refresh calendar when filters change
+        ["projectFilter", "statusFilter", "searchInput"].forEach((filterId) => {
+            const element = document.getElementById(filterId);
+            if (element) {
+                element.addEventListener("change", () =>
+                    myTasksCalendar.applyFilters()
+                );
+                element.addEventListener("input", () =>
+                    myTasksCalendar.applyFilters()
+                );
+            }
+        });
 
-    // Make calendar globally accessible for view switching
-    window.myTasksCalendar = myTasksCalendar;
+        // Make calendar globally accessible for view switching
+        window.myTasksCalendar = myTasksCalendar;
 
-    console.log('✅ My Tasks Calendar initialized successfully');
+        console.log("✅ My Tasks Calendar initialized successfully");
+    } catch (e) {
+        console.error("❌ Error in initializeMyTasksCalendar:", e);
+        throw e;
+    }
 }
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    initializeMyTasksCalendar();
-});
 
 // Export for global access
 window.MyTasksCalendar = MyTasksCalendar;

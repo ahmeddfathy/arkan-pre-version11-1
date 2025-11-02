@@ -17,10 +17,8 @@ function startTimer(taskId) {
     let startedAtTimestamp = taskElement.getAttribute('data-started-at');
     const taskStatus = taskElement.getAttribute('data-status');
 
-    // ✅ التأكد من وجود timestamp صحيح عند بدء المهمة
     if (taskStatus === 'in_progress') {
         if (!startedAtTimestamp || startedAtTimestamp === 'null' || startedAtTimestamp === '') {
-            // إذا لم يوجد timestamp، نضعه الآن
             startedAtTimestamp = new Date().getTime().toString();
             taskElement.setAttribute('data-started-at', startedAtTimestamp);
         }
@@ -308,24 +306,19 @@ function updateMyTasksTotalTimerDisplay() {
     updateTotalTimerDisplay();
 }
 
-// ✅ إضافة Page Visibility API لحل مشكلة توقف التايمر عند تغيير التاب
 function initializePageVisibilityHandler() {
-    // الكشف عن تغيير حالة الصفحة (نشطة/غير نشطة)
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
-            // المستخدم عاد للتاب - نحديث جميع التايمرات فوراً
             syncAllTimersWithRealTime();
         }
     });
 
-    // تحديث التايمرات كل 10 ثوان كـ backup عندما التاب نشط
     setInterval(function() {
         if (!document.hidden) {
             syncAllTimersWithRealTime();
         }
-    }, 10000); // كل 10 ثوان بدلاً من 30
+    }, 10000);
 
-    // تحديث التايمرات كل ثانيتين عند النقر على أي مكان في الصفحة
     document.addEventListener('click', function() {
         if (!document.hidden) {
             setTimeout(() => {
@@ -338,40 +331,33 @@ function initializePageVisibilityHandler() {
 function syncAllTimersWithRealTime() {
     const timers = window.MyTasksCore.getTimers();
 
-    // ✅ تحديث تايمرات Kanban View (استخدام selector الصحيح)
     const inProgressKanbanTasks = document.querySelectorAll('.kanban-card[data-status="in_progress"]');
     inProgressKanbanTasks.forEach(taskElement => {
         updateSingleTaskTimer(taskElement, timers);
     });
 
-    // ✅ تحديث تايمرات Table View
     const inProgressTableRows = document.querySelectorAll('#myTasksTable tbody tr[data-status="in_progress"]');
     inProgressTableRows.forEach(rowElement => {
         updateSingleTaskTimer(rowElement, timers);
     });
 
-    // تحديث Total Timer أيضاً
     if (window.MyTasksTimers && window.MyTasksTimers.calculateInitialTotalTime) {
         window.MyTasksTimers.calculateInitialTotalTime();
     }
 }
 
 function updateSingleTaskTimer(taskElement, timers) {
-    // ✅ استخدام data-task-id لأنه المستخدم في HTML id للتايمر
     const taskId = taskElement.getAttribute('data-task-id');
     const startedAtTimestamp = taskElement.getAttribute('data-started-at');
     const initialMinutes = parseInt(taskElement.getAttribute('data-initial-minutes') || '0');
 
     if (taskId && startedAtTimestamp && startedAtTimestamp !== 'null' && startedAtTimestamp !== '') {
-        // ✅ حساب الوقت الفعلي من البداية
         const elapsedSeconds = window.MyTasksUtils.calculateElapsedSecondsForTask(startedAtTimestamp);
         const totalSeconds = (initialMinutes * 60) + elapsedSeconds;
 
-        // تحديث التايمر المحلي
         timers[taskId] = totalSeconds;
         updateTaskTimerDisplay(taskId, totalSeconds);
 
-        // ✅ تحديث التايمر في Table View أيضاً
         const tableTimerElement = document.querySelector(`.task-timer[data-task-id="${taskId}"]`);
         if (tableTimerElement) {
             tableTimerElement.textContent = window.MyTasksUtils.formatTime(totalSeconds);

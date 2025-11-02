@@ -3,270 +3,373 @@
 @section('title', 'تعديل بند التقييم')
 
 @push('styles')
-    <link href="{{ asset('css/evaluation-criteria-modern.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/kpi/evaluation-criteria-edit.css') }}">
 @endpush
 
 @section('content')
-<div class="container-fluid evaluation-container">
-    <div class="row justify-content-center">
-        <div class="col-xl-10 col-lg-11">
-            <!-- 🎯 Header Section -->
-            <div class="modern-card mb-5 fade-in-up">
-                <div class="text-center p-5" style="background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                    <div class="d-inline-block p-3 rounded-circle mb-4 floating" style="background: linear-gradient(135deg, #fa709a, #fee140); box-shadow: 0 8px 20px rgba(250, 112, 154, 0.3);">
-                        <i class="fas fa-edit fa-3x text-white"></i>
+<div class="simple-container">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>✏️ تعديل البند</h1>
+            <p>تحديث بيانات بند "{{ $evaluationCriteria->criteria_name }}"</p>
+        </div>
+
+        @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>يرجى تصحيح الأخطاء التالية:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Form Container -->
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2>📝 تحديث بيانات البند</h2>
                     </div>
-                    <h1 class="display-6 fw-bold mb-3" style="color: #2c3e50;">✏️ تعديل بند التقييم</h1>
-                    <p class="lead mb-4" style="color: #6c757d;">
-                        قم بتحديث وتطوير معايير التقييم حسب احتياجاتك
-                    </p>
 
-                    <div class="d-flex flex-wrap justify-content-center gap-2">
-                        <a href="{{ route('evaluation-criteria.index') }}" class="btn btn-modern btn-primary-modern">
-                            <i class="fas fa-arrow-left me-2"></i>العودة للقائمة
-                        </a>
-                        <a href="{{ route('evaluation-criteria.show', $evaluationCriteria) }}" class="btn btn-modern btn-success-modern">
-                            <i class="fas fa-eye me-2"></i>عرض التفاصيل
-                        </a>
-                    </div>
-                </div>
-            </div>
+                    <div class="form-body">
+                        <form method="POST" action="{{ route('evaluation-criteria.update', $evaluationCriteria) }}" id="criteriaEditForm">
+                            @csrf
+                            @method('PUT')
 
-            <!-- 📝 Edit Form Card -->
-            <div class="modern-card slide-in-right">
-                <div class="modern-card-header">
-                    <h3 class="mb-0">
-                        <i class="fas fa-clipboard-list me-2"></i>
-                        نموذج التعديل
-                    </h3>
-                </div>
-                <div class="modern-card-body">
-                    <form method="POST" action="{{ route('evaluation-criteria.update', $evaluationCriteria) }}">
-                        @csrf
-                        @method('PUT')
-
-                        <!-- 🎯 الدور والنوع -->
-                        <div class="form-section-modern">
-                            <h6><i class="fas fa-user-cog"></i> الدور والنوع</h6>
-                            <div class="form-row-modern row">
+                            <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-floating-modern">
-                                        <select name="role_id" id="role_id" class="form-select-modern @error('role_id') is-invalid @enderror" required>
-                                            <option value="">-- اختر الدور --</option>
+                                    <div class="form-group">
+                                        <label for="role_id" class="form-label">
+                                            <i class="fas fa-user-tie"></i>
+                                            الدور <span style="color: #ef4444;">*</span>
+                                        </label>
+                                        <select id="role_id"
+                                            class="form-control @error('role_id') is-invalid @enderror"
+                                            name="role_id"
+                                            required>
                                             @foreach($roles as $role)
-                                                <option value="{{ $role->id }}"
-                                                        {{ old('role_id', $evaluationCriteria->role_id) == $role->id ? 'selected' : '' }}>
-                                                    {{ $role->display_name ?? $role->name }}
-                                                </option>
+                                            <option value="{{ $role->id }}" {{ old('role_id', $evaluationCriteria->role_id) == $role->id ? 'selected' : '' }}>
+                                                {{ $role->display_name ?? $role->name }}
+                                            </option>
                                             @endforeach
                                         </select>
-                                        <label for="role_id">👤 الدور <span class="text-danger">*</span></label>
                                         @error('role_id')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        <span class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle ml-1"></i>{{ $message }}
+                                        </span>
                                         @enderror
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <div class="form-floating-modern">
-                                        <select name="criteria_type" id="criteria_type" class="form-select-modern @error('criteria_type') is-invalid @enderror" required>
+                                    <div class="form-group">
+                                        <label for="criteria_type" class="form-label">
+                                            <i class="fas fa-tags"></i>
+                                            نوع البند <span style="color: #ef4444;">*</span>
+                                        </label>
+                                        <select id="criteria_type"
+                                            class="form-control @error('criteria_type') is-invalid @enderror"
+                                            name="criteria_type"
+                                            required>
                                             @foreach($criteriaTypes as $key => $label)
-                                                <option value="{{ $key }}"
-                                                        {{ old('criteria_type', $evaluationCriteria->criteria_type) == $key ? 'selected' : '' }}>
-                                                    @if($key == 'positive') ✅ @elseif($key == 'negative') ❌ @elseif($key == 'bonus') 🌟 @elseif($key == 'development') 🎓 @endif {{ $label }}
-                                                </option>
+                                            <option value="{{ $key }}" {{ old('criteria_type', $evaluationCriteria->criteria_type) == $key ? 'selected' : '' }}>
+                                                @if($key == 'positive') ✅ @elseif($key == 'negative') ❌ @elseif($key == 'bonus') 🌟 @endif {{ $label }}
+                                            </option>
                                             @endforeach
                                         </select>
-                                        <label for="criteria_type">🏷️ نوع البند <span class="text-danger">*</span></label>
                                         @error('criteria_type')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        <span class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle ml-1"></i>{{ $message }}
+                                        </span>
                                         @enderror
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- 📝 معلومات البند -->
-                        <div class="form-section-modern">
-                            <h6><i class="fas fa-edit"></i> معلومات البند</h6>
+                            <div class="form-group">
+                                <label for="criteria_name" class="form-label">
+                                    <i class="fas fa-tag"></i>
+                                    اسم البند <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input id="criteria_name"
+                                    type="text"
+                                    class="form-control @error('criteria_name') is-invalid @enderror"
+                                    name="criteria_name"
+                                    value="{{ old('criteria_name', $evaluationCriteria->criteria_name) }}"
+                                    required
+                                    autofocus>
+                                @error('criteria_name')
+                                <span class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle ml-1"></i>{{ $message }}
+                                </span>
+                                @enderror
+                            </div>
 
-                            <!-- اسم البند والنقاط -->
-                            <div class="form-row-modern row">
-                                <div class="col-md-8">
-                                    <div class="form-floating-modern">
-                                        <input type="text" name="criteria_name" id="criteria_name"
-                                               class="form-control-modern @error('criteria_name') is-invalid @enderror"
-                                               value="{{ old('criteria_name', $evaluationCriteria->criteria_name) }}" required>
-                                        <label for="criteria_name">📝 اسم البند <span class="text-danger">*</span></label>
-                                        @error('criteria_name')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="form-group">
+                                <label for="criteria_description" class="form-label">
+                                    <i class="fas fa-align-left"></i>
+                                    الوصف
+                                </label>
+                                <textarea id="criteria_description"
+                                    class="form-control @error('criteria_description') is-invalid @enderror"
+                                    name="criteria_description"
+                                    rows="4">{{ old('criteria_description', $evaluationCriteria->criteria_description) }}</textarea>
+                                @error('criteria_description')
+                                <span class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle ml-1"></i>{{ $message }}
+                                </span>
+                                @enderror
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="max_points" class="form-label">
+                                            <i class="fas fa-star"></i>
+                                            أقصى نقاط <span style="color: #ef4444;">*</span>
+                                        </label>
+                                        <input id="max_points"
+                                            type="number"
+                                            class="form-control @error('max_points') is-invalid @enderror"
+                                            name="max_points"
+                                            value="{{ old('max_points', $evaluationCriteria->max_points) }}"
+                                            min="0"
+                                            max="1000"
+                                            required>
+                                        @error('max_points')
+                                        <span class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle ml-1"></i>{{ $message }}
+                                        </span>
                                         @enderror
                                     </div>
                                 </div>
 
                                 <div class="col-md-4">
-                                    <div class="form-floating-modern">
-                                        <input type="number" name="max_points" id="max_points"
-                                               class="form-control-modern @error('max_points') is-invalid @enderror"
-                                               value="{{ old('max_points', $evaluationCriteria->max_points) }}"
-                                               min="0" max="1000" required>
-                                        <label for="max_points">🔢 أقصى نقاط <span class="text-danger">*</span></label>
-                                        @error('max_points')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- وصف البند -->
-                            <div class="form-floating-modern">
-                                <textarea name="criteria_description" id="criteria_description" rows="4"
-                                          class="form-control-modern @error('criteria_description') is-invalid @enderror">{{ old('criteria_description', $evaluationCriteria->criteria_description) }}</textarea>
-                                <label for="criteria_description">📋 وصف البند</label>
-                                @error('criteria_description')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- 📂 التصنيف والترتيب -->
-                        <div class="form-section-modern">
-                            <h6><i class="fas fa-tags"></i> التصنيف والترتيب</h6>
-                            <div class="form-row-modern row">
-                                <div class="col-md-6">
-                                    <div class="form-floating-modern">
-                                        <select name="evaluation_period" id="evaluation_period" class="form-select-modern @error('evaluation_period') is-invalid @enderror" required>
+                                    <div class="form-group">
+                                        <label for="evaluation_period" class="form-label">
+                                            <i class="fas fa-calendar"></i>
+                                            فترة التقييم <span style="color: #ef4444;">*</span>
+                                        </label>
+                                        <select id="evaluation_period"
+                                            class="form-control @error('evaluation_period') is-invalid @enderror"
+                                            name="evaluation_period"
+                                            required>
                                             @foreach($evaluationPeriods as $value => $label)
-                                                <option value="{{ $value }}" {{ old('evaluation_period', $evaluationCriteria->evaluation_period ?? 'monthly') == $value ? 'selected' : '' }}>
-                                                    @if($value == 'monthly') 📅 @else ⚡ @endif {{ $label }}
-                                                </option>
+                                            <option value="{{ $value }}" {{ old('evaluation_period', $evaluationCriteria->evaluation_period ?? 'monthly') == $value ? 'selected' : '' }}>
+                                                @if($value == 'monthly') 📅 @else ⚡ @endif {{ $label }}
+                                            </option>
                                             @endforeach
                                         </select>
-                                        <label for="evaluation_period">📅 فترة التقييم <span class="text-danger">*</span></label>
                                         @error('evaluation_period')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        <span class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle ml-1"></i>{{ $message }}
+                                        </span>
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating-modern">
-                                        <select name="category" id="category" class="form-select-modern @error('category') is-invalid @enderror">
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="category" class="form-label">
+                                            <i class="fas fa-folder"></i>
+                                            الفئة
+                                        </label>
+                                        <select id="category"
+                                            class="form-control @error('category') is-invalid @enderror"
+                                            name="category">
                                             <option value="">اختر الفئة</option>
                                             @foreach($criteriaCategories as $value => $label)
-                                                <option value="{{ $value }}" {{ old('category', $evaluationCriteria->category) == $value ? 'selected' : '' }}>
-                                                    @if($value == 'بنود إيجابية') ✅ @elseif($value == 'بنود سلبية') ❌ @elseif($value == 'بنود تطويرية') 🎓 @elseif($value == 'بونص') 🌟 @endif {{ $label }}
-                                                </option>
+                                            <option value="{{ $value }}" {{ old('category', $evaluationCriteria->category) == $value ? 'selected' : '' }}>
+                                                @if($value == 'بنود إيجابية') ✅ @elseif($value == 'بنود سلبية') ❌ @elseif($value == 'بونص') 🌟 @endif {{ $label }}
+                                            </option>
                                             @endforeach
                                         </select>
-                                        <label for="category">📂 فئة البند</label>
                                         @error('category')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        <span class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle ml-1"></i>{{ $message }}
+                                        </span>
                                         @enderror
                                     </div>
                                 </div>
-
                             </div>
-                        </div>
 
-                        <!-- ✅ حالة البند -->
-                        <div class="form-check-modern mb-3">
-                            <div class="form-check">
-                                <input type="checkbox" name="is_active" id="is_active"
-                                       class="form-check-input" value="1"
-                                       {{ old('is_active', $evaluationCriteria->is_active) ? 'checked' : '' }}>
-                                <label for="is_active" class="form-check-label">
-                                    <i class="fas fa-toggle-on text-success me-2"></i>
-                                    البند نشط ومفعل
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- 🎯 تقييم لكل مشروع -->
-                        <div class="form-check-modern">
-                            <div class="form-check">
-                                <input type="checkbox" name="evaluate_per_project" id="evaluate_per_project"
-                                       class="form-check-input" value="1"
-                                       {{ old('evaluate_per_project', $evaluationCriteria->evaluate_per_project) ? 'checked' : '' }}>
-                                <label for="evaluate_per_project" class="form-check-label">
-                                    <i class="fas fa-project-diagram text-primary me-2"></i>
-                                    يتم تقييم هذا البند لكل مشروع على حدة
-                                </label>
-                                <small class="text-muted d-block mt-1">
-                                    إذا تم تفعيل هذا الخيار، سيظهر هذا البند في تقييم كل مشروع يشارك فيه الموظف
-                                </small>
-                            </div>
-                        </div>
-
-                        <!-- 🚀 Action Buttons -->
-                        <div class="action-buttons-modern">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <a href="{{ route('evaluation-criteria.show', $evaluationCriteria) }}"
-                                       class="btn btn-modern btn-success-modern w-100">
-                                        <i class="fas fa-eye me-2"></i>عرض التفاصيل
-                                    </a>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('evaluation-criteria.index') }}"
-                                           class="btn btn-modern btn-warning-modern flex-fill">
-                                            <i class="fas fa-times me-2"></i>إلغاء
-                                        </a>
-                                        <button type="submit" class="btn btn-modern btn-primary-modern flex-fill">
-                                            <i class="fas fa-save me-2"></i>حفظ التعديلات
-                                        </button>
-                                    </div>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                        name="is_active"
+                                        id="is_active"
+                                        class="form-check-input"
+                                        value="1"
+                                        {{ old('is_active', $evaluationCriteria->is_active) ? 'checked' : '' }}>
+                                    <label for="is_active" class="form-check-label">
+                                        <i class="fas fa-toggle-on text-success ml-1"></i>
+                                        البند نشط ومفعل
+                                    </label>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                        name="evaluate_per_project"
+                                        id="evaluate_per_project"
+                                        class="form-check-input"
+                                        value="1"
+                                        {{ old('evaluate_per_project', $evaluationCriteria->evaluate_per_project) ? 'checked' : '' }}>
+                                    <label for="evaluate_per_project" class="form-check-label">
+                                        <i class="fas fa-project-diagram text-primary ml-1"></i>
+                                        يتم تقييم هذا البند لكل مشروع على حدة
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="services-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                    <i class="fas fa-save ml-1"></i>
+                                    حفظ التغييرات
+                                </button>
+                                <a href="{{ route('evaluation-criteria.show', $evaluationCriteria) }}" class="services-btn" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                                    <i class="fas fa-eye ml-1"></i>
+                                    عرض البند
+                                </a>
+                                <a href="{{ route('evaluation-criteria.index') }}" class="services-btn" style="background: linear-gradient(135deg, #6b7280, #4b5563);">
+                                    <i class="fas fa-times ml-1"></i>
+                                    إلغاء
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Info Card -->
+                <div class="info-card">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        معلومات البند
+                    </h3>
+                    <ul class="info-list">
+                        <li>
+                            <span class="info-label">الدور:</span>
+                            <span class="info-value">{{ $evaluationCriteria->role->display_name ?? $evaluationCriteria->role->name }}</span>
+                        </li>
+                        <li>
+                            <span class="info-label">تاريخ الإنشاء:</span>
+                            <span class="info-value">{{ $evaluationCriteria->created_at->format('d/m/Y') }}</span>
+                        </li>
+                        <li>
+                            <span class="info-label">آخر تحديث:</span>
+                            <span class="info-value">{{ $evaluationCriteria->updated_at->diffForHumans() }}</span>
+                        </li>
+                        <li>
+                            <span class="info-label">الحالة:</span>
+                            <span class="info-value">
+                                @if($evaluationCriteria->is_active)
+                                <span class="status-badge status-in-progress">نشط</span>
+                                @else
+                                <span class="status-badge status-new">غير نشط</span>
+                                @endif
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Warning Card -->
+                <div class="warning-card">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        تنبيهات مهمة
+                    </h3>
+                    <ul class="warning-list">
+                        <li>
+                            <i class="fas fa-info-circle"></i>
+                            <span>تعديل البيانات قد يؤثر على التقييمات السابقة</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-ban"></i>
+                            <span>تأكد من صحة البيانات قبل الحفظ</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 🎨 تأثير تدرجي لظهور العناصر
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('criteriaEditForm');
+        const submitBtn = form.querySelector('button[type="submit"]');
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in-up');
-                    }
+        // Store original values
+        const originalValues = {
+            name: form.querySelector('#criteria_name').value,
+            description: form.querySelector('#criteria_description').value
+        };
+
+        // Check for changes
+        function hasChanges() {
+            return (
+                form.querySelector('#criteria_name').value !== originalValues.name ||
+                form.querySelector('#criteria_description').value !== originalValues.description
+            );
+        }
+
+        // Form validation
+        form.addEventListener('submit', function(e) {
+            const name = form.querySelector('#criteria_name').value.trim();
+
+            if (!name) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'يرجى إدخال اسم البند',
+                    confirmButtonColor: '#ef4444'
                 });
-            }, observerOptions);
+                return false;
+            }
 
-            // مراقبة جميع عناصر النموذج
-            const formElements = document.querySelectorAll('.form-floating-modern');
-            formElements.forEach((element, index) => {
-                element.style.animationDelay = (index * 0.1) + 's';
-                observer.observe(element);
-            });
+            if (!hasChanges()) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'info',
+                    title: 'لا توجد تغييرات',
+                    text: 'لم يتم إجراء أي تغييرات على البيانات',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return false;
+            }
 
-            // 🎯 تأثير النوع على الرؤوس
-            const criteriaTypeSelect = document.getElementById('criteria_type');
-            criteriaTypeSelect.addEventListener('change', function() {
-                const cardHeader = document.querySelector('.modern-card-header');
-                const value = this.value;
-
-                if (value === 'positive') {
-                    cardHeader.style.background = 'var(--success-gradient)';
-                } else if (value === 'negative') {
-                    cardHeader.style.background = 'var(--danger-gradient)';
-                } else if (value === 'bonus') {
-                    cardHeader.style.background = 'var(--warning-gradient)';
-                } else {
-                    cardHeader.style.background = 'var(--primary-gradient)';
-                }
-            });
+            // Add loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-1"></i> جاري الحفظ...';
+            submitBtn.disabled = true;
         });
-    </script>
+
+        // Warn before leaving if there are unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasChanges()) {
+                e.preventDefault();
+                e.returnValue = 'لديك تغييرات غير محفوظة. هل أنت متأكد من رغبتك في المغادرة؟';
+            }
+        });
+    });
+</script>
 @endpush
-@endsection

@@ -892,6 +892,105 @@ function displayUserDetails(data) {
             `;
         }
     }
+
+    // عرض المشاريع المسلّمة
+    const deliveredProjectsContent = document.getElementById('deliveredProjectsContent');
+    if (deliveredProjectsContent) {
+        if (data.delivered_projects && data.delivered_projects.length > 0) {
+            let projectsHtml = `
+                <div class="alert alert-success mb-3">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>عدد المشاريع المسلّمة:</strong> ${data.delivered_projects.length} مشروع
+                </div>
+            `;
+            
+            data.delivered_projects.forEach(project => {
+                projectsHtml += `
+                    <div class="delivered-project-item mb-3 border rounded p-3" style="background: rgba(40, 167, 69, 0.05); border-color: rgba(40, 167, 69, 0.3) !important;">
+                        <div class="project-header d-flex justify-content-between align-items-start mb-2">
+                            <div class="project-info flex-grow-1">
+                                <h6 class="project-name mb-1">
+                                    <i class="fas fa-project-diagram text-success me-2"></i>${project.project_name}
+                                    ${project.project_code ? `<span class="badge bg-secondary ms-2">${project.project_code}</span>` : ''}
+                                </h6>
+                                <div class="project-details">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>${project.client_name} |
+                                        <i class="fas fa-cog me-1"></i>${project.service_name} |
+                                        <i class="fas fa-calendar-check me-1"></i>${project.delivered_at_formatted || project.delivered_at}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="approval-status">
+                                ${project.has_all_approvals ? 
+                                    '<span class="badge bg-success"><i class="fas fa-check-double me-1"></i>مكتمل الاعتماد</span>' : 
+                                    '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>في انتظار الاعتماد</span>'
+                                }
+                            </div>
+                        </div>
+                        
+                        <!-- Approval Notes Section -->
+                        <div class="approval-notes mt-3 pt-2 border-top">
+                            ${project.needs_administrative ? `
+                                <div class="approval-note-item mb-2">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-user-tie text-primary me-2 mt-1"></i>
+                                        <div class="flex-grow-1">
+                                            <strong class="d-block mb-1">ملاحظة الاعتماد الإداري:</strong>
+                                            <div class="note-content p-2 bg-light rounded">
+                                                ${project.administrative_note || 'لا يوجد'}
+                                            </div>
+                                            ${project.has_administrative_approval && project.administrative_approver_name ? `
+                                                <small class="text-muted d-block mt-1">
+                                                    اعتمدها: ${project.administrative_approver_name}
+                                                    ${project.administrative_approval_at ? ` - ${project.administrative_approval_at}` : ''}
+                                                </small>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${project.needs_technical ? `
+                                <div class="approval-note-item mb-2">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-tools text-info me-2 mt-1"></i>
+                                        <div class="flex-grow-1">
+                                            <strong class="d-block mb-1">ملاحظة الاعتماد الفني:</strong>
+                                            <div class="note-content p-2 bg-light rounded">
+                                                ${project.technical_note || 'لا يوجد'}
+                                            </div>
+                                            ${project.has_technical_approval && project.technical_approver_name ? `
+                                                <small class="text-muted d-block mt-1">
+                                                    اعتمدها: ${project.technical_approver_name}
+                                                    ${project.technical_approval_at ? ` - ${project.technical_approval_at}` : ''}
+                                                </small>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${!project.needs_administrative && !project.needs_technical ? `
+                                <div class="text-muted text-center py-2">
+                                    <small><i class="fas fa-info-circle me-1"></i>لا يتطلب هذا المشروع اعتمادات إدارية أو فنية</small>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            deliveredProjectsContent.innerHTML = projectsHtml;
+        } else {
+            deliveredProjectsContent.innerHTML = `
+                <div class="empty-state text-center py-4">
+                    <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">لا توجد مشاريع مسلّمة</h6>
+                    <p class="text-muted">لم يتم تسليم أي مشاريع في هذه الفترة</p>
+                </div>
+            `;
+        }
+    }
 }
 
 /**

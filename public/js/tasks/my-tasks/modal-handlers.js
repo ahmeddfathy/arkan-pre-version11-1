@@ -3,14 +3,6 @@ $(document).ready(function() {
         const taskId = $(this).data('id');
         const taskUserId = $(this).data('task-user-id') || taskId;
         const isTemplate = $(this).closest('tr, .kanban-card').data('is-template');
-
-        console.log('🔍 My-Tasks view task clicked - Opening Sidebar:', {
-            taskId: taskId,
-            taskUserId: taskUserId,
-            isTemplate: isTemplate
-        });
-
-        // استخدام السايد بار بدلاً من المودال
         const taskType = (isTemplate === 'true' || isTemplate === true) ? 'template' : 'regular';
         openTaskSidebar(taskType, taskUserId);
     });
@@ -36,10 +28,6 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#addNotesModal').modal('hide');
-
-                // ✅ بدون SweetAlert هنا - drag-drop.js هو المسؤول عن العرض
-                // التحديث تم بنجاح - الصفحة ستتحدث تلقائياً
-
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
@@ -49,8 +37,6 @@ $(document).ready(function() {
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMessage = xhr.responseJSON.message;
                 }
-
-                // ✅ عرض الأخطاء بـ alert بسيط هنا
                 alert(errorMessage);
 
                 submitBtn.html(originalBtnText);

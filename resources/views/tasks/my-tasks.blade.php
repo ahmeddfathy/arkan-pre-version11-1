@@ -1047,9 +1047,12 @@
 
 
 <script src="{{ asset('js/tasks/filters.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/utils.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/tasks/my-tasks/core.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/tasks/my-tasks/timers.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/drag-drop.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/tasks/my-tasks/kanban.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/modal-handlers.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/tasks/my-tasks-kanban.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/tasks/my-tasks-calendar.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/tasks/my-tasks-stats.js') }}?v={{ time() }}"></script>

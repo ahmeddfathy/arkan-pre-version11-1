@@ -19,7 +19,7 @@
     border-radius: 12px;
     padding: 0;
     border: 1px solid #e9ecef;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     max-height: 600px;
     display: flex;
     flex-direction: column;
@@ -46,7 +46,7 @@
 }
 
 .kanban-header .task-count {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 12px;
@@ -87,8 +87,8 @@
 }
 
 .kanban-cards {
-    -ms-overflow-style: none;  /* إخفاء الـ scrollbar في Internet Explorer و Edge */
-    scrollbar-width: none;     /* إخفاء الـ scrollbar في Firefox */
+    -ms-overflow-style: none; /* إخفاء الـ scrollbar في Internet Explorer و Edge */
+    scrollbar-width: none; /* إخفاء الـ scrollbar في Firefox */
 }
 
 /* دعم للكلاسات الجديدة */
@@ -97,8 +97,8 @@
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 16px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.05);
-    border: 1px solid rgba(255,255,255,0.8);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     cursor: pointer;
     position: relative;
     transition: all 0.3s ease;
@@ -106,7 +106,7 @@
 
 .kanban-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.12), 0 5px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12), 0 5px 10px rgba(0, 0, 0, 0.08);
 }
 
 .my-kanban-card {
@@ -114,8 +114,8 @@
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 16px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.05);
-    border: 1px solid rgba(255,255,255,0.8);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     cursor: pointer;
 }
 
@@ -244,7 +244,7 @@
 }
 
 .kanban-card-timer {
-    font-family: 'Monaco', 'Courier New', monospace;
+    font-family: "Monaco", "Courier New", monospace;
     font-weight: 700;
     color: #065f46;
     padding: 8px 16px;
@@ -334,7 +334,7 @@
     border-radius: 50%;
     overflow: hidden;
     border: 2px solid #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .kanban-card-assignees .avatar img {
@@ -357,22 +357,22 @@
 }
 
 .kanban-card-creator::before {
-    content: '👤';
+    content: "👤";
     font-size: 10px;
 }
 
 .kanban-card-service::before {
-    content: '⚙️';
+    content: "⚙️";
     font-size: 10px;
 }
 
 .kanban-card-project::before {
-    content: '🏢';
+    content: "🏢";
     font-size: 10px;
 }
 
 .kanban-card-role::before {
-    content: '👤';
+    content: "👤";
     font-size: 10px;
 }
 
@@ -387,19 +387,19 @@
 }
 
 .kanban-card-timer::before {
-    content: '⏰';
+    content: "⏰";
     margin-right: 6px;
     font-size: 12px;
 }
 
 .kanban-card-due-date::before {
-    content: '📅';
+    content: "📅";
     margin-right: 4px;
     font-size: 10px;
 }
 
 .my-kanban-card-project::before {
-    content: '🏢';
+    content: "🏢";
     font-size: 10px;
 }
 
@@ -417,7 +417,7 @@
 }
 
 .my-kanban-card-role::before {
-    content: '👤';
+    content: "👤";
     font-size: 10px;
 }
 
@@ -468,7 +468,7 @@
 }
 
 .my-kanban-card-timer {
-    font-family: 'Monaco', 'Courier New', monospace;
+    font-family: "Monaco", "Courier New", monospace;
     font-weight: 700;
     color: #065f46;
     padding: 8px 16px;
@@ -484,15 +484,21 @@
 }
 
 .my-kanban-card-timer::before {
-    content: '⏰';
+    content: "⏰";
     margin-right: 6px;
     font-size: 12px;
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
-    50% { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
-    100% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+    0% {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    50% {
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+    100% {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
 }
 
 .my-kanban-card-due-date {
@@ -523,7 +529,7 @@
     /* Use same styling as regular cards */
     background: white;
     border: 1px solid #e9ecef;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .template-task-card .my-kanban-card-title {
@@ -568,8 +574,6 @@
     border-radius: 12px;
     transition: all 0.2s ease;
 }
-
-
 
 /* 🎯 Additional Card Elements - العناصر المفقودة */
 
@@ -695,7 +699,7 @@
     border-radius: 12px;
     padding: 8px 12px;
     font-size: 11px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .my-kanban-card-actions .btn:first-child {
@@ -727,8 +731,6 @@
     border-radius: 12px;
     font-weight: 600;
 }
-
-
 
 /* Kanban Responsive Design */
 @media (max-width: 768px) {

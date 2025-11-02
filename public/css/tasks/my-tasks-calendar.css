@@ -10,7 +10,7 @@
     margin: 0 auto;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
@@ -26,13 +26,13 @@
 }
 
 .calendar-header .btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
 }
 
 .calendar-header .btn:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
     color: white;
 }
 
@@ -141,7 +141,7 @@
 .calendar-task:hover {
     background: #0056b3;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .calendar-task.status-new {
@@ -169,7 +169,7 @@
     border-left: 3px solid #563d7c;
     color: #ffffff;
     font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     box-shadow: 0 2px 4px rgba(111, 66, 193, 0.3);
     letter-spacing: 0.3px;
     line-height: 1.4;
@@ -180,7 +180,7 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(111, 66, 193, 0.4);
     color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .calendar-task.template-task::before {
@@ -200,7 +200,7 @@
 }
 
 .calendar-task.cancelled-project-task::before {
-    content: '🚫 ';
+    content: "🚫 ";
     font-size: 8px;
     margin-right: 2px;
 }
@@ -227,14 +227,14 @@
     border-radius: 6px;
     font-size: 12px;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     max-width: 200px;
     word-wrap: break-word;
     display: none;
 }
 
 .calendar-task-tooltip::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 100%;
     left: 50%;

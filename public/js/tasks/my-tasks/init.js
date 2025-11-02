@@ -114,11 +114,10 @@
     })();
 
     // Cleanup old functions
+    // Note: startTimer and pauseTimer are part of window API or may be needed by other scripts
     const oldFunctionsToRemove = [
         "initializeTimers",
         "loadTimeLogs",
-        "startTimer",
-        "pauseTimer",
         "loadTaskTimeLogs",
         "taskTimers",
         "intervals",
@@ -126,8 +125,34 @@
 
     oldFunctionsToRemove.forEach((funcName) => {
         if (typeof window[funcName] !== "undefined") {
-            console.warn(`⚠️ Removing old cached function: ${funcName}`);
-            delete window[funcName];
+            try {
+                // Check if property is configurable before deleting
+                const descriptor = Object.getOwnPropertyDescriptor(
+                    window,
+                    funcName
+                );
+                if (descriptor && descriptor.configurable) {
+                    console.warn(
+                        `⚠️ Removing old cached function: ${funcName}`
+                    );
+                    delete window[funcName];
+                } else {
+                    // If not configurable, try to set it to undefined instead
+                    try {
+                        window[funcName] = undefined;
+                        console.warn(
+                            `⚠️ Set ${funcName} to undefined (non-configurable)`
+                        );
+                    } catch (e2) {
+                        console.warn(
+                            `⚠️ Could not modify ${funcName}:`,
+                            e2.message
+                        );
+                    }
+                }
+            } catch (e) {
+                console.warn(`⚠️ Could not delete ${funcName}:`, e.message);
+            }
         }
     });
 
@@ -243,18 +268,71 @@
                     if (kanbanViewBtn) kanbanViewBtn.classList.add("active");
                     break;
                 case "calendar":
-                    if (calendarView) calendarView.style.display = "block";
-                    if (calendarViewBtn)
-                        calendarViewBtn.classList.add("active");
-                    // Refresh calendar when switching to it
-                    if (
-                        typeof initializeMyTasksCalendar === "function" &&
-                        !window.myTasksCalendar
-                    ) {
-                        initializeMyTasksCalendar();
-                    } else if (window.myTasksCalendar) {
-                        window.myTasksCalendar.refresh();
+                    console.log("📅 Switching to calendar view");
+                    if (calendarView) {
+                        calendarView.style.display = "block";
+                        console.log("✅ Calendar view shown");
+                    } else {
+                        console.error("❌ Calendar view element not found");
+                        return; // Exit if view not found
                     }
+                    if (calendarViewBtn) {
+                        calendarViewBtn.classList.add("active");
+                    }
+                    // Initialize or refresh calendar when switching to it
+                    // Small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        console.log("🔍 Checking calendar initialization...");
+                        console.log(
+                            "initializeMyTasksCalendar exists:",
+                            typeof initializeMyTasksCalendar
+                        );
+                        console.log(
+                            "window.myTasksCalendar exists:",
+                            !!window.myTasksCalendar
+                        );
+
+                        if (typeof initializeMyTasksCalendar === "function") {
+                            if (!window.myTasksCalendar) {
+                                // Initialize calendar for the first time
+                                console.log(
+                                    "🚀 Initializing calendar for the first time"
+                                );
+                                try {
+                                    initializeMyTasksCalendar();
+                                    console.log(
+                                        "✅ Calendar initialized successfully"
+                                    );
+                                } catch (e) {
+                                    console.error(
+                                        "❌ Error initializing calendar:",
+                                        e
+                                    );
+                                }
+                            } else {
+                                // Refresh existing calendar
+                                console.log("🔄 Refreshing existing calendar");
+                                try {
+                                    window.myTasksCalendar.refresh();
+                                    console.log(
+                                        "✅ Calendar refreshed successfully"
+                                    );
+                                } catch (e) {
+                                    console.error(
+                                        "❌ Error refreshing calendar:",
+                                        e
+                                    );
+                                }
+                            }
+                        } else {
+                            console.warn(
+                                "⚠️ initializeMyTasksCalendar function not found. Available functions:",
+                                Object.keys(window).filter((k) =>
+                                    k.includes("Calendar")
+                                )
+                            );
+                        }
+                    }, 100);
                     break;
             }
 
@@ -277,9 +355,14 @@
         }
 
         if (calendarViewBtn) {
-            calendarViewBtn.addEventListener("click", () =>
-                switchToView("calendar")
-            );
+            calendarViewBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("📅 Calendar button clicked");
+                switchToView("calendar");
+            });
+        } else {
+            console.error("❌ Calendar view button not found");
         }
 
         // Apply saved preference or default to table
