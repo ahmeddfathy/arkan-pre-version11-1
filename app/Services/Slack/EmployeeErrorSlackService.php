@@ -7,9 +7,7 @@ use App\Models\User;
 
 class EmployeeErrorSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار عند تسجيل خطأ على موظف
-     */
+
     public function sendErrorNotification(EmployeeError $error): bool
     {
         $employee = $error->user;
@@ -22,13 +20,9 @@ class EmployeeErrorSlackService extends BaseSlackService
         $context = 'إشعار تسجيل خطأ';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($employee, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار للمديرين عن خطأ جوهري
-     */
     public function sendCriticalErrorNotification(EmployeeError $error, User $manager): bool
     {
         $message = $this->buildCriticalErrorMessage($error);
@@ -38,9 +32,6 @@ class EmployeeErrorSlackService extends BaseSlackService
         return $this->sendSlackNotification($manager, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار عند تحديث خطأ
-     */
     public function sendErrorUpdateNotification(EmployeeError $error): bool
     {
         $employee = $error->user;
@@ -56,9 +47,6 @@ class EmployeeErrorSlackService extends BaseSlackService
         return $this->sendSlackNotification($employee, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار عند حذف خطأ
-     */
     public function sendErrorDeletedNotification(EmployeeError $error): bool
     {
         $employee = $error->user;
@@ -74,18 +62,13 @@ class EmployeeErrorSlackService extends BaseSlackService
         return $this->sendSlackNotification($employee, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة تسجيل خطأ
-     */
     private function buildErrorNotificationMessage(EmployeeError $error): array
     {
         $error->load(['reportedBy', 'errorable']);
 
-        // تحديد نوع الخطأ والأيقونة
         $errorTypeIcon = $error->error_type === 'critical' ? '🔴' : '⚠️';
         $errorTypeText = $error->error_type === 'critical' ? 'خطأ جوهري' : 'خطأ عادي';
 
-        // تحديد فئة الخطأ
         $categoryMap = [
             'quality' => '🎯 جودة',
             'deadline' => '⏰ موعد',
@@ -96,7 +79,6 @@ class EmployeeErrorSlackService extends BaseSlackService
         ];
         $categoryText = $categoryMap[$error->error_category] ?? '📌 أخرى';
 
-        // بناء معلومات المصدر (مهمة، مشروع، الخ)
         $sourceInfo = $this->getErrorSourceInfo($error);
 
         $blocks = [
@@ -112,12 +94,10 @@ class EmployeeErrorSlackService extends BaseSlackService
             ])
         ];
 
-        // إضافة معلومات المصدر إن وجدت
         if ($sourceInfo) {
             $blocks[] = $this->buildTextSection("*المصدر:*\n{$sourceInfo}");
         }
 
-        // زر عرض الأخطاء
         $errorsUrl = url('/employee-errors');
         $blocks[] = $this->buildActionsSection([
             $this->buildActionButton('📊 عرض أخطائي', $errorsUrl, 'primary')
@@ -131,9 +111,6 @@ class EmployeeErrorSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة خطأ جوهري للمديرين
-     */
     private function buildCriticalErrorMessage(EmployeeError $error): array
     {
         $error->load(['user', 'reportedBy']);
@@ -180,9 +157,6 @@ class EmployeeErrorSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة تحديث خطأ
-     */
     private function buildErrorUpdateMessage(EmployeeError $error): array
     {
         $error->load(['reportedBy']);
@@ -209,9 +183,6 @@ class EmployeeErrorSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة حذف خطأ
-     */
     private function buildErrorDeletedMessage(EmployeeError $error): array
     {
         $errorsUrl = url('/employee-errors');
@@ -229,10 +200,7 @@ class EmployeeErrorSlackService extends BaseSlackService
             ]
         ];
     }
-
-    /**
-     * الحصول على معلومات مصدر الخطأ
-     */
+        
     private function getErrorSourceInfo(EmployeeError $error): ?string
     {
         if (!$error->errorable) {

@@ -7,9 +7,6 @@ use Carbon\Carbon;
 
 class EmployeeErrorFilterService
 {
-    /**
-     * تطبيق جميع الفلاتر على الاستعلام
-     */
     public function applyFilters(Builder $query, array $filters): Builder
     {
         if (isset($filters['error_type'])) {
@@ -61,65 +58,41 @@ class EmployeeErrorFilterService
         return $query;
     }
 
-    /**
-     * فلتر حسب نوع الخطأ
-     */
     private function filterByErrorType(Builder $query, string $errorType): Builder
     {
         return $query->where('error_type', $errorType);
     }
 
-    /**
-     * فلتر حسب تصنيف الخطأ
-     */
     private function filterByCategory(Builder $query, string $category): Builder
     {
         return $query->where('error_category', $category);
     }
 
-    /**
-     * فلتر حسب نوع الكيان (TaskUser, TemplateTaskUser, ProjectServiceUser)
-     */
     private function filterByErrorableType(Builder $query, string $errorableType): Builder
     {
         return $query->where('errorable_type', $errorableType);
     }
 
-    /**
-     * فلتر حسب الموظف
-     */
     private function filterByUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
-    /**
-     * فلتر حسب من سجل الخطأ
-     */
     private function filterByReporter(Builder $query, int $reporterId): Builder
     {
         return $query->where('reported_by', $reporterId);
     }
 
-    /**
-     * فلتر من تاريخ معين
-     */
     private function filterByDateFrom(Builder $query, string $dateFrom): Builder
     {
         return $query->whereDate('created_at', '>=', Carbon::parse($dateFrom));
     }
 
-    /**
-     * فلتر إلى تاريخ معين
-     */
     private function filterByDateTo(Builder $query, string $dateTo): Builder
     {
         return $query->whereDate('created_at', '<=', Carbon::parse($dateTo));
     }
 
-    /**
-     * فلتر حسب القسم
-     */
     private function filterByDepartment(Builder $query, string $department): Builder
     {
         return $query->whereHas('user', function ($q) use ($department) {
@@ -127,9 +100,6 @@ class EmployeeErrorFilterService
         });
     }
 
-    /**
-     * فلتر حسب المشروع
-     */
     private function filterByProject(Builder $query, int $projectId): Builder
     {
         return $query->whereHasMorph('errorable', [\App\Models\ProjectServiceUser::class], function ($q) use ($projectId) {
@@ -137,41 +107,26 @@ class EmployeeErrorFilterService
         });
     }
 
-    /**
-     * فلتر الأخطاء الحديثة (آخر 7 أيام)
-     */
     public function getRecentErrors(Builder $query): Builder
     {
         return $query->where('created_at', '>=', Carbon::now()->subDays(7));
     }
 
-    /**
-     * فلتر الأخطاء الجوهرية فقط
-     */
     public function getCriticalErrors(Builder $query): Builder
     {
         return $query->where('error_type', 'critical');
     }
 
-    /**
-     * فلتر الأخطاء العادية فقط
-     */
     public function getNormalErrors(Builder $query): Builder
     {
         return $query->where('error_type', 'normal');
     }
 
-    /**
-     * فلتر الأخطاء المحذوفة
-     */
     public function getTrashedErrors(Builder $query): Builder
     {
         return $query->onlyTrashed();
     }
 
-    /**
-     * فلتر الأخطاء حسب فترة زمنية
-     */
     public function filterByPeriod(Builder $query, string $period): Builder
     {
         switch ($period) {
@@ -209,9 +164,6 @@ class EmployeeErrorFilterService
         }
     }
 
-    /**
-     * ✅ فلتر حسب الشهر (YYYY-MM format)
-     */
     private function filterByMonth(Builder $query, string $month): Builder
     {
         try {
@@ -223,9 +175,6 @@ class EmployeeErrorFilterService
         }
     }
 
-    /**
-     * ✅ فلتر حسب كود المشروع
-     */
     private function filterByProjectCode(Builder $query, string $projectCode): Builder
     {
         return $query->whereHasMorph('errorable', [
@@ -234,17 +183,14 @@ class EmployeeErrorFilterService
             \App\Models\ProjectServiceUser::class
         ], function ($q, $type) use ($projectCode) {
             if ($type === \App\Models\TaskUser::class) {
-                // للمهام العادية
                 $q->whereHas('task.project', function ($subQ) use ($projectCode) {
                     $subQ->where('code', $projectCode);
                 });
             } elseif ($type === \App\Models\TemplateTaskUser::class) {
-                // لمهام القوالب
                 $q->whereHas('project', function ($subQ) use ($projectCode) {
                     $subQ->where('code', $projectCode);
                 });
             } elseif ($type === \App\Models\ProjectServiceUser::class) {
-                // للمشاريع
                 $q->whereHas('project', function ($subQ) use ($projectCode) {
                     $subQ->where('code', $projectCode);
                 });

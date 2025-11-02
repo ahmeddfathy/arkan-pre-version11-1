@@ -24,16 +24,11 @@ class DeliveryNotificationService
         $this->slackService = $slackService;
     }
 
-    /**
-     * إشعار للمعتمدين عند تسليم الموظف للشغل
-     * هنا بيروح للكل اللي ينطبق عليهم الشروط
-     */
     public function notifyApproversWhenDelivered(ProjectServiceUser $delivery): void
     {
         try {
             $requiredApprovals = $delivery->getRequiredApprovals();
 
-            // جلب المعتمدين الإداريين والفنيين
             $administrativeApprovers = collect();
             $technicalApprovers = collect();
 
@@ -45,37 +40,30 @@ class DeliveryNotificationService
                 $technicalApprovers = $this->getPotentialApprovers($delivery, 'technical');
             }
 
-            // ✅ تحديد المعتمدين المشتركين بشكل صحيح باستخدام IDs
             $administrativeIds = $administrativeApprovers->pluck('id')->unique();
             $technicalIds = $technicalApprovers->pluck('id')->unique();
             $commonIds = $administrativeIds->intersect($technicalIds);
 
-            // تجميع المعتمدين المشتركين
             $commonApprovers = $administrativeApprovers->filter(function ($approver) use ($commonIds) {
                 return $commonIds->contains($approver->id);
             })->unique('id');
 
-            // المعتمدين الإداريين فقط (بدون المشتركين)
             $uniqueAdministrativeApprovers = $administrativeApprovers->filter(function ($approver) use ($commonIds) {
                 return !$commonIds->contains($approver->id);
             })->unique('id');
 
-            // المعتمدين الفنيين فقط (بدون المشتركين)
             $uniqueTechnicalApprovers = $technicalApprovers->filter(function ($approver) use ($commonIds) {
                 return !$commonIds->contains($approver->id);
             })->unique('id');
 
-            // إرسال إشعارات للمعتمدين المشتركين (إشعار واحد فقط)
             foreach ($commonApprovers as $approver) {
                 $this->sendCombinedApprovalNotification($delivery, $approver, ['administrative', 'technical']);
             }
 
-            // إرسال إشعارات للمعتمدين الإداريين فقط
             foreach ($uniqueAdministrativeApprovers as $approver) {
                 $this->sendApprovalNotification($delivery, $approver, 'administrative');
             }
 
-            // إرسال إشعارات للمعتمدين الفنيين فقط
             foreach ($uniqueTechnicalApprovers as $approver) {
                 $this->sendApprovalNotification($delivery, $approver, 'technical');
             }
@@ -97,9 +85,6 @@ class DeliveryNotificationService
         }
     }
 
-    /**
-     * إرسال إشعار مشترك للمعتمدين الذين يمكنهم الاعتماد الإداري والفني
-     */
     private function sendCombinedApprovalNotification(ProjectServiceUser $delivery, User $approver, array $approvalTypes): void
     {
         $typesArabic = [];
@@ -110,14 +95,13 @@ class DeliveryNotificationService
 
         $message = "تسليمة بانتظار اعتمادك {$typesText}: {$delivery->project->name} - {$delivery->user->name}";
 
-        // إنشاء إشعار في قاعدة البيانات
         Notification::create([
             'user_id' => $approver->id,
             'type' => 'delivery_awaiting_approval',
             'data' => [
                 'message' => $message,
                 'approval_types' => $approvalTypes,
-                'approval_type' => 'combined', // للتوافق مع الكود الموجود
+                'approval_type' => 'combined',
                 'delivery_id' => $delivery->id,
                 'project_id' => $delivery->project_id,
                 'project_name' => $delivery->project->name ?? 'غير محدد',
@@ -128,7 +112,6 @@ class DeliveryNotificationService
             'related_id' => $delivery->id
         ]);
 
-        // إرسال Firebase
         if ($approver->fcm_token) {
             try {
                 $this->firebaseService->sendNotificationQueued(
@@ -145,7 +128,6 @@ class DeliveryNotificationService
             }
         }
 
-        // إرسال Slack
         try {
             $this->slackService->sendDeliveryAwaitingApprovalNotification(
                 $delivery,
@@ -166,15 +148,11 @@ class DeliveryNotificationService
         ]);
     }
 
-    /**
-     * إرسال إشعار اعتماد واحد لمعتمد واحد
-     */
     private function sendApprovalNotification(ProjectServiceUser $delivery, User $approver, string $approvalType): void
     {
         $typeArabic = $approvalType === 'administrative' ? 'الإداري' : 'الفني';
         $message = "📋 تسليمة جديدة بانتظار اعتمادك {$typeArabic}\n\nالمشروع: {$delivery->project->name}\nالموظف: {$delivery->user->name}\nالخدمة: " . ($delivery->service->name ?? 'غير محدد') . "\n\n⏰ يرجى المراجعة في أقرب وقت";
 
-        // إنشاء إشعار في قاعدة البيانات
         Notification::create([
             'user_id' => $approver->id,
             'type' => 'delivery_awaiting_approval',
@@ -191,7 +169,6 @@ class DeliveryNotificationService
             'related_id' => $delivery->id
         ]);
 
-        // إرسال Firebase
         if ($approver->fcm_token) {
             try {
                 $this->firebaseService->sendNotificationQueued(
@@ -208,7 +185,6 @@ class DeliveryNotificationService
             }
         }
 
-        // إرسال Slack
         try {
             $this->slackService->sendDeliveryAwaitingApprovalNotification(
                 $delivery,
@@ -229,9 +205,6 @@ class DeliveryNotificationService
         ]);
     }
 
-    /**
-     * إرسال إشعارات الاعتماد لجميع المعتمدين المحتملين (الدالة القديمة - للتوافق)
-     */
     private function sendApprovalNotifications(ProjectServiceUser $delivery, string $approvalType): void
     {
         $approvers = $this->getPotentialApprovers($delivery, $approvalType);
@@ -248,7 +221,6 @@ class DeliveryNotificationService
         $message = "تسليمة بانتظار اعتمادك {$typeArabic}: {$delivery->project->name} - {$delivery->user->name}";
 
         foreach ($approvers as $approver) {
-            // إنشاء إشعار في قاعدة البيانات
             Notification::create([
                 'user_id' => $approver->id,
                 'type' => 'delivery_awaiting_approval',
@@ -265,7 +237,6 @@ class DeliveryNotificationService
                 'related_id' => $delivery->id
             ]);
 
-            // إرسال Firebase
             if ($approver->fcm_token) {
                 try {
                     $this->firebaseService->sendNotificationQueued(
@@ -282,7 +253,6 @@ class DeliveryNotificationService
                 }
             }
 
-            // إرسال Slack
             try {
                 $this->slackService->sendDeliveryAwaitingApprovalNotification(
                     $delivery,
@@ -305,9 +275,6 @@ class DeliveryNotificationService
         ]);
     }
 
-    /**
-     * إشعار للموظف عند اعتماد تسليمته
-     */
     public function notifyEmployeeWhenApproved(ProjectServiceUser $delivery, User $approver, string $approvalType): void
     {
         try {
@@ -317,7 +284,6 @@ class DeliveryNotificationService
             $typeArabic = $approvalType === 'administrative' ? 'إدارياً' : 'فنياً';
             $message = "تم اعتماد تسليمتك {$typeArabic} في مشروع: {$delivery->project->name}";
 
-            // إنشاء إشعار في قاعدة البيانات
             Notification::create([
                 'user_id' => $user->id,
                 'type' => 'delivery_approved',
@@ -336,7 +302,6 @@ class DeliveryNotificationService
                 'related_id' => $delivery->id
             ]);
 
-            // إرسال Firebase
             if ($user->fcm_token) {
                 try {
                     $this->firebaseService->sendNotificationQueued(
@@ -353,7 +318,6 @@ class DeliveryNotificationService
                 }
             }
 
-            // إرسال Slack
             try {
                 $this->slackService->sendDeliveryApprovedNotification(
                     $delivery,
@@ -368,7 +332,6 @@ class DeliveryNotificationService
                 ]);
             }
 
-            // إذا تم الاعتماد الإداري، أرسل للمعتمدين الفنيين (إن وجد)
             if ($approvalType === 'administrative') {
                 $requiredApprovals = $delivery->getRequiredApprovals();
                 if ($requiredApprovals['needs_technical'] && !$delivery->hasTechnicalApproval()) {
@@ -391,17 +354,12 @@ class DeliveryNotificationService
         }
     }
 
-    /**
-     * جلب جميع المعتمدين المحتملين
-     * هنا بنطبق شروط RoleApproval
-     */
     private function getPotentialApprovers(ProjectServiceUser $delivery, string $approvalType): Collection
     {
         $approvers = collect();
         $deliveryUserRoles = $delivery->user->roles;
 
         foreach ($deliveryUserRoles as $deliveryRole) {
-            // جلب قواعد الاعتماد لهذا الرول
             $approvalRules = RoleApproval::where('role_id', $deliveryRole->id)
                 ->where('approval_type', $approvalType)
                 ->where('is_active', true)
@@ -409,26 +367,21 @@ class DeliveryNotificationService
                 ->get();
 
             foreach ($approvalRules as $rule) {
-                // جلب جميع المستخدمين الذين لديهم الـ approver role
                 $potentialApprovers = User::role($rule->approverRole->name)
                     ->where('employee_status', 'active')
                     ->get();
 
                 foreach ($potentialApprovers as $potentialApprover) {
-                    // فحص الشروط الإضافية
-
-                    // 1. requires_same_project
                     if ($rule->requires_same_project) {
                         $isInSameProject = ProjectServiceUser::where('project_id', $delivery->project_id)
                             ->where('user_id', $potentialApprover->id)
                             ->exists();
 
                         if (!$isInSameProject) {
-                            continue; // هذا المعتمد ليس في نفس المشروع
+                                continue;
                         }
                     }
 
-                    // 2. requires_team_owner
                     if ($rule->requires_team_owner) {
                         $deliveryUserTeamId = $delivery->user->current_team_id;
 
@@ -438,32 +391,26 @@ class DeliveryNotificationService
                                 ->exists();
 
                             if (!$isTeamOwner) {
-                                continue; // هذا المعتمد ليس مالك الفريق
+                                continue;
                             }
                         } else {
-                            continue; // الموظف ليس في فريق
+                            continue;
                         }
                     }
 
-                    // إذا وصلنا هنا، المعتمد ينطبق عليه الشروط
                     $approvers->push($potentialApprover);
                 }
             }
         }
 
-        // إرجاع معتمدين فريدين (لو واحد عنده أكتر من role ينطبق عليه)
         return $approvers->unique('id');
     }
 
-    /**
-     * إشعار للمعتمدين عند إلغاء تسليم الموظف
-     */
     public function notifyApproversWhenUndelivered(ProjectServiceUser $delivery): void
     {
         try {
             $requiredApprovals = $delivery->getRequiredApprovals();
 
-            // جلب المعتمدين الإداريين والفنيين الذين كانوا سيعتمدون التسليمة
             $administrativeApprovers = collect();
             $technicalApprovers = collect();
 
@@ -475,10 +422,8 @@ class DeliveryNotificationService
                 $technicalApprovers = $this->getPotentialApprovers($delivery, 'technical');
             }
 
-            // دمج المعتمدين
             $allApprovers = $administrativeApprovers->merge($technicalApprovers)->unique('id');
 
-            // إرسال إشعارات للمعتمدين
             foreach ($allApprovers as $approver) {
                 $this->sendUndeliveryNotification($delivery, $approver);
             }
@@ -497,14 +442,10 @@ class DeliveryNotificationService
         }
     }
 
-    /**
-     * إرسال إشعار إلغاء التسليمة للمعتمد
-     */
     private function sendUndeliveryNotification(ProjectServiceUser $delivery, User $approver): void
     {
         $message = "❌ تم إلغاء تسليمة كانت في انتظار اعتمادك\n\nالمشروع: {$delivery->project->name}\nالموظف: {$delivery->user->name}\nالخدمة: " . ($delivery->service->name ?? 'غير محدد') . "\n\nℹ️ لم تعد هذه التسليمة في انتظار اعتمادك";
 
-        // إنشاء إشعار في قاعدة البيانات
         Notification::create([
             'user_id' => $approver->id,
             'type' => 'delivery_undelivered',
@@ -520,7 +461,6 @@ class DeliveryNotificationService
             'related_id' => $delivery->id
         ]);
 
-        // إرسال Firebase
         if ($approver->fcm_token) {
             try {
                 $this->firebaseService->sendNotificationQueued(
@@ -536,8 +476,7 @@ class DeliveryNotificationService
                 ]);
             }
         }
-
-        // إرسال Slack
+            
         try {
             $this->slackService->sendDeliveryUndeliveredNotification(
                 $delivery,

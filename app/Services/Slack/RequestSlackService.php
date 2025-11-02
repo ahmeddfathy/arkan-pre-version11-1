@@ -6,54 +6,36 @@ use App\Models\User;
 
 class RequestSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار طلب عمل إضافي
-     */
     public function sendOvertimeRequestNotification($request, User $targetUser, User $author, string $action): bool
     {
         $message = $this->buildOvertimeRequestMessage($request, $targetUser, $author, $action);
 
-        // تحديد context بناءً على نوع العملية والرد
         $context = $this->getOvertimeNotificationContext($request, $action, $author);
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($targetUser, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار طلب إذن
-     */
     public function sendPermissionRequestNotification($request, User $targetUser, User $author, string $action): bool
     {
         $message = $this->buildPermissionRequestMessage($request, $targetUser, $author, $action);
 
-        // تحديد context بناءً على نوع العملية والرد
         $context = $this->getPermissionNotificationContext($request, $action, $author);
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($targetUser, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار طلب غياب
-     */
     public function sendAbsenceRequestNotification($request, User $targetUser, User $author, string $action): bool
     {
         $message = $this->buildAbsenceRequestMessage($request, $targetUser, $author, $action);
 
-        // تحديد context بناءً على نوع العملية والرد
         $context = $this->getAbsenceNotificationContext($request, $action, $author);
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($targetUser, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة طلب العمل الإضافي
-     */
     private function buildOvertimeRequestMessage($request, User $targetUser, User $author, string $action): array
     {
         $actionEmoji = $this->getActionEmoji($action);
@@ -87,9 +69,6 @@ class RequestSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة طلب الإذن
-     */
     private function buildPermissionRequestMessage($request, User $targetUser, User $author, string $action): array
     {
         $actionEmoji = $this->getActionEmoji($action);
@@ -124,9 +103,6 @@ class RequestSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة طلب الغياب
-     */
     private function buildAbsenceRequestMessage($request, User $targetUser, User $author, string $action): array
     {
         $actionEmoji = $this->getActionEmoji($action);
@@ -156,9 +132,6 @@ class RequestSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * الحصول على رمز الإجراء
-     */
     private function getActionEmoji(string $action): string
     {
         switch ($action) {
@@ -172,9 +145,6 @@ class RequestSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * الحصول على نص الإجراء
-     */
     private function getActionText(string $action): string
     {
         switch ($action) {
@@ -188,9 +158,6 @@ class RequestSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * الحصول على نص الحالة
-     */
     private function getStatusText($request, string $action): string
     {
         switch ($action) {
@@ -209,20 +176,14 @@ class RequestSlackService extends BaseSlackService
         }
     }
 
-        /**
-     * تحديد context الإشعار للإجازات بناءً على العملية والمستخدم
-     */
     private function getAbsenceNotificationContext($request, string $action, User $author): string
     {
-        // التحقق من دور المؤلف لتحديد نوع الرد
         $authorRole = $author->roles->first()?->name;
 
-        // إذا كان العمل إنشاء طلب جديد
         if ($action === 'created') {
             return 'إشعار طلب إجازة';
         }
 
-        // إذا كان رد من HR
         if ($authorRole === 'hr') {
             if ($action === 'approved') {
                 return 'إشعار رد HR بالموافقة على الإجازة';
@@ -232,7 +193,6 @@ class RequestSlackService extends BaseSlackService
                 return 'إشعار رد HR على الإجازة';
             }
         }
-        // إذا كان رد من مدير
         else {
             if ($action === 'approved') {
                 return 'إشعار رد المدير بالموافقة على الإجازة';
@@ -244,9 +204,6 @@ class RequestSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * تحديد context الإشعار للعمل الإضافي بناءً على العملية والمستخدم
-     */
     private function getOvertimeNotificationContext($request, string $action, User $author): string
     {
         $authorRole = $author->roles->first()?->name;
@@ -274,9 +231,6 @@ class RequestSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * تحديد context الإشعار للإذن بناءً على العملية والمستخدم
-     */
     private function getPermissionNotificationContext($request, string $action, User $author): string
     {
         $authorRole = $author->roles->first()?->name;

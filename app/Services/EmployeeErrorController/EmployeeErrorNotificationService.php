@@ -17,16 +17,11 @@ class EmployeeErrorNotificationService
         $this->slackService = $slackService;
     }
 
-    /**
-     * إرسال إشعار عند تسجيل خطأ جديد
-     */
     public function notifyOnErrorCreated(EmployeeError $error): void
     {
         try {
-            // إشعار للموظف صاحب الخطأ
             $this->notifyEmployee($error);
 
-            // إشعار للمديرين إذا كان الخطأ جوهري
             if ($error->error_type === 'critical') {
                 $this->notifyManagers($error);
             }
@@ -43,9 +38,6 @@ class EmployeeErrorNotificationService
         }
     }
 
-    /**
-     * إشعار الموظف بالخطأ المسجل عليه
-     */
     private function notifyEmployee(EmployeeError $error): void
     {
         $employee = $error->user;
@@ -54,10 +46,8 @@ class EmployeeErrorNotificationService
             return;
         }
 
-        // إرسال إشعار Slack
         $this->slackService->sendErrorNotification($error);
 
-        // يمكن استخدام Firebase أو Database Notification
         // $employee->notify(new EmployeeErrorNotification($error));
 
         Log::info('Employee notified about error', [
@@ -66,19 +56,12 @@ class EmployeeErrorNotificationService
         ]);
     }
 
-    /**
-     * إشعار المديرين بالأخطاء الجوهرية
-     */
     private function notifyManagers(EmployeeError $error): void
     {
         $managers = User::role(['admin', 'super-admin', 'hr', 'project_manager'])->get();
 
         foreach ($managers as $manager) {
-            // إرسال إشعار Slack للمديرين
             $this->slackService->sendCriticalErrorNotification($error, $manager);
-
-            // $manager->notify(new CriticalErrorNotification($error));
-
             Log::info('Manager notified about critical error', [
                 'manager_id' => $manager->id,
                 'error_id' => $error->id
@@ -86,19 +69,13 @@ class EmployeeErrorNotificationService
         }
     }
 
-    /**
-     * إشعار عند تحديث خطأ
-     */
     public function notifyOnErrorUpdated(EmployeeError $error): void
     {
         try {
             $employee = $error->user;
 
             if ($employee) {
-                // إرسال إشعار Slack
                 $this->slackService->sendErrorUpdateNotification($error);
-
-                // $employee->notify(new EmployeeErrorUpdatedNotification($error));
 
                 Log::info('Employee notified about error update', [
                     'user_id' => $employee->id,
@@ -113,19 +90,13 @@ class EmployeeErrorNotificationService
         }
     }
 
-    /**
-     * إشعار عند حذف خطأ
-     */
     public function notifyOnErrorDeleted(EmployeeError $error): void
     {
         try {
             $employee = $error->user;
 
             if ($employee) {
-                // إرسال إشعار Slack
                 $this->slackService->sendErrorDeletedNotification($error);
-
-                // $employee->notify(new EmployeeErrorDeletedNotification($error));
 
                 Log::info('Employee notified about error deletion', [
                     'user_id' => $employee->id,
@@ -140,19 +111,11 @@ class EmployeeErrorNotificationService
         }
     }
 
-    /**
-     * إشعار عند تجاوز حد معين من الأخطاء
-     */
     public function notifyOnErrorThreshold(User $employee, int $errorCount, string $period = 'month'): void
     {
         try {
-            // إشعار الموظف
-            // $employee->notify(new ErrorThresholdNotification($errorCount, $period));
-
-            // إشعار المديرين
             $managers = User::role(['admin', 'super-admin', 'hr'])->get();
             foreach ($managers as $manager) {
-                // $manager->notify(new EmployeeErrorThresholdNotification($employee, $errorCount, $period));
             }
 
             Log::info('Error threshold notification sent', [
@@ -168,9 +131,6 @@ class EmployeeErrorNotificationService
         }
     }
 
-    /**
-     * إشعار تقرير أسبوعي بالأخطاء
-     */
     public function sendWeeklyReport(): void
     {
         try {
@@ -178,7 +138,6 @@ class EmployeeErrorNotificationService
 
             foreach ($managers as $manager) {
                 $stats = $this->getWeeklyStats();
-                // $manager->notify(new WeeklyErrorReportNotification($stats));
 
                 Log::info('Weekly error report sent', [
                     'manager_id' => $manager->id
@@ -191,9 +150,6 @@ class EmployeeErrorNotificationService
         }
     }
 
-    /**
-     * الحصول على إحصائيات الأسبوع
-     */
     private function getWeeklyStats(): array
     {
         return [
@@ -209,9 +165,6 @@ class EmployeeErrorNotificationService
         ];
     }
 
-    /**
-     * إشعار تذكير للموظف بأخطائه
-     */
     public function sendErrorReminder(User $employee): void
     {
         try {
@@ -220,7 +173,6 @@ class EmployeeErrorNotificationService
                 ->get();
 
             if ($pendingErrors->isNotEmpty()) {
-                // $employee->notify(new ErrorReminderNotification($pendingErrors));
 
                 Log::info('Error reminder sent', [
                     'user_id' => $employee->id,
@@ -234,5 +186,5 @@ class EmployeeErrorNotificationService
             ]);
         }
     }
-}
+    }
 

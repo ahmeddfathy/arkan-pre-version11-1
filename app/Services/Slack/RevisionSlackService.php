@@ -9,17 +9,11 @@ use Illuminate\Support\Facades\Log;
 
 class RevisionSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار عند إنشاء تعديل جديد
-     * يتم إرسال إشعار واحد لكل شخص مشارك (حتى لو في أكثر من دور)
-     */
     public function sendRevisionCreatedNotification(TaskRevision $revision): bool
     {
         try {
-            // جمع كل الأشخاص المعنيين بالتعديل
             $usersToNotify = $this->collectUniqueUsers($revision);
 
-            // إرسال إشعار لكل شخص
             foreach ($usersToNotify as $userId => $userData) {
                 $user = User::find($userId);
 
@@ -45,13 +39,9 @@ class RevisionSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * إرسال إشعار عند تحديث حالة التعديل
-     */
     public function sendRevisionStatusUpdateNotification(TaskRevision $revision, string $oldStatus, User $updatedBy): bool
     {
         try {
-            // إشعار للمسؤول عن التعديل
             if ($revision->responsible_user_id && $revision->responsibleUser) {
                 $message = $this->buildStatusUpdateMessage($revision, $oldStatus, $updatedBy);
                 $context = 'تحديث حالة تعديل';
@@ -67,13 +57,9 @@ class RevisionSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * إرسال إشعار عند اكتمال التعديل
-     */
     public function sendRevisionCompletedNotification(TaskRevision $revision): bool
     {
         try {
-            // إشعار لمنشئ التعديل
             if ($revision->creator) {
                 $message = $this->buildRevisionCompletedMessage($revision);
                 $context = 'تعديل مكتمل';
@@ -89,10 +75,6 @@ class RevisionSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * جمع المستخدمين الفريدين المعنيين بالتعديل
-     * كل شخص يظهر مرة واحدة مع كل أدواره
-     */
     private function collectUniqueUsers(TaskRevision $revision): array
     {
         $revision->load([
@@ -104,23 +86,14 @@ class RevisionSlackService extends BaseSlackService
 
         $users = [];
 
-        // منشئ التعديل (عادة مايحتاجش إشعار لأنه هو اللي عمله)
-        // لكن نسيبه comment للمرونة
-        // if ($revision->created_by && $revision->creator) {
-        //     $this->addUserRole($users, $revision->created_by, 'creator', 'منشئ التعديل');
-        // }
-
-        // المسؤول عن التعديل (اللي اتخصم عليه)
         if ($revision->responsible_user_id && $revision->responsibleUser) {
             $this->addUserRole($users, $revision->responsible_user_id, 'responsible', 'مسؤول عن الخطأ');
         }
 
-        // المنفذ (اللي هيشتغل التعديل)
         if ($revision->executor_user_id && $revision->executorUser) {
             $this->addUserRole($users, $revision->executor_user_id, 'executor', 'منفذ التعديل');
         }
 
-        // المراجعين المخصصين (متعددين)
         if ($revision->reviewers && is_array($revision->reviewers)) {
             foreach ($revision->reviewers as $index => $reviewerData) {
                 $reviewerUser = \App\Models\User::find($reviewerData['reviewer_id']);
@@ -131,7 +104,6 @@ class RevisionSlackService extends BaseSlackService
             }
         }
 
-        // الشخص المكلف (إن وجد)
         if ($revision->assigned_to && $revision->assignedUser) {
             $this->addUserRole($users, $revision->assigned_to, 'assigned', 'مكلف بالتعديل');
         }
@@ -139,9 +111,6 @@ class RevisionSlackService extends BaseSlackService
         return $users;
     }
 
-    /**
-     * إضافة دور للمستخدم
-     */
     private function addUserRole(array &$users, int $userId, string $roleKey, string $roleLabel): void
     {
         if (!isset($users[$userId])) {
@@ -153,12 +122,8 @@ class RevisionSlackService extends BaseSlackService
         $users[$userId]['roles'][$roleKey] = $roleLabel;
     }
 
-    /**
-     * بناء رسالة إنشاء تعديل
-     */
     private function buildRevisionCreatedMessage(TaskRevision $revision, User $user, array $roles): array
     {
-        // تحديد الأيقونة والنوع
         $typeIcon = '🔄';
         $typeText = match($revision->revision_type) {
             'project' => 'تعديل مشروع',
@@ -167,17 +132,14 @@ class RevisionSlackService extends BaseSlackService
             default => 'تعديل'
         };
 
-        // بناء نص الأدوار
         $rolesText = $this->formatUserRoles($roles);
 
-        // معلومات المصدر
         $sourceInfo = $this->getRevisionSourceInfo($revision);
 
         $blocks = [
             $this->buildHeader($typeIcon . ' ' . $typeText . ' جديد'),
         ];
 
-        // إضافة الأدوار
         if ($rolesText) {
             $blocks[] = $this->buildTextSection("*دورك:* {$rolesText}");
         }
@@ -189,7 +151,6 @@ class RevisionSlackService extends BaseSlackService
 
         $blocks[] = $this->buildTextSection("*الوصف:*\n{$revision->description}");
 
-        // معلومات إضافية
         $additionalInfo = [];
 
         if ($sourceInfo) {
@@ -210,12 +171,10 @@ class RevisionSlackService extends BaseSlackService
             $blocks[] = $this->buildInfoSection($additionalInfo);
         }
 
-        // ملاحظات المسؤولية
         if ($revision->responsibility_notes) {
             $blocks[] = $this->buildTextSection("📝 *ملاحظات:*\n{$revision->responsibility_notes}");
         }
 
-        // زر عرض التعديل
         $revisionUrl = url('/revisions/' . $revision->id);
         $blocks[] = $this->buildActionsSection([
             $this->buildActionButton('📋 عرض التعديل', $revisionUrl, 'primary')
@@ -229,9 +188,6 @@ class RevisionSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة تحديث الحالة
-     */
     private function buildStatusUpdateMessage(TaskRevision $revision, string $oldStatus, User $updatedBy): array
     {
         $statusMap = [
@@ -265,9 +221,6 @@ class RevisionSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة اكتمال التعديل
-     */
     private function buildRevisionCompletedMessage(TaskRevision $revision): array
     {
         $completedBy = $revision->executorUser ?? $revision->getCurrentReviewer();
@@ -293,9 +246,6 @@ class RevisionSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * تنسيق أدوار المستخدم
-     */
     private function formatUserRoles(array $roles): string
     {
         if (empty($roles)) {
@@ -311,9 +261,6 @@ class RevisionSlackService extends BaseSlackService
         return implode(' • ', $roleLabels);
     }
 
-    /**
-     * الحصول على معلومات مصدر التعديل
-     */
     private function getRevisionSourceInfo(TaskRevision $revision): ?string
     {
         if ($revision->revision_type === 'project' && $revision->project) {
@@ -354,9 +301,6 @@ class RevisionSlackService extends BaseSlackService
         return null;
     }
 
-    /**
-     * إرسال إشعار عند نقل المنفذ
-     */
     public function sendRevisionExecutorTransferNotification(
         TaskRevision $revision,
         User $fromUser,
@@ -365,12 +309,10 @@ class RevisionSlackService extends BaseSlackService
         ?string $reason = null
     ): bool {
         try {
-            // إشعار للمستلم الجديد
             $messageToNew = $this->buildExecutorTransferMessage($revision, $fromUser, $toUser, $transferredBy, $reason, 'to');
             $this->setNotificationContext('نقل تنفيذ تعديل إليك');
             $this->sendSlackNotification($toUser, $messageToNew, 'نقل تنفيذ تعديل', true);
 
-            // إشعار للمُرسِل
             $messageToOld = $this->buildExecutorTransferMessage($revision, $fromUser, $toUser, $transferredBy, $reason, 'from');
             $this->setNotificationContext('نقل تنفيذ تعديل منك');
             $this->sendSlackNotification($fromUser, $messageToOld, 'نقل تنفيذ تعديل', true);
@@ -386,9 +328,6 @@ class RevisionSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * إرسال إشعار عند نقل المراجع
-     */
     public function sendRevisionReviewerTransferNotification(
         TaskRevision $revision,
         ?User $fromUser,
@@ -398,12 +337,10 @@ class RevisionSlackService extends BaseSlackService
         ?string $reason = null
     ): bool {
         try {
-            // إشعار للمراجع الجديد
             $messageToNew = $this->buildReviewerTransferMessage($revision, $fromUser, $toUser, $transferredBy, $reviewerOrder, $reason, 'to');
             $this->setNotificationContext('نقل مراجعة تعديل إليك');
             $this->sendSlackNotification($toUser, $messageToNew, 'نقل مراجعة تعديل', true);
 
-            // إشعار للمراجع السابق (إذا كان موجود)
             if ($fromUser) {
                 $messageToOld = $this->buildReviewerTransferMessage($revision, $fromUser, $toUser, $transferredBy, $reviewerOrder, $reason, 'from');
                 $this->setNotificationContext('نقل مراجعة تعديل منك');
@@ -421,9 +358,6 @@ class RevisionSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * بناء رسالة نقل المنفذ
-     */
     private function buildExecutorTransferMessage(
         TaskRevision $revision,
         User $fromUser,
@@ -464,9 +398,6 @@ class RevisionSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة نقل المراجع
-     */
     private function buildReviewerTransferMessage(
         TaskRevision $revision,
         ?User $fromUser,

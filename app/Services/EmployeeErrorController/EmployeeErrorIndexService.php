@@ -23,9 +23,6 @@ class EmployeeErrorIndexService
         $this->errorStatisticsService = $errorStatisticsService;
     }
 
-    /**
-     * جلب وتنظيم الأخطاء لصفحة Index
-     */
     public function getErrorsForIndex(Request $request): array
     {
         $user = Auth::user();
@@ -36,14 +33,12 @@ class EmployeeErrorIndexService
             'errorable_type' => $request->get('errorable_type'),
             'date_from' => $request->get('date_from'),
             'date_to' => $request->get('date_to'),
-            'month' => $request->get('month'), // ✅ فلتر الشهر
-            'project_code' => $request->get('project_code'), // ✅ فلتر كود المشروع
+            'month' => $request->get('month'),
+            'project_code' => $request->get('project_code'),
         ];
 
-        // جلب الأخطاء حسب الدور
         $employeeErrors = $this->getErrorsBasedOnRole($user, array_filter($filters));
 
-        // الإحصائيات حسب الدور
         $stats = $this->getStatsBasedOnRole($user);
 
         return [
@@ -53,27 +48,20 @@ class EmployeeErrorIndexService
         ];
     }
 
-    /**
-     * جلب الأخطاء حسب المستوى الهرمي للمستخدم
-     */
+
     private function getErrorsBasedOnRole(User $user, array $filters): Collection
     {
         $query = EmployeeError::query();
 
-        // التحقق من المستوى الهرمي
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
-        // إذا كان المستوى الهرمي 2 أو أعلى، يعرض الأخطاء اللي سجلها
         if (($globalLevel && $globalLevel >= 2) || ($departmentLevel && $departmentLevel >= 2)) {
-            // للمديرين: عرض الأخطاء اللي سجلوها
             $query->where('reported_by', $user->id);
         } else {
-            // للموظفين: عرض الأخطاء اللي عليهم
             $query->where('user_id', $user->id);
         }
 
-        // تطبيق الفلاتر
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['errorable', 'reportedBy', 'user'])
@@ -81,33 +69,25 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * الإحصائيات حسب المستوى الهرمي
-     */
+
     private function getStatsBasedOnRole(User $user): array
     {
-        // التحقق من المستوى الهرمي
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
-        // إذا كان المستوى الهرمي 2 أو أعلى، إحصائيات الأخطاء اللي سجلها
         if (($globalLevel && $globalLevel >= 2) || ($departmentLevel && $departmentLevel >= 2)) {
-            // للمديرين: إحصائيات الأخطاء اللي سجلوها
             return $this->errorStatisticsService->getReporterStats($user);
         } else {
-            // للموظفين: إحصائيات الأخطاء اللي عليهم
             return $this->errorStatisticsService->getUserErrorStats($user);
         }
     }
 
-    /**
-     * جلب أخطاء موظف معين (للمديرين)
-     */
+
     public function getUserErrors(User $user, array $filters = []): Collection
     {
         $query = EmployeeError::where('user_id', $user->id);
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['errorable', 'reportedBy'])
@@ -115,16 +95,13 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * جلب أخطاء مشروع معين
-     */
+
     public function getProjectErrors($projectId, array $filters = []): Collection
     {
         $query = EmployeeError::whereHasMorph('errorable', [\App\Models\ProjectServiceUser::class], function ($q) use ($projectId) {
             $q->where('project_id', $projectId);
         });
 
-        // تطبيق الفلاتر
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])
@@ -132,16 +109,14 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * جلب أخطاء مهمة معينة
-     */
+
     public function getTaskErrors($taskId, array $filters = []): Collection
     {
         $query = EmployeeError::whereHasMorph('errorable', [\App\Models\TaskUser::class], function ($q) use ($taskId) {
             $q->where('task_id', $taskId);
         });
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])
@@ -149,16 +124,14 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * جلب الأخطاء حسب القسم
-     */
+
     public function getDepartmentErrors(string $department, array $filters = []): Collection
     {
         $query = EmployeeError::whereHas('user', function ($q) use ($department) {
             $q->where('department', $department);
         });
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])
@@ -166,9 +139,7 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * البحث في الأخطاء
-     */
+
     public function searchErrors(string $searchTerm, array $filters = []): Collection
     {
         $query = EmployeeError::where(function ($q) use ($searchTerm) {
@@ -179,7 +150,7 @@ class EmployeeErrorIndexService
               });
         });
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])
@@ -187,14 +158,12 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * جلب أخطائي (الأخطاء المسجلة علي)
-     */
+
     public function getMyErrors(User $user, array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
         $query = EmployeeError::where('user_id', $user->id);
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])
@@ -202,14 +171,12 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * جلب الأخطاء التي أضفتها
-     */
+
     public function getReportedErrors(User $user, array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
         $query = EmployeeError::where('reported_by', $user->id);
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])
@@ -217,14 +184,12 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * جلب جميع الأخطاء (للمديرين)
-     */
+
     public function getAllErrors(array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
         $query = EmployeeError::query();
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])
@@ -232,15 +197,12 @@ class EmployeeErrorIndexService
                      ->get();
     }
 
-    /**
-     * جلب جميع الأخطاء الجوهرية (متاح لجميع الموظفين للتعلم والوعي)
-     * هذه الأخطاء تكون مرئية للجميع للتعلم من أخطاء الآخرين
-     */
+
     public function getAllCriticalErrors(array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
         $query = EmployeeError::where('error_type', 'critical');
 
-        // تطبيق الفلاتر
+
         $query = $this->errorFilterService->applyFilters($query, $filters);
 
         return $query->with(['user', 'errorable', 'reportedBy'])

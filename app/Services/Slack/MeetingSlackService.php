@@ -8,40 +8,28 @@ use Illuminate\Support\Str;
 
 class MeetingSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار منشن في الاجتماع
-     */
     public function sendMeetingMentionNotification(Meeting $meeting, User $mentionedUser, User $creator): bool
     {
         $message = $this->buildMeetingMentionMessage($meeting, $mentionedUser, $creator);
         $context = 'إشعار ذكر في اجتماع';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($mentionedUser, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار إنشاء اجتماع للمشاركين
-     */
     public function sendMeetingCreatedNotification(Meeting $meeting, User $participant, User $creator): bool
     {
         $message = $this->buildMeetingCreatedMessage($meeting, $participant, $creator);
         $context = 'إشعار اجتماع جديد';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($participant, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة منشن الاجتماع
-     */
     private function buildMeetingMentionMessage(Meeting $meeting, User $mentionedUser, User $creator): array
     {
         $meetingUrl = url("/meetings/{$meeting->id}");
 
-        // تحديد نوع المنشن
         $isEveryoneMention = strpos($meeting->description, '@everyone') !== false || strpos($meeting->description, '@الجميع') !== false;
         $mentionIcon = $isEveryoneMention ? '👥' : '📢';
         $mentionText = $isEveryoneMention ? 'تم ذكر الجميع في اجتماع جديد' : 'تم ذكرك في اجتماع جديد';
@@ -74,9 +62,6 @@ class MeetingSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة إنشاء الاجتماع
-     */
     private function buildMeetingCreatedMessage(Meeting $meeting, User $participant, User $creator): array
     {
         $meetingUrl = url("/meetings/{$meeting->id}");
@@ -108,9 +93,6 @@ class MeetingSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * إرسال إشعار منشن في ملاحظة الاجتماع
-     */
     public function sendMeetingNoteMentionNotification(Meeting $meeting, User $mentionedUser, User $author, string $noteContent): bool
     {
         $message = $this->buildMeetingNoteMentionMessage($meeting, $mentionedUser, $author, $noteContent);
@@ -119,15 +101,11 @@ class MeetingSlackService extends BaseSlackService
         return $result;
     }
 
-    /**
-     * بناء رسالة منشن ملاحظة الاجتماع
-     */
     private function buildMeetingNoteMentionMessage(Meeting $meeting, User $mentionedUser, User $author, string $noteContent): array
     {
         $meetingUrl = url("/meetings/{$meeting->id}");
         $notePreview = Str::limit($noteContent, 150);
 
-        // تحديد نوع المنشن
         $isEveryoneMention = strpos($noteContent, '@everyone') !== false || strpos($noteContent, '@الجميع') !== false;
         $mentionIcon = $isEveryoneMention ? '👥' : '📢';
         $mentionText = $isEveryoneMention ? 'تم ذكر الجميع في ملاحظة اجتماع' : 'تم ذكرك في ملاحظة اجتماع';
@@ -160,9 +138,6 @@ class MeetingSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * إرسال إشعار طلب موافقة اجتماع عميل
-     */
     public function sendMeetingApprovalRequestNotification(Meeting $meeting, User $approver, User $creator): bool
     {
         $message = $this->buildMeetingApprovalRequestMessage($meeting, $approver, $creator);
@@ -171,9 +146,6 @@ class MeetingSlackService extends BaseSlackService
         return $result;
     }
 
-    /**
-     * إرسال إشعار نتيجة الموافقة
-     */
     public function sendMeetingApprovalResultNotification(Meeting $meeting, User $creator, User $approver, string $result): bool
     {
         $message = $this->buildMeetingApprovalResultMessage($meeting, $creator, $approver, $result);
@@ -182,9 +154,6 @@ class MeetingSlackService extends BaseSlackService
         return $notificationResult;
     }
 
-    /**
-     * إرسال إشعار تحديث وقت الاجتماع
-     */
     public function sendMeetingTimeUpdatedNotification(Meeting $meeting, User $participant, User $updatedBy): bool
     {
         $message = $this->buildMeetingTimeUpdatedMessage($meeting, $participant, $updatedBy);
@@ -193,9 +162,14 @@ class MeetingSlackService extends BaseSlackService
         return $result;
     }
 
-    /**
-     * بناء رسالة طلب موافقة اجتماع
-     */
+    public function sendMeetingCancelledNotification(Meeting $meeting, User $participant, User $cancelledBy): bool
+    {
+        $message = $this->buildMeetingCancelledMessage($meeting, $participant, $cancelledBy);
+        $result = $this->sendDirectMessage($participant, $message);
+        $this->setNotificationContext('إشعار إلغاء اجتماع');
+        return $result;
+    }
+
     private function buildMeetingApprovalRequestMessage(Meeting $meeting, User $approver, User $creator): array
     {
         $meetingUrl = url("/meetings/{$meeting->id}");
@@ -227,21 +201,18 @@ class MeetingSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة نتيجة الموافقة
-     */
     private function buildMeetingApprovalResultMessage(Meeting $meeting, User $creator, User $approver, string $result): array
     {
         $meetingUrl = url("/meetings/{$meeting->id}");
 
-        $statusIcon = match($result) {
+        $statusIcon = match ($result) {
             'approved' => '✅',
             'rejected' => '❌',
             'time_updated' => '⏰',
             default => '📅'
         };
 
-        $statusText = match($result) {
+        $statusText = match ($result) {
             'approved' => 'تم الموافقة على اجتماعك',
             'rejected' => 'تم رفض اجتماعك',
             'time_updated' => 'تم تحديث وقت اجتماعك',
@@ -268,9 +239,6 @@ class MeetingSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة تحديث وقت الاجتماع
-     */
     private function buildMeetingTimeUpdatedMessage(Meeting $meeting, User $participant, User $updatedBy): array
     {
         $meetingUrl = url("/meetings/{$meeting->id}");
@@ -289,6 +257,37 @@ class MeetingSlackService extends BaseSlackService
                 $meeting->approval_notes ? $this->buildTextSection("*ملاحظات التحديث:*\n{$meeting->approval_notes}") : null,
                 $this->buildActionsSection([
                     $this->buildActionButton('🔗 عرض الاجتماع', $meetingUrl)
+                ]),
+                $this->buildContextSection()
+            ]
+        ];
+    }
+
+    private function buildMeetingCancelledMessage(Meeting $meeting, User $participant, User $cancelledBy): array
+    {
+        $meetingUrl = url("/meetings/{$meeting->id}");
+        $meetingTypeText = $meeting->isClientMeeting() ? 'اجتماع عميل' : 'اجتماع داخلي';
+        $clientName = $meeting->client ? $meeting->client->name : 'غير محدد';
+
+        return [
+            'text' => 'تم إلغاء الاجتماع',
+            'blocks' => [
+                $this->buildHeader('❌ تم إلغاء الاجتماع'),
+                $this->buildTextSection("*📋 الاجتماع:*\n{$meeting->title}"),
+                $this->buildInfoSection([
+                    "*تم الإلغاء بواسطة:*\n{$cancelledBy->name}",
+                    "*نوع الاجتماع:*\n{$meetingTypeText}",
+                    "*الموعد الأصلي:*\n{$meeting->start_time->format('d/m/Y - H:i')}",
+                    "*ينتهي:*\n{$meeting->end_time->format('d/m/Y - H:i')}"
+                ]),
+                $this->buildInfoSection([
+                    "*المكان:*\n" . ($meeting->location ?: 'غير محدد'),
+                    "*العميل:*\n{$clientName}",
+                    "*الحالة:*\n❌ ملغي"
+                ]),
+                $meeting->description ? $this->buildTextSection("*الوصف:*\n" . Str::limit($meeting->description, 200)) : null,
+                $this->buildActionsSection([
+                    $this->buildActionButton('🔗 عرض التفاصيل', $meetingUrl)
                 ]),
                 $this->buildContextSection()
             ]

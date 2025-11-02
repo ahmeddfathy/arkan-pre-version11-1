@@ -7,25 +7,17 @@ use App\Models\Task;
 
 class TaskSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار عند تعيين مهمة للمستخدم
-     */
     public function sendTaskAssignmentNotification($task, User $assignedUser, User $author): bool
     {
         $message = $this->buildTaskAssignmentMessage($task, $assignedUser, $author);
         $context = 'إشعار تعيين مهمة';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($assignedUser, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة تعيين المهمة
-     */
     private function buildTaskAssignmentMessage($task, User $assignedUser, User $author): array
     {
-        // التعامل مع الكائنات المختلفة (Task model أو stdClass)
         if (is_object($task) && method_exists($task, 'load')) {
             $task->load(['project', 'service']);
         }
@@ -53,9 +45,6 @@ class TaskSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * الحصول على اسم المشروع
-     */
     private function getProjectName($task): string
     {
         if (isset($task->project)) {
@@ -66,25 +55,17 @@ class TaskSlackService extends BaseSlackService
         return 'غير محدد';
     }
 
-    /**
-     * إرسال إشعار عند اعتماد المهمة ومنح النقاط
-     */
     public function sendTaskApprovalNotification($taskUser, int $awardedPoints, string $approverName, string $note = null): bool
     {
         $message = $this->buildTaskApprovalMessage($taskUser, $awardedPoints, $approverName, $note);
         $context = 'إشعار اعتماد مهمة';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($taskUser->user, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة اعتماد المهمة
-     */
     private function buildTaskApprovalMessage($taskUser, int $awardedPoints, string $approverName, string $note = null): array
     {
-        // التحقق من نوع المهمة
         $isTemplateTask = get_class($taskUser) === 'App\Models\TemplateTaskUser';
         $taskName = $isTemplateTask ? $taskUser->templateTask->name : $taskUser->task->name;
         $originalPoints = $isTemplateTask ? $taskUser->templateTask->points : $taskUser->task->points;
@@ -106,7 +87,6 @@ class TaskSlackService extends BaseSlackService
             $this->buildTextSection("✨ *النقاط المحصل عليها:* {$awardedPoints} نقطة\n{$pointsMessage}")
         ];
 
-        // إضافة الملاحظة إذا وجدت
         if ($note) {
             $blocks[] = $this->buildTextSection("📝 *ملاحظة المعتمد:*\n{$note}");
         }
@@ -123,9 +103,6 @@ class TaskSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * الحصول على تاريخ الاستحقاق
-     */
     private function getDueDate($task): string
     {
         if (!isset($task->due_date) || !$task->due_date) {
@@ -139,35 +116,24 @@ class TaskSlackService extends BaseSlackService
         return $task->due_date->format('d/m/Y');
     }
 
-    /**
-     * إرسال إشعار عند إكمال مهمة لمالك الفريق
-     */
     public function sendTaskCompletedNotification(Task $task, User $teamOwner, User $completedBy): bool
     {
         $message = $this->buildTaskCompletedMessage($task, $teamOwner, $completedBy);
         $context = 'إشعار إكمال مهمة';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($teamOwner, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار عند إعطاء نقاط للموظف
-     */
     public function sendPointsAwardedNotification(Task $task, User $recipient, User $awardedBy, int $points): bool
     {
         $message = $this->buildPointsAwardedMessage($task, $recipient, $awardedBy, $points);
         $context = 'إشعار منح نقاط';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($recipient, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة إكمال المهمة
-     */
     private function buildTaskCompletedMessage(Task $task, User $teamOwner, User $completedBy): array
     {
         $taskUrl = route('tasks.index') . '?task_id=' . $task->id;
@@ -195,9 +161,6 @@ class TaskSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة منح النقاط
-     */
     private function buildPointsAwardedMessage(Task $task, User $recipient, User $awardedBy, int $points): array
     {
         $taskUrl = route('tasks.my-tasks') . '?task_id=' . $task->id;
@@ -225,9 +188,6 @@ class TaskSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * إرسال إشعار عند اكتمال تاسك (للمعتمدين أو creator)
-     */
     public function sendTaskDeliveryNotification($taskUser, User $recipient, string $recipientType = 'approver'): bool
     {
         $message = $this->buildTaskDeliveryMessage($taskUser, $recipient, $recipientType);
@@ -237,9 +197,6 @@ class TaskSlackService extends BaseSlackService
         return $this->sendSlackNotification($recipient, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة اكتمال التاسك
-     */
     private function buildTaskDeliveryMessage($taskUser, User $recipient, string $recipientType): array
     {
         $isTemplateTask = get_class($taskUser) === 'App\Models\TemplateTaskUser';
@@ -257,7 +214,6 @@ class TaskSlackService extends BaseSlackService
             url("/projects/{$taskUser->task->project_id}");
 
         if ($recipientType === 'approver') {
-            // رسالة للمعتمدين
             return [
                 'text' => "تاسك بانتظار اعتمادك",
                 'blocks' => [
@@ -276,7 +232,6 @@ class TaskSlackService extends BaseSlackService
                 ]
             ];
         } else {
-            // رسالة للـ creator
             return [
                 'text' => "تاسك مكتملة",
                 'blocks' => [
@@ -296,9 +251,6 @@ class TaskSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * إرسال إشعار عند اعتماد تاسك (إداري/فني)
-     */
     public function sendTaskApprovedNotification($taskUser, User $employee, User $approver, string $approvalType): bool
     {
         $message = $this->buildTaskApprovedMessage($taskUser, $employee, $approver, $approvalType);
@@ -308,9 +260,6 @@ class TaskSlackService extends BaseSlackService
         return $this->sendSlackNotification($employee, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة اعتماد التاسك
-     */
     private function buildTaskApprovedMessage($taskUser, User $employee, User $approver, string $approvalType): array
     {
         $isTemplateTask = get_class($taskUser) === 'App\Models\TemplateTaskUser';
@@ -337,7 +286,6 @@ class TaskSlackService extends BaseSlackService
             $this->buildTextSection("✅ *تم الاعتماد {$typeArabic} بنجاح!*")
         ];
 
-        // إضافة الملاحظات إذا وجدت
         if ($notes) {
             $blocks[] = $this->buildTextSection("📝 *ملاحظات:*\n{$notes}");
         }

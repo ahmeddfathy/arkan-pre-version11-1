@@ -10,74 +10,51 @@ use App\Models\ProjectServiceUser;
 
 class ProjectSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار منشن في ملاحظة مشروع
-     */
     public function sendProjectNoteMention(ProjectNote $note, User $mentionedUser, User $author): bool
     {
         $message = $this->buildProjectNoteMentionMessage($note, $mentionedUser, $author);
         $context = 'إشعار ذكر في ملاحظة مشروع';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($mentionedUser, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار عند إضافة مستخدم للمشروع
-     */
     public function sendProjectAssignmentNotification(Project $project, User $assignedUser, User $author): bool
     {
         $message = $this->buildProjectAssignmentMessage($project, $assignedUser, $author);
         $context = 'إشعار تعيين مشروع';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($assignedUser, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار عند إزالة مستخدم من المشروع
-     */
     public function sendProjectRemovalNotification(Project $project, User $removedUser, User $author): bool
     {
         $message = $this->buildProjectRemovalMessage($project, $removedUser, $author);
         $context = 'إشعار إزالة من مشروع';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($removedUser, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار عند مشاركة ملف
-     */
     public function sendFileShareNotification(AttachmentShare $share, User $recipient, User $sharedBy): bool
     {
         $message = $this->buildFileShareMessage($share, $recipient, $sharedBy);
         $context = 'إشعار مشاركة ملف';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($recipient, $message, $context, true);
     }
 
-    /**
-     * إرسال إشعار عند رفع مرفق جديد في المجلدات الثابتة
-     */
     public function sendAttachmentUploadedNotification(Project $project, User $participant, User $uploadedBy, string $folderName, string $fileName): bool
     {
         $message = $this->buildAttachmentUploadedMessage($project, $uploadedBy, $folderName, $fileName);
         $context = 'إشعار رفع مرفق مشروع';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($participant, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة منشن ملاحظة المشروع
-     */
     private function buildProjectNoteMentionMessage(ProjectNote $note, User $mentionedUser, User $author): array
     {
         $note->load(['project']);
@@ -105,9 +82,6 @@ class ProjectSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة إضافة للمشروع
-     */
     private function buildProjectAssignmentMessage(Project $project, User $assignedUser, User $author): array
     {
         $projectUrl = url("/projects/{$project->id}");
@@ -129,9 +103,6 @@ class ProjectSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة إزالة من المشروع
-     */
     private function buildProjectRemovalMessage(Project $project, User $removedUser, User $author): array
     {
         return [
@@ -148,9 +119,6 @@ class ProjectSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة مشاركة ملف
-     */
     private function buildFileShareMessage(AttachmentShare $share, User $recipient, User $sharedBy): array
     {
         $attachment = $share->attachment;
@@ -183,9 +151,6 @@ class ProjectSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * إرسال إشعار للمعتمدين عند تسليم الموظف
-     */
     public function sendDeliveryAwaitingApprovalNotification(ProjectServiceUser $delivery, User $approver, string $approvalType): bool
     {
         $message = $this->buildDeliveryAwaitingApprovalMessage($delivery, $approver, $approvalType);
@@ -200,7 +165,6 @@ class ProjectSlackService extends BaseSlackService
      */
     private function buildDeliveryAwaitingApprovalMessage(ProjectServiceUser $delivery, User $approver, string $approvalType): array
     {
-        // ✅ التعامل مع حالة 'combined' بشكل صحيح
         if ($approvalType === 'combined') {
             $typeArabic = 'الإداري والفني';
         } else {
@@ -210,7 +174,6 @@ class ProjectSlackService extends BaseSlackService
         $projectUrl = url("/projects/{$delivery->project_id}");
         $deliveryUrl = route('deliveries.index');
 
-        // ✅ التأكد من عدم وجود قيم null أو فارغة
         $serviceName = ($delivery->service && $delivery->service->name) ? $delivery->service->name : 'غير محدد';
         $projectName = ($delivery->project && $delivery->project->name) ? $delivery->project->name : 'غير محدد';
         $userName = ($delivery->user && $delivery->user->name) ? $delivery->user->name : 'غير محدد';
@@ -219,14 +182,11 @@ class ProjectSlackService extends BaseSlackService
             $delivery->delivered_at->format('d/m/Y H:i') :
             now()->format('d/m/Y H:i');
 
-        // ✅ إصلاح style الأزرار - Slack يدعم فقط 'primary' أو 'danger'
         $buttons = [
             $this->buildActionButton('🔍 مراجعة التسليمات', $deliveryUrl, 'primary'),
             $this->buildActionButton('🔗 عرض المشروع', $projectUrl)
         ];
 
-        // ✅ تقسيم الـ fields لتجنب مشاكل Slack API
-        // استخدام section واحدة مع 2 fields (Slack يفضل هذا)
         $blocks = [
             $this->buildHeader("📋 تسليمة جديدة بانتظار الاعتماد {$typeArabic}"),
             $this->buildInfoSection([
@@ -250,9 +210,6 @@ class ProjectSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * إرسال إشعار للموظف عند اعتماد التسليمة
-     */
     public function sendDeliveryApprovedNotification(ProjectServiceUser $delivery, User $employee, User $approver, string $approvalType): bool
     {
         $message = $this->buildDeliveryApprovedMessage($delivery, $employee, $approver, $approvalType);
@@ -262,9 +219,6 @@ class ProjectSlackService extends BaseSlackService
         return $this->sendSlackNotification($employee, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة اعتماد التسليمة
-     */
     private function buildDeliveryApprovedMessage(ProjectServiceUser $delivery, User $employee, User $approver, string $approvalType): array
     {
         $typeArabic = $approvalType === 'administrative' ? 'الإداري' : 'الفني';
@@ -285,7 +239,6 @@ class ProjectSlackService extends BaseSlackService
             $this->buildTextSection("✅ *تم الاعتماد {$typeArabic} بنجاح!*")
         ];
 
-        // إضافة الملاحظات إذا وجدت
         if ($notes) {
             $blocks[] = $this->buildTextSection("📝 *ملاحظات المعتمد:*\n{$notes}");
         }
@@ -302,9 +255,6 @@ class ProjectSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * إرسال إشعار للمعتمد عند إلغاء التسليمة
-     */
     public function sendDeliveryUndeliveredNotification(ProjectServiceUser $delivery, User $approver): bool
     {
         $message = $this->buildDeliveryUndeliveredMessage($delivery, $approver);
@@ -314,9 +264,6 @@ class ProjectSlackService extends BaseSlackService
         return $this->sendSlackNotification($approver, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة إلغاء التسليمة
-     */
     private function buildDeliveryUndeliveredMessage(ProjectServiceUser $delivery, User $approver): array
     {
         $projectUrl = url("/projects/{$delivery->project_id}");
@@ -347,10 +294,7 @@ class ProjectSlackService extends BaseSlackService
             ]
         ];
     }
-
-    /**
-     * بناء رسالة رفع مرفق جديد
-     */
+        
     private function buildAttachmentUploadedMessage(Project $project, User $uploadedBy, string $folderName, string $fileName): array
     {
         $projectUrl = url("/projects/{$project->id}");

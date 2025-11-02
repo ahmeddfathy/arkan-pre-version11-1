@@ -12,17 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeeErrorService
 {
-    /**
-     * تسجيل خطأ جديد على موظف
-     */
     public function createError($errorable, array $data): EmployeeError
     {
-        // التحقق من نوع الكيان
         if (!$this->isValidErrorable($errorable)) {
             throw new \Exception('نوع الكيان غير صالح');
         }
 
-        // التحقق من وجود البيانات المطلوبة
         $this->validateErrorData($data);
 
         return DB::transaction(function () use ($errorable, $data) {
@@ -37,16 +32,12 @@ class EmployeeErrorService
 
             $errorable->errors()->save($error);
 
-            // يمكن إضافة إشعار للموظف هنا
             // $this->notifyEmployee($error);
 
             return $error;
         });
     }
 
-    /**
-     * تحديث خطأ موجود
-     */
     public function updateError(EmployeeError $error, array $data): EmployeeError
     {
         $error->update([
@@ -59,22 +50,15 @@ class EmployeeErrorService
         return $error->fresh();
     }
 
-    /**
-     * حذف خطأ
-     */
     public function deleteError(EmployeeError $error): bool
     {
         return $error->delete();
     }
 
-    /**
-     * الحصول على أخطاء موظف معين
-     */
     public function getUserErrors(User $user, array $filters = [])
     {
         $query = EmployeeError::where('user_id', $user->id);
 
-        // تطبيق الفلاتر
         if (isset($filters['error_type'])) {
             $query->where('error_type', $filters['error_type']);
         }
@@ -92,9 +76,6 @@ class EmployeeErrorService
                     ->get();
     }
 
-    /**
-     * الحصول على إحصائيات أخطاء موظف
-     */
     public function getUserErrorStats(User $user): array
     {
         $errors = EmployeeError::where('user_id', $user->id);
@@ -114,9 +95,6 @@ class EmployeeErrorService
         ];
     }
 
-    /**
-     * الحصول على أخطاء مهمة معينة
-     */
     public function getTaskErrors($taskUser)
     {
         if (!$this->isValidErrorable($taskUser)) {
@@ -126,9 +104,6 @@ class EmployeeErrorService
         return $taskUser->errors()->with(['user', 'reportedBy'])->latest()->get();
     }
 
-    /**
-     * التحقق من نوع الكيان الصالح
-     */
     private function isValidErrorable($errorable): bool
     {
         return $errorable instanceof TaskUser ||
@@ -136,9 +111,6 @@ class EmployeeErrorService
                $errorable instanceof ProjectServiceUser;
     }
 
-    /**
-     * التحقق من صحة بيانات الخطأ
-     */
     private function validateErrorData(array $data): void
     {
         if (empty($data['title'])) {
@@ -160,16 +132,12 @@ class EmployeeErrorService
         }
     }
 
-    /**
-     * الحصول على أخطاء حسب المشروع
-     */
     public function getProjectErrors($projectId, array $filters = [])
     {
         $query = EmployeeError::whereHasMorph('errorable', [ProjectServiceUser::class], function ($q) use ($projectId) {
             $q->where('project_id', $projectId);
         });
 
-        // تطبيق الفلاتر
         if (isset($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
         }
@@ -181,9 +149,6 @@ class EmployeeErrorService
         return $query->with(['user', 'errorable', 'reportedBy'])->latest()->get();
     }
 
-    /**
-     * إحصائيات الأخطاء لفريق أو قسم
-     */
     public function getTeamErrorStats($teamId = null): array
     {
         $query = EmployeeError::query();
@@ -205,9 +170,6 @@ class EmployeeErrorService
         ];
     }
 
-    /**
-     * الحصول على أكثر الموظفين الذين لديهم أخطاء
-     */
     private function getTopUsersWithErrors($errors, $limit = 10)
     {
         return $errors->groupBy('user_id')

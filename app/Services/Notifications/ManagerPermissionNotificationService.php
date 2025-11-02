@@ -36,20 +36,16 @@ class ManagerPermissionNotificationService
                 if ($hrUsers->isNotEmpty()) {
                     $this->sendNotificationsToMultipleUsers($hrUsers, $request, $type, $message, true);
 
-                    // إرسال إشعار Slack لفريق الموارد البشرية - فقط ببيانات الموظف والطلب
                     $employeeName = $request->user ? $request->user->name : 'موظف';
                     $slackMessage = "طلب إذن: $employeeName - " . $request->departure_time->format('Y-m-d H:i');
 
-                    // تحديد نوع العملية بناءً على نوع الإشعار
                     $operation = $this->determineSlackOperation($type);
 
-                    // إضافة الرابط للطلب
                     $additionalData = [
                         'link_url' => url("/permission-requests/{$request->id}"),
                         'link_text' => 'عرض الطلب'
                     ];
 
-                    // تحديد context حسب نوع الإشعار
                     if (strpos($type, 'hr_response') !== false) {
                         if ($request->hr_status === 'approved') {
                             $this->setHRNotificationContext('إشعار رد HR بالموافقة على الإذن');
@@ -105,7 +101,6 @@ class ManagerPermissionNotificationService
                 if ($managersToNotify->isNotEmpty()) {
                     $this->sendNotificationsToMultipleUsers($managersToNotify, $request, $type, $message, false);
 
-                                        // إرسال إشعارات Slack لمالكي الفرق
                     $currentUser = \Illuminate\Support\Facades\Auth::user();
                     $action = $this->determineSlackActionFromType($type, $request);
 
@@ -238,10 +233,7 @@ class ManagerPermissionNotificationService
 
         return 'إشعار طلب إذن';
     }
-
-    /**
-     * تحديد نوع العملية لإشعارات Slack بناءً على نوع الإشعار
-     */
+    
     private function determineSlackOperation(string $type): string
     {
         if (strpos($type, 'new_permission_request') !== false) {

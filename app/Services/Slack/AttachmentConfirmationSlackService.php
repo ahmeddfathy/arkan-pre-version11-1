@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class AttachmentConfirmationSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار للمسؤول عند طلب تأكيد المرفق
-     */
+
     public function sendConfirmationRequest(AttachmentConfirmation $confirmation): bool
     {
         try {
@@ -37,9 +35,7 @@ class AttachmentConfirmationSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * إرسال إشعار لمقدم الطلب عند التأكيد أو الرفض
-     */
+
     public function sendConfirmationResponse(AttachmentConfirmation $confirmation, string $action): bool
     {
         try {
@@ -67,9 +63,7 @@ class AttachmentConfirmationSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * بناء رسالة طلب التأكيد للمسؤول
-     */
+
     private function buildConfirmationRequestMessage(AttachmentConfirmation $confirmation): array
     {
         $requester = $confirmation->requester;
@@ -88,7 +82,7 @@ class AttachmentConfirmationSlackService extends BaseSlackService
             ])
         ];
 
-        // معلومات المرفق
+
         $attachmentInfo = [];
 
         if ($attachment->file_name) {
@@ -103,16 +97,13 @@ class AttachmentConfirmationSlackService extends BaseSlackService
             $blocks[] = $this->buildInfoSection($attachmentInfo);
         }
 
-        // الوصف
         if ($attachment->description) {
             $blocks[] = $this->buildTextSection("*الوصف:*\n{$attachment->description}");
         }
 
-        // نوع المرفق
         $attachmentType = $attachment->file_path ? '📁 ملف' : '🔗 رابط';
         $blocks[] = $this->buildTextSection("*النوع:* {$attachmentType}");
 
-        // أزرار الإجراءات
         $confirmationsUrl = url('/attachment-confirmations');
         $blocks[] = $this->buildActionsSection([
             $this->buildActionButton('✅ عرض الطلبات', $confirmationsUrl, 'primary')
@@ -126,9 +117,6 @@ class AttachmentConfirmationSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة رد التأكيد لمقدم الطلب
-     */
     private function buildConfirmationResponseMessage(AttachmentConfirmation $confirmation, string $action): array
     {
         $manager = $confirmation->manager;
@@ -139,7 +127,6 @@ class AttachmentConfirmationSlackService extends BaseSlackService
             ? "[{$project->code}] {$project->name}"
             : $project->name;
 
-        // تحديد الأيقونة والنص حسب الإجراء
         if ($action === 'confirmed') {
             $header = '✅ تم تأكيد المرفق';
             $actionText = 'تأكيد';
@@ -158,7 +145,6 @@ class AttachmentConfirmationSlackService extends BaseSlackService
             ])
         ];
 
-        // معلومات المرفق
         $attachmentInfo = [];
 
         if ($attachment->file_name) {
@@ -173,15 +159,12 @@ class AttachmentConfirmationSlackService extends BaseSlackService
             $blocks[] = $this->buildInfoSection($attachmentInfo);
         }
 
-        // الحالة
         $blocks[] = $this->buildTextSection("*الحالة:* {$actionIcon} {$actionText}");
 
-        // الملاحظات
         if ($confirmation->notes) {
             $blocks[] = $this->buildTextSection("📝 *ملاحظات:*\n{$confirmation->notes}");
         }
 
-        // زر عرض الطلبات
         $myRequestsUrl = url('/attachment-confirmations/my-requests');
         $blocks[] = $this->buildActionsSection([
             $this->buildActionButton('📋 طلباتي', $myRequestsUrl)

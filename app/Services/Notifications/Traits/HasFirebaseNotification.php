@@ -11,7 +11,6 @@ trait HasFirebaseNotification
     protected function sendAdditionalFirebaseNotification(User $user, string $message, string $title = 'إشعار جديد', ?string $link = null, ?string $type = null): ?array
     {
         try {
-            // 🚀 Smart Check: تحقق سريع من FCM token قبل أي معالجة
             if (!$user || empty($user->fcm_token)) {
                 return [
                     'success' => true,
@@ -35,7 +34,6 @@ trait HasFirebaseNotification
                 }
             }
 
-            // استخدام Firebase queue بدلاً من الإرسال المباشر
             $result = $firebaseService->sendNotificationQueued(
                 $user->fcm_token,
                 $title,
@@ -56,7 +54,6 @@ trait HasFirebaseNotification
                     'error' => $result['message']
                 ]);
 
-                // Fallback للإرسال المباشر في حالة فشل الـ queue
                 $result = $firebaseService->sendNotification(
                     $user->fcm_token,
                     $title,
@@ -80,7 +77,6 @@ trait HasFirebaseNotification
                 'message' => $message
             ]);
 
-            // Fallback للإرسال المباشر في حالة الأخطاء
             try {
                 $firebaseService = app(FirebaseNotificationService::class);
                 return $firebaseService->sendNotification(
@@ -117,8 +113,7 @@ trait HasFirebaseNotification
                 case 'deleted': $title = 'تم حذف الطلب'; break;
                 case 'reset': $title = 'تم إعادة تعيين الطلب'; break;
             }
-
-            // استخدام الروابط الموحدة الجديدة
+            
             $link = '/dashboard';
             switch ($requestType) {
                 case 'absence':

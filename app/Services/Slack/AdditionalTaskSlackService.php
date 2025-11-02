@@ -7,22 +7,17 @@ use App\Models\AdditionalTask;
 
 class AdditionalTaskSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعار للمهام الإضافية
-     */
+
     public function sendAdditionalTaskNotification(AdditionalTask $task, User $user, User $author, string $action): bool
     {
         $message = $this->buildAdditionalTaskMessage($task, $user, $author, $action);
         $context = 'إشعار مهمة إضافية';
         $this->setNotificationContext($context);
 
-        // استخدام Queue لتقليل الضغط على النظام
         return $this->sendSlackNotification($user, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة المهام الإضافية
-     */
+
     private function buildAdditionalTaskMessage(AdditionalTask $task, User $user, User $author, string $action): array
     {
         $actionText = $this->getAdditionalTaskActionText($action);
@@ -55,9 +50,7 @@ class AdditionalTaskSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * الحصول على نص الإجراء للمهام الإضافية
-     */
+
     private function getAdditionalTaskActionText(string $action): string
     {
         $actions = [
@@ -73,9 +66,7 @@ class AdditionalTaskSlackService extends BaseSlackService
         return $actions[$action] ?? 'تحديث المهمة';
     }
 
-    /**
-     * الحصول على رمز الإجراء للمهام الإضافية
-     */
+    
     private function getAdditionalTaskActionEmoji(string $action): string
     {
         $emojis = [

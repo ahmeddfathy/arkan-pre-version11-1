@@ -152,25 +152,16 @@ class TemplateTaskUser extends Model implements Auditable
         return $this->belongsTo(User::class, 'original_user_id');
     }
 
-    /**
-     * العلاقة مع السجل الأصلي (إذا كان السجل الحالي منقول من مكان آخر)
-     */
     public function originalTemplateTaskUser()
     {
         return $this->belongsTo(TemplateTaskUser::class, 'original_template_task_user_id');
     }
 
-    /**
-     * العلاقة مع السجل الجديد المُنشأ للموظف المنقول إليه
-     */
     public function transferredRecord()
     {
         return $this->belongsTo(TemplateTaskUser::class, 'transferred_record_id');
     }
 
-    /**
-     * العلاقة مع المستخدم المنقولة إليه المهمة
-     */
     public function transferredToUser()
     {
         return $this->belongsTo(User::class, 'transferred_to_user_id');
@@ -211,17 +202,11 @@ class TemplateTaskUser extends Model implements Auditable
         return $this->is_transferred === true;
     }
 
-    /**
-     * التحقق من كون المهمة إضافية منقولة
-     */
     public function isAdditionalTask(): bool
     {
         return $this->is_additional_task === true && $this->task_source === 'transferred';
     }
 
-    /**
-     * التحقق من كون المهمة منقولة من مهمة أخرى
-     */
     public function isTransferredFromAnother(): bool
     {
         return !is_null($this->original_template_task_user_id);
@@ -343,10 +328,7 @@ class TemplateTaskUser extends Model implements Auditable
             'season_id' => $this->season_id,
         ]);
     }
-
-    /**
-     * إيقاف الجلسة النشطة (time logs منفصل عن النظام الأصلي)
-     */
+    
     public function stopActiveTimeLog(): ?TaskTimeLog
     {
         $activeLog = $this->activeTimeLog()->first();
@@ -354,7 +336,6 @@ class TemplateTaskUser extends Model implements Auditable
         if ($activeLog) {
             $activeLog->stop();
 
-            // لا نحدث actual_minutes - النظام الأصلي منفصل عن time logs
 
             return $activeLog;
         }
@@ -362,9 +343,6 @@ class TemplateTaskUser extends Model implements Auditable
         return null;
     }
 
-    /**
-     * الحصول على إجمالي الوقت المسجل اليوم
-     */
     public function getTodayLoggedMinutes(): int
     {
         $today = $this->getCurrentCairoTime()->toDateString();
@@ -375,49 +353,31 @@ class TemplateTaskUser extends Model implements Auditable
             ->sum('duration_minutes') ?? 0;
     }
 
-    /**
-     * العلاقة مع تعديلات المهمة
-     */
     public function revisions()
     {
         return $this->hasMany(TaskRevision::class, 'template_task_user_id');
     }
 
-    /**
-     * الحصول على عدد التعديلات للمهمة
-     */
     public function getRevisionsCountAttribute()
     {
         return $this->revisions()->count();
     }
 
-    /**
-     * الحصول على عدد التعديلات المعلقة للمهمة
-     */
     public function getPendingRevisionsCountAttribute()
     {
         return $this->revisions()->where('status', 'pending')->count();
     }
 
-    /**
-     * الحصول على عدد التعديلات المقبولة للمهمة
-     */
     public function getApprovedRevisionsCountAttribute()
     {
         return $this->revisions()->where('status', 'approved')->count();
     }
 
-    /**
-     * الحصول على عدد التعديلات المرفوضة للمهمة
-     */
     public function getRejectedRevisionsCountAttribute()
     {
         return $this->revisions()->where('status', 'rejected')->count();
     }
 
-    /**
-     * الحصول على حالة التعديلات الإجمالية للمهمة
-     */
     public function getRevisionsStatusAttribute()
     {
         $total = $this->revisions_count;
@@ -445,104 +405,63 @@ class TemplateTaskUser extends Model implements Auditable
         return 'mixed';
     }
 
-    /**
-     * أخطاء الموظف في هذه المهمة
-     */
     public function errors()
     {
         return $this->morphMany(EmployeeError::class, 'errorable');
     }
 
-    /**
-     * الحصول على عدد الأخطاء
-     */
     public function getErrorsCountAttribute()
     {
         return $this->errors()->count();
     }
 
-    /**
-     * الحصول على عدد الأخطاء الجوهرية
-     */
     public function getCriticalErrorsCountAttribute()
     {
         return $this->errors()->where('error_type', 'critical')->count();
     }
 
-    /**
-     * الحصول على عدد الأخطاء العادية
-     */
     public function getNormalErrorsCountAttribute()
     {
         return $this->errors()->where('error_type', 'normal')->count();
     }
 
-    /**
-     * التحقق من وجود أخطاء
-     */
     public function hasErrors(): bool
     {
         return $this->errors()->exists();
     }
 
-    /**
-     * التحقق من وجود أخطاء جوهرية
-     */
     public function hasCriticalErrors(): bool
     {
         return $this->errors()->where('error_type', 'critical')->exists();
     }
 
-    // ======================================
-    // نظام الاعتماد الإداري والفني للمشاريع
-    // ======================================
-
-    /**
-     * العلاقة مع المعتمد الإداري
-     */
     public function administrativeApprover()
     {
         return $this->belongsTo(User::class, 'administrative_approver_id');
     }
 
-    /**
-     * العلاقة مع المعتمد الفني
-     */
     public function technicalApprover()
     {
         return $this->belongsTo(User::class, 'technical_approver_id');
     }
 
-    /**
-     * فحص ما إذا كانت التاسك مرتبطة بمشروع
-     */
     public function isProjectTask(): bool
     {
         return !is_null($this->project_id);
     }
 
-    /**
-     * فحص ما إذا كان المستخدم حصل على الاعتماد الإداري
-     */
     public function hasAdministrativeApproval(): bool
     {
         return (bool) $this->administrative_approval;
     }
 
-    /**
-     * فحص ما إذا كان المستخدم حصل على الاعتماد الفني
-     */
     public function hasTechnicalApproval(): bool
     {
         return (bool) $this->technical_approval;
     }
 
-    /**
-     * فحص ما إذا كان المستخدم حصل على جميع الاعتمادات المطلوبة
-     */
     public function hasAllRequiredApprovals(): bool
     {
-        // التاسكات العادية (بدون project_id) لا تحتاج اعتمادات إضافية
         if (!$this->isProjectTask()) {
             return true;
         }
@@ -560,9 +479,6 @@ class TemplateTaskUser extends Model implements Auditable
         return true;
     }
 
-    /**
-     * إعطاء الاعتماد الإداري
-     */
     public function grantAdministrativeApproval($approverId, $notes = null): bool
     {
         return $this->update([
@@ -573,9 +489,6 @@ class TemplateTaskUser extends Model implements Auditable
         ]);
     }
 
-    /**
-     * إعطاء الاعتماد الفني
-     */
     public function grantTechnicalApproval($approverId, $notes = null): bool
     {
         return $this->update([
@@ -586,9 +499,6 @@ class TemplateTaskUser extends Model implements Auditable
         ]);
     }
 
-    /**
-     * إلغاء الاعتماد الإداري
-     */
     public function revokeAdministrativeApproval(): bool
     {
         return $this->update([
@@ -599,9 +509,6 @@ class TemplateTaskUser extends Model implements Auditable
         ]);
     }
 
-    /**
-     * إلغاء الاعتماد الفني
-     */
     public function revokeTechnicalApproval(): bool
     {
         return $this->update([
@@ -612,12 +519,8 @@ class TemplateTaskUser extends Model implements Auditable
         ]);
     }
 
-    /**
-     * فحص ما إذا كان يمكن تغيير حالة المهمة
-     */
     public function canChangeStatus(): bool
     {
-        // لا يمكن تغيير الحالة إذا تم اعتماد المهمة مسبقاً
         if ($this->hasAdministrativeApproval() || $this->hasTechnicalApproval()) {
             return false;
         }
@@ -625,17 +528,12 @@ class TemplateTaskUser extends Model implements Auditable
         return true;
     }
 
-    /**
-     * فحص ما إذا كان يمكن سحب المهمة في الكانبان
-     */
     public function canBeDragged(): bool
     {
-        // لا يمكن السحب إذا تم اعتماد المهمة مسبقاً
         if ($this->hasAdministrativeApproval() || $this->hasTechnicalApproval()) {
             return false;
         }
 
-        // الشروط الأساسية للسحب
         return ($this->user_id === auth()->user()?->id) && !($this->is_transferred ?? false);
     }
 
@@ -656,13 +554,11 @@ class TemplateTaskUser extends Model implements Auditable
         $needsTechnical = false;
 
         foreach ($userRoles as $role) {
-            // فحص إذا كان الرول يحتاج اعتماد إداري
             $adminApprovers = RoleApproval::getApproversForRole($role->id, 'administrative');
             if ($adminApprovers->isNotEmpty()) {
                 $needsAdministrative = true;
             }
 
-            // فحص إذا كان الرول يحتاج اعتماد فني
             $techApprovers = RoleApproval::getApproversForRole($role->id, 'technical');
             if ($techApprovers->isNotEmpty()) {
                 $needsTechnical = true;
@@ -679,17 +575,12 @@ class TemplateTaskUser extends Model implements Auditable
         ];
     }
 
-    /**
-     * فحص ما إذا كان المستخدم المحدد يمكنه اعتماد هذه التاسك
-     */
     public function canUserApprove($userId, $approvalType): bool
     {
-        // التاسكات العادية لا تحتاج اعتمادات
         if (!$this->isProjectTask()) {
             return false;
         }
 
-        // الحصول على أدوار المستخدم الذي يريد الاعتماد
         $approverUser = User::find($userId);
         if (!$approverUser) {
             return false;
@@ -697,10 +588,8 @@ class TemplateTaskUser extends Model implements Auditable
 
         $approverRoles = $approverUser->roles->pluck('id')->toArray();
 
-        // الحصول على أدوار الموظف المكلف بالتاسك
         $taskUserRoles = $this->user->roles->pluck('id')->toArray();
 
-        // فحص إذا كان أي من أدوار المعتمد يمكنه اعتماد أي من أدوار الموظف
         foreach ($approverRoles as $approverRoleId) {
             foreach ($taskUserRoles as $taskUserRoleId) {
                 if (RoleApproval::canApprove($approverRoleId, $taskUserRoleId, $approvalType)) {
@@ -712,37 +601,26 @@ class TemplateTaskUser extends Model implements Auditable
         return false;
     }
 
-    /**
-     * فحص ما إذا كانت التاسك مكتملة بالكامل (approved + جميع الاعتمادات)
-     */
     public function isFullyCompleted(): bool
     {
-        // للتاسكات العادية: فقط is_approved
         if (!$this->isProjectTask()) {
             return (bool) $this->is_approved;
         }
 
-        // للتاسكات المرتبطة بمشاريع: is_approved + جميع الاعتمادات المطلوبة
         return (bool) $this->is_approved && $this->hasAllRequiredApprovals();
     }
 
-    /**
-     * التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
-     */
     public function canUpdateStatus(): bool
     {
-        // إذا لم تكن المهمة مرتبطة بمشروع، يمكن تحديث حالتها
         if (!$this->project_id) {
             return true;
         }
 
-        // التحقق من حالة المشروع
         $project = $this->project;
         if (!$project) {
-            return true; // إذا لم يكن هناك مشروع، نسمح بالتحديث
+            return true;
         }
 
-        // إذا كان المشروع ملغي، لا يمكن تحديث حالة المهمة
         if ($project->status === 'ملغي') {
             return false;
         }
@@ -750,9 +628,6 @@ class TemplateTaskUser extends Model implements Auditable
         return true;
     }
 
-    /**
-     * الحصول على رسالة خطأ عند عدم إمكانية تحديث الحالة
-     */
     public function getStatusUpdateErrorMessage(): string
     {
         if (!$this->project_id) {

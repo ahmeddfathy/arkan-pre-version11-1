@@ -62,7 +62,6 @@ class OvertimeEmployeeNotificationService
             ]);
 
             if ($request->user) {
-                // تحديد العنوان والرابط بناءً على نوع الإشعار
                 $title = $this->getOvertimeFirebaseTitle($type);
                 $link = "/overtime-requests/{$request->id}";
 
@@ -74,7 +73,6 @@ class OvertimeEmployeeNotificationService
                     $type
                 );
 
-                // إرسال إشعار Slack للموظف إذا كان لديه slack_user_id
                 if ($request->user->slack_user_id) {
                     $action = $this->determineSlackAction($type, $request);
                     $currentUser = \Illuminate\Support\Facades\Auth::user();
@@ -237,10 +235,7 @@ class OvertimeEmployeeNotificationService
             return 'created';
         }
     }
-
-    /**
-     * Get Firebase notification title for overtime requests
-     */
+    
     private function getOvertimeFirebaseTitle(string $type): string
     {
         if (strpos($type, 'status_updated') !== false) {

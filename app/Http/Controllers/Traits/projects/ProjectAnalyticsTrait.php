@@ -21,9 +21,6 @@ trait ProjectAnalyticsTrait
     protected $errorStatsService;
     protected $sidebarService;
 
-    /**
-     * عرض صفحة إحصائيات المشروع
-     */
     public function analytics(Project $project)
     {
         $user = Auth::user();
@@ -40,7 +37,6 @@ trait ProjectAnalyticsTrait
             }
         }
 
-        // تسجيل نشاط دخول صفحة إحصائيات المشروع
         activity()
             ->causedBy($user)
             ->performedOn($project)
@@ -57,7 +53,6 @@ trait ProjectAnalyticsTrait
 
         $analyticsData = $this->analyticsService->getProjectAnalytics($project);
 
-        // إحصائيات التعديلات للمشروع (مقسمة حسب النوع: مهام/مشاريع)
         $user = Auth::user();
         $isAdmin = $this->authorizationService->isAdmin();
 
@@ -67,18 +62,15 @@ trait ProjectAnalyticsTrait
         $pendingRevisions = $this->revisionStatsService->getProjectPendingRevisions($project->id, $isAdmin, $user->id);
         $urgentRevisions = $this->revisionStatsService->getProjectUrgentRevisions($project->id, $isAdmin, $user->id);
 
-        // إحصائيات الملفات والوقت العامة
         $attachmentStats = $this->revisionStatsService->getAttachmentStats($isAdmin, [$user->id]);
         $averageReviewTime = $this->revisionStatsService->getAverageReviewTime();
 
-        // ✅ آخر الاجتماعات المتعلقة بالمشروع
         $projectMeetings = DB::table('meetings')
             ->where('project_id', $project->id)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
-        // ✅ إحصائيات نقل التعديلات للمشروع
         $projectUserIds = DB::table('project_service_user')
             ->where('project_id', $project->id)
             ->pluck('user_id')
@@ -86,7 +78,6 @@ trait ProjectAnalyticsTrait
 
         $projectRevisionTransferStats = $this->revisionStatsService->getRevisionTransferStats($projectUserIds, null);
 
-        // ✅ إحصائيات الأخطاء للمشروع
         $projectErrorStats = $this->errorStatsService->getGroupErrorStats($projectUserIds, null);
 
         return view('projects.analytics', array_merge(
@@ -107,9 +98,6 @@ trait ProjectAnalyticsTrait
         ));
     }
 
-    /**
-     * عرض إحصائيات أداء موظف في مشروع معين
-     */
     public function getEmployeeProjectPerformance(Request $request, Project $project, $userId)
     {
         $user = Auth::user();
@@ -139,7 +127,6 @@ trait ProjectAnalyticsTrait
 
         $performanceData = $this->employeeAnalyticsService->getEmployeeProjectAnalytics($project, $employee);
 
-        // تسجيل نشاط دخول صفحة تحليلات الموظف
         activity()
             ->causedBy($user)
             ->performedOn($project)
@@ -156,7 +143,6 @@ trait ProjectAnalyticsTrait
             ])
             ->log('دخل على صفحة تحليلات الموظف: ' . $employee->name . ' في المشروع: ' . $project->name);
 
-        // إحصائيات التعديلات للموظف في المشروع
         $revisionStats = $this->revisionStatsService->getGeneralRevisionStats(false, [$userId]);
         $latestRevisions = $this->revisionStatsService->getLatestRevisions(false, [$userId]);
         $pendingRevisions = $this->revisionStatsService->getPendingRevisions(false, [$userId]);
@@ -164,20 +150,16 @@ trait ProjectAnalyticsTrait
         $employeeAttachmentStats = $this->revisionStatsService->getAttachmentStats(false, [$userId]);
         $averageReviewTime = $this->revisionStatsService->getAverageReviewTime();
 
-        // ✅ اجتماعات المشروع للموظف
         $employeeProjectMeetings = DB::table('meetings')
             ->where('project_id', $project->id)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
-        // ✅ إحصائيات نقل التعديلات للموظف
         $employeeRevisionTransferStats = $this->revisionStatsService->getRevisionTransferStats($userId, null);
 
-        // إضافة الـ revisionsByCategory
         $revisionsByCategory = $this->revisionStatsService->getRevisionsByCategory(null, false, [$userId]);
 
-        // ✅ إحصائيات الأخطاء للموظف في المشروع
         $employeeErrorStats = $this->errorStatsService->getGroupErrorStats($userId, null);
 
         return view('projects.employee-analytics', compact(
@@ -197,9 +179,6 @@ trait ProjectAnalyticsTrait
         ));
     }
 
-    /**
-     * عرض صفحة إحصائيات الخدمات
-     */
     public function serviceAnalyticsPage(Project $project)
     {
         $user = Auth::user();
@@ -216,7 +195,6 @@ trait ProjectAnalyticsTrait
             }
         }
 
-        // تسجيل نشاط دخول صفحة إحصائيات الخدمات
         activity()
             ->causedBy($user)
             ->performedOn($project)
@@ -231,7 +209,6 @@ trait ProjectAnalyticsTrait
             ])
             ->log('دخل على صفحة إحصائيات الخدمات للمشروع: ' . $project->name);
 
-        // إحصائيات التعديلات للمشروع (مقسمة حسب النوع: مهام/مشاريع)
         $user = Auth::user();
         $isAdmin = $this->authorizationService->isAdmin();
 
@@ -241,7 +218,6 @@ trait ProjectAnalyticsTrait
         $pendingRevisions = $this->revisionStatsService->getProjectPendingRevisions($project->id, $isAdmin, $user->id);
         $urgentRevisions = $this->revisionStatsService->getProjectUrgentRevisions($project->id, $isAdmin, $user->id);
 
-        // إحصائيات الملفات والوقت العامة
         $attachmentStats = $this->revisionStatsService->getAttachmentStats($isAdmin, [$user->id]);
         $averageReviewTime = $this->revisionStatsService->getAverageReviewTime();
 
@@ -257,9 +233,6 @@ trait ProjectAnalyticsTrait
         ));
     }
 
-    /**
-     * جلب إحصائيات الخدمات
-     */
     public function getServiceAnalytics(Project $project)
     {
         $user = Auth::user();
@@ -281,9 +254,6 @@ trait ProjectAnalyticsTrait
         return response()->json($serviceAnalytics);
     }
 
-    /**
-     * تحديث تقدم الخدمة
-     */
     public function updateServiceProgress(Request $request, Project $project, $serviceId)
     {
         $request->validate([
@@ -305,9 +275,6 @@ trait ProjectAnalyticsTrait
         }
     }
 
-    /**
-     * جلب تاريخ تقدم الخدمة
-     */
     public function getServiceProgressHistory(Project $project, $serviceId)
     {
         try {
@@ -318,9 +285,6 @@ trait ProjectAnalyticsTrait
         }
     }
 
-    /**
-     * جلب تنبيهات الخدمة
-     */
     public function getServiceAlerts(Project $project)
     {
         try {
@@ -331,12 +295,8 @@ trait ProjectAnalyticsTrait
         }
     }
 
-    /**
-     * جلب اقتراح الفريق الذكي
-     */
     public function getSmartTeamSuggestion(Request $request, Project $project, $serviceId)
     {
-        // فحص صلاحيات عرض اقتراح الفريق - للـ operation assistant فقط
         if (!$this->authorizationService->canViewTeamSuggestion()) {
             return response()->json([
                 'success' => false,
@@ -361,27 +321,18 @@ trait ProjectAnalyticsTrait
         }
     }
 
-    /**
-     * Get project details for sidebar
-     */
     public function getSidebarDetails(Project $project)
     {
         $result = $this->sidebarService->getSidebarDetails($project);
         return response()->json($result, $result['status_code']);
     }
 
-    /**
-     * Get project participants for revisions
-     */
     public function getProjectParticipants(Project $project)
     {
         $result = $this->sidebarService->getProjectParticipants($project);
         return response()->json($result, $result['status_code']);
     }
 
-    /**
-     * Get project services for simple overview
-     */
     public function getProjectServicesSimple($projectId)
     {
         try {
@@ -409,18 +360,15 @@ trait ProjectAnalyticsTrait
             }
 
             $services = $project->services->map(function ($service) use ($project) {
-                // حساب عدد المشاركين الكلي
                 $participantsCount = ProjectServiceUser::where('project_id', $project->id)
                     ->where('service_id', $service->id)
                     ->count();
 
-                // حساب عدد المشاركين الذين سلموا
                 $deliveredParticipantsCount = ProjectServiceUser::where('project_id', $project->id)
                     ->where('service_id', $service->id)
                     ->whereNotNull('delivered_at')
                     ->count();
 
-                // حساب عدد المهام الكلي والمكتملة لهذه الخدمة في المشروع
                 $totalTasks = \App\Models\TaskUser::whereHas('task', function ($query) use ($project, $service) {
                     $query->where('project_id', $project->id)
                         ->where('service_id', $service->id);
@@ -432,9 +380,6 @@ trait ProjectAnalyticsTrait
                             ->where('service_id', $service->id);
                     })->count();
 
-                // إضافة مهام القوالب
-                // ملاحظة: service_id موجود في TaskTemplate وليس في TemplateTask
-                // يجب الوصول إليه عبر: TemplateTaskUser -> TemplateTask -> TaskTemplate
                 $totalTemplateTasks = \App\Models\TemplateTaskUser::where('project_id', $project->id)
                     ->whereHas('templateTask.template', function ($query) use ($service) {
                         $query->where('service_id', $service->id);
@@ -449,12 +394,10 @@ trait ProjectAnalyticsTrait
                 $totalTasks += $totalTemplateTasks;
                 $completedTasks += $completedTemplateTasks;
 
-                // حساب حالة التسليم بناءً على الديدلاين
                 $deliveryStatus = 'not_delivered'; // افتراضياً: لم يتم التسليم
                 $deliveryStatusText = '⏳ لم يتم التسليم';
                 $deliveryStatusClass = 'warning';
 
-                // جلب معلومات الديدلاين والتسليم مع بيانات المشاركين
                 $participants = ProjectServiceUser::where('project_id', $project->id)
                     ->where('service_id', $service->id)
                     ->with('user')
@@ -464,7 +407,6 @@ trait ProjectAnalyticsTrait
                     $allDelivered = $participants->every(fn($p) => !is_null($p->delivered_at));
 
                     if ($allDelivered) {
-                        // جميع المشاركين سلموا، نتحقق من الديدلاين
                         $latestDelivery = $participants->max('delivered_at');
                         $earliestDeadline = $participants->min('deadline');
 
@@ -484,14 +426,12 @@ trait ProjectAnalyticsTrait
                             $deliveryStatusClass = 'success';
                         }
                     } else {
-                        // بعض المشاركين لم يسلموا بعد
                         $deliveryStatus = 'not_delivered';
                         $deliveryStatusText = '⏳ لم يتم التسليم';
                         $deliveryStatusClass = 'warning';
                     }
                 }
 
-                // تجهيز بيانات المشاركين مع حالاتهم ومعلومات المهام
                 $participantsData = $participants->map(function ($participant) use ($project, $service) {
                     $hasDelivered = !is_null($participant->delivered_at);
                     $isLate = false;
@@ -500,7 +440,6 @@ trait ProjectAnalyticsTrait
                         $isLate = $participant->delivered_at > $participant->deadline;
                     }
 
-                    // تحديد حالة التسليم
                     $deliveryStatus = 'not_delivered';
                     $deliveryStatusText = 'لم يسلم';
                     $deliveryStatusIcon = '⏳';
@@ -517,8 +456,6 @@ trait ProjectAnalyticsTrait
                         }
                     }
 
-                    // حساب مهام المشارك في هذه الخدمة
-                    // المهام العادية
                     $userTasks = \App\Models\TaskUser::where('user_id', $participant->user_id)
                         ->whereHas('task', function ($query) use ($project, $service) {
                             $query->where('project_id', $project->id)
@@ -526,7 +463,6 @@ trait ProjectAnalyticsTrait
                         })
                         ->get();
 
-                    // مهام القوالب
                     $userTemplateTasks = \App\Models\TemplateTaskUser::where('user_id', $participant->user_id)
                         ->where('project_id', $project->id)
                         ->whereHas('templateTask.template', function ($query) use ($service) {
@@ -534,28 +470,22 @@ trait ProjectAnalyticsTrait
                         })
                         ->get();
 
-                    // دمج كل المهام
                     $allUserTasks = $userTasks->concat($userTemplateTasks);
 
-                    // حساب المهام
                     $totalTasks = $allUserTasks->count();
                     $completedTasks = $allUserTasks->where('status', 'completed')->count();
 
-                    // حساب المهام المتأخرة (أي مهمة عدت الديدلاين بتاعها)
                     $now = now();
                     $lateTasks = $allUserTasks->filter(function ($task) use ($now) {
-                        // لو مفيش ديدلاين، مش متأخرة
                         if (!$task->deadline) {
                             return false;
                         }
 
-                        // لو المهمة مكتملة، نشوف اتسلمت بعد الديدلاين ولا لأ
                         if ($task->status === 'completed') {
                             $completedAt = $task->completed_at ?? $task->updated_at;
                             return $completedAt && $completedAt > $task->deadline;
                         }
 
-                        // لو المهمة لسه شغالة والديدلاين عدى = متأخرة
                         return $now->greaterThan($task->deadline);
                     })->count();
 
@@ -571,14 +501,12 @@ trait ProjectAnalyticsTrait
                         'delivery_status' => $deliveryStatus,
                         'delivery_status_text' => $deliveryStatusText,
                         'delivery_status_icon' => $deliveryStatusIcon,
-                        // معلومات المهام
                         'total_tasks' => $totalTasks,
                         'completed_tasks' => $completedTasks,
                         'late_tasks' => $lateTasks,
                     ];
                 });
 
-                // حساب الـ Progress من المهام المكتملة الفعلية
                 $calculatedProgress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
 
                 return [
@@ -615,15 +543,11 @@ trait ProjectAnalyticsTrait
         }
     }
 
-    /**
-     * Get complete project details with participants and their tasks
-     */
     public function getProjectDetailsForSidebar($projectId)
     {
         try {
             $user = Auth::user();
 
-            // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
             $allowedRoles = ['company_manager', 'project_manager', 'operations_manager', 'general_reviewer', 'operation_assistant'];
             $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
 
@@ -636,7 +560,6 @@ trait ProjectAnalyticsTrait
 
             $project = Project::with(['client', 'services'])->findOrFail($projectId);
 
-            // Get all services
             $services = $project->services->map(function ($service) use ($project) {
                 return [
                     'id' => $service->id,
@@ -646,7 +569,6 @@ trait ProjectAnalyticsTrait
                 ];
             });
 
-            // Get all participants with their details
             $participants = ProjectServiceUser::where('project_id', $project->id)
                 ->with(['user', 'role', 'service'])
                 ->get()

@@ -16,9 +16,6 @@ class EmployeeErrorStatisticsService
         $this->filterService = $filterService;
     }
 
-    /**
-     * الحصول على إحصائيات أخطاء موظف
-     */
     public function getUserErrorStats(User $user): array
     {
         $errors = EmployeeError::where('user_id', $user->id);
@@ -40,9 +37,6 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * إحصائيات الأخطاء اللي سجلها المدير
-     */
     public function getReporterStats(User $user): array
     {
         $errors = EmployeeError::where('reported_by', $user->id);
@@ -64,9 +58,6 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * إحصائيات الأخطاء للفريق أو قسم
-     */
     public function getTeamErrorStats($teamId = null, $department = null): array
     {
         $query = EmployeeError::query();
@@ -96,9 +87,6 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * الحصول على أكثر الموظفين الذين لديهم أخطاء
-     */
     private function getTopUsersWithErrors($errors, $limit = 10)
     {
         return $errors->groupBy('user_id')
@@ -114,9 +102,6 @@ class EmployeeErrorStatisticsService
             ->values();
     }
 
-    /**
-     * أكثر الموظفين أخطاءً لمدير معين
-     */
     private function getTopEmployeesWithErrors($reporterId, $limit = 10)
     {
         return EmployeeError::where('reported_by', $reporterId)
@@ -139,9 +124,6 @@ class EmployeeErrorStatisticsService
             });
     }
 
-    /**
-     * الأخطاء حسب الشهر
-     */
     private function getErrorsByMonth($userId, $months = 12)
     {
         return EmployeeError::where('user_id', $userId)
@@ -157,9 +139,6 @@ class EmployeeErrorStatisticsService
             ->get();
     }
 
-    /**
-     * الأخطاء المسجلة حسب الشهر
-     */
     private function getReportedErrorsByMonth($reporterId, $months = 12)
     {
         return EmployeeError::where('reported_by', $reporterId)
@@ -175,9 +154,6 @@ class EmployeeErrorStatisticsService
             ->get();
     }
 
-    /**
-     * اتجاه الأخطاء (زيادة أم نقصان)
-     */
     private function getErrorTrend($userId)
     {
         $thisMonth = EmployeeError::where('user_id', $userId)
@@ -205,9 +181,6 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * متوسط الأخطاء لكل موظف
-     */
     private function calculateAverageErrorsPerEmployee($errors)
     {
         $uniqueUsers = $errors->pluck('user_id')->unique()->count();
@@ -219,9 +192,6 @@ class EmployeeErrorStatisticsService
         return round($errors->count() / $uniqueUsers, 2);
     }
 
-    /**
-     * إحصائيات مقارنة بين الأقسام
-     */
     public function getDepartmentComparison(): array
     {
         return EmployeeError::join('users', 'employee_errors.user_id', '=', 'users.id')
@@ -236,9 +206,6 @@ class EmployeeErrorStatisticsService
             ->toArray();
     }
 
-    /**
-     * إحصائيات الأخطاء الشهرية العامة
-     */
     public function getMonthlyOverview($month = null, $year = null): array
     {
         $month = $month ?? Carbon::now()->month;
@@ -256,9 +223,6 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * الأخطاء حسب اليوم في شهر معين
-     */
     private function getErrorsByDay($month, $year)
     {
         return EmployeeError::whereMonth('created_at', $month)
@@ -272,12 +236,8 @@ class EmployeeErrorStatisticsService
             ->get();
     }
 
-    /**
-     * جلب إحصائيات "أخطائي" (الأخطاء المسجلة على المستخدم الحالي) مع تطبيق الفلاتر
-     */
     public function getMyErrorsStats(User $user, array $filters = []): array
     {
-        // بناء استعلام لأخطاء المستخدم الحالي فقط
         $query = EmployeeError::where('user_id', $user->id);
         $query = $this->filterService->applyFilters($query, $filters);
 
@@ -296,12 +256,8 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * جلب إحصائيات "جميع الأخطاء" (للمديرين) مع تطبيق الفلاتر
-     */
     public function getAllErrorsStats(array $filters = []): array
     {
-        // بناء استعلام لكل الأخطاء
         $query = EmployeeError::query();
         $query = $this->filterService->applyFilters($query, $filters);
 
@@ -320,12 +276,8 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * جلب إحصائيات "الأخطاء التي أضفتها" مع تطبيق الفلاتر
-     */
     public function getReportedErrorsStats(User $user, array $filters = []): array
     {
-        // بناء استعلام للأخطاء التي سجلها المستخدم
         $query = EmployeeError::where('reported_by', $user->id);
         $query = $this->filterService->applyFilters($query, $filters);
 
@@ -344,19 +296,15 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * جلب إحصائيات "الأخطاء الجوهرية" (متاح للجميع) مع تطبيق الفلاتر
-     */
     public function getCriticalErrorsStats(array $filters = []): array
     {
-        // بناء استعلام للأخطاء الجوهرية فقط
         $query = EmployeeError::where('error_type', 'critical');
         $query = $this->filterService->applyFilters($query, $filters);
 
         return [
             'total_errors' => (clone $query)->count(),
-            'critical_errors' => (clone $query)->count(), // كلهم جوهرية
-            'normal_errors' => 0, // مفيش عادية لأن الفلتر على الجوهرية فقط
+            'critical_errors' => (clone $query)->count(),
+            'normal_errors' => 0,
             'by_category' => [
                 'quality' => (clone $query)->where('error_category', 'quality')->count(),
                 'deadline' => (clone $query)->where('error_category', 'deadline')->count(),
@@ -368,22 +316,17 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * جلب الإحصائيات حسب الدور مع تطبيق جميع الفلاتر
-     */
     public function getStatsBasedOnRole(User $user, array $filters = []): array
     {
         $globalLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = \App\Models\DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
-        // إذا كان مدير
         if (
             $user->hasRole(['admin', 'super-admin', 'hr', 'project_manager']) ||
             ($globalLevel && $globalLevel >= 2) ||
             ($departmentLevel && $departmentLevel >= 2)
         ) {
 
-            // بناء الاستعلام الأساسي مع تطبيق جميع الفلاتر
             $query = EmployeeError::query();
             $query = $this->filterService->applyFilters($query, $filters);
 
@@ -402,7 +345,6 @@ class EmployeeErrorStatisticsService
             ];
         }
 
-        // إذا كان موظف عادي - تطبيق جميع الفلاتر
         $query = EmployeeError::where('user_id', $user->id);
         $query = $this->filterService->applyFilters($query, $filters);
 
@@ -421,21 +363,14 @@ class EmployeeErrorStatisticsService
         ];
     }
 
-    /**
-     * الحصول على إحصائيات أخطاء لمجموعة موظفين (للأقسام/الفرق/المشاريع)
-     * @param array|int $userIds - معرف موظف واحد أو مصفوفة معرفات
-     * @param array|null $dateFilters - فلاتر التاريخ
-     */
     public function getGroupErrorStats($userIds, $dateFilters = null): array
     {
-        // تحويل إلى مصفوفة إذا كان رقم واحد
         if (!is_array($userIds)) {
             $userIds = [$userIds];
         }
 
         $query = EmployeeError::whereIn('user_id', $userIds);
 
-        // تطبيق فلاتر التاريخ إذا وجدت
         if ($dateFilters && isset($dateFilters['start_date'])) {
             $query->where('created_at', '>=', $dateFilters['start_date']);
         }
@@ -445,7 +380,6 @@ class EmployeeErrorStatisticsService
 
         $errors = $query->get();
 
-        // الحصول على آخر 5 أخطاء
         $latestErrors = $query->with(['user', 'reportedBy', 'errorable'])
             ->orderBy('created_at', 'desc')
             ->take(5)
@@ -468,10 +402,7 @@ class EmployeeErrorStatisticsService
             'top_users' => $this->getTopUsersWithErrorsFromCollection($errors, 5),
         ];
     }
-
-    /**
-     * الحصول على أكثر الموظفين أخطاءً من collection
-     */
+        
     private function getTopUsersWithErrorsFromCollection($errors, $limit = 5)
     {
         return $errors->groupBy('user_id')

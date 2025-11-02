@@ -12,17 +12,12 @@ use Illuminate\Support\Facades\Log;
 
 class EmployeeErrorManagementService
 {
-    /**
-     * تسجيل خطأ جديد على موظف
-     */
     public function createError($errorable, array $data): EmployeeError
     {
-        // التحقق من نوع الكيان
         if (!$this->isValidErrorable($errorable)) {
             throw new \Exception('نوع الكيان غير صالح');
         }
 
-        // التحقق من وجود البيانات المطلوبة
         $this->validateErrorData($data);
 
         return DB::transaction(function () use ($errorable, $data) {
@@ -48,9 +43,6 @@ class EmployeeErrorManagementService
         });
     }
 
-    /**
-     * تحديث خطأ موجود
-     */
     public function updateError(EmployeeError $error, array $data): EmployeeError
     {
         $oldType = $error->error_type;
@@ -71,9 +63,6 @@ class EmployeeErrorManagementService
         return $error->fresh();
     }
 
-    /**
-     * حذف خطأ
-     */
     public function deleteError(EmployeeError $error): bool
     {
         Log::info('Employee error deleted', [
@@ -84,9 +73,6 @@ class EmployeeErrorManagementService
         return $error->delete();
     }
 
-    /**
-     * استعادة خطأ محذوف
-     */
     public function restoreError($errorId): EmployeeError
     {
         $error = EmployeeError::withTrashed()->findOrFail($errorId);
@@ -99,9 +85,6 @@ class EmployeeErrorManagementService
         return $error;
     }
 
-    /**
-     * حذف نهائي
-     */
     public function forceDeleteError(EmployeeError $error): bool
     {
         Log::info('Employee error force deleted', [
@@ -111,9 +94,6 @@ class EmployeeErrorManagementService
         return $error->forceDelete();
     }
 
-    /**
-     * التحقق من نوع الكيان الصالح
-     */
     private function isValidErrorable($errorable): bool
     {
         return $errorable instanceof TaskUser ||
@@ -121,9 +101,6 @@ class EmployeeErrorManagementService
                $errorable instanceof ProjectServiceUser;
     }
 
-    /**
-     * التحقق من صحة بيانات الخطأ
-     */
     private function validateErrorData(array $data): void
     {
         if (empty($data['title'])) {
@@ -145,9 +122,6 @@ class EmployeeErrorManagementService
         }
     }
 
-    /**
-     * تحديث حالة عدة أخطاء دفعة واحدة
-     */
     public function bulkUpdateErrorType(array $errorIds, string $errorType): int
     {
         if (!in_array($errorType, ['normal', 'critical'])) {
@@ -165,9 +139,6 @@ class EmployeeErrorManagementService
         return $updated;
     }
 
-    /**
-     * حذف عدة أخطاء دفعة واحدة
-     */
     public function bulkDeleteErrors(array $errorIds): int
     {
         $deleted = EmployeeError::whereIn('id', $errorIds)->delete();

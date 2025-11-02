@@ -39,7 +39,6 @@ class EmployeeNotificationService
             ]);
 
             if ($request->user) {
-                // تحديد العنوان والرابط بناءً على نوع الإشعار
                 $title = $this->getFirebaseTitle($type);
                 $link = "/absence-requests/{$request->id}";
 
@@ -51,7 +50,6 @@ class EmployeeNotificationService
                     $type
                 );
 
-                // إرسال إشعار Slack للموظف إذا كان لديه slack_user_id
                                 if ($request->user->slack_user_id) {
                     $action = $this->determineSlackAction($type, $request);
                     $currentUser = \Illuminate\Support\Facades\Auth::user();
@@ -110,9 +108,6 @@ class EmployeeNotificationService
         }
     }
 
-    /**
-     * ترجمة حالة الطلب إلى العربية
-     */
     private function getStatusInArabic(string $status): string
     {
         $statusMap = [
@@ -125,9 +120,6 @@ class EmployeeNotificationService
         return $statusMap[$status] ?? $status;
     }
 
-    /**
-     * Get Firebase notification title based on type
-     */
     private function getFirebaseTitle(string $type): string
     {
         if (strpos($type, 'status_updated') !== false || strpos($type, 'status_update') !== false) {

@@ -37,20 +37,16 @@ class ManagerNotificationService
                 if ($hrUsers->isNotEmpty()) {
                     $this->sendNotificationsToMultipleUsers($hrUsers, $request, $type, $message, true);
 
-                    // إرسال إشعار Slack لفريق الموارد البشرية - فقط ببيانات الموظف والطلب
                     $employeeName = $request->user ? $request->user->name : 'موظف';
                     $slackMessage = "طلب غياب: $employeeName - " . $request->absence_date->format('Y-m-d');
 
-                    // تحديد نوع العملية بناءً على نوع الإشعار
                     $operation = $this->determineSlackOperation($type);
 
-                    // إضافة الرابط للطلب
                     $additionalData = [
                         'link_url' => url("/absence-requests/{$request->id}"),
                         'link_text' => 'عرض الطلب'
                     ];
 
-                    // تحديد context حسب نوع الإشعار
                     if (strpos($type, 'hr_response') !== false) {
                         if ($request->hr_status === 'approved') {
                             $this->setHRNotificationContext('إشعار رد HR بالموافقة على الإجازة');
@@ -106,7 +102,6 @@ class ManagerNotificationService
                 if ($managersToNotify->isNotEmpty()) {
                     $this->sendNotificationsToMultipleUsers($managersToNotify, $request, $type, $message, false);
 
-                                        // إرسال إشعارات Slack لمالكي الفرق
                     $currentUser = Auth::user();
                     $action = $this->determineSlackActionFromType($type, $request);
 
@@ -127,9 +122,6 @@ class ManagerNotificationService
         }
     }
 
-    /**
-     * تحديد نوع العملية لإشعارات Slack بناءً على نوع الإشعار
-     */
     private function determineSlackOperation(string $type): string
     {
         if (strpos($type, 'new_leave_request') !== false) {
@@ -143,9 +135,6 @@ class ManagerNotificationService
         }
     }
 
-    /**
-     * ترجمة نوع الإشعار إلى العربية
-     */
     private function getNotificationTypeInArabic(string $type): string
     {
         $typeMap = [
@@ -304,7 +293,6 @@ class ManagerNotificationService
         if (strpos($type, 'new_leave_request') !== false) {
             return 'created';
         } elseif (strpos($type, 'hr_response') !== false) {
-            // عند رد HR، نحدد الإجراء بناء على حالة HR
             if ($request && $request->hr_status === 'rejected') {
                 return 'rejected';
             } elseif ($request && $request->hr_status === 'approved') {
@@ -312,7 +300,6 @@ class ManagerNotificationService
             }
             return 'approved';
         } elseif (strpos($type, 'manager_response') !== false) {
-            // عند رد المدير، نحدد الإجراء بناء على حالة المدير
             if ($request && $request->manager_status === 'rejected') {
                 return 'rejected';
             } elseif ($request && $request->manager_status === 'approved') {

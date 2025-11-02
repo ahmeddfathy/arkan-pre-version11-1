@@ -14,34 +14,24 @@ use Illuminate\Support\Facades\Log;
 
 class EmployeeErrorValidationService
 {
-    /**
-     * التحقق من صلاحية تسجيل خطأ
-     */
     public function canReportError(): bool
     {
         $user = Auth::user();
 
-        // التحقق من المستوى الهرمي
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
-        // إذا كان المستوى الهرمي 2 أو أعلى، يمكنه تسجيل الأخطاء
         return ($globalLevel && $globalLevel >= 2) || ($departmentLevel && $departmentLevel >= 2);
     }
 
-    /**
-     * التحقق من صلاحية تعديل خطأ
-     */
     public function canEditError($error): bool
     {
         $user = Auth::user();
 
-        // من سجل الخطأ يمكنه تعديله
         if ($error->reported_by === $user->id) {
             return true;
         }
 
-        // التحقق من المستوى الهرمي
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
@@ -56,19 +46,14 @@ class EmployeeErrorValidationService
         return false;
     }
 
-    /**
-     * التحقق من صلاحية حذف خطأ
-     */
     public function canDeleteError($error): bool
     {
         $user = Auth::user();
 
-        // من سجل الخطأ يمكنه حذفه
         if ($error->reported_by === $user->id) {
             return true;
         }
 
-        // التحقق من المستوى الهرمي - مستوى 4 أو أعلى للحذف
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
@@ -83,9 +68,6 @@ class EmployeeErrorValidationService
         return false;
     }
 
-    /**
-     * التحقق من صحة بيانات الخطأ
-     */
     public function validateErrorData(array $data): array
     {
         $errors = [];
@@ -115,9 +97,6 @@ class EmployeeErrorValidationService
         return $errors;
     }
 
-    /**
-     * التحقق من وجود الـ errorable
-     */
     public function validateErrorable($errorableType, $errorableId): ?object
     {
         switch ($errorableType) {
@@ -138,30 +117,21 @@ class EmployeeErrorValidationService
         }
     }
 
-    /**
-     * التحقق من وجود المستخدم
-     */
     public function validateUser($userId): ?User
     {
         return User::find($userId);
     }
 
-    /**
-     * التحقق من عدم تكرار الخطأ
-     */
     public function isDuplicateError($userId, $errorableType, $errorableId, $title): bool
     {
         return \App\Models\EmployeeError::where('user_id', $userId)
             ->where('errorable_type', $errorableType)
             ->where('errorable_id', $errorableId)
             ->where('title', $title)
-            ->where('created_at', '>=', now()->subHours(24)) // خلال آخر 24 ساعة
+            ->where('created_at', '>=', now()->subHours(24))
             ->exists();
     }
 
-    /**
-     * التحقق من حد الأخطاء اليومي
-     */
     public function hasReachedDailyLimit($userId, $limit = 10): bool
     {
         $todayErrorsCount = \App\Models\EmployeeError::where('user_id', $userId)
@@ -171,9 +141,6 @@ class EmployeeErrorValidationService
         return $todayErrorsCount >= $limit;
     }
 
-    /**
-     * التحقق من وجود أخطاء جوهرية متكررة
-     */
     public function hasRecurringCriticalErrors($userId, $threshold = 3): bool
     {
         $criticalErrorsCount = \App\Models\EmployeeError::where('user_id', $userId)
@@ -184,23 +151,17 @@ class EmployeeErrorValidationService
         return $criticalErrorsCount >= $threshold;
     }
 
-    /**
-     * التحقق من صلاحية عرض الأخطاء
-     */
     public function canViewErrors($userId): bool
     {
         $currentUser = Auth::user();
 
-        // المستخدم يمكنه رؤية أخطائه
         if ($currentUser->id == $userId) {
             return true;
         }
 
-        // التحقق من المستوى الهرمي
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($currentUser);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($currentUser);
 
-        // إذا كان المستوى الهرمي 2 أو أعلى، يمكنه رؤية الأخطاء
         if ($globalLevel && $globalLevel >= 2) {
             return $this->canViewHierarchicalErrors($currentUser, $userId, $globalLevel);
         }
@@ -212,24 +173,16 @@ class EmployeeErrorValidationService
         return false;
     }
 
-    /**
-     * التحقق من صلاحية عرض إحصائيات الفريق
-     */
     public function canViewTeamStats(): bool
     {
         $user = Auth::user();
 
-        // التحقق من المستوى الهرمي
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
-        // إذا كان المستوى الهرمي 3 أو أعلى، يمكنه رؤية إحصائيات الفريق
         return ($globalLevel && $globalLevel >= 3) || ($departmentLevel && $departmentLevel >= 3);
     }
 
-    /**
-     * التحقق من إمكانية الوصول لخطأ حسب التسلسل الهرمي العام
-     */
     private function canAccessHierarchicalError($user, $error, $userLevel): bool
     {
         $targetUser = User::find($error->user_id);
@@ -237,32 +190,23 @@ class EmployeeErrorValidationService
 
         $targetUserLevel = RoleHierarchy::getUserMaxHierarchyLevel($targetUser);
 
-        // يمكن الوصول إذا كان المستوى الهرمي للمستخدم الحالي أعلى من المستهدف
         return $targetUserLevel === null || $userLevel > $targetUserLevel;
     }
 
-    /**
-     * التحقق من إمكانية الوصول لخطأ حسب التسلسل الهرمي للقسم
-     */
     private function canAccessDepartmentHierarchicalError($user, $error, $userLevel): bool
     {
         $targetUser = User::find($error->user_id);
         if (!$targetUser) return false;
 
-        // يجب أن يكونوا في نفس القسم
         if ($user->department !== $targetUser->department) {
             return false;
         }
 
         $targetUserLevel = DepartmentRole::getUserDepartmentHierarchyLevel($targetUser);
 
-        // يمكن الوصول إذا كان المستوى الهرمي للمستخدم الحالي أعلى من المستهدف
         return $targetUserLevel === null || $userLevel > $targetUserLevel;
     }
 
-    /**
-     * التحقق من إمكانية رؤية الأخطاء حسب التسلسل الهرمي العام
-     */
     private function canViewHierarchicalErrors($currentUser, $targetUserId, $userLevel): bool
     {
         $targetUser = User::find($targetUserId);
@@ -270,44 +214,33 @@ class EmployeeErrorValidationService
 
         $targetUserLevel = RoleHierarchy::getUserMaxHierarchyLevel($targetUser);
 
-        // يمكن رؤية الأخطاء إذا كان المستوى الهرمي للمستخدم الحالي أعلى من أو مساوي للمستهدف
         return $targetUserLevel === null || $userLevel >= $targetUserLevel;
     }
 
-    /**
-     * التحقق من إمكانية رؤية الأخطاء حسب التسلسل الهرمي للقسم
-     */
     private function canViewDepartmentHierarchicalErrors($currentUser, $targetUserId, $userLevel): bool
     {
         $targetUser = User::find($targetUserId);
         if (!$targetUser) return false;
 
-        // يجب أن يكونوا في نفس القسم
         if ($currentUser->department !== $targetUser->department) {
             return false;
         }
 
         $targetUserLevel = DepartmentRole::getUserDepartmentHierarchyLevel($targetUser);
 
-        // يمكن رؤية الأخطاء إذا كان المستوى الهرمي للمستخدم الحالي أعلى من أو مساوي للمستهدف
         return $targetUserLevel === null || $userLevel >= $targetUserLevel;
     }
 
-    /**
-     * الحصول على قائمة الموظفين الذين يمكن إضافة أخطاء عليهم حسب النظام الهرمي
-     */
     public function getUsersCanAddErrorsTo(): \Illuminate\Support\Collection
     {
         $currentUser = Auth::user();
         $globalLevel = RoleHierarchy::getUserMaxHierarchyLevel($currentUser);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($currentUser);
 
-        // إذا لم يكن لديه مستوى هرمي، لا يمكنه إضافة أخطاء
         if (!$globalLevel && !$departmentLevel) {
             return collect();
         }
 
-        // جلب جميع المستخدمين النشطين
         $allUsers = User::where('employee_status', 'active')->get();
         $availableUsers = collect();
 
@@ -320,7 +253,6 @@ class EmployeeErrorValidationService
         ]);
 
         foreach ($allUsers as $user) {
-            // تخطي المستخدم الحالي
             if ($user->id === $currentUser->id) {
                 continue;
             }
@@ -330,58 +262,46 @@ class EmployeeErrorValidationService
 
             $canAddError = false;
 
-            // التحقق من المستوى الهرمي العام (مثل TaskHierarchyService)
             if ($globalLevel && $globalLevel >= 5) {
-                // يمكن إضافة خطأ على المستخدمين في مستوى أقل أو مساوي
                 if ($userGlobalLevel === null || $userGlobalLevel <= $globalLevel) {
                     $canAddError = true;
                 }
             }
 
-            // التحقق من المستوى الهرمي للقسم (فقط المستوى 4+)
             if (!$canAddError && $departmentLevel && $departmentLevel >= 4) {
                 if ($user->department === $currentUser->department) {
-                    // يمكن إضافة خطأ على المستخدمين في مستوى أقل فقط (وليس مساوي)
                     if ($userDepartmentLevel && $userDepartmentLevel < $departmentLevel) {
                         $canAddError = true;
                     }
                 }
             }
 
-            // المستوى 2 العام - يمكن إضافة خطأ على المستوى 1 فقط
             if (!$canAddError && $globalLevel && $globalLevel == 2) {
                 if ($user->department === $currentUser->department) {
-                    // يمكن إضافة خطأ على المستوى 1 فقط
                     if ($userDepartmentLevel && $userDepartmentLevel == 1) {
                         $canAddError = true;
                     }
                 }
             }
 
-            // المستوى 2 القسمي - يمكن إضافة خطأ على المستوى 1 فقط
             if (!$canAddError && $departmentLevel && $departmentLevel == 2) {
                 if ($user->department === $currentUser->department) {
-                    // يمكن إضافة خطأ على المستوى 1 فقط
                     if ($userDepartmentLevel && $userDepartmentLevel == 1) {
                         $canAddError = true;
                     }
                 }
             }
 
-            // المستوى 4 العام - يمكن إضافة خطأ على المستويات 1، 2، 3
             if (!$canAddError && $globalLevel && $globalLevel == 4) {
                 if ($user->department === $currentUser->department) {
-                    // يمكن إضافة خطأ على المستويات 1، 2، 3
                     if ($userDepartmentLevel && $userDepartmentLevel < 4) {
                         $canAddError = true;
                     }
                 }
             }
 
-            // المستوى 3 - فقط أعضاء الفريق (مثل TaskHierarchyService)
             if (!$canAddError && $departmentLevel && $departmentLevel == 3) {
                 if ($user->department === $currentUser->department) {
-                    // يمكن إضافة خطأ على أعضاء الفريق فقط
                     $canAddError = $this->isUserInSameTeam($user, $currentUser);
                 }
             }
@@ -412,9 +332,6 @@ class EmployeeErrorValidationService
         return $availableUsers;
     }
 
-    /**
-     * التحقق من أن المستخدمين في نفس الفريق
-     */
     private function isUserInSameTeam($user, $currentUser): bool
     {
         $currentTeamId = $currentUser->current_team_id;

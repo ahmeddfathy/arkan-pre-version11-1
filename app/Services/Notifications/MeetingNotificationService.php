@@ -20,16 +20,13 @@ class MeetingNotificationService
         $this->meetingSlackService = $meetingSlackService;
     }
 
-    /**
-     * إشعار المشاركين عند إنشاء اجتماع
-     */
     public function notifyMeetingParticipants(Meeting $meeting, array $participantIds, User $creator): void
     {
         try {
             foreach ($participantIds as $participantId) {
                 $participant = User::find($participantId);
                 if (!$participant || $participant->id === $creator->id) {
-                    continue; // تجاهل المنظم
+                    continue;
                 }
 
                 $notificationData = [
@@ -45,7 +42,6 @@ class MeetingNotificationService
                     ]
                 ];
 
-                // إنشاء الإشعار في قاعدة البيانات
                 Notification::create([
                     'user_id' => $participant->id,
                     'type' => 'meeting_participant',
@@ -53,7 +49,6 @@ class MeetingNotificationService
                     'related_id' => $meeting->id
                 ]);
 
-                // إرسال إشعار Firebase
                 $this->sendAdditionalFirebaseNotification(
                     $participant,
                     $notificationData['message'],
@@ -62,7 +57,6 @@ class MeetingNotificationService
                     'meeting_participant'
                 );
 
-                // إرسال إشعار Slack
                 if ($participant->slack_user_id) {
                     $this->meetingSlackService->sendMeetingCreatedNotification(
                         $meeting,
@@ -83,9 +77,6 @@ class MeetingNotificationService
         }
     }
 
-    /**
-     * إشعار المستخدمين المذكورين في وصف الاجتماع
-     */
     public function notifyMentionedUsers(Meeting $meeting, User $creator): void
     {
         try {
@@ -96,12 +87,10 @@ class MeetingNotificationService
             $mentionedUsers = User::whereIn('id', $meeting->mentions)->get();
 
             foreach ($mentionedUsers as $mentionedUser) {
-                // لا نرسل إشعار للمنظم
                 if ($mentionedUser->id === $creator->id) {
                     continue;
                 }
 
-                // تحديد نوع المنشن
                 $isEveryoneMention = strpos($meeting->description, '@everyone') !== false || strpos($meeting->description, '@الجميع') !== false;
                 $mentionType = $isEveryoneMention ? 'تم ذكر الجميع' : 'تم ذكرك';
 
@@ -118,7 +107,6 @@ class MeetingNotificationService
                     ]
                 ];
 
-                // إنشاء الإشعار في قاعدة البيانات
                 Notification::create([
                     'user_id' => $mentionedUser->id,
                     'type' => 'meeting_mention',
@@ -126,7 +114,6 @@ class MeetingNotificationService
                     'related_id' => $meeting->id
                 ]);
 
-                // إرسال إشعار Firebase
                 $this->sendAdditionalFirebaseNotification(
                     $mentionedUser,
                     $notificationData['message'],
@@ -135,7 +122,6 @@ class MeetingNotificationService
                     'meeting_mention'
                 );
 
-                // إرسال إشعار Slack
                 if ($mentionedUser->slack_user_id) {
                     $this->meetingSlackService->sendMeetingMentionNotification(
                         $meeting,
@@ -156,9 +142,6 @@ class MeetingNotificationService
         }
     }
 
-    /**
-     * إشعار المستخدمين المذكورين في ملاحظة اجتماع
-     */
     public function notifyMentionedUsersInNote(Meeting $meeting, array $mentionIds, User $author, string $noteContent): void
     {
         try {
@@ -169,12 +152,10 @@ class MeetingNotificationService
             $mentionedUsers = User::whereIn('id', $mentionIds)->get();
 
             foreach ($mentionedUsers as $mentionedUser) {
-                // لا نرسل إشعار لكاتب الملاحظة
                 if ($mentionedUser->id === $author->id) {
                     continue;
                 }
 
-                // تحديد نوع المنشن
                 $isEveryoneMention = strpos($noteContent, '@everyone') !== false || strpos($noteContent, '@الجميع') !== false;
                 $mentionType = $isEveryoneMention ? 'تم ذكر الجميع' : 'تم ذكرك';
 
@@ -192,7 +173,6 @@ class MeetingNotificationService
                     ]
                 ];
 
-                // إنشاء الإشعار في قاعدة البيانات
                 Notification::create([
                     'user_id' => $mentionedUser->id,
                     'type' => 'meeting_note_mention',
@@ -200,7 +180,6 @@ class MeetingNotificationService
                     'related_id' => $meeting->id
                 ]);
 
-                // إرسال إشعار Firebase
                 $this->sendAdditionalFirebaseNotification(
                     $mentionedUser,
                     $notificationData['message'],
@@ -209,7 +188,6 @@ class MeetingNotificationService
                     'meeting_note_mention'
                 );
 
-                // إرسال إشعار Slack
                 if ($mentionedUser->slack_user_id) {
                     $this->meetingSlackService->sendMeetingNoteMentionNotification(
                         $meeting,
@@ -231,17 +209,12 @@ class MeetingNotificationService
         }
     }
 
-    /**
-     * إشعار المسؤولين عن اجتماعات العملاء للموافقة
-     */
     public function notifyClientMeetingApprovers(Meeting $meeting, User $creator): void
     {
         try {
-            // جلب المستخدمين الذين لديهم صلاحية schedule_client_meetings
             $approvers = User::permission('schedule_client_meetings')->get();
 
             foreach ($approvers as $approver) {
-                // لا نرسل إشعار لمنشئ الاجتماع
                 if ($approver->id === $creator->id) {
                     continue;
                 }
@@ -260,7 +233,6 @@ class MeetingNotificationService
                     ]
                 ];
 
-                // إنشاء الإشعار في قاعدة البيانات
                 Notification::create([
                     'user_id' => $approver->id,
                     'type' => 'meeting_approval_request',
@@ -268,7 +240,6 @@ class MeetingNotificationService
                     'related_id' => $meeting->id
                 ]);
 
-                // إرسال إشعار Firebase
                 $this->sendAdditionalFirebaseNotification(
                     $approver,
                     $notificationData['message'],
@@ -277,7 +248,6 @@ class MeetingNotificationService
                     'meeting_approval_request'
                 );
 
-                // إرسال إشعار Slack
                 if ($approver->slack_user_id) {
                     $this->meetingSlackService->sendMeetingApprovalRequestNotification(
                         $meeting,
@@ -298,9 +268,6 @@ class MeetingNotificationService
         }
     }
 
-    /**
-     * إشعار منشئ الاجتماع بنتيجة الموافقة
-     */
     public function notifyMeetingApprovalResult(Meeting $meeting, string $result, User $approver): void
     {
         try {
@@ -327,7 +294,6 @@ class MeetingNotificationService
                 ]
             ];
 
-            // إنشاء الإشعار في قاعدة البيانات
             Notification::create([
                 'user_id' => $creator->id,
                 'type' => 'meeting_approval_result',
@@ -335,7 +301,6 @@ class MeetingNotificationService
                 'related_id' => $meeting->id
             ]);
 
-            // إرسال إشعار Firebase
             $this->sendAdditionalFirebaseNotification(
                 $creator,
                 $notificationData['message'],
@@ -344,7 +309,6 @@ class MeetingNotificationService
                 'meeting_approval_result'
             );
 
-            // إرسال إشعار Slack
             if ($creator->slack_user_id) {
                 $this->meetingSlackService->sendMeetingApprovalResultNotification(
                     $meeting,
@@ -366,9 +330,6 @@ class MeetingNotificationService
         }
     }
 
-    /**
-     * إشعار المشاركين بتحديث وقت الاجتماع
-     */
     public function notifyMeetingTimeUpdated(Meeting $meeting, array $participantIds, User $updatedBy): void
     {
         try {
@@ -391,7 +352,6 @@ class MeetingNotificationService
                     ]
                 ];
 
-                // إنشاء الإشعار في قاعدة البيانات
                 Notification::create([
                     'user_id' => $participant->id,
                     'type' => 'meeting_time_updated',
@@ -399,7 +359,6 @@ class MeetingNotificationService
                     'related_id' => $meeting->id
                 ]);
 
-                // إرسال إشعار Firebase
                 $this->sendAdditionalFirebaseNotification(
                     $participant,
                     $notificationData['message'],
@@ -408,7 +367,6 @@ class MeetingNotificationService
                     'meeting_time_updated'
                 );
 
-                // إرسال إشعار Slack
                 if ($participant->slack_user_id) {
                     $this->meetingSlackService->sendMeetingTimeUpdatedNotification(
                         $meeting,
@@ -429,9 +387,6 @@ class MeetingNotificationService
         }
     }
 
-    /**
-     * إشعار المشاركين بإلغاء الاجتماع
-     */
     public function notifyMeetingCancelled(Meeting $meeting, array $participantIds, User $cancelledBy): void
     {
         try {
@@ -454,7 +409,6 @@ class MeetingNotificationService
                     ]
                 ];
 
-                // إنشاء الإشعار في قاعدة البيانات
                 Notification::create([
                     'user_id' => $participant->id,
                     'type' => 'meeting_cancelled',
@@ -462,7 +416,6 @@ class MeetingNotificationService
                     'related_id' => $meeting->id
                 ]);
 
-                // إرسال إشعار Firebase
                 $this->sendAdditionalFirebaseNotification(
                     $participant,
                     $notificationData['message'],
@@ -471,7 +424,6 @@ class MeetingNotificationService
                     'meeting_cancelled'
                 );
 
-                // إرسال إشعار Slack
                 if ($participant->slack_user_id) {
                     $this->meetingSlackService->sendMeetingCancelledNotification(
                         $meeting,

@@ -7,14 +7,6 @@ use Illuminate\Support\Facades\Log;
 
 trait HasSlackNotification
 {
-    /**
-     * إرسال إشعار إلى Slack
-     *
-     * @param string $message رسالة الإشعار
-     * @param string $operation نوع العملية (إنشاء، تحديث، حذف)
-     * @param array $additionalData بيانات إضافية للرسالة
-     * @return bool نجاح أو فشل العملية
-     */
     protected function sendSlackNotification(string $message, string $operation = 'إنشاء', array $additionalData = []): bool
     {
         try {
@@ -25,21 +17,19 @@ trait HasSlackNotification
                 return false;
             }
 
-            // تحديد اللون بناءً على نوع العملية
-            $color = '#36a64f'; // أخضر للإنشاء
+            $color = '#36a64f';
             $operationIcon = ':white_check_mark:';
 
             if ($operation === 'تحديث') {
-                $color = '#3AA3E3'; // أزرق للتحديث
+                $color = '#3AA3E3';
                 $operationIcon = ':arrows_counterclockwise:';
             } elseif ($operation === 'حذف') {
-                $color = '#E01E5A'; // أحمر للحذف
+                $color = '#E01E5A';
                 $operationIcon = ':x:';
             }
 
-            // بناء رسالة أكثر تنظيماً وجاذبية
             $payload = [
-                'text' => $message, // النص الرئيسي للرسالة
+                'text' => $message,
                 'blocks' => [
                     [
                         'type' => 'section',
@@ -77,7 +67,6 @@ trait HasSlackNotification
                 ]
             ];
 
-            // إضافة زر للرابط إذا كان متوفراً
             if (isset($additionalData['link_url']) && isset($additionalData['link_text'])) {
                 $payload['blocks'][] = [
                     'type' => 'actions',
@@ -95,7 +84,6 @@ trait HasSlackNotification
                 ];
             }
 
-            // ⚡ تقليل timeout للـ HR webhook
             $response = Http::timeout(3)->post($webhookUrl, $payload);
 
             $success = $response->successful();
@@ -103,11 +91,10 @@ trait HasSlackNotification
 
             return $success;
 
-        } catch (\Exception $e) {
-            // 🛡️ Fallback سريع للـ HR channel
+        } catch (\Exception $e) {       
             Log::warning('HR Slack timeout or error - continuing anyway', ['error' => $e->getMessage()]);
             $this->setHRNotificationStatus(true, 'تم المحاولة (انتهت مهلة الانتظار)');
-            return true; // نقول نجحت عشان الصفحة تكمل
+            return true;
         }
     }
 

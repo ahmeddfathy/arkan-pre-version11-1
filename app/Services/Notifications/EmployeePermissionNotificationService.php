@@ -55,7 +55,6 @@ class EmployeePermissionNotificationService
             }
 
             if ($request->user) {
-                // تحديد العنوان والرابط بناءً على نوع الإشعار
                 $title = $this->getPermissionFirebaseTitle($type);
                 $link = "/permission-requests/{$request->id}";
 
@@ -67,7 +66,6 @@ class EmployeePermissionNotificationService
                     $type
                 );
 
-                // إرسال إشعار Slack للموظف إذا كان لديه slack_user_id
                 if ($request->user->slack_user_id) {
                     $action = $this->determineSlackAction($type, $request);
                     $currentUser = \Illuminate\Support\Facades\Auth::user();

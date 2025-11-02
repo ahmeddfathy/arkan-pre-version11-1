@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Log;
 
 class TaskTransferSlackService extends BaseSlackService
 {
-    /**
-     * إرسال إشعارات نقل المهمة العادية
-     */
     public function sendTaskTransferNotifications(
         TaskUser $originalTaskUser,
         ?TaskUser $newTaskUser,
@@ -22,12 +19,10 @@ class TaskTransferSlackService extends BaseSlackService
         ?string $reason = null
     ): bool {
         try {
-            // إشعار للشخص اللي اتنقلت منه (إذا كان نقل سلبي)
             if ($transferType === 'negative') {
                 $this->sendTransferFromNotification($originalTaskUser, $fromUser, $toUser, $transferPoints, $reason, 'task');
             }
 
-            // إشعار للشخص اللي اتنقلت له
             $taskUserToNotify = $newTaskUser ?? $originalTaskUser;
             $this->sendTransferToNotification($taskUserToNotify, $fromUser, $toUser, $transferType, $transferPoints, $reason, 'task');
 
@@ -42,9 +37,6 @@ class TaskTransferSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * إرسال إشعارات نقل مهمة القالب
-     */
     public function sendTemplateTaskTransferNotifications(
         TemplateTaskUser $originalTemplateTaskUser,
         ?TemplateTaskUser $newTemplateTaskUser,
@@ -55,12 +47,10 @@ class TaskTransferSlackService extends BaseSlackService
         ?string $reason = null
     ): bool {
         try {
-            // إشعار للشخص اللي اتنقلت منه (إذا كان نقل سلبي)
             if ($transferType === 'negative') {
                 $this->sendTransferFromNotification($originalTemplateTaskUser, $fromUser, $toUser, $transferPoints, $reason, 'template');
             }
 
-            // إشعار للشخص اللي اتنقلت له
             $templateTaskUserToNotify = $newTemplateTaskUser ?? $originalTemplateTaskUser;
             $this->sendTransferToNotification($templateTaskUserToNotify, $fromUser, $toUser, $transferType, $transferPoints, $reason, 'template');
 
@@ -75,9 +65,6 @@ class TaskTransferSlackService extends BaseSlackService
         }
     }
 
-    /**
-     * إشعار للشخص اللي اتنقلت منه المهمة
-     */
     private function sendTransferFromNotification($taskUser, User $fromUser, User $toUser, int $points, ?string $reason, string $taskType): void
     {
         $message = $this->buildTransferFromMessage($taskUser, $fromUser, $toUser, $points, $reason, $taskType);
@@ -87,9 +74,6 @@ class TaskTransferSlackService extends BaseSlackService
         $this->sendSlackNotification($fromUser, $message, $context, true);
     }
 
-    /**
-     * إشعار للشخص اللي اتنقلت له المهمة
-     */
     private function sendTransferToNotification($taskUser, User $fromUser, User $toUser, string $transferType, int $points, ?string $reason, string $taskType): void
     {
         $message = $this->buildTransferToMessage($taskUser, $fromUser, $toUser, $transferType, $points, $reason, $taskType);
@@ -99,9 +83,6 @@ class TaskTransferSlackService extends BaseSlackService
         $this->sendSlackNotification($toUser, $message, $context, true);
     }
 
-    /**
-     * بناء رسالة للشخص اللي اتنقلت منه
-     */
     private function buildTransferFromMessage($taskUser, User $fromUser, User $toUser, int $points, ?string $reason, string $taskType): array
     {
         $taskInfo = $this->getTaskInfo($taskUser, $taskType);
@@ -114,20 +95,16 @@ class TaskTransferSlackService extends BaseSlackService
             ])
         ];
 
-        // معلومات المشروع
         if ($taskInfo['project']) {
             $blocks[] = $this->buildTextSection("*المشروع:* {$taskInfo['project']}");
         }
 
-        // النقاط المخصومة
         $blocks[] = $this->buildTextSection("⚠️ *تم خصم {$points} نقطة* بسبب نقل المهمة");
 
-        // السبب
         if ($reason) {
             $blocks[] = $this->buildTextSection("📝 *السبب:*\n{$reason}");
         }
 
-        // زر عرض المهام
         $tasksUrl = $taskType === 'template'
             ? url('/projects/' . $taskInfo['project_id'])
             : url('/tasks/my-tasks');
@@ -144,9 +121,6 @@ class TaskTransferSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * بناء رسالة للشخص اللي اتنقلت له
-     */
     private function buildTransferToMessage($taskUser, User $fromUser, User $toUser, string $transferType, int $points, ?string $reason, string $taskType): array
     {
         $taskInfo = $this->getTaskInfo($taskUser, $taskType);
@@ -164,32 +138,26 @@ class TaskTransferSlackService extends BaseSlackService
             ])
         ];
 
-        // معلومات المشروع
         if ($taskInfo['project']) {
             $blocks[] = $this->buildTextSection("*المشروع:* {$taskInfo['project']}");
         }
 
-        // النقاط
         $blocks[] = $this->buildTextSection($pointsText);
 
-        // الوصف
         if ($taskInfo['description']) {
             $blocks[] = $this->buildTextSection("*الوصف:*\n{$taskInfo['description']}");
         }
 
-        // السبب
         if ($reason) {
             $blocks[] = $this->buildTextSection("📝 *سبب النقل:*\n{$reason}");
         }
 
-        // الموعد النهائي
         if ($taskInfo['deadline']) {
             $blocks[] = $this->buildInfoSection([
                 "*الموعد النهائي:*\n⏰ {$taskInfo['deadline']}"
             ]);
         }
 
-        // زر عرض المهمة
         $tasksUrl = $taskType === 'template'
             ? url('/projects/' . $taskInfo['project_id'])
             : url('/tasks/my-tasks');
@@ -206,9 +174,6 @@ class TaskTransferSlackService extends BaseSlackService
         ];
     }
 
-    /**
-     * الحصول على معلومات المهمة
-     */
     private function getTaskInfo($taskUser, string $taskType): array
     {
         if ($taskType === 'template') {

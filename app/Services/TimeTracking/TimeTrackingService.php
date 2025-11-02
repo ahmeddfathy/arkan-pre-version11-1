@@ -11,23 +11,15 @@ use Illuminate\Support\Facades\DB;
 
 class TimeTrackingService
 {
-    /**
-     * بدء تسجيل الوقت لمهمة عادية
-     */
     public function startTaskTracking(TaskUser $taskUser): TaskTimeLog
     {
-        // إيقاف أي جلسة نشطة للمستخدم
         $this->stopAllActiveLogsForUser($taskUser->user_id);
 
         return $taskUser->startTimeLog();
     }
 
-    /**
-     * بدء تسجيل الوقت لمهمة قالب
-     */
     public function startTemplateTaskTracking(TemplateTaskUser $templateTaskUser): TaskTimeLog
     {
-        // إيقاف أي جلسة نشطة للمستخ
         $this->stopAllActiveLogsForUser($templateTaskUser->user_id);
 
         return $templateTaskUser->startTimeLog();
@@ -39,9 +31,6 @@ class TimeTrackingService
         return $task->stopActiveTimeLog();
     }
 
-    /**
-     * إيقاف جميع الجلسات النشطة للمستخدم
-     */
     public function stopAllActiveLogsForUser(int $userId): int
     {
         $activeLogs = TaskTimeLog::where('user_id', $userId)
@@ -51,15 +40,11 @@ class TimeTrackingService
                 foreach ($activeLogs as $log) {
             $log->stop();
 
-            // لا نحدث actual_time في المهام - النظام منفصل
         }
 
         return $activeLogs->count();
     }
 
-    /**
-     * الحصول على الجلسة النشطة للمستخدم
-     */
     public function getActiveLogForUser(int $userId): ?TaskTimeLog
     {
         return TaskTimeLog::where('user_id', $userId)
@@ -68,9 +53,6 @@ class TimeTrackingService
                          ->first();
     }
 
-    /**
-     * الحصول على تقرير يومي للمستخدم
-     */
     public function getDailyReport(int $userId, string $date = null): array
     {
         $date = $date ?? now()->toDateString();
@@ -102,9 +84,6 @@ class TimeTrackingService
         ];
     }
 
-    /**
-     * الحصول على تقرير أسبوعي للمستخدم
-     */
     public function getWeeklyReport(int $userId, string $startDate = null): array
     {
         $startDate = $startDate ? Carbon::parse($startDate) : now()->startOfWeek();
@@ -145,9 +124,6 @@ class TimeTrackingService
         ];
     }
 
-    /**
-     * الحصول على تقرير شهري للمستخدم
-     */
     public function getMonthlyReport(int $userId, int $year = null, int $month = null): array
     {
         $year = $year ?? now()->year;
@@ -165,7 +141,6 @@ class TimeTrackingService
         $totalMinutes = $logs->sum('duration_minutes');
         $sessionsCount = $logs->count();
 
-        // تجميع حسب المهام
         $tasksSummary = $logs->groupBy(function ($log) {
             return $log->task_type . '_' . ($log->task_user_id ?? $log->template_task_user_id);
         })->map(function ($taskLogs) {
@@ -204,9 +179,6 @@ class TimeTrackingService
         return 'مهمة غير محددة';
     }
 
-    /**
-     * تنسيق الدقائق لعرض مقروء
-     */
     private function formatMinutes(int $minutes): string
     {
         if ($minutes === 0) {
@@ -227,9 +199,6 @@ class TimeTrackingService
         return implode(' و ', $parts);
     }
 
-    /**
-     * التحقق من وجود جلسة نشطة للمستخدم
-     */
     public function hasActiveSession(int $userId): bool
     {
         return TaskTimeLog::where('user_id', $userId)
@@ -237,9 +206,6 @@ class TimeTrackingService
                          ->exists();
     }
 
-    /**
-     * الحصول على إحصائيات سريعة للمستخدم
-     */
     public function getUserStats(int $userId): array
     {
         $today = now()->toDateString();
