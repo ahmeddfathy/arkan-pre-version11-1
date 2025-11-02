@@ -619,6 +619,8 @@
                                         <div class="btn-group">
                                             <button class="btn btn-sm {{ $myTaskViewDisabled ? 'btn-secondary' : 'btn-info' }} view-task"
                                                 data-id="{{ $originalTaskId }}"
+                                                data-task-user-id="{{ $taskUserId }}"
+                                                data-is-template="{{ $isTemplate ? 'true' : 'false' }}"
                                                 {{ $myTaskViewDisabled ? 'disabled' : '' }}
                                                 title="{{ $myTaskViewDisabled ? '🔒 المهمة تم نقلها - العرض معطل' : 'عرض التفاصيل' }}">
                                                 <i class="fas fa-{{ $myTaskViewDisabled ? 'eye-slash' : 'eye' }}"></i>
@@ -1041,36 +1043,6 @@
     </div>
 </div>
 
-@push('scripts')
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-<script src="{{ asset('js/tasks/filters.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks/utils.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks/core.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks/timers.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks/drag-drop.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks/kanban.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks/modal-handlers.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks-kanban.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks-calendar.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks-stats.js') }}?v={{ time() }}"></script>
-
-<!-- Set current user ID (needs to be in blade for Auth::id()) -->
-<script>
-    window.currentUserId = {
-        {
-            Auth::id()
-        }
-    };
-</script>
-
-<!-- My Tasks Custom Scripts -->
-<script src="{{ asset('js/tasks/my-tasks/filters.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('js/tasks/my-tasks/init.js') }}?v={{ time() }}"></script>
-
-
 
 <!-- Task Sidebar (مثل Asana) - Note: Sidebar HTML was already below, keeping it -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeTaskSidebar()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1040; visibility: hidden; opacity: 0; transition: all 0.3s ease;"></div>
@@ -1100,8 +1072,40 @@
     </div>
 </div>
 
-<!-- Include Task Sidebar JavaScript -->
+
+@push('scripts')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ⚠️ Set current user ID FIRST (needed by all scripts) -->
+<script>
+    window.currentUserId = {
+        {
+            Auth::id()
+        }
+    };
+    console.log('✅ Current User ID:', window.currentUserId);
+</script>
+
 <script src="{{ asset('js/projects/task-sidebar.js') }}?v={{ time() }}"></script>
+
+<!-- My Tasks Scripts -->
+<script src="{{ asset('js/tasks/filters.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/utils.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/core.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/timers.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/drag-drop.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/kanban.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks/modal-handlers.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks-kanban.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks-calendar.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/tasks/my-tasks-stats.js') }}?v={{ time() }}"></script>
+
+<!-- 🚀 Initialization Script (MUST BE LAST) -->
+<script src="{{ asset('js/tasks/my-tasks/init.js') }}?v={{ time() }}"></script>
+
+
+
 
 @endpush
 @endsection

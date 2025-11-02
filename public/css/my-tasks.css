@@ -959,8 +959,6 @@ select.form-control {
 
 html,
 body {
-    /* Enable GPU Acceleration */
-    transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-font-smoothing: antialiased;
 }

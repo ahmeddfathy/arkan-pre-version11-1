@@ -122,9 +122,9 @@
                 <div class="filters-section" style="margin-bottom: 2rem;">
                     <div class="filter-group">
                         <label for="delivery_type" class="filter-label">
-                            نوع التسليم <span style="color: #ef4444;">*</span>
+                            نوع التسليم (اختياري)
                         </label>
-                        <select id="delivery_type" name="delivery_type" class="filter-select" required>
+                        <select id="delivery_type" name="delivery_type" class="filter-select">
                             <option value="">اختر نوع التسليم</option>
                             <option value="مسودة" {{ old('delivery_type', $project->delivery_type) == 'مسودة' ? 'selected' : '' }}>تسليم مسودة</option>
                             <option value="كامل" {{ old('delivery_type', $project->delivery_type) == 'كامل' ? 'selected' : '' }}>تسليم كامل</option>

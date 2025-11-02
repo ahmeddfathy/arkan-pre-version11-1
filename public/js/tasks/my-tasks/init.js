@@ -383,31 +383,42 @@
 
             const button = e.target.closest(".view-task");
             const taskId = button.getAttribute("data-id");
-            const taskUserId =
-                button.getAttribute("data-task-user-id") || taskId;
-            const isTemplate = button.getAttribute("data-is-template");
+            const rawTaskUserId = button.getAttribute("data-task-user-id");
+            let isTemplateAttr = button.getAttribute("data-is-template");
+
+            if (isTemplateAttr === null) {
+                const parent = button.closest(".kanban-card, .my-kanban-card");
+                if (parent) {
+                    isTemplateAttr = parent.getAttribute("data-is-template");
+                }
+            }
+
+            const isTemplate =
+                isTemplateAttr === "true" || isTemplateAttr === true;
+            const taskType = isTemplate ? "template" : "regular";
+
+            let targetId;
+            if (taskType === "template") {
+                targetId = rawTaskUserId || taskId;
+            } else {
+                const parsedTaskUserId =
+                    rawTaskUserId && !isNaN(parseInt(rawTaskUserId, 10))
+                        ? parseInt(rawTaskUserId, 10)
+                        : null;
+                targetId = parsedTaskUserId || taskId;
+            }
 
             console.log("🔍 Opening task sidebar:", {
                 taskId: taskId,
-                taskUserId: taskUserId,
-                isTemplate: isTemplate,
+                taskUserId: rawTaskUserId,
+                resolvedTargetId: targetId,
+                isTemplate: isTemplateAttr,
             });
-
-            // استخدم نفس الطريقة الموجودة في صفحة المهام الرئيسية
-            const taskType =
-                isTemplate === "true" || isTemplate === true
-                    ? "template"
-                    : "regular";
-
-            // للمهام العادية: استخدم Task ID
-            // لمهام القوالب: استخدم TaskUser ID
-            const targetId = taskType === "regular" ? taskId : taskUserId;
 
             if (typeof openTaskSidebar === "function") {
                 openTaskSidebar(taskType, targetId);
             } else {
                 console.error("❌ openTaskSidebar function not found");
-                // Fallback: محاولة فتح السايد بار بطريقة أخرى
                 if (typeof window.openTaskSidebar === "function") {
                     window.openTaskSidebar(taskType, targetId);
                 } else {

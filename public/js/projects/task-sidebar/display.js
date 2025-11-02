@@ -674,6 +674,13 @@ function displayTaskDetails(task) {
                         هذه المهمة غير مُعيَّنة لأي مستخدم ولا يمكن العمل عليها
                     </div>
                 `
+                        : task.status === "cancelled"
+                        ? `
+                    <div class="alert alert-danger py-2 px-3 mb-0" style="font-size: 12px; border-radius: 6px;">
+                        <i class="fas fa-times-circle me-1"></i>
+                        هذه المهمة تم إلغاؤها
+                    </div>
+                `
                         : task.status === "new" &&
                           canUserStartTask(task, window.currentUserId)
                         ? `
@@ -721,6 +728,21 @@ function displayTaskDetails(task) {
                                 : "هذه المهمة متوقفة وغير مخصصة لك"
                         }
                     </div>
+                `
+                        : ""
+                }
+
+                ${
+                    // زر إلغاء المهمة - يظهر فقط لمنشئ المهمة ولو المهمة مش ملغية أو مكتملة
+                    ((task.created_by && task.created_by == window.currentUserId) ||
+                     (task.created_by_user && task.created_by_user.id == window.currentUserId)) &&
+                    task.status !== "cancelled" &&
+                    task.status !== "completed"
+                        ? `
+                    <button class="btn btn-outline-danger px-4 py-2" onclick="cancelTask('${task.type}', '${task.task_user_id || task.pivot_id || task.id}', '${task.id}')" style="border-radius: 6px; font-weight: 500; font-size: 13px;">
+                        <i class="fas fa-ban me-1"></i>
+                        إلغاء المهمة
+                    </button>
                 `
                         : ""
                 }

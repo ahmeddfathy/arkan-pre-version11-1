@@ -3,10 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use App\Models\ProjectAttachment;
-use App\Models\Client;
-use App\Models\CompanyService;
-use App\Models\User;
 use App\Services\ProjectManagement\ProjectService;
 use App\Services\ProjectManagement\AttachmentSharingService;
 use App\Services\ProjectManagement\ParticipantService;
@@ -36,14 +32,8 @@ use App\Http\Controllers\Traits\Projects\ProjectCRUDTrait;
 use App\Http\Controllers\Traits\Projects\ProjectAnalyticsTrait;
 use App\Http\Controllers\Traits\Projects\ProjectAttachmentsTrait;
 use App\Http\Controllers\Traits\Projects\ProjectParticipantsTrait;
-use App\Models\ProjectNote;
-use App\Models\TemplateTaskUser;
-use App\Models\TaskUser;
-use App\Models\ProjectServiceUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -137,11 +127,11 @@ class ProjectController extends Controller
             'coordination_department_manager',
             'general_reviewer'
         ];
-        
+
         if (!$this->roleCheckService->userHasRole($allowedRoles)) {
             abort(403, 'غير مسموح لك بالوصول إلى هذه الصفحة');
         }
-        
+
         // جلب جميع المشاريع للقائمة المنسدلة (مرتبة من الأحدث)
         $allProjects = Project::with('client')
             ->orderBy('created_at', 'desc')
@@ -178,11 +168,11 @@ class ProjectController extends Controller
             'coordination_department_manager',
             'general_reviewer'
         ];
-        
+
         if (!$this->roleCheckService->userHasRole($allowedRoles)) {
             abort(403, 'غير مسموح لك بتغيير حالة المشروع');
         }
-        
+
         return view('projects.internal-delivery.change-status', compact('project'));
     }
 
@@ -198,14 +188,14 @@ class ProjectController extends Controller
             'coordination_department_manager',
             'general_reviewer'
         ];
-        
+
         if (!$this->roleCheckService->userHasRole($allowedRoles)) {
             abort(403, 'غير مسموح لك بتحديث حالة المشروع');
         }
-        
+
         $request->validate([
             'status' => 'required|string|in:جديد,جاري التنفيذ,مكتمل,ملغي',
-            'delivery_type' => 'required|string|in:مسودة,كامل',
+            'delivery_type' => 'nullable|string|in:مسودة,كامل',
             'delivery_notes' => 'nullable|string|max:1000',
         ]);
 

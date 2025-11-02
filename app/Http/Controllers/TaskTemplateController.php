@@ -502,7 +502,7 @@ class TaskTemplateController extends Controller
         // التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
         if (!$task->canUpdateStatus()) {
             $errorMessage = $task->getStatusUpdateErrorMessage();
-            
+
             Log::warning('Blocked template task status update due to cancelled project', [
                 'template_task_user_id' => $templateTaskUserId,
                 'project_id' => $task->project_id,
@@ -676,4 +676,3 @@ class TaskTemplateController extends Controller
         return ['valid' => true];
     }
 }
-
