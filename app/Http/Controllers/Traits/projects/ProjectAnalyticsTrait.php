@@ -353,7 +353,6 @@ trait ProjectAnalyticsTrait
                 'teams_analysis' => $result['teams_analysis'],
                 'best_team' => $result['best_team']
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -388,25 +387,28 @@ trait ProjectAnalyticsTrait
         try {
             $project = Project::with(['services'])->findOrFail($projectId);
 
-            // Check if user has access to this project
+            // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
             $user = Auth::user();
-            $isAdmin = $this->roleCheckService->userHasRole(['hr', 'company_manager', 'project_manager', 'sales_employee', 'operation_assistant']);
+            $allowedRoles = [
+                'company_manager',
+                'project_manager',
+                'operations_manager',
+                'general_reviewer',
+                'operation_assistant',
+                'coordination_department_manager',
+                'coordination_team_leader',
+                'coordination-team-employee'
+            ];
+            $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
 
-            if (!$isAdmin) {
-                $userProjectIds = DB::table('project_service_user')
-                    ->where('user_id', $user->id)
-                    ->pluck('project_id')
-                    ->toArray();
-
-                if (!in_array($project->id, $userProjectIds)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'غير مسموح لك بعرض خدمات هذا المشروع'
-                    ], 403);
-                }
+            if (!$hasPermission) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مسموح لك بعرض خدمات هذا المشروع'
+                ], 403);
             }
 
-            $services = $project->services->map(function($service) use ($project) {
+            $services = $project->services->map(function ($service) use ($project) {
                 // حساب عدد المشاركين الكلي
                 $participantsCount = ProjectServiceUser::where('project_id', $project->id)
                     ->where('service_id', $service->id)
@@ -419,28 +421,28 @@ trait ProjectAnalyticsTrait
                     ->count();
 
                 // حساب عدد المهام الكلي والمكتملة لهذه الخدمة في المشروع
-                $totalTasks = \App\Models\TaskUser::whereHas('task', function($query) use ($project, $service) {
+                $totalTasks = \App\Models\TaskUser::whereHas('task', function ($query) use ($project, $service) {
                     $query->where('project_id', $project->id)
-                          ->where('service_id', $service->id);
+                        ->where('service_id', $service->id);
                 })->count();
 
                 $completedTasks = \App\Models\TaskUser::where('status', 'completed')
-                    ->whereHas('task', function($query) use ($project, $service) {
+                    ->whereHas('task', function ($query) use ($project, $service) {
                         $query->where('project_id', $project->id)
-                              ->where('service_id', $service->id);
+                            ->where('service_id', $service->id);
                     })->count();
 
                 // إضافة مهام القوالب
                 // ملاحظة: service_id موجود في TaskTemplate وليس في TemplateTask
                 // يجب الوصول إليه عبر: TemplateTaskUser -> TemplateTask -> TaskTemplate
                 $totalTemplateTasks = \App\Models\TemplateTaskUser::where('project_id', $project->id)
-                    ->whereHas('templateTask.template', function($query) use ($service) {
+                    ->whereHas('templateTask.template', function ($query) use ($service) {
                         $query->where('service_id', $service->id);
                     })->count();
 
                 $completedTemplateTasks = \App\Models\TemplateTaskUser::where('project_id', $project->id)
                     ->where('status', 'completed')
-                    ->whereHas('templateTask.template', function($query) use ($service) {
+                    ->whereHas('templateTask.template', function ($query) use ($service) {
                         $query->where('service_id', $service->id);
                     })->count();
 
@@ -490,7 +492,7 @@ trait ProjectAnalyticsTrait
                 }
 
                 // تجهيز بيانات المشاركين مع حالاتهم ومعلومات المهام
-                $participantsData = $participants->map(function($participant) use ($project, $service) {
+                $participantsData = $participants->map(function ($participant) use ($project, $service) {
                     $hasDelivered = !is_null($participant->delivered_at);
                     $isLate = false;
 
@@ -518,16 +520,16 @@ trait ProjectAnalyticsTrait
                     // حساب مهام المشارك في هذه الخدمة
                     // المهام العادية
                     $userTasks = \App\Models\TaskUser::where('user_id', $participant->user_id)
-                        ->whereHas('task', function($query) use ($project, $service) {
+                        ->whereHas('task', function ($query) use ($project, $service) {
                             $query->where('project_id', $project->id)
-                                  ->where('service_id', $service->id);
+                                ->where('service_id', $service->id);
                         })
                         ->get();
 
                     // مهام القوالب
                     $userTemplateTasks = \App\Models\TemplateTaskUser::where('user_id', $participant->user_id)
                         ->where('project_id', $project->id)
-                        ->whereHas('templateTask.template', function($query) use ($service) {
+                        ->whereHas('templateTask.template', function ($query) use ($service) {
                             $query->where('service_id', $service->id);
                         })
                         ->get();
@@ -541,7 +543,7 @@ trait ProjectAnalyticsTrait
 
                     // حساب المهام المتأخرة (أي مهمة عدت الديدلاين بتاعها)
                     $now = now();
-                    $lateTasks = $allUserTasks->filter(function($task) use ($now) {
+                    $lateTasks = $allUserTasks->filter(function ($task) use ($now) {
                         // لو مفيش ديدلاين، مش متأخرة
                         if (!$task->deadline) {
                             return false;
@@ -599,7 +601,6 @@ trait ProjectAnalyticsTrait
                 'success' => true,
                 'services' => $services
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching project services', [
                 'project_id' => $projectId,
@@ -621,27 +622,22 @@ trait ProjectAnalyticsTrait
     {
         try {
             $user = Auth::user();
-            $isAdmin = $this->roleCheckService->userHasRole(['hr', 'company_manager', 'project_manager', 'sales_employee', 'operation_assistant']);
+
+            // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
+            $allowedRoles = ['company_manager', 'project_manager', 'operations_manager', 'general_reviewer', 'operation_assistant'];
+            $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+            if (!$hasPermission) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مسموح لك بعرض تفاصيل هذا المشروع'
+                ], 403);
+            }
 
             $project = Project::with(['client', 'services'])->findOrFail($projectId);
 
-            // Check if user has access to this project
-            if (!$isAdmin) {
-                $userProjectIds = DB::table('project_service_user')
-                    ->where('user_id', $user->id)
-                    ->pluck('project_id')
-                    ->toArray();
-
-                if (!in_array($project->id, $userProjectIds)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'غير مسموح لك بعرض تفاصيل هذا المشروع'
-                    ], 403);
-                }
-            }
-
             // Get all services
-            $services = $project->services->map(function($service) use ($project) {
+            $services = $project->services->map(function ($service) use ($project) {
                 return [
                     'id' => $service->id,
                     'name' => $service->name,
@@ -655,12 +651,12 @@ trait ProjectAnalyticsTrait
                 ->with(['user', 'role', 'service'])
                 ->get()
                 ->groupBy('user_id')
-                ->map(function($userServices) {
+                ->map(function ($userServices) {
                     $firstService = $userServices->first();
                     return [
                         'user_id' => $firstService->user->id,
                         'user_name' => $firstService->user->name,
-                        'services' => $userServices->map(function($service) {
+                        'services' => $userServices->map(function ($service) {
                             return [
                                 'service_id' => $service->service_id,
                                 'service_name' => $service->service->name,
@@ -681,7 +677,6 @@ trait ProjectAnalyticsTrait
                 'services' => $services,
                 'participants' => $participants
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching project details for sidebar', [
                 'project_id' => $projectId,

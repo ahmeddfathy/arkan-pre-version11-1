@@ -19,15 +19,16 @@ class KpiEvaluationController extends Controller
     public function create(Request $request)
     {
         $user = Auth::user();
-        $userRole = $user->roles->first();
+        $userRoles = $user->roles->pluck('id')->toArray();
 
-        if (!$userRole) {
+        if (empty($userRoles)) {
             abort(403, 'لا يوجد دور محدد للمستخدم');
         }
 
         // جلب جميع الأدوار اللي المستخدم مصرح له يقيمها (بدون تقييد بالقسم في البداية)
+        // التحقق من جميع أدوار المستخدم
         $rolesCanEvaluate = RoleEvaluationMapping::with(['roleToEvaluate'])
-            ->where('evaluator_role_id', $userRole->id)
+            ->whereIn('evaluator_role_id', $userRoles)
             ->where('can_evaluate', true)
             ->get();
 
@@ -42,7 +43,8 @@ class KpiEvaluationController extends Controller
             return view('kpi.employee-kpi-evaluations.select-role', compact('rolesCanEvaluate'));
         }
 
-        $canEvaluate = RoleEvaluationMapping::where('evaluator_role_id', $userRole->id)
+        // التحقق من جميع أدوار المستخدم
+        $canEvaluate = RoleEvaluationMapping::whereIn('evaluator_role_id', $userRoles)
             ->where('role_to_evaluate_id', $selectedRoleId)
             ->where('can_evaluate', true)
             ->when($user->department, function ($query) use ($user) {
@@ -51,7 +53,8 @@ class KpiEvaluationController extends Controller
             ->exists();
 
         if (!$canEvaluate) {
-            $canEvaluate = RoleEvaluationMapping::where('evaluator_role_id', $userRole->id)
+            // محاولة أخرى بدون تقييد بالقسم
+            $canEvaluate = RoleEvaluationMapping::whereIn('evaluator_role_id', $userRoles)
                 ->where('role_to_evaluate_id', $selectedRoleId)
                 ->where('can_evaluate', true)
                 ->exists();

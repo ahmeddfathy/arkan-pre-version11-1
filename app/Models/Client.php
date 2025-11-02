@@ -22,6 +22,7 @@ class Client extends Model
         'client_code',
         'source',
         'interests',
+        'logo',
     ];
 
     protected $casts = [
@@ -39,7 +40,7 @@ class Client extends Model
         return LogOptions::defaults()
             ->logOnly([
                 'name', 'emails', 'phones', 'company_name', 'client_code',
-                'source', 'interests'
+                'source', 'interests', 'logo'
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()

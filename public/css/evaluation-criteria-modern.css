@@ -31,7 +31,7 @@
 /* 🌍 Global Improvements */
 body {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
 }
 
@@ -46,7 +46,7 @@ body {
     background: white;
     border: 1px solid #e9ecef;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
@@ -67,18 +67,21 @@ body {
 /* 🌟 Role Selection Cards */
 .role-selection-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 400px));
     gap: 1.5rem;
     padding: 1rem 0;
+    justify-content: center;
 }
 
 .role-card-modern {
     background: white;
     border-radius: 8px;
     padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     border: 1px solid #e9ecef;
+    max-width: 400px;
+    width: 100%;
 }
 
 .role-icon {
@@ -125,7 +128,8 @@ body {
     margin-bottom: 2rem;
 }
 
-.form-control-modern, .form-select-modern {
+.form-control-modern,
+.form-select-modern {
     background: white;
     border: 1px solid #ced4da;
     border-radius: 6px;
@@ -135,7 +139,8 @@ body {
     min-height: 38px;
 }
 
-.form-control-modern:focus, .form-select-modern:focus {
+.form-control-modern:focus,
+.form-select-modern:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     background: white;
@@ -168,7 +173,7 @@ textarea.form-control-modern {
     background: white;
     border: 1px solid #e9ecef;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border-left: 4px solid #28a745;
 }
 
@@ -209,7 +214,7 @@ textarea.form-control-modern {
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
@@ -229,13 +234,19 @@ textarea.form-control-modern {
     background: white;
     border-radius: 8px;
     padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border-top: 4px solid transparent;
 }
 
-.workflow-step-modern:nth-child(1) { border-top-color: #667eea; }
-.workflow-step-modern:nth-child(2) { border-top-color: #4facfe; }
-.workflow-step-modern:nth-child(3) { border-top-color: #fa709a; }
+.workflow-step-modern:nth-child(1) {
+    border-top-color: #667eea;
+}
+.workflow-step-modern:nth-child(2) {
+    border-top-color: #4facfe;
+}
+.workflow-step-modern:nth-child(3) {
+    border-top-color: #fa709a;
+}
 
 .step-number-modern {
     width: 60px;
@@ -390,8 +401,7 @@ textarea.form-control-modern {
 .form-control-modern.is-invalid:focus,
 .form-select-modern.is-invalid:focus {
     border-color: #dc3545;
-    box-shadow:
-        0 0 0 4px rgba(220, 53, 69, 0.15),
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.15),
         0 8px 25px rgba(220, 53, 69, 0.15);
 }
 
@@ -405,7 +415,11 @@ textarea.form-control-modern {
 
 /* 🎨 Enhanced Form Sections */
 .form-section-modern {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 255, 0.9) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(248, 249, 255, 0.9) 100%
+    );
     border-radius: 20px;
     padding: 2rem;
     margin-bottom: 2rem;
@@ -417,7 +431,7 @@ textarea.form-control-modern {
 }
 
 .form-section-modern::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -442,7 +456,11 @@ textarea.form-control-modern {
 
 /* 🎯 Enhanced Checkbox */
 .form-check-modern {
-    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(32, 201, 151, 0.1));
+    background: linear-gradient(
+        135deg,
+        rgba(40, 167, 69, 0.1),
+        rgba(32, 201, 151, 0.1)
+    );
     border-radius: 15px;
     padding: 1.5rem;
     border: 2px solid rgba(40, 167, 69, 0.2);
@@ -474,7 +492,11 @@ textarea.form-control-modern {
 
 /* 🚀 Enhanced Action Buttons Area */
 .action-buttons-modern {
-    background: linear-gradient(135deg, rgba(248, 249, 255, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(248, 249, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.8) 100%
+    );
     border-radius: 20px;
     padding: 2rem;
     margin-top: 2rem;
@@ -484,7 +506,11 @@ textarea.form-control-modern {
 
 /* 🎨 Form Row Enhancements */
 .form-row-modern {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(248, 249, 255, 0.05) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(248, 249, 255, 0.05) 100%
+    );
     border-radius: 15px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -501,7 +527,11 @@ textarea.form-control-modern {
 
 /* 🎯 Special Role Display Enhancement */
 .role-display-modern {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    background: linear-gradient(
+        135deg,
+        rgba(102, 126, 234, 0.1),
+        rgba(118, 75, 162, 0.1)
+    );
     border: 2px solid rgba(102, 126, 234, 0.15);
     border-radius: 20px;
     padding: 2rem;
@@ -511,7 +541,7 @@ textarea.form-control-modern {
 }
 
 .role-display-modern::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;

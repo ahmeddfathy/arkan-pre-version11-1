@@ -8,6 +8,7 @@ use App\Models\ClientTicket;
 use App\Services\Auth\RoleCheckService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
 {
@@ -39,7 +40,7 @@ class ClientController extends Controller
         }
 
         $clients = Client::with(['callLogs', 'tickets'])
-            ->withCount(['callLogs', 'tickets as open_tickets_count' => function($query) {
+            ->withCount(['callLogs', 'tickets as open_tickets_count' => function ($query) {
                 $query->whereIn('client_tickets.status', ['open', 'in_progress']);
             }])
             ->orderBy('created_at', 'desc')
@@ -71,6 +72,7 @@ class ClientController extends Controller
             'phones.*' => 'required|string|max:20',
             'company_name' => 'nullable|string|max:255',
             'source' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -84,12 +86,12 @@ class ClientController extends Controller
 
         // Check for existing client with same name, emails, or phones
         $exists = Client::where('name', $request->name)
-            ->orWhere(function($q) use ($emails) {
+            ->orWhere(function ($q) use ($emails) {
                 foreach ($emails as $email) {
                     $q->orWhereJsonContains('emails', $email);
                 }
             })
-            ->orWhere(function($q) use ($phones) {
+            ->orWhere(function ($q) use ($phones) {
                 foreach ($phones as $phone) {
                     $q->orWhereJsonContains('phones', $phone);
                 }
@@ -102,13 +104,21 @@ class ClientController extends Controller
                 ->withInput();
         }
 
-        Client::create([
+        $data = [
             'name' => $request->name,
             'emails' => $emails,
             'phones' => $phones,
             'company_name' => $request->company_name,
             'source' => $request->source,
-        ]);
+        ];
+
+        // رفع اللوجو إذا كان موجود
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('clients/logos', 'public');
+            $data['logo'] = $logoPath;
+        }
+
+        Client::create($data);
 
         return redirect()->route('clients.index')->with('success', 'تم إضافة العميل بنجاح');
     }
@@ -190,7 +200,8 @@ class ClientController extends Controller
             'company_name' => 'nullable|string|max:255',
             'source' => 'nullable|string|max:255',
             'interests' => 'nullable|array',
-            'interests.*' => 'string|max:100',
+            'interests.*' => 'nullable|string|max:100',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -204,7 +215,7 @@ class ClientController extends Controller
 
         // Check for existing client with same data (excluding current client)
         $exists = Client::where('id', '!=', $client->id)
-            ->where(function($q) use ($request, $emails, $phones) {
+            ->where(function ($q) use ($request, $emails, $phones) {
                 $q->where('name', $request->name);
                 foreach ($emails as $email) {
                     $q->orWhereJsonContains('emails', $email);
@@ -221,14 +232,27 @@ class ClientController extends Controller
                 ->withInput();
         }
 
-        $client->update([
+        $data = [
             'name' => $request->name,
             'emails' => $emails,
             'phones' => $phones,
             'company_name' => $request->company_name,
             'source' => $request->source,
-            'interests' => $request->interests ? array_filter($request->interests) : null,
-        ]);
+            'interests' => $request->interests ? array_values(array_filter(array_map('trim', $request->interests))) : null,
+        ];
+
+        // رفع اللوجو إذا كان موجود
+        if ($request->hasFile('logo')) {
+            // حذف اللوجو القديم إن وجد
+            if ($client->logo && Storage::disk('public')->exists($client->logo)) {
+                Storage::disk('public')->delete($client->logo);
+            }
+
+            $logoPath = $request->file('logo')->store('clients/logos', 'public');
+            $data['logo'] = $logoPath;
+        }
+
+        $client->update($data);
 
         return redirect()->route('clients.show', $client)->with('success', 'تم تحديث بيانات العميل بنجاح');
     }

@@ -231,5 +231,21 @@ class EmployeeErrorIndexService
                      ->latest()
                      ->get();
     }
+
+    /**
+     * جلب جميع الأخطاء الجوهرية (متاح لجميع الموظفين للتعلم والوعي)
+     * هذه الأخطاء تكون مرئية للجميع للتعلم من أخطاء الآخرين
+     */
+    public function getAllCriticalErrors(array $filters = []): \Illuminate\Database\Eloquent\Collection
+    {
+        $query = EmployeeError::where('error_type', 'critical');
+
+        // تطبيق الفلاتر
+        $query = $this->errorFilterService->applyFilters($query, $filters);
+
+        return $query->with(['user', 'errorable', 'reportedBy'])
+                     ->latest()
+                     ->get();
+    }
 }
 

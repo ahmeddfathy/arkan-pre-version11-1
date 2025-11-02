@@ -532,7 +532,6 @@ trait ProjectParticipantsTrait
                 'success' => true,
                 'task' => $task
             ]);
-
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Exception in getTaskDetails', [
                 'type' => $type,
@@ -566,7 +565,6 @@ trait ProjectParticipantsTrait
                 'success' => true,
                 'notes' => $notes
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error in getNotes: ' . $e->getMessage(), [
                 'project_id' => $project->id,
@@ -604,7 +602,6 @@ trait ProjectParticipantsTrait
                 'mentions_count' => count($noteData['mentions'] ?? []),
                 'target_department' => $request->target_department
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -643,7 +640,6 @@ trait ProjectParticipantsTrait
                 'message' => 'تم تحديث الملاحظة بنجاح',
                 'note' => $updatedNoteData
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -674,7 +670,6 @@ trait ProjectParticipantsTrait
                 'success' => true,
                 'message' => 'تم حذف الملاحظة بنجاح'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -743,7 +738,6 @@ trait ProjectParticipantsTrait
                 'success' => true,
                 'stats' => $stats
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error in getNotesStats: ' . $e->getMessage(), [
                 'project_id' => $project->id
@@ -776,7 +770,6 @@ trait ProjectParticipantsTrait
                 'success' => true,
                 'users' => $users
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error in getProjectUsersForMentions: ' . $e->getMessage(), [
                 'project_id' => $project->id
@@ -797,24 +790,28 @@ trait ProjectParticipantsTrait
     {
         try {
             $currentUser = Auth::user();
-            $isAdmin = $this->roleCheckService->userHasRole(['hr', 'company_manager', 'project_manager', 'sales_employee', 'operation_assistant']);
+
+            // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
+            $allowedRoles = [
+                'company_manager',
+                'project_manager',
+                'operations_manager',
+                'general_reviewer',
+                'operation_assistant',
+                'coordination_department_manager',
+                'coordination_team_leader',
+                'coordination-team-employee'
+            ];
+            $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+            if (!$hasPermission) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مسموح لك بعرض تفاصيل هذا المشروع'
+                ], 403);
+            }
 
             $project = Project::findOrFail($projectId);
-
-            // Check if current user has access to this project
-            if (!$isAdmin) {
-                $userProjectIds = DB::table('project_service_user')
-                    ->where('user_id', $currentUser->id)
-                    ->pluck('project_id')
-                    ->toArray();
-
-                if (!in_array($project->id, $userProjectIds)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'غير مسموح لك بعرض تفاصيل هذا المشروع'
-                    ], 403);
-                }
-            }
 
             // Get regular tasks with errors, revisions, and delivery status
             $regularTasks = DB::table('tasks')
@@ -845,7 +842,7 @@ trait ProjectParticipantsTrait
                     'original_user.name as transferred_from_user_name'
                 )
                 ->get()
-                ->map(function($task) use ($userId) {
+                ->map(function ($task) use ($userId) {
                     // حساب حالة التسليم (قبل/بعد الـ deadline)
                     $delivery_status = null;
                     $days_late = null;
@@ -958,7 +955,7 @@ trait ProjectParticipantsTrait
                     'original_user.name as transferred_from_user_name'
                 )
                 ->get()
-                ->map(function($task) use ($userId) {
+                ->map(function ($task) use ($userId) {
                     // حساب حالة التسليم (قبل/بعد الـ deadline)
                     $delivery_status = null;
                     $days_late = null;
@@ -1053,7 +1050,7 @@ trait ProjectParticipantsTrait
                     ->where('is_transferred_from', false)
                     ->where('is_transferred_to', false)
                     ->values(),
-                'additional' => $allTasks->filter(function($task) {
+                'additional' => $allTasks->filter(function ($task) {
                     // المهام الإضافية + المهام المنقولة للشخص
                     return $task['is_additional'] === true || $task['is_transferred_to'] === true;
                 })->values(),
@@ -1070,7 +1067,6 @@ trait ProjectParticipantsTrait
                 'tasks' => $taskGroups,
                 'total' => $allTasks->count()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching participant tasks', [
                 'project_id' => $projectId,
@@ -1093,6 +1089,26 @@ trait ProjectParticipantsTrait
     {
         try {
             $currentUser = Auth::user();
+
+            // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
+            $allowedRoles = [
+                'company_manager',
+                'project_manager',
+                'operations_manager',
+                'general_reviewer',
+                'operation_assistant',
+                'coordination_department_manager',
+                'coordination_team_leader',
+                'coordination-team-employee'
+            ];
+            $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+            if (!$hasPermission) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مسموح لك بعرض أخطاء المهام'
+                ], 403);
+            }
 
             // تحديد نوع المهمة
             if ($taskType === 'regular') {
@@ -1125,7 +1141,7 @@ trait ProjectParticipantsTrait
                 )
                 ->orderBy('employee_errors.created_at', 'desc')
                 ->get()
-                ->map(function($error) {
+                ->map(function ($error) {
                     return [
                         'id' => $error->id,
                         'title' => $error->title,
@@ -1145,7 +1161,6 @@ trait ProjectParticipantsTrait
                 'errors' => $errors,
                 'total' => $errors->count()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching task errors', [
                 'task_type' => $taskType,
@@ -1167,6 +1182,26 @@ trait ProjectParticipantsTrait
     {
         try {
             $currentUser = Auth::user();
+
+            // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
+            $allowedRoles = [
+                'company_manager',
+                'project_manager',
+                'operations_manager',
+                'general_reviewer',
+                'operation_assistant',
+                'coordination_department_manager',
+                'coordination_team_leader',
+                'coordination-team-employee'
+            ];
+            $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+            if (!$hasPermission) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مسموح لك بعرض تعديلات المهام'
+                ], 403);
+            }
 
             // تحديد الحقل المناسب
             $taskField = $taskType === 'regular' ? 'task_user_id' : 'template_task_user_id';
@@ -1194,7 +1229,7 @@ trait ProjectParticipantsTrait
                 )
                 ->orderBy('task_revisions.created_at', 'desc')
                 ->get()
-                ->map(function($revision) {
+                ->map(function ($revision) {
                     return [
                         'id' => $revision->id,
                         'title' => $revision->title,
@@ -1218,7 +1253,6 @@ trait ProjectParticipantsTrait
                 'revisions' => $revisions,
                 'total' => $revisions->count()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching task revisions', [
                 'task_type' => $taskType,
@@ -1235,7 +1269,7 @@ trait ProjectParticipantsTrait
 
     private function getErrorCategoryText($category)
     {
-        return match($category) {
+        return match ($category) {
             'quality' => 'جودة',
             'deadline' => 'موعد نهائي',
             'communication' => 'تواصل',
@@ -1248,7 +1282,7 @@ trait ProjectParticipantsTrait
 
     private function getRevisionStatusText($status)
     {
-        return match($status) {
+        return match ($status) {
             'new' => 'جديد',
             'in_progress' => 'جاري العمل',
             'paused' => 'متوقف',
@@ -1293,5 +1327,4 @@ trait ProjectParticipantsTrait
 
         return implode(' ', $parts);
     }
-
 }

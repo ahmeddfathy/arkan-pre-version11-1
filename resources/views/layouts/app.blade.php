@@ -141,29 +141,37 @@
                     <span>فترة التحضير للمشاريع</span>
                 </a>
             </li>
+            @if(Auth::user()->hasRole(['project_manager', 'operations_manager', 'operation_assistant', 'technical_support']))
             <li>
                 <a href="{{ route('projects.pause.index') }}" class="{{ request()->routeIs('projects.pause.*') ? 'active' : '' }}">
                     <i class="fas fa-pause-circle"></i>
                     <span>إدارة توقيف المشاريع</span>
                 </a>
             </li>
+            @endif
+            @if(Auth::user()->hasRole(['technical_support', 'customer_service_team_leader', 'sales_employee', 'customer_service_department_manager']))
             <li>
                 <a href="{{ route('projects.deliveries.index') }}" class="{{ request()->routeIs('projects.deliveries.*') ? 'active' : '' }}">
                     <i class="fas fa-shipping-fast"></i>
                     <span>إدارة تسليمات المشاريع (خدمة العملاء)</span>
                 </a>
             </li>
+            @endif
+            @if(Auth::user()->hasRole(['operation_assistant', 'operations_manager', 'project_manager', 'company_manager', 'hr', 'general_reviewer']))
             <li>
                 <a href="{{ route('projects.client-deliveries') }}" class="{{ request()->routeIs('projects.client-deliveries') ? 'active' : '' }}">
                     <i class="fas fa-handshake"></i>
                     <span>للفريق التنفيذي (مواعيد التسليم مع العملاء)</span>
                 </a>
             </li>
+            @endif
+            @if(Auth::user()->hasRole(['coordination-team-employee', 'coordination_team_leader', 'coordination_department_manager', 'general_reviewer']))
             <li>
                 <a href="{{ route('projects.internal-delivery.index') }}" class="{{ request()->routeIs('projects.internal-delivery.*') ? 'active' : '' }}">
                     <span>التسليم الداخلي للمشاريع</span>
                 </a>
             </li>
+            @endif
             @if(Auth::user()->hasRole('hr'))
             <li>
                 <a href="{{ route('project-fields.index') }}" class="{{ request()->routeIs('project-fields.*') ? 'active' : '' }}">
@@ -272,12 +280,17 @@
                     <span>كل المهام الإضافية</span>
                 </a>
             </li>
+            @php
+            $userHierarchyLevelForTasks = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
+            @endphp
+            @if($userHierarchyLevelForTasks !== null && $userHierarchyLevelForTasks >= 3)
             <li>
                 <a href="{{ route('additional-tasks.create') }}" class="{{ request()->routeIs('additional-tasks.create') ? 'active' : '' }}">
                     <i class="fas fa-plus-circle"></i>
                     <span>إضافة مهمة إضافية</span>
                 </a>
             </li>
+            @endif
             <li>
                 <a href="{{ route('additional-tasks.user-tasks') }}" class="{{ request()->routeIs('additional-tasks.user-tasks') ? 'active' : '' }}">
                     <i class="fas fa-user-check"></i>
@@ -382,18 +395,32 @@
 
 
 
+        <!-- سجل تقييمات KPI - متاح للجميع -->
+        <div class="sidebar-category">📊 تقييمات KPI والأداء</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ route('kpi-evaluation.index') }}" class="{{ request()->routeIs('kpi-evaluation.index') ? 'active' : '' }}">
+                    <i class="fas fa-list-alt"></i>
+                    <span>سجل تقييمات KPI</span>
+                </a>
+            </li>
+        </ul>
+
         <!-- النظام الديناميكي لإدارة التقييمات -->
         @php
-        $canAccessDynamicEvaluation = Auth::user()->hasRole('hr') ||
-        Auth::user()->hasRole(['technical_team_leader', 'technical_department_manager',
-        'marketing_team_leader', 'marketing_department_manager',
-        'customer_service_team_leader', 'customer_service_department_manager',
-        'coordination_team_leader', 'coordination_department_manager',
-        'project_manager']);
+        // التحقق من جميع الأدوار التي يمتلكها المستخدم
+        $userRoles = Auth::user()->roles->pluck('id')->toArray();
+        // التحقق من وجود mappings في RoleEvaluationMapping حيث can_evaluate = true لأي من أدوار المستخدم
+        $canAccessDynamicEvaluation = false;
+        if (!empty($userRoles)) {
+        $canAccessDynamicEvaluation = \App\Models\RoleEvaluationMapping::whereIn('evaluator_role_id', $userRoles)
+        ->where('can_evaluate', true)
+        ->exists();
+        }
         @endphp
 
         @if($canAccessDynamicEvaluation)
-        <div class="sidebar-category">📊 تقييمات KPI والأداء</div>
+        <div class="sidebar-category">إدارة تقييمات KPI</div>
         <ul class="sidebar-menu">
             <li>
                 <a href="{{ route('kpi-evaluation.create') }}" class="{{ request()->routeIs('kpi-evaluation.create') ? 'active' : '' }}">
@@ -401,13 +428,7 @@
                     <span>تقييم KPI للموظفين</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ route('kpi-evaluation.index') }}" class="{{ request()->routeIs('kpi-evaluation.index') ? 'active' : '' }}">
-                    <i class="fas fa-list-alt"></i>
-                    <span>سجل تقييمات KPI</span>
-                </a>
-            </li>
-            @if(Auth::user()->hasRole('hr'))
+            @if(Auth::user()->hasAnyRole(['hr', 'project_manager', 'company_manager']))
             <li>
                 <a href="{{ route('evaluation-criteria.index') }}" class="{{ request()->routeIs('evaluation-criteria.*') ? 'active' : '' }}">
                     <i class="fas fa-list-check"></i>

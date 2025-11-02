@@ -27,21 +27,21 @@
     </div>
 
     @if($errors->any())
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div class="error-content">
-                <h4>يرجى تصحيح الأخطاء التالية:</h4>
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+    <div class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="error-content">
+            <h4>يرجى تصحيح الأخطاء التالية:</h4>
+            <ul>
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
+    </div>
     @endif
 
     <div class="form-container">
-        <form action="{{ route('clients.update', $client) }}" method="POST" class="client-form">
+        <form action="{{ route('clients.update', $client) }}" method="POST" enctype="multipart/form-data" class="client-form">
             @csrf
             @method('PUT')
 
@@ -66,10 +66,9 @@
                             class="form-input {{ $errors->has('name') ? 'error' : '' }}"
                             value="{{ old('name', $client->name) }}"
                             placeholder="أدخل اسم العميل"
-                            required
-                        >
+                            required>
                         @error('name')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -84,10 +83,42 @@
                             name="company_name"
                             class="form-input {{ $errors->has('company_name') ? 'error' : '' }}"
                             value="{{ old('company_name', $client->company_name) }}"
-                            placeholder="أدخل اسم الشركة (اختياري)"
-                        >
+                            placeholder="أدخل اسم الشركة (اختياري)">
                         @error('company_name')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logo" class="form-label">
+                            <i class="fas fa-image"></i>
+                            لوجو العميل
+                        </label>
+                        <div class="logo-upload-wrapper">
+                            @if($client->logo)
+                            <div class="current-logo-container mb-3">
+                                <strong>اللوجو الحالي:</strong>
+                                <img src="{{ asset('storage/' . $client->logo) }}" alt="Current Logo" style="max-width: 150px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 10px; display: block;">
+                            </div>
+                            @endif
+                            <div class="logo-preview-container" id="logoPreviewContainer" style="display: none;">
+                                <strong>اللوجو الجديد:</strong>
+                                <img id="logoPreview" src="" alt="Logo Preview" style="max-width: 150px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 10px; display: block;">
+                            </div>
+                            <input
+                                type="file"
+                                id="logo"
+                                name="logo"
+                                accept="image/*"
+                                class="form-input {{ $errors->has('logo') ? 'error' : '' }}"
+                                onchange="previewLogo(this)">
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            الصيغ المدعومة: JPG, PNG, GIF, WEBP - الحد الأقصى: 2MB
+                        </small>
+                        @error('logo')
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -99,8 +130,7 @@
                         <select
                             id="source"
                             name="source"
-                            class="form-input {{ $errors->has('source') ? 'error' : '' }}"
-                        >
+                            class="form-input {{ $errors->has('source') ? 'error' : '' }}">
                             <option value="">اختر مصدر العميل</option>
                             <option value="مكالمة هاتفية" {{ old('source', $client->source) == 'مكالمة هاتفية' ? 'selected' : '' }}>مكالمة هاتفية</option>
                             <option value="بريد إلكتروني" {{ old('source', $client->source) == 'بريد إلكتروني' ? 'selected' : '' }}>بريد إلكتروني</option>
@@ -111,7 +141,7 @@
                             <option value="آخر" {{ old('source', $client->source) == 'آخر' ? 'selected' : '' }}>آخر</option>
                         </select>
                         @error('source')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -133,51 +163,48 @@
                         </label>
                         <div class="dynamic-inputs" id="interests-container">
                             @if(old('interests'))
-                                @foreach(old('interests') as $index => $interest)
-                                    @if($interest)
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                name="interests[]"
-                                                class="form-input interest-input"
-                                                placeholder="أدخل اهتمام العميل"
-                                                value="{{ $interest }}"
-                                            >
-                                            <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    @endif
-                                @endforeach
+                            @foreach(old('interests') as $index => $interest)
+                            @if($interest)
+                            <div class="input-group">
+                                <input
+                                    type="text"
+                                    name="interests[]"
+                                    class="form-input interest-input"
+                                    placeholder="أدخل اهتمام العميل"
+                                    value="{{ $interest }}">
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            @endif
+                            @endforeach
                             @elseif(is_array($client->interests) && count($client->interests) > 0)
-                                @foreach($client->interests as $index => $interest)
-                                    @if($interest)
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                name="interests[]"
-                                                class="form-input interest-input"
-                                                placeholder="أدخل اهتمام العميل"
-                                                value="{{ $interest }}"
-                                            >
-                                            <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    @endif
-                                @endforeach
+                            @foreach($client->interests as $index => $interest)
+                            @if($interest)
+                            <div class="input-group">
+                                <input
+                                    type="text"
+                                    name="interests[]"
+                                    class="form-input interest-input"
+                                    placeholder="أدخل اهتمام العميل"
+                                    value="{{ $interest }}">
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            @endif
+                            @endforeach
                             @else
-                                <div class="input-group">
-                                    <input
-                                        type="text"
-                                        name="interests[]"
-                                        class="form-input interest-input"
-                                        placeholder="أدخل اهتمام العميل (مثال: تطوير المواقع)"
-                                    >
-                                    <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                            <div class="input-group">
+                                <input
+                                    type="text"
+                                    name="interests[]"
+                                    class="form-input interest-input"
+                                    placeholder="أدخل اهتمام العميل (مثال: تطوير المواقع)">
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                             @endif
                         </div>
                         <button type="button" class="btn-add-input" onclick="addInterestInput()">
@@ -185,10 +212,10 @@
                             إضافة اهتمام آخر
                         </button>
                         @error('interests')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                         @error('interests.*')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -210,50 +237,47 @@
                         </label>
                         <div class="dynamic-inputs" id="emails-container">
                             @if(old('emails'))
-                                @foreach(old('emails') as $index => $email)
-                                    <div class="input-group">
-                                        <input
-                                            type="email"
-                                            name="emails[]"
-                                            class="form-input email-input"
-                                            placeholder="أدخل البريد الإلكتروني"
-                                            value="{{ $email }}"
-                                            required
-                                        >
-                                        <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                @endforeach
+                            @foreach(old('emails') as $index => $email)
+                            <div class="input-group">
+                                <input
+                                    type="email"
+                                    name="emails[]"
+                                    class="form-input email-input"
+                                    placeholder="أدخل البريد الإلكتروني"
+                                    value="{{ $email }}"
+                                    required>
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            @endforeach
                             @elseif(is_array($client->emails) && count($client->emails) > 0)
-                                @foreach($client->emails as $index => $email)
-                                    <div class="input-group">
-                                        <input
-                                            type="email"
-                                            name="emails[]"
-                                            class="form-input email-input"
-                                            placeholder="أدخل البريد الإلكتروني"
-                                            value="{{ $email }}"
-                                            required
-                                        >
-                                        <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                @endforeach
+                            @foreach($client->emails as $index => $email)
+                            <div class="input-group">
+                                <input
+                                    type="email"
+                                    name="emails[]"
+                                    class="form-input email-input"
+                                    placeholder="أدخل البريد الإلكتروني"
+                                    value="{{ $email }}"
+                                    required>
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            @endforeach
                             @else
-                                <div class="input-group">
-                                    <input
-                                        type="email"
-                                        name="emails[]"
-                                        class="form-input email-input"
-                                        placeholder="أدخل البريد الإلكتروني"
-                                        required
-                                    >
-                                    <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                            <div class="input-group">
+                                <input
+                                    type="email"
+                                    name="emails[]"
+                                    class="form-input email-input"
+                                    placeholder="أدخل البريد الإلكتروني"
+                                    required>
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                             @endif
                         </div>
                         <button type="button" class="btn-add-input" onclick="addEmailInput()">
@@ -261,10 +285,10 @@
                             إضافة إيميل آخر
                         </button>
                         @error('emails')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                         @error('emails.*')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -275,50 +299,47 @@
                         </label>
                         <div class="dynamic-inputs" id="phones-container">
                             @if(old('phones'))
-                                @foreach(old('phones') as $index => $phone)
-                                    <div class="input-group">
-                                        <input
-                                            type="tel"
-                                            name="phones[]"
-                                            class="form-input phone-input"
-                                            placeholder="أدخل رقم الهاتف"
-                                            value="{{ $phone }}"
-                                            required
-                                        >
-                                        <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                @endforeach
+                            @foreach(old('phones') as $index => $phone)
+                            <div class="input-group">
+                                <input
+                                    type="tel"
+                                    name="phones[]"
+                                    class="form-input phone-input"
+                                    placeholder="أدخل رقم الهاتف"
+                                    value="{{ $phone }}"
+                                    required>
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            @endforeach
                             @elseif(is_array($client->phones) && count($client->phones) > 0)
-                                @foreach($client->phones as $index => $phone)
-                                    <div class="input-group">
-                                        <input
-                                            type="tel"
-                                            name="phones[]"
-                                            class="form-input phone-input"
-                                            placeholder="أدخل رقم الهاتف"
-                                            value="{{ $phone }}"
-                                            required
-                                        >
-                                        <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                @endforeach
+                            @foreach($client->phones as $index => $phone)
+                            <div class="input-group">
+                                <input
+                                    type="tel"
+                                    name="phones[]"
+                                    class="form-input phone-input"
+                                    placeholder="أدخل رقم الهاتف"
+                                    value="{{ $phone }}"
+                                    required>
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="{{ $index === 0 ? 'display: none;' : '' }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            @endforeach
                             @else
-                                <div class="input-group">
-                                    <input
-                                        type="tel"
-                                        name="phones[]"
-                                        class="form-input phone-input"
-                                        placeholder="أدخل رقم الهاتف"
-                                        required
-                                    >
-                                    <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                            <div class="input-group">
+                                <input
+                                    type="tel"
+                                    name="phones[]"
+                                    class="form-input phone-input"
+                                    placeholder="أدخل رقم الهاتف"
+                                    required>
+                                <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                             @endif
                         </div>
                         <button type="button" class="btn-add-input" onclick="addPhoneInput()">
@@ -326,10 +347,10 @@
                             إضافة رقم آخر
                         </button>
                         @error('phones')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                         @error('phones.*')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -366,7 +387,10 @@
                 // Scroll to first error
                 const firstError = form.querySelector('.error');
                 if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
                     firstError.focus();
                 }
             }
@@ -599,6 +623,25 @@
         });
 
         return isFormValid;
+    }
+
+    // Preview logo before upload
+    function previewLogo(input) {
+        const previewContainer = document.getElementById('logoPreviewContainer');
+        const previewImg = document.getElementById('logoPreview');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewContainer.style.display = 'block';
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+        }
     }
 </script>
 @endpush

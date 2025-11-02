@@ -10,7 +10,11 @@
     <div class="client-page-header">
         <div class="client-avatar-section">
             <div class="avatar-circle">
-                {{ strtoupper(substr($client->name, 0, 2)) }}
+                @if($client->logo)
+                    <img src="{{ asset('storage/' . $client->logo) }}" alt="{{ $client->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                @else
+                    {{ strtoupper(substr($client->name, 0, 2)) }}
+                @endif
             </div>
             <div class="client-header-info">
                 <h2>{{ $client->name }}</h2>

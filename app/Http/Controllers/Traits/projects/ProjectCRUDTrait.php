@@ -367,6 +367,14 @@ trait ProjectCRUDTrait
     public function preparationPeriod()
     {
         try {
+            $user = Auth::user();
+
+            // الأدوار المحظورة من الوصول للصفحة
+            $restrictedRoles = ['graphic-designer', 'programmer', 'Translator'];
+            if ($this->roleCheckService->userHasRole($restrictedRoles)) {
+                abort(403, 'غير مسموح لك بالوصول إلى هذه الصفحة');
+            }
+
             // تسجيل نشاط دخول صفحة المشاريع في فترة التحضير
             if (Auth::check()) {
                 activity()
@@ -471,7 +479,14 @@ trait ProjectCRUDTrait
 
             $projects = $query->paginate(20)->appends(request()->query());
 
-            return view('projects.preparation-period', compact('projects'));
+            // جلب IDs المشاريع التي المستخدم مشارك فيها
+            $userParticipatedProjectIds = DB::table('project_service_user')
+                ->where('user_id', $user->id)
+                ->distinct()
+                ->pluck('project_id')
+                ->toArray();
+
+            return view('projects.preparation-period', compact('projects', 'userParticipatedProjectIds'));
         } catch (\Exception $e) {
             Log::error('Error in preparation period page', [
                 'error' => $e->getMessage(),
@@ -488,6 +503,26 @@ trait ProjectCRUDTrait
     public function getProjectsListForPreparation(Request $request)
     {
         try {
+            $user = Auth::user();
+
+            // فقط الأدوار المحددة يمكنها جلب قائمة المشاريع لإضافتها لفترة التحضير
+            $allowedRoles = [
+                'operation_assistant',
+                'operations_manager',
+                'project_manager',
+                'sales_employee',
+                'customer_service_department_manager',
+                'customer_service_team_leader'
+            ];
+            $canAdd = $this->roleCheckService->userHasRole($allowedRoles);
+
+            if (!$canAdd) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'غير مسموح لك بالوصول إلى هذه البيانات'
+                ], 403);
+            }
+
             $search = $request->input('search', '');
 
             // جلب المشاريع التي لديها عملاء فقط
@@ -537,6 +572,23 @@ trait ProjectCRUDTrait
     public function addPreparationPeriod(Request $request)
     {
         try {
+            $user = Auth::user();
+
+            // فقط الأدوار المحددة يمكنها إضافة مشروع لفترة التحضير
+            $allowedRoles = [
+                'operation_assistant',
+                'operations_manager',
+                'project_manager',
+                'sales_employee',
+                'customer_service_department_manager',
+                'customer_service_team_leader'
+            ];
+            $canAdd = $this->roleCheckService->userHasRole($allowedRoles);
+
+            if (!$canAdd) {
+                abort(403, 'غير مسموح لك بإضافة مشاريع لفترة التحضير');
+            }
+
             // التحقق من صحة البيانات
             $validated = $request->validate([
                 'project_id' => 'required|exists:projects,id',
@@ -614,6 +666,20 @@ trait ProjectCRUDTrait
      */
     public function clientDeliveries(Request $request)
     {
+        // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
+        $allowedRoles = [
+            'operation_assistant',
+            'operations_manager',
+            'project_manager',
+            'company_manager',
+            'hr',
+            'general_reviewer'
+        ];
+
+        if (!$this->roleCheckService->userHasRole($allowedRoles)) {
+            abort(403, 'غير مسموح لك بالوصول إلى هذه الصفحة');
+        }
+
         try {
             // تسجيل النشاط
             activity()
@@ -785,12 +851,22 @@ trait ProjectCRUDTrait
     {
         try {
             $user = Auth::user();
-            // Check if user is admin using RoleCheckService
-            $isAdmin = $this->roleCheckService->userHasRole(['hr', 'company_manager', 'project_manager', 'sales_employee', 'operation_assistant']);
+            // الأدوار التي يمكنها رؤية جميع المشاريع
+            $canViewAllProjects = $this->roleCheckService->userHasRole([
+                'company_manager',
+                'project_manager',
+                'operations_manager',
+                'general_reviewer',
+                'operation_assistant',
+                'coordination_department_manager',
+                'coordination_team_leader',
+                'coordination-team-employee'
+            ]);
 
             $projectsQuery = Project::with(['client', 'services']);
 
-            if (!$isAdmin) {
+            if (!$canViewAllProjects) {
+                // المستخدمون الآخرون يرون فقط المشاريع التي هم مشاركين فيها
                 $userProjectIds = DB::table('project_service_user')
                     ->where('user_id', $user->id)
                     ->pluck('project_id')

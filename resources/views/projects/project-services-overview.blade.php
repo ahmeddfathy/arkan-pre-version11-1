@@ -161,6 +161,7 @@
                         data-has-revisions="{{ $hasRevisions ? '1' : '0' }}">
                         <td>
                             <div class="project-info">
+                                @if(Auth::user()->hasRole(['company_manager', 'project_manager', 'operations_manager', 'general_reviewer', 'operation_assistant', 'coordination_department_manager', 'coordination_team_leader', 'coordination-team-employee']))
                                 <button class="project-details-btn"
                                     data-project-id="{{ $project->id }}"
                                     data-project-name="{{ $project->name }}"
@@ -168,6 +169,7 @@
                                     title="عرض تفاصيل المشروع">
                                     <i class="fas fa-info-circle"></i>
                                 </button>
+                                @endif
                                 <div class="project-avatar">
                                     <i class="fas fa-project-diagram"></i>
                                 </div>
@@ -422,6 +424,7 @@
                                     <span style="font-weight: 600; color: #3b82f6;">
                                         {{ $progressPercentage }}%
                                     </span>
+                                    @if(Auth::user()->hasRole(['company_manager', 'project_manager', 'operations_manager', 'general_reviewer', 'operation_assistant', 'coordination_department_manager', 'coordination_team_leader', 'coordination-team-employee']))
                                     <button class="services-btn" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;"
                                         data-project-id="{{ $project->id }}"
                                         data-project-name="{{ $project->name }}"
@@ -429,6 +432,7 @@
                                         <i class="fas fa-list"></i>
                                         تفاصيل
                                     </button>
+                                    @endif
                                 </div>
 
                                 @php

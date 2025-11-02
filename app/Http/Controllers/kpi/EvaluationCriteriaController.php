@@ -7,10 +7,25 @@ use App\Http\Controllers\Controller;
 use App\Models\EvaluationCriteria;
 use App\Models\RoleEvaluationMapping;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 
 
 class EvaluationCriteriaController extends Controller
 {
+    /**
+     * تقييد إدارة بنود التقييم على HR و project_manager و company_manager فقط
+     */
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $user = Auth::user();
+            if (!$user || !$user->hasAnyRole(['hr', 'project_manager', 'company_manager'])) {
+                abort(403, 'غير مصرح لك بالوصول إلى إدارة بنود التقييم. يجب أن تكون لديك صلاحية HR أو Project Manager أو Company Manager.');
+            }
+            return $next($request);
+        });
+    }
+
     /**
      * عرض قائمة البنود
      */
@@ -34,7 +49,7 @@ class EvaluationCriteriaController extends Controller
             ->toArray();
 
         // إضافة عدد البنود لكل دور
-        $roles = $roles->map(function($role) use ($roleCriteriaCounts) {
+        $roles = $roles->map(function ($role) use ($roleCriteriaCounts) {
             $role->criteria_count = $roleCriteriaCounts[$role->id] ?? 0;
             return $role;
         });
@@ -81,7 +96,7 @@ class EvaluationCriteriaController extends Controller
         }
 
         // إضافة معلومات الأقسام لكل دور
-        $roles = $roles->map(function($role) {
+        $roles = $roles->map(function ($role) {
             $departmentRoles = \App\Models\DepartmentRole::where('role_id', $role->id)
                 ->get();
 

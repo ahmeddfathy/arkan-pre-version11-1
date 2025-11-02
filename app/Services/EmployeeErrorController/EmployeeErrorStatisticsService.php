@@ -9,6 +9,13 @@ use Carbon\Carbon;
 
 class EmployeeErrorStatisticsService
 {
+    protected $filterService;
+
+    public function __construct(EmployeeErrorFilterService $filterService)
+    {
+        $this->filterService = $filterService;
+    }
+
     /**
      * الحصول على إحصائيات أخطاء موظف
      */
@@ -95,16 +102,16 @@ class EmployeeErrorStatisticsService
     private function getTopUsersWithErrors($errors, $limit = 10)
     {
         return $errors->groupBy('user_id')
-                     ->map(function ($userErrors) {
-                         return [
-                             'user' => $userErrors->first()->user,
-                             'total' => $userErrors->count(),
-                             'critical' => $userErrors->where('error_type', 'critical')->count(),
-                         ];
-                     })
-                     ->sortByDesc('total')
-                     ->take($limit)
-                     ->values();
+            ->map(function ($userErrors) {
+                return [
+                    'user' => $userErrors->first()->user,
+                    'total' => $userErrors->count(),
+                    'critical' => $userErrors->where('error_type', 'critical')->count(),
+                ];
+            })
+            ->sortByDesc('total')
+            ->take($limit)
+            ->values();
     }
 
     /**
@@ -113,9 +120,11 @@ class EmployeeErrorStatisticsService
     private function getTopEmployeesWithErrors($reporterId, $limit = 10)
     {
         return EmployeeError::where('reported_by', $reporterId)
-            ->select('user_id',
+            ->select(
+                'user_id',
                 DB::raw('COUNT(*) as total_errors'),
-                DB::raw('SUM(CASE WHEN error_type = "critical" THEN 1 ELSE 0 END) as critical_errors'))
+                DB::raw('SUM(CASE WHEN error_type = "critical" THEN 1 ELSE 0 END) as critical_errors')
+            )
             ->groupBy('user_id')
             ->orderByDesc('total_errors')
             ->limit($limit)
@@ -216,9 +225,11 @@ class EmployeeErrorStatisticsService
     public function getDepartmentComparison(): array
     {
         return EmployeeError::join('users', 'employee_errors.user_id', '=', 'users.id')
-            ->select('users.department',
+            ->select(
+                'users.department',
                 DB::raw('COUNT(*) as total_errors'),
-                DB::raw('SUM(CASE WHEN error_type = "critical" THEN 1 ELSE 0 END) as critical_errors'))
+                DB::raw('SUM(CASE WHEN error_type = "critical" THEN 1 ELSE 0 END) as critical_errors')
+            )
             ->groupBy('users.department')
             ->orderByDesc('total_errors')
             ->get()
@@ -234,7 +245,7 @@ class EmployeeErrorStatisticsService
         $year = $year ?? Carbon::now()->year;
 
         $errors = EmployeeError::whereMonth('created_at', $month)
-                              ->whereYear('created_at', $year);
+            ->whereYear('created_at', $year);
 
         return [
             'total_errors' => $errors->count(),
@@ -262,45 +273,150 @@ class EmployeeErrorStatisticsService
     }
 
     /**
-     * جلب الإحصائيات حسب الدور
+     * جلب إحصائيات "أخطائي" (الأخطاء المسجلة على المستخدم الحالي) مع تطبيق الفلاتر
      */
-    public function getStatsBasedOnRole(User $user): array
+    public function getMyErrorsStats(User $user, array $filters = []): array
+    {
+        // بناء استعلام لأخطاء المستخدم الحالي فقط
+        $query = EmployeeError::where('user_id', $user->id);
+        $query = $this->filterService->applyFilters($query, $filters);
+
+        return [
+            'total_errors' => (clone $query)->count(),
+            'critical_errors' => (clone $query)->where('error_type', 'critical')->count(),
+            'normal_errors' => (clone $query)->where('error_type', 'normal')->count(),
+            'by_category' => [
+                'quality' => (clone $query)->where('error_category', 'quality')->count(),
+                'deadline' => (clone $query)->where('error_category', 'deadline')->count(),
+                'communication' => (clone $query)->where('error_category', 'communication')->count(),
+                'technical' => (clone $query)->where('error_category', 'technical')->count(),
+                'procedural' => (clone $query)->where('error_category', 'procedural')->count(),
+                'other' => (clone $query)->where('error_category', 'other')->count(),
+            ]
+        ];
+    }
+
+    /**
+     * جلب إحصائيات "جميع الأخطاء" (للمديرين) مع تطبيق الفلاتر
+     */
+    public function getAllErrorsStats(array $filters = []): array
+    {
+        // بناء استعلام لكل الأخطاء
+        $query = EmployeeError::query();
+        $query = $this->filterService->applyFilters($query, $filters);
+
+        return [
+            'total_errors' => (clone $query)->count(),
+            'critical_errors' => (clone $query)->where('error_type', 'critical')->count(),
+            'normal_errors' => (clone $query)->where('error_type', 'normal')->count(),
+            'by_category' => [
+                'quality' => (clone $query)->where('error_category', 'quality')->count(),
+                'deadline' => (clone $query)->where('error_category', 'deadline')->count(),
+                'communication' => (clone $query)->where('error_category', 'communication')->count(),
+                'technical' => (clone $query)->where('error_category', 'technical')->count(),
+                'procedural' => (clone $query)->where('error_category', 'procedural')->count(),
+                'other' => (clone $query)->where('error_category', 'other')->count(),
+            ]
+        ];
+    }
+
+    /**
+     * جلب إحصائيات "الأخطاء التي أضفتها" مع تطبيق الفلاتر
+     */
+    public function getReportedErrorsStats(User $user, array $filters = []): array
+    {
+        // بناء استعلام للأخطاء التي سجلها المستخدم
+        $query = EmployeeError::where('reported_by', $user->id);
+        $query = $this->filterService->applyFilters($query, $filters);
+
+        return [
+            'total_errors' => (clone $query)->count(),
+            'critical_errors' => (clone $query)->where('error_type', 'critical')->count(),
+            'normal_errors' => (clone $query)->where('error_type', 'normal')->count(),
+            'by_category' => [
+                'quality' => (clone $query)->where('error_category', 'quality')->count(),
+                'deadline' => (clone $query)->where('error_category', 'deadline')->count(),
+                'communication' => (clone $query)->where('error_category', 'communication')->count(),
+                'technical' => (clone $query)->where('error_category', 'technical')->count(),
+                'procedural' => (clone $query)->where('error_category', 'procedural')->count(),
+                'other' => (clone $query)->where('error_category', 'other')->count(),
+            ]
+        ];
+    }
+
+    /**
+     * جلب إحصائيات "الأخطاء الجوهرية" (متاح للجميع) مع تطبيق الفلاتر
+     */
+    public function getCriticalErrorsStats(array $filters = []): array
+    {
+        // بناء استعلام للأخطاء الجوهرية فقط
+        $query = EmployeeError::where('error_type', 'critical');
+        $query = $this->filterService->applyFilters($query, $filters);
+
+        return [
+            'total_errors' => (clone $query)->count(),
+            'critical_errors' => (clone $query)->count(), // كلهم جوهرية
+            'normal_errors' => 0, // مفيش عادية لأن الفلتر على الجوهرية فقط
+            'by_category' => [
+                'quality' => (clone $query)->where('error_category', 'quality')->count(),
+                'deadline' => (clone $query)->where('error_category', 'deadline')->count(),
+                'communication' => (clone $query)->where('error_category', 'communication')->count(),
+                'technical' => (clone $query)->where('error_category', 'technical')->count(),
+                'procedural' => (clone $query)->where('error_category', 'procedural')->count(),
+                'other' => (clone $query)->where('error_category', 'other')->count(),
+            ]
+        ];
+    }
+
+    /**
+     * جلب الإحصائيات حسب الدور مع تطبيق جميع الفلاتر
+     */
+    public function getStatsBasedOnRole(User $user, array $filters = []): array
     {
         $globalLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
         $departmentLevel = \App\Models\DepartmentRole::getUserDepartmentHierarchyLevel($user);
 
         // إذا كان مدير
-        if ($user->hasRole(['admin', 'super-admin', 'hr', 'project_manager']) ||
+        if (
+            $user->hasRole(['admin', 'super-admin', 'hr', 'project_manager']) ||
             ($globalLevel && $globalLevel >= 2) ||
-            ($departmentLevel && $departmentLevel >= 2)) {
+            ($departmentLevel && $departmentLevel >= 2)
+        ) {
+
+            // بناء الاستعلام الأساسي مع تطبيق جميع الفلاتر
+            $query = EmployeeError::query();
+            $query = $this->filterService->applyFilters($query, $filters);
 
             return [
-                'total_errors' => EmployeeError::count(),
-                'critical_errors' => EmployeeError::where('error_type', 'critical')->count(),
-                'normal_errors' => EmployeeError::where('error_type', 'normal')->count(),
+                'total_errors' => (clone $query)->count(),
+                'critical_errors' => (clone $query)->where('error_type', 'critical')->count(),
+                'normal_errors' => (clone $query)->where('error_type', 'normal')->count(),
                 'by_category' => [
-                    'quality' => EmployeeError::where('error_category', 'quality')->count(),
-                    'deadline' => EmployeeError::where('error_category', 'deadline')->count(),
-                    'communication' => EmployeeError::where('error_category', 'communication')->count(),
-                    'technical' => EmployeeError::where('error_category', 'technical')->count(),
-                    'procedural' => EmployeeError::where('error_category', 'procedural')->count(),
-                    'other' => EmployeeError::where('error_category', 'other')->count(),
+                    'quality' => (clone $query)->where('error_category', 'quality')->count(),
+                    'deadline' => (clone $query)->where('error_category', 'deadline')->count(),
+                    'communication' => (clone $query)->where('error_category', 'communication')->count(),
+                    'technical' => (clone $query)->where('error_category', 'technical')->count(),
+                    'procedural' => (clone $query)->where('error_category', 'procedural')->count(),
+                    'other' => (clone $query)->where('error_category', 'other')->count(),
                 ]
             ];
         }
 
-        // إذا كان موظف عادي
+        // إذا كان موظف عادي - تطبيق جميع الفلاتر
+        $query = EmployeeError::where('user_id', $user->id);
+        $query = $this->filterService->applyFilters($query, $filters);
+
         return [
-            'total_errors' => EmployeeError::where('user_id', $user->id)->count(),
-            'critical_errors' => EmployeeError::where('user_id', $user->id)->where('error_type', 'critical')->count(),
-            'normal_errors' => EmployeeError::where('user_id', $user->id)->where('error_type', 'normal')->count(),
+            'total_errors' => (clone $query)->count(),
+            'critical_errors' => (clone $query)->where('error_type', 'critical')->count(),
+            'normal_errors' => (clone $query)->where('error_type', 'normal')->count(),
             'by_category' => [
-                'quality' => EmployeeError::where('user_id', $user->id)->where('error_category', 'quality')->count(),
-                'deadline' => EmployeeError::where('user_id', $user->id)->where('error_category', 'deadline')->count(),
-                'communication' => EmployeeError::where('user_id', $user->id)->where('error_category', 'communication')->count(),
-                'technical' => EmployeeError::where('user_id', $user->id)->where('error_category', 'technical')->count(),
-                'procedural' => EmployeeError::where('user_id', $user->id)->where('error_category', 'procedural')->count(),
-                'other' => EmployeeError::where('user_id', $user->id)->where('error_category', 'other')->count(),
+                'quality' => (clone $query)->where('error_category', 'quality')->count(),
+                'deadline' => (clone $query)->where('error_category', 'deadline')->count(),
+                'communication' => (clone $query)->where('error_category', 'communication')->count(),
+                'technical' => (clone $query)->where('error_category', 'technical')->count(),
+                'procedural' => (clone $query)->where('error_category', 'procedural')->count(),
+                'other' => (clone $query)->where('error_category', 'other')->count(),
             ]
         ];
     }
@@ -375,4 +491,3 @@ class EmployeeErrorStatisticsService
             ->values();
     }
 }
-

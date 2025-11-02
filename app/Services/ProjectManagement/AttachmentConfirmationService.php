@@ -460,7 +460,7 @@ class AttachmentConfirmationService
 
         // المستويات الأقل - المشاريع التي المستخدم مسؤول عنها
         return Project::where('manager', $user->name)
-            ->orWhereHas('users', function($query) use ($user) {
+            ->orWhereHas('participants', function($query) use ($user) {
                 $query->where('users.id', $user->id);
             })
             ->orderBy('name')

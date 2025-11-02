@@ -21,21 +21,21 @@
     </div>
 
     @if($errors->any())
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div class="error-content">
-                <h4>يرجى تصحيح الأخطاء التالية:</h4>
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+    <div class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="error-content">
+            <h4>يرجى تصحيح الأخطاء التالية:</h4>
+            <ul>
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
+    </div>
     @endif
 
     <div class="form-container">
-        <form action="{{ route('clients.store') }}" method="POST" class="client-form">
+        <form action="{{ route('clients.store') }}" method="POST" enctype="multipart/form-data" class="client-form">
             @csrf
 
             <div class="form-card">
@@ -59,10 +59,9 @@
                             class="form-input {{ $errors->has('name') ? 'error' : '' }}"
                             value="{{ old('name') }}"
                             placeholder="أدخل اسم العميل"
-                            required
-                        >
+                            required>
                         @error('name')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -77,10 +76,35 @@
                             name="company_name"
                             class="form-input {{ $errors->has('company_name') ? 'error' : '' }}"
                             value="{{ old('company_name') }}"
-                            placeholder="أدخل اسم الشركة (اختياري)"
-                        >
+                            placeholder="أدخل اسم الشركة (اختياري)">
                         @error('company_name')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logo" class="form-label">
+                            <i class="fas fa-image"></i>
+                            لوجو العميل
+                        </label>
+                        <div class="logo-upload-wrapper">
+                            <div class="logo-preview-container" id="logoPreviewContainer" style="display: none;">
+                                <img id="logoPreview" src="" alt="Logo Preview" style="max-width: 150px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            </div>
+                            <input
+                                type="file"
+                                id="logo"
+                                name="logo"
+                                accept="image/*"
+                                class="form-input {{ $errors->has('logo') ? 'error' : '' }}"
+                                onchange="previewLogo(this)">
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            الصيغ المدعومة: JPG, PNG, GIF, WEBP - الحد الأقصى: 2MB
+                        </small>
+                        @error('logo')
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -92,8 +116,7 @@
                         <select
                             id="source"
                             name="source"
-                            class="form-input {{ $errors->has('source') ? 'error' : '' }}"
-                        >
+                            class="form-input {{ $errors->has('source') ? 'error' : '' }}">
                             <option value="">اختر مصدر العميل</option>
                             <option value="مكالمة هاتفية" {{ old('source') == 'مكالمة هاتفية' ? 'selected' : '' }}>مكالمة هاتفية</option>
                             <option value="بريد إلكتروني" {{ old('source') == 'بريد إلكتروني' ? 'selected' : '' }}>بريد إلكتروني</option>
@@ -104,7 +127,7 @@
                             <option value="آخر" {{ old('source') == 'آخر' ? 'selected' : '' }}>آخر</option>
                         </select>
                         @error('source')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -121,7 +144,7 @@
                 </div>
 
                 <div class="card-body">
-                                        <div class="form-group">
+                    <div class="form-group">
                         <label for="emails" class="form-label required">
                             <i class="fas fa-envelope"></i>
                             البريد الإلكتروني
@@ -134,8 +157,7 @@
                                     class="form-input email-input"
                                     placeholder="أدخل البريد الإلكتروني"
                                     value="{{ old('emails.0') }}"
-                                    required
-                                >
+                                    required>
                                 <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
                                     <i class="fas fa-times"></i>
                                 </button>
@@ -146,10 +168,10 @@
                             إضافة إيميل آخر
                         </button>
                         @error('emails')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                         @error('emails.*')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -166,8 +188,7 @@
                                     class="form-input phone-input"
                                     placeholder="أدخل رقم الهاتف"
                                     value="{{ old('phones.0') }}"
-                                    required
-                                >
+                                    required>
                                 <button type="button" class="btn-remove-input" onclick="removeInput(this)" style="display: none;">
                                     <i class="fas fa-times"></i>
                                 </button>
@@ -178,10 +199,10 @@
                             إضافة رقم آخر
                         </button>
                         @error('phones')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                         @error('phones.*')
-                            <span class="error-message">{{ $message }}</span>
+                        <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -218,7 +239,10 @@
                 // Scroll to first error
                 const firstError = form.querySelector('.error');
                 if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
                     firstError.focus();
                 }
             }
@@ -437,22 +461,41 @@
 
         return isFormValid;
     }
+
+    // Preview logo before upload
+    function previewLogo(input) {
+        const previewContainer = document.getElementById('logoPreviewContainer');
+        const previewImg = document.getElementById('logoPreview');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewContainer.style.display = 'block';
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    }
 </script>
 
 {{-- Hidden inputs for old data --}}
 @if(old('emails'))
-    @foreach(old('emails') as $index => $email)
-        @if($index > 0)
-            <input type="hidden" name="old_emails[]" value="{{ $email }}">
-        @endif
-    @endforeach
+@foreach(old('emails') as $index => $email)
+@if($index > 0)
+<input type="hidden" name="old_emails[]" value="{{ $email }}">
+@endif
+@endforeach
 @endif
 
 @if(old('phones'))
-    @foreach(old('phones') as $index => $phone)
-        @if($index > 0)
-            <input type="hidden" name="old_phones[]" value="{{ $phone }}">
-        @endif
-    @endforeach
+@foreach(old('phones') as $index => $phone)
+@if($index > 0)
+<input type="hidden" name="old_phones[]" value="{{ $phone }}">
+@endif
+@endforeach
 @endif
 @endpush

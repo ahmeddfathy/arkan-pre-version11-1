@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\ProjectDelivery;
 use App\Models\Client;
 use App\Services\ProjectManagement\ProjectDeliveryService;
+use App\Services\Auth\RoleCheckService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,10 +16,12 @@ use Carbon\Carbon;
 class ProjectDeliveryController extends Controller
 {
     protected $deliveryService;
+    protected $roleCheckService;
 
-    public function __construct(ProjectDeliveryService $deliveryService)
+    public function __construct(ProjectDeliveryService $deliveryService, RoleCheckService $roleCheckService)
     {
         $this->deliveryService = $deliveryService;
+        $this->roleCheckService = $roleCheckService;
     }
 
     /**
@@ -26,6 +29,19 @@ class ProjectDeliveryController extends Controller
      */
     public function index(Request $request)
     {
+        // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
+        $allowedRoles = [
+            'technical_support',
+            'customer_service_team_leader',
+            'sales_employee',
+            'customer_service_department_manager'
+        ];
+        $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+        if (!$hasPermission) {
+            abort(403, 'غير مسموح لك بالوصول إلى هذه الصفحة');
+        }
+
         // تسجيل النشاط
         if (Auth::check()) {
             activity()
@@ -57,7 +73,6 @@ class ProjectDeliveryController extends Controller
         // أنواع التسليم
         $deliveryTypes = ProjectDelivery::getDeliveryTypes();
 
-        // حساب الإحصائيات
         $stats = $this->calculateStats();
 
         return view('projects.deliveries.index', compact(
@@ -75,6 +90,19 @@ class ProjectDeliveryController extends Controller
      */
     public function deliver(Request $request, $projectId)
     {
+        // التحقق من الصلاحيات
+        $allowedRoles = [
+            'technical_support',
+            'customer_service_team_leader',
+            'sales_employee',
+            'customer_service_department_manager'
+        ];
+        $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+        if (!$hasPermission) {
+            abort(403, 'غير مسموح لك بتسليم المشاريع');
+        }
+
         try {
             $request->validate([
                 'delivery_type' => 'required|string',
@@ -117,6 +145,22 @@ class ProjectDeliveryController extends Controller
      */
     public function getDeliveriesHistory($projectId)
     {
+        // التحقق من الصلاحيات
+        $allowedRoles = [
+            'technical_support',
+            'customer_service_team_leader',
+            'sales_employee',
+            'customer_service_department_manager'
+        ];
+        $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+        if (!$hasPermission) {
+            return response()->json([
+                'success' => false,
+                'message' => 'غير مسموح لك بالوصول إلى هذه البيانات'
+            ], 403);
+        }
+
         try {
             $deliveries = ProjectDelivery::with('deliveredBy')
                 ->where('project_id', $projectId)
@@ -150,6 +194,22 @@ class ProjectDeliveryController extends Controller
      */
     public function getProjectServices($projectId)
     {
+        // التحقق من الصلاحيات
+        $allowedRoles = [
+            'technical_support',
+            'customer_service_team_leader',
+            'sales_employee',
+            'customer_service_department_manager'
+        ];
+        $hasPermission = $this->roleCheckService->userHasRole($allowedRoles);
+
+        if (!$hasPermission) {
+            return response()->json([
+                'success' => false,
+                'message' => 'غير مسموح لك بالوصول إلى هذه البيانات'
+            ], 403);
+        }
+
         try {
             $project = Project::with(['services' => function ($query) {
                 $query->withPivot('service_status', 'service_data');

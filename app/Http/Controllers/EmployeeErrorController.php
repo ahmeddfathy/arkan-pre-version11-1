@@ -48,29 +48,48 @@ class EmployeeErrorController extends Controller
     {
         $user = Auth::user();
 
-        // أخطائي (الأخطاء المسجلة علي)
+
         $myErrors = $this->indexService->getMyErrors($user, $request->all());
 
-        // الأخطاء التي أضفتها (للمستخدمين الذين يمكنهم إضافة أخطاء)
+
         $reportedErrors = collect();
         if ($this->validationService->canReportError()) {
             $reportedErrors = $this->indexService->getReportedErrors($user, $request->all());
         }
 
-        // جميع الأخطاء (للمديرين)
+
         $allErrors = collect();
         if ($user->hasRole(['admin', 'super-admin', 'hr', 'project_manager'])) {
             $allErrors = $this->indexService->getAllErrors($request->all());
         }
 
-        // الإحصائيات
-        $stats = $this->statisticsService->getStatsBasedOnRole($user);
+
+        $criticalErrors = $this->indexService->getAllCriticalErrors($request->all());
+
+        // إحصائيات منفصلة لكل tab
+        $myErrorsStats = $this->statisticsService->getMyErrorsStats($user, $request->all());
+
+        $allErrorsStats = [];
+        if ($user->hasRole(['admin', 'super-admin', 'hr', 'project_manager'])) {
+            $allErrorsStats = $this->statisticsService->getAllErrorsStats($request->all());
+        }
+
+        $reportedErrorsStats = [];
+        if ($this->validationService->canReportError()) {
+            $reportedErrorsStats = $this->statisticsService->getReportedErrorsStats($user, $request->all());
+        }
+
+        $criticalErrorsStats = $this->statisticsService->getCriticalErrorsStats($request->all());
 
         return view('employee-errors.index', [
             'myErrors' => $myErrors,
             'reportedErrors' => $reportedErrors,
             'allErrors' => $allErrors,
-            'stats' => $stats
+            'criticalErrors' => $criticalErrors,
+            'myErrorsStats' => $myErrorsStats,
+            'allErrorsStats' => $allErrorsStats,
+            'reportedErrorsStats' => $reportedErrorsStats,
+            'criticalErrorsStats' => $criticalErrorsStats,
         ]);
     }
 
@@ -345,7 +364,7 @@ class EmployeeErrorController extends Controller
 
                     // تصفية حسب كود المشروع إذا كان موجوداً
                     if ($projectCode) {
-                        $query->whereHas('task.project', function($q) use ($projectCode) {
+                        $query->whereHas('task.project', function ($q) use ($projectCode) {
                             $q->where('code', $projectCode);
                         });
                     }
@@ -368,7 +387,7 @@ class EmployeeErrorController extends Controller
 
                     // تصفية حسب كود المشروع إذا كان موجوداً
                     if ($projectCode) {
-                        $query->whereHas('project', function($q) use ($projectCode) {
+                        $query->whereHas('project', function ($q) use ($projectCode) {
                             $q->where('code', $projectCode);
                         });
                     }
@@ -391,7 +410,7 @@ class EmployeeErrorController extends Controller
 
                     // تصفية حسب كود المشروع إذا كان موجوداً
                     if ($projectCode) {
-                        $query->whereHas('project', function($q) use ($projectCode) {
+                        $query->whereHas('project', function ($q) use ($projectCode) {
                             $q->where('code', $projectCode);
                         });
                     }
@@ -436,7 +455,7 @@ class EmployeeErrorController extends Controller
 
         return response()->json([
             'success' => true,
-            'users' => $users->map(function($user) {
+            'users' => $users->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name
@@ -488,4 +507,3 @@ class EmployeeErrorController extends Controller
         }
     }
 }
-

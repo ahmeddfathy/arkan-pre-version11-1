@@ -3,12 +3,19 @@
 namespace App\Services\ProjectManagement;
 
 use App\Models\Project;
+use App\Services\Auth\RoleCheckService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 class ProjectPauseService
 {
+    protected $roleCheckService;
+
+    public function __construct(RoleCheckService $roleCheckService)
+    {
+        $this->roleCheckService = $roleCheckService;
+    }
     /**
      * توقيف مشروع
      */
@@ -43,7 +50,6 @@ class ProjectPauseService
                 'success' => false,
                 'message' => 'فشل في توقيف المشروع'
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -90,7 +96,6 @@ class ProjectPauseService
                 'success' => false,
                 'message' => 'فشل في إلغاء توقيف المشروع'
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -112,13 +117,33 @@ class ProjectPauseService
     public function searchProjects(array $filters): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = Project::query();
+        $user = Auth::user();
+
+        // الأدوار التي يمكنها رؤية جميع المشاريع
+        $canViewAllProjects = $this->roleCheckService->userHasRole([
+            'project_manager',
+            'operations_manager',
+            'operation_assistant',
+            'technical_support'
+        ]);
+
+        // إذا لم يكن المستخدم من الأدوار المحددة، يرى فقط المشاريع التي هو مشارك فيها
+        if (!$canViewAllProjects) {
+            $userProjectIds = DB::table('project_service_user')
+                ->where('user_id', $user->id)
+                ->distinct()
+                ->pluck('project_id')
+                ->toArray();
+
+            $query->whereIn('id', $userProjectIds);
+        }
 
         // البحث بالاسم أو الكود
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%");
             });
         }
 
@@ -139,7 +164,7 @@ class ProjectPauseService
 
         // فلتر حسب سبب التوقيف
         if (!empty($filters['pause_reason'])) {
-            $query->whereHas('activePause', function($q) use ($filters) {
+            $query->whereHas('activePause', function ($q) use ($filters) {
                 $q->where('pause_reason', $filters['pause_reason']);
             });
         }
@@ -264,7 +289,6 @@ class ProjectPauseService
                 'failed_count' => count($failedProjects),
                 'failed_projects' => $failedProjects
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -280,4 +304,3 @@ class ProjectPauseService
         }
     }
 }
-

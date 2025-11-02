@@ -5,102 +5,128 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/projects-preparation-period.css') }}?v={{ time() }}">
 <style>
-/* Statistics Cards - Simple White Design */
-.stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 1px solid #e9ecef;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: white;
-    flex-shrink: 0;
-}
-
-.stat-icon-primary {
-    background-color: #667eea;
-}
-
-.stat-icon-warning {
-    background-color: #f093fb;
-}
-
-.stat-icon-success {
-    background-color: #4facfe;
-}
-
-.stat-icon-info {
-    background-color: #43e97b;
-}
-
-.stat-content {
-    flex: 1;
-}
-
-.stat-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #6c757d;
-    margin-bottom: 6px;
-}
-
-.stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 4px;
-    line-height: 1.2;
-}
-
-.stat-footer {
-    font-size: 12px;
-    color: #9ca3af;
-    font-weight: 500;
-}
-
-.stat-footer i {
-    opacity: 0.8;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+    /* Statistics Cards - Simple White Design */
     .stat-card {
-        padding: 16px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .stat-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        flex-shrink: 0;
     }
 
-    .stat-value {
-        font-size: 24px;
+    .stat-icon-primary {
+        background-color: #667eea;
+    }
+
+    .stat-icon-warning {
+        background-color: #f093fb;
+    }
+
+    .stat-icon-success {
+        background-color: #4facfe;
+    }
+
+    .stat-icon-info {
+        background-color: #43e97b;
+    }
+
+    .stat-content {
+        flex: 1;
     }
 
     .stat-label {
-        font-size: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 6px;
     }
-}
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .stat-footer {
+        font-size: 12px;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+
+    .stat-footer i {
+        opacity: 0.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stat-card {
+            padding: 16px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+        }
+    }
+
+    /* Project Participant Highlighting */
+    tr[style*="background-color: #d4edda"] {
+        transition: all 0.3s ease;
+    }
+
+    tr[style*="background-color: #d4edda"]:hover {
+        background-color: #c3e6cb !important;
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+    }
+
+    .participant-badge {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.8;
+        }
+    }
 </style>
 @endpush
 
@@ -121,10 +147,12 @@
                         </p>
                     </div>
                     <div class="text-end">
+                        @if(Auth::user()->hasRole(['operation_assistant', 'operations_manager', 'project_manager', 'sales_employee', 'customer_service_department_manager', 'customer_service_team_leader']))
                         <button type="button" class="btn btn-success me-3" data-bs-toggle="modal" data-bs-target="#addPreparationModal">
                             <i class="fas fa-plus-circle me-2"></i>
                             إضافة مشروع لفترة التحضير
                         </button>
+                        @endif
                         <div class="badge bg-white text-primary p-3" style="font-size: 1.1rem;">
                             <i class="fas fa-project-diagram me-2"></i>
                             {{ $projects->total() }} مشروع
@@ -208,24 +236,24 @@
             <div class="card mb-4" style="border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
                 <div class="card-body p-3">
                     @if(request('month'))
-                        <div class="alert alert-info mb-3 d-flex align-items-center justify-content-between">
-                            <span>
-                                <i class="fas fa-filter me-2"></i>
-                                <strong>فلتر نشط:</strong> عرض مشاريع
-                                @php
-                                    $monthYear = request('month'); // Format: YYYY-MM
-                                    $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                                    $monthNames = [
-                                        1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
-                                        5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-                                        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
-                                    ];
-                                    $monthName = $monthNames[$date->month];
-                                    $year = $date->year;
-                                @endphp
-                                <strong>{{ $monthName }} {{ $year }}</strong>
-                            </span>
-                        </div>
+                    <div class="alert alert-info mb-3 d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="fas fa-filter me-2"></i>
+                            <strong>فلتر نشط:</strong> عرض مشاريع
+                            @php
+                            $monthYear = request('month'); // Format: YYYY-MM
+                            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+                            $monthNames = [
+                            1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
+                            5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
+                            9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+                            ];
+                            $monthName = $monthNames[$date->month];
+                            $year = $date->year;
+                            @endphp
+                            <strong>{{ $monthName }} {{ $year }}</strong>
+                        </span>
+                    </div>
                     @endif
                     <form method="GET" action="{{ route('projects.preparation-period') }}" class="row g-3 align-items-end">
                         <div class="col-md-3">
@@ -234,10 +262,10 @@
                                 الشهر والسنة
                             </label>
                             <input type="month"
-                                   name="month"
-                                   class="form-control"
-                                   value="{{ request('month') }}"
-                                   onchange="this.form.submit()">
+                                name="month"
+                                class="form-control"
+                                value="{{ request('month') }}"
+                                onchange="this.form.submit()">
                         </div>
 
                         <div class="col-md-3">
@@ -298,10 +326,10 @@
                                     بحث
                                 </button>
                                 @if(request()->hasAny(['status', 'sort', 'search', 'month']))
-                                    <a href="{{ route('projects.preparation-period') }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-redo me-1"></i>
-                                        إعادة تعيين
-                                    </a>
+                                <a href="{{ route('projects.preparation-period') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-redo me-1"></i>
+                                    إعادة تعيين
+                                </a>
                                 @endif
                             </div>
                         </div>
@@ -311,212 +339,221 @@
 
             <!-- Messages -->
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             @endif
 
             @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             @endif
 
             <!-- Projects Table -->
             @if($projects->count() > 0)
-                <div class="projects-table-container">
-                    <table class="projects-table">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <i class="fas fa-project-diagram me-2"></i>
-                                    اسم المشروع
-                                </th>
-                                <th>
-                                    <i class="fas fa-building me-2"></i>
-                                    العميل
-                                </th>
-                                <th>
-                                    <i class="fas fa-calendar-day me-2"></i>
-                                    بداية التحضير
-                                </th>
-                                <th>
-                                    <i class="fas fa-calendar-check me-2"></i>
-                                    نهاية التحضير
-                                </th>
-                                <th>
-                                    <i class="fas fa-hashtag me-2"></i>
-                                    عدد الأيام
-                                </th>
-                                <th>
-                                    <i class="fas fa-hourglass-half me-2"></i>
-                                    الأيام المتبقية
-                                </th>
-                                <th>
-                                    <i class="fas fa-tasks me-2"></i>
-                                    الحالة
-                                </th>
-                                <th>
-                                    <i class="fas fa-file-check me-2"></i>
-                                    طلبات التأكيد
-                                </th>
-                                <th>
-                                    <i class="fas fa-cogs me-2"></i>
-                                    الإجراءات
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($projects as $project)
-                                <tr>
-                                    <td>
-                                        <div>
-                                            <a href="{{ route('projects.show', $project) }}" class="text-decoration-none text-dark fw-bold">
-                                                {{ $project->name }}
-                                            </a>
-                                            @if($project->is_urgent)
-                                                <i class="fas fa-exclamation-triangle text-danger ms-2" title="مشروع مستعجل"></i>
-                                            @endif
-                                            @if($project->code)
-                                                <br>
-                                                <small class="badge bg-light text-dark mt-1">
-                                                    <i class="fas fa-qrcode me-1"></i>
-                                                    {{ $project->code }}
-                                                </small>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-user-tie text-primary me-1"></i>
-                                        {{ $project->client?->name ?? 'غير محدد' }}
-                                    </td>
-                                    <td>
-                                        {{ $project->preparation_start_date ? $project->preparation_start_date->format('Y-m-d H:i') : 'غير محدد' }}
-                                    </td>
-                                    <td>
-                                        {{ $project->preparation_end_date ? $project->preparation_end_date->format('Y-m-d H:i') : 'غير محدد' }}
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-info">{{ $project->preparation_days }} يوم</span>
-                                    </td>
-                                    <td class="text-center">
-                                        @if($project->isInPreparationPeriod())
-                                            <span class="badge bg-warning text-dark">
-                                                {{ $project->remaining_preparation_days }} يوم
-                                            </span>
-                                            <div class="preparation-progress mt-2">
-                                                <div class="preparation-progress-fill" style="width: {{ $project->preparation_progress_percentage }}%"></div>
-                                            </div>
-                                            <small class="text-muted">{{ $project->preparation_progress_percentage }}%</small>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if($project->preparation_status === 'active')
-                                            <div class="preparation-badge active">
-                                                <i class="fas fa-spinner fa-pulse"></i>
-                                                جارية
-                                            </div>
-                                        @elseif($project->preparation_status === 'pending')
-                                            <div class="preparation-badge pending">
-                                                <i class="fas fa-clock"></i>
-                                                لم تبدأ
-                                            </div>
-                                        @elseif($project->preparation_status === 'completed')
-                                            <div class="preparation-badge completed">
-                                                <i class="fas fa-check-circle"></i>
-                                                انتهت
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td class="confirmations-cell text-center">
-                                        @php
-                                            $totalConfirmations = $project->total_attachment_confirmations;
-                                            $duringPreparation = $project->attachment_confirmations_during_preparation;
-                                            $afterPreparation = $project->attachment_confirmations_after_preparation;
-                                        @endphp
+            <div class="projects-table-container">
+                <table class="projects-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-project-diagram me-2"></i>
+                                اسم المشروع
+                            </th>
+                            <th>
+                                <i class="fas fa-building me-2"></i>
+                                العميل
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar-day me-2"></i>
+                                بداية التحضير
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar-check me-2"></i>
+                                نهاية التحضير
+                            </th>
+                            <th>
+                                <i class="fas fa-hashtag me-2"></i>
+                                عدد الأيام
+                            </th>
+                            <th>
+                                <i class="fas fa-hourglass-half me-2"></i>
+                                الأيام المتبقية
+                            </th>
+                            <th>
+                                <i class="fas fa-tasks me-2"></i>
+                                الحالة
+                            </th>
+                            <th>
+                                <i class="fas fa-file-check me-2"></i>
+                                طلبات التأكيد
+                            </th>
+                            <th>
+                                <i class="fas fa-cogs me-2"></i>
+                                الإجراءات
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($projects as $project)
+                        @php
+                        $isParticipant = in_array($project->id, $userParticipatedProjectIds ?? []);
+                        @endphp
+                        <tr @if($isParticipant) style="background-color: #d4edda; border-left: 4px solid #28a745;" @endif>
+                            <td>
+                                <div>
+                                    @if($isParticipant)
+                                    <span class="badge bg-success text-white me-2 participant-badge" title="أنت مشارك في هذا المشروع">
+                                        <i class="fas fa-user-check"></i>
+                                        مشارك
+                                    </span>
+                                    @endif
+                                    <a href="{{ route('projects.show', $project) }}" class="text-decoration-none text-dark fw-bold">
+                                        {{ $project->name }}
+                                    </a>
+                                    @if($project->is_urgent)
+                                    <i class="fas fa-exclamation-triangle text-danger ms-2" title="مشروع مستعجل"></i>
+                                    @endif
+                                    @if($project->code)
+                                    <br>
+                                    <small class="badge bg-light text-dark mt-1">
+                                        <i class="fas fa-qrcode me-1"></i>
+                                        {{ $project->code }}
+                                    </small>
+                                    @endif
+                                </div>
+                            </td>
+                            <td>
+                                <i class="fas fa-user-tie text-primary me-1"></i>
+                                {{ $project->client?->name ?? 'غير محدد' }}
+                            </td>
+                            <td>
+                                {{ $project->preparation_start_date ? $project->preparation_start_date->format('Y-m-d H:i') : 'غير محدد' }}
+                            </td>
+                            <td>
+                                {{ $project->preparation_end_date ? $project->preparation_end_date->format('Y-m-d H:i') : 'غير محدد' }}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-info">{{ $project->preparation_days }} يوم</span>
+                            </td>
+                            <td class="text-center">
+                                @if($project->isInPreparationPeriod())
+                                <span class="badge bg-warning text-dark">
+                                    {{ $project->remaining_preparation_days }} يوم
+                                </span>
+                                <div class="preparation-progress mt-2">
+                                    <div class="preparation-progress-fill" style="width: {{ $project->preparation_progress_percentage }}%"></div>
+                                </div>
+                                <small class="text-muted">{{ $project->preparation_progress_percentage }}%</small>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($project->preparation_status === 'active')
+                                <div class="preparation-badge active">
+                                    <i class="fas fa-spinner fa-pulse"></i>
+                                    جارية
+                                </div>
+                                @elseif($project->preparation_status === 'pending')
+                                <div class="preparation-badge pending">
+                                    <i class="fas fa-clock"></i>
+                                    لم تبدأ
+                                </div>
+                                @elseif($project->preparation_status === 'completed')
+                                <div class="preparation-badge completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    انتهت
+                                </div>
+                                @endif
+                            </td>
+                            <td class="confirmations-cell text-center">
+                                @php
+                                $totalConfirmations = $project->total_attachment_confirmations;
+                                $duringPreparation = $project->attachment_confirmations_during_preparation;
+                                $afterPreparation = $project->attachment_confirmations_after_preparation;
+                                @endphp
 
-                                        @if($totalConfirmations > 0)
-                                            <div class="d-flex flex-column">
-                                                <a href="{{ route('attachment-confirmations.index', ['project_id' => $project->id]) }}"
-                                                   class="badge bg-primary text-white text-decoration-none"
-                                                   style="font-size: 0.9rem;"
-                                                   title="عرض جميع طلبات التأكيد">
-                                                    <i class="fas fa-list-check me-1"></i>
-                                                    الإجمالي: {{ $totalConfirmations }}
-                                                </a>
-                                                @if($duringPreparation > 0)
-                                                    <div class="badge bg-success"
-                                                         style="font-size: 0.85rem;"
-                                                         title="طلبات تأكيد تمت من {{ $project->preparation_start_date->format('Y-m-d') }} إلى {{ $project->preparation_end_date->format('Y-m-d') }}">
-                                                        <i class="fas fa-clock me-1"></i>
-                                                        خلال التحضير: {{ $duringPreparation }}
-                                                    </div>
-                                                @endif
-                                                @if($afterPreparation > 0)
-                                                    <div class="badge bg-warning text-dark"
-                                                         style="font-size: 0.85rem;"
-                                                         title="طلبات تأكيد تمت بعد {{ $project->preparation_end_date->format('Y-m-d') }}">
-                                                        <i class="fas fa-forward me-1"></i>
-                                                        بعد التحضير: {{ $afterPreparation }}
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        @else
-                                            <span class="text-muted" title="لا توجد طلبات تأكيد مرفقات لهذا المشروع">
-                                                <i class="fas fa-minus-circle"></i>
-                                                لا توجد
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group">
-                                            @php
-                                                $userMaxHierarchy = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
-                                            @endphp
-                                            @if($userMaxHierarchy && $userMaxHierarchy >= 4)
-                                                <button type="button" class="btn btn-sm btn-info" title="التفاصيل الكاملة" onclick="openProjectSidebar({{ $project->id }})">
-                                                    <i class="fas fa-info-circle"></i>
-                                                </button>
-                                            @endif
-                                            <a href="{{ route('projects.show', $project) }}" class="btn btn-sm btn-primary" title="عرض التفاصيل">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('projects.edit', $project) }}" class="btn btn-sm btn-outline-primary" title="تعديل">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                @if($totalConfirmations > 0)
+                                <div class="d-flex flex-column">
+                                    <a href="{{ route('attachment-confirmations.index', ['project_id' => $project->id]) }}"
+                                        class="badge bg-primary text-white text-decoration-none"
+                                        style="font-size: 0.9rem;"
+                                        title="عرض جميع طلبات التأكيد">
+                                        <i class="fas fa-list-check me-1"></i>
+                                        الإجمالي: {{ $totalConfirmations }}
+                                    </a>
+                                    @if($duringPreparation > 0)
+                                    <div class="badge bg-success"
+                                        style="font-size: 0.85rem;"
+                                        title="طلبات تأكيد تمت من {{ $project->preparation_start_date->format('Y-m-d') }} إلى {{ $project->preparation_end_date->format('Y-m-d') }}">
+                                        <i class="fas fa-clock me-1"></i>
+                                        خلال التحضير: {{ $duringPreparation }}
+                                    </div>
+                                    @endif
+                                    @if($afterPreparation > 0)
+                                    <div class="badge bg-warning text-dark"
+                                        style="font-size: 0.85rem;"
+                                        title="طلبات تأكيد تمت بعد {{ $project->preparation_end_date->format('Y-m-d') }}">
+                                        <i class="fas fa-forward me-1"></i>
+                                        بعد التحضير: {{ $afterPreparation }}
+                                    </div>
+                                    @endif
+                                </div>
+                                @else
+                                <span class="text-muted" title="لا توجد طلبات تأكيد مرفقات لهذا المشروع">
+                                    <i class="fas fa-minus-circle"></i>
+                                    لا توجد
+                                </span>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    @php
+                                    $userMaxHierarchy = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
+                                    @endphp
+                                    @if($userMaxHierarchy && $userMaxHierarchy >= 4)
+                                    <button type="button" class="btn btn-sm btn-info" title="التفاصيل الكاملة" onclick="openProjectSidebar({{ $project->id }})">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    @endif
+                                    <a href="{{ route('projects.show', $project) }}" class="btn btn-sm btn-primary" title="عرض التفاصيل">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('projects.edit', $project) }}" class="btn btn-sm btn-outline-primary" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Include Sidebar -->
-                @include('projects.partials._project_sidebar')
+            <!-- Include Sidebar -->
+            @include('projects.partials._project_sidebar')
             @else
-                <div class="projects-empty-state">
-                    <div class="projects-empty-icon">📋</div>
-                    <h4 class="projects-empty-title">لا توجد مشاريع في فترة التحضير</h4>
-                    <p class="projects-empty-subtitle">جميع المشاريع إما لم يتم تفعيل فترة التحضير لها أو انتهت فترة التحضير</p>
-                    <a href="{{ route('projects.index') }}" class="projects-empty-btn">
-                        <i class="fas fa-arrow-left me-2"></i>
-                        العودة لقائمة المشاريع
-                    </a>
-                </div>
+            <div class="projects-empty-state">
+                <div class="projects-empty-icon">📋</div>
+                <h4 class="projects-empty-title">لا توجد مشاريع في فترة التحضير</h4>
+                <p class="projects-empty-subtitle">جميع المشاريع إما لم يتم تفعيل فترة التحضير لها أو انتهت فترة التحضير</p>
+                <a href="{{ route('projects.index') }}" class="projects-empty-btn">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    العودة لقائمة المشاريع
+                </a>
+            </div>
             @endif
 
             <!-- Pagination -->
             @if($projects->hasPages())
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $projects->links() }}
-                </div>
+            <div class="d-flex justify-content-center mt-4">
+                {{ $projects->links() }}
+            </div>
             @endif
         </div>
     </div>
@@ -548,17 +585,17 @@
                                 <i class="fas fa-search text-muted"></i>
                             </span>
                             <input type="text"
-                                   class="form-control @error('project_id') is-invalid @enderror"
-                                   id="project_search"
-                                   list="projectsList"
-                                   placeholder="ابحث عن المشروع بالكود أو الاسم..."
-                                   autocomplete="off"
-                                   style="border-right: none;">
+                                class="form-control @error('project_id') is-invalid @enderror"
+                                id="project_search"
+                                list="projectsList"
+                                placeholder="ابحث عن المشروع بالكود أو الاسم..."
+                                autocomplete="off"
+                                style="border-right: none;">
                         </div>
                         <datalist id="projectsList"></datalist>
                         <input type="hidden" id="project_id" name="project_id" required>
                         @error('project_id')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                         <small class="text-muted">
                             <i class="fas fa-info-circle me-1"></i>
@@ -599,13 +636,13 @@
                                     تاريخ بداية فترة التحضير
                                 </label>
                                 <input type="datetime-local"
-                                       class="form-control @error('preparation_start_date') is-invalid @enderror"
-                                       id="preparation_start_date"
-                                       name="preparation_start_date"
-                                       value="{{ old('preparation_start_date') }}"
-                                       required>
+                                    class="form-control @error('preparation_start_date') is-invalid @enderror"
+                                    id="preparation_start_date"
+                                    name="preparation_start_date"
+                                    value="{{ old('preparation_start_date') }}"
+                                    required>
                                 @error('preparation_start_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -615,13 +652,13 @@
                                     تاريخ نهاية فترة التحضير
                                 </label>
                                 <input type="datetime-local"
-                                       class="form-control @error('preparation_end_date') is-invalid @enderror"
-                                       id="preparation_end_date"
-                                       name="preparation_end_date"
-                                       value="{{ old('preparation_end_date') }}"
-                                       required>
+                                    class="form-control @error('preparation_end_date') is-invalid @enderror"
+                                    id="preparation_end_date"
+                                    name="preparation_end_date"
+                                    value="{{ old('preparation_end_date') }}"
+                                    required>
                                 @error('preparation_end_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -637,13 +674,13 @@
                     </div>
 
                     @if($errors->any() && !$errors->has('project_id'))
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                     @endif
                 </div>
 
@@ -664,154 +701,8 @@
 @endsection
 
 @push('scripts')
-<script>
-    console.log('📋 صفحة المشاريع في فترة التحضير');
-
-    let projectsData = [];
-
-    // جلب قائمة المشاريع عند فتح الـ Modal
-    document.getElementById('addPreparationModal')?.addEventListener('show.bs.modal', function () {
-        loadProjectsList();
-    });
-
-    // تحميل قائمة المشاريع
-    function loadProjectsList() {
-        const datalistElement = document.getElementById('projectsList');
-        const searchInput = document.getElementById('project_search');
-
-        if (!datalistElement) return;
-
-        // عرض loader
-        if (searchInput) {
-            searchInput.placeholder = 'جاري تحميل المشاريع...';
-            searchInput.disabled = true;
-        }
-
-        fetch(`{{ route('projects.list-for-preparation') }}`, {
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.projects) {
-                projectsData = data.projects;
-
-                // ملء الـ datalist
-                datalistElement.innerHTML = '';
-                data.projects.forEach(project => {
-                    const option = document.createElement('option');
-                    option.value = project.display_text;
-                    option.dataset.id = project.id;
-                    option.dataset.code = project.code;
-                    option.dataset.name = project.name;
-                    option.dataset.client = project.client_name;
-                    datalistElement.appendChild(option);
-                });
-
-                if (searchInput) {
-                    searchInput.disabled = false;
-                    searchInput.placeholder = 'ابحث عن المشروع بالكود أو الاسم...';
-                }
-            } else {
-                alert('حدث خطأ أثناء تحميل المشاريع');
-                if (searchInput) {
-                    searchInput.placeholder = 'لا توجد مشاريع متاحة';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('حدث خطأ أثناء تحميل المشاريع');
-            if (searchInput) {
-                searchInput.placeholder = 'خطأ في التحميل';
-            }
-        });
-    }
-
-    // عند الكتابة أو الاختيار من الـ datalist
-    document.getElementById('project_search')?.addEventListener('input', function() {
-        const searchValue = this.value.trim();
-        const hiddenInput = document.getElementById('project_id');
-
-        if (!searchValue) {
-            hiddenInput.value = '';
-            document.getElementById('projectInfo').style.display = 'none';
-            document.getElementById('submitBtn').disabled = true;
-            return;
-        }
-
-        // البحث عن المشروع المطابق
-        const selectedProject = projectsData.find(p => p.display_text === searchValue);
-
-        if (selectedProject) {
-            // تعيين الـ ID في الـ hidden input
-            hiddenInput.value = selectedProject.id;
-
-            // عرض معلومات المشروع
-            document.getElementById('projectCode').textContent = selectedProject.code || 'غير محدد';
-            document.getElementById('projectName').textContent = selectedProject.name || 'غير محدد';
-            document.getElementById('projectClient').textContent = selectedProject.client_name || 'غير محدد';
-            document.getElementById('projectInfo').style.display = 'block';
-            document.getElementById('submitBtn').disabled = false;
-
-            // تعيين تاريخ افتراضي (الآن)
-            const now = new Date();
-            const nowStr = now.toISOString().slice(0, 16);
-            document.getElementById('preparation_start_date').value = nowStr;
-
-            // تعيين تاريخ النهاية (بعد 7 أيام مثلاً)
-            const endDate = new Date(now);
-            endDate.setDate(endDate.getDate() + 7);
-            const endStr = endDate.toISOString().slice(0, 16);
-            document.getElementById('preparation_end_date').value = endStr;
-
-            // حساب عدد الأيام
-            calculateDays();
-        } else {
-            // لم يتم العثور على مطابقة
-            hiddenInput.value = '';
-            document.getElementById('projectInfo').style.display = 'none';
-            document.getElementById('submitBtn').disabled = true;
-        }
-    });
-
-    // حساب عدد الأيام تلقائياً
-    function calculateDays() {
-        const startDate = document.getElementById('preparation_start_date').value;
-        const endDate = document.getElementById('preparation_end_date').value;
-
-        if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            document.getElementById('calculatedDays').textContent = diffDays + ' يوم';
-        }
-    }
-
-    // حساب عدد الأيام عند تغيير التواريخ
-    document.getElementById('preparation_start_date')?.addEventListener('change', calculateDays);
-    document.getElementById('preparation_end_date')?.addEventListener('change', calculateDays);
-
-    // إعادة تعيين الفورم عند إغلاق الـ Modal
-    const modal = document.getElementById('addPreparationModal');
-    modal?.addEventListener('hidden.bs.modal', function () {
-        document.getElementById('preparationForm').reset();
-        document.getElementById('project_search').value = '';
-        document.getElementById('project_id').value = '';
-        document.getElementById('projectInfo').style.display = 'none';
-        document.getElementById('submitBtn').disabled = true;
-        document.getElementById('calculatedDays').textContent = '0 يوم';
-    });
-
-    @if($errors->any())
-        // إعادة فتح الـ Modal إذا كانت هناك أخطاء
-        const addModal = new bootstrap.Modal(document.getElementById('addPreparationModal'));
-        addModal.show();
-    @endif
-</script>
+<div data-projects-list-route="{{ route('projects.list-for-preparation') }}"
+    data-has-errors="{{ $errors->any() ? 'true' : 'false' }}"
+    style="display: none;"></div>
+<script src="{{ asset('js/preparation-period.js') }}"></script>
 @endpush
-

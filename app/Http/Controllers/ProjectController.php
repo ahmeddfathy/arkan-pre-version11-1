@@ -130,6 +130,18 @@ class ProjectController extends Controller
      */
     public function changeStatusIndex(Request $request)
     {
+        // التحقق من الصلاحيات - فقط الأدوار المحددة يمكنها الوصول
+        $allowedRoles = [
+            'coordination-team-employee',
+            'coordination_team_leader',
+            'coordination_department_manager',
+            'general_reviewer'
+        ];
+        
+        if (!$this->roleCheckService->userHasRole($allowedRoles)) {
+            abort(403, 'غير مسموح لك بالوصول إلى هذه الصفحة');
+        }
+        
         // جلب جميع المشاريع للقائمة المنسدلة (مرتبة من الأحدث)
         $allProjects = Project::with('client')
             ->orderBy('created_at', 'desc')
@@ -159,6 +171,18 @@ class ProjectController extends Controller
      */
     public function changeStatus(Project $project)
     {
+        // التحقق من الصلاحيات
+        $allowedRoles = [
+            'coordination-team-employee',
+            'coordination_team_leader',
+            'coordination_department_manager',
+            'general_reviewer'
+        ];
+        
+        if (!$this->roleCheckService->userHasRole($allowedRoles)) {
+            abort(403, 'غير مسموح لك بتغيير حالة المشروع');
+        }
+        
         return view('projects.internal-delivery.change-status', compact('project'));
     }
 
@@ -167,6 +191,18 @@ class ProjectController extends Controller
      */
     public function updateStatus(Request $request, Project $project)
     {
+        // التحقق من الصلاحيات
+        $allowedRoles = [
+            'coordination-team-employee',
+            'coordination_team_leader',
+            'coordination_department_manager',
+            'general_reviewer'
+        ];
+        
+        if (!$this->roleCheckService->userHasRole($allowedRoles)) {
+            abort(403, 'غير مسموح لك بتحديث حالة المشروع');
+        }
+        
         $request->validate([
             'status' => 'required|string|in:جديد,جاري التنفيذ,مكتمل,ملغي',
             'delivery_type' => 'required|string|in:مسودة,كامل',
