@@ -124,7 +124,7 @@ class TaskManagementService
     {
         $project = Project::findOrFail($projectId);
         $tasks = Task::with(['service', 'users'])
-            ->withCount(['revisions', 'revisions as pending_revisions_count' => function($query) {
+            ->withCount(['revisions', 'revisions as pending_revisions_count' => function ($query) {
                 $query->where('status', 'pending');
             }])
             ->where('project_id', $projectId)
@@ -140,18 +140,18 @@ class TaskManagementService
     public function getUserTasks(int $userId, array $filters = [], $paginate = true)
     {
         try {
-            $query = Task::with(['project', 'service', 'users' => function($q) use ($userId) {
-                    $q->where('users.id', $userId);
-                }])
+            $query = Task::with(['project', 'service', 'users' => function ($q) use ($userId) {
+                $q->where('users.id', $userId);
+            }])
                 ->withCount([
                     'revisions',
-                    'revisions as pending_revisions_count' => function($query) {
+                    'revisions as pending_revisions_count' => function ($query) {
                         $query->where('status', 'pending');
                     },
-                    'revisions as approved_revisions_count' => function($query) {
+                    'revisions as approved_revisions_count' => function ($query) {
                         $query->where('status', 'approved');
                     },
-                    'revisions as rejected_revisions_count' => function($query) {
+                    'revisions as rejected_revisions_count' => function ($query) {
                         $query->where('status', 'rejected');
                     }
                 ])
@@ -159,14 +159,31 @@ class TaskManagementService
                     $q->where('users.id', $userId);
                 });
 
+            // ✅ لا نطبق applyHierarchicalTaskFiltering هنا لأن:
+            // 1. getUserTasks يستخدم لصفحة "مهامي" التي يجب أن تعرض مهام المستخدم فقط
+            // 2. نحن بالفعل نفلتر حسب userId في whereHas أعلاه
+            // 3. applyHierarchicalTaskFiltering قد يسبب مشاكل في الفلترة للمستخدمين العاديين
 
-
-            // تطبيق الفلترة الهرمية للاتساق مع صفحة Index
+            // فقط نطبق الفلترة الهرمية إذا كان المستخدم الحالي مختلف عن المستخدم المطلوب
+            // (في حالة HR أو Admin يشاهد مهام مستخدم آخر)
             $taskFilterService = app(\App\Services\TaskController\TaskFilterService::class);
             $currentUser = \Illuminate\Support\Facades\Auth::user();
 
-            if ($currentUser) {
-                $query = $taskFilterService->applyHierarchicalTaskFiltering($query, $currentUser);
+            if ($currentUser && $currentUser->id != $userId) {
+                /** @var \App\Models\User $currentUser */
+                $hasPermission = false;
+                try {
+                    $hasPermission = $currentUser->hasRole(['company_manager', 'hr', 'project_manager']);
+                } catch (\Exception $e) {
+                    if (method_exists($currentUser, 'roles') && $currentUser->roles) {
+                        $roleNames = $currentUser->roles->pluck('name')->toArray();
+                        $hasPermission = !empty(array_intersect($roleNames, ['company_manager', 'hr', 'project_manager']));
+                    }
+                }
+
+                if ($hasPermission) {
+                    $query = $taskFilterService->applyHierarchicalTaskFiltering($query, $currentUser);
+                }
             }
 
             if (isset($filters['project_id']) && $filters['project_id']) {
@@ -180,53 +197,44 @@ class TaskManagementService
                 });
             }
 
-                        // حماية من الـ pagination عندما تكون البيانات فارغة
             $totalCount = $query->count();
             if ($totalCount === 0) {
-                // إرجاع paginator فارغ بدلاً من pagination عادي
                 return new \Illuminate\Pagination\LengthAwarePaginator(
-                    collect([]), // items فارغة
-                    0, // total
-                    10, // perPage
-                    1, // currentPage
+                    collect([]),
+                    0,
+                    10,
+                    1,
                     ['path' => request()->url(), 'query' => request()->query()]
                 );
             }
 
-            // ✅ ترتيب المهام من الأحدث إلى الأقدم
             if ($paginate) {
                 $result = $query->orderBy('created_at', 'desc')->paginate(10);
             } else {
-                // إرجاع كل المهام بدون pagination لصفحة My Tasks
                 $result = $query->orderBy('created_at', 'desc')->get();
             }
 
-            // إضافة pivot data للمهام العادية للتوافق مع الـ view
             if ($result && $result instanceof \Illuminate\Database\Eloquent\Collection) {
                 foreach ($result as $task) {
                     if (!$task->users->isEmpty()) {
                         $userPivot = $task->users->first()->pivot;
                         $task->pivot = $userPivot;
 
-                        // ✅ جلب TaskUser record كاملة لإضافة بيانات النقل مع العلاقات
                         $taskUser = TaskUser::with(['transferredToUser', 'originalTaskUser.user', 'administrativeApprover', 'technicalApprover'])
-                                           ->where('task_id', $task->id)
-                                           ->where('user_id', $userId)
-                                           ->first();
+                            ->where('task_id', $task->id)
+                            ->where('user_id', $userId)
+                            ->first();
 
                         if ($taskUser) {
-                            // تأكد من وجود ID صالح للـ pivot
                             if (!isset($task->pivot->id) || !$task->pivot->id) {
                                 $task->pivot->id = $taskUser->id;
                             }
 
-                            // ✅ إضافة بيانات النقل للـ pivot
                             $task->pivot->is_additional_task = $taskUser->is_additional_task ?? false;
                             $task->pivot->task_source = $taskUser->task_source ?? 'assigned';
                             $task->pivot->is_transferred = $taskUser->is_transferred ?? false;
                             $task->pivot->original_task_user_id = $taskUser->original_task_user_id ?? null;
 
-                            // ✅ إضافة بيانات الاعتماد الإداري والفني للـ pivot
                             $task->pivot->administrative_approval = $taskUser->administrative_approval ?? false;
                             $task->pivot->technical_approval = $taskUser->technical_approval ?? false;
                             $task->pivot->administrative_approval_at = $taskUser->administrative_approval_at ?? null;
@@ -234,17 +242,14 @@ class TaskManagementService
                             $task->pivot->administrativeApprover = $taskUser->administrativeApprover ?? null;
                             $task->pivot->technicalApprover = $taskUser->technicalApprover ?? null;
 
-                            // ✅ إضافة معلومات المستخدم المنقول إليه
                             $task->transferredToUser = $taskUser->transferredToUser;
                             $task->transferred_at = $taskUser->transferred_at;
 
-                            // ✅ إضافة معلومات المستخدم الأصلي (للمهام المنقولة إليك)
                             if ($taskUser->originalTaskUser) {
                                 $task->original_user = $taskUser->originalTaskUser->user;
                             }
                         }
 
-                        // Add notes count for current user
                         if (isset($task->pivot->id) && $task->pivot->id) {
                             $task->notes_count = \App\Models\TaskNote::where('task_type', 'regular')
                                 ->where('task_user_id', $task->pivot->id)
@@ -261,25 +266,21 @@ class TaskManagementService
                         $userPivot = $task->users->first()->pivot;
                         $task->pivot = $userPivot;
 
-                        // ✅ جلب TaskUser record كاملة لإضافة بيانات النقل مع العلاقات
                         $taskUser = TaskUser::with(['transferredToUser', 'originalTaskUser.user', 'administrativeApprover', 'technicalApprover'])
-                                           ->where('task_id', $task->id)
-                                           ->where('user_id', $userId)
-                                           ->first();
+                            ->where('task_id', $task->id)
+                            ->where('user_id', $userId)
+                            ->first();
 
                         if ($taskUser) {
-                            // تأكد من وجود ID صالح للـ pivot
                             if (!isset($task->pivot->id) || !$task->pivot->id) {
                                 $task->pivot->id = $taskUser->id;
                             }
 
-                            // ✅ إضافة بيانات النقل للـ pivot
                             $task->pivot->is_additional_task = $taskUser->is_additional_task ?? false;
                             $task->pivot->task_source = $taskUser->task_source ?? 'assigned';
                             $task->pivot->is_transferred = $taskUser->is_transferred ?? false;
                             $task->pivot->original_task_user_id = $taskUser->original_task_user_id ?? null;
 
-                            // ✅ إضافة بيانات الاعتماد الإداري والفني للـ pivot
                             $task->pivot->administrative_approval = $taskUser->administrative_approval ?? false;
                             $task->pivot->technical_approval = $taskUser->technical_approval ?? false;
                             $task->pivot->administrative_approval_at = $taskUser->administrative_approval_at ?? null;
@@ -287,17 +288,14 @@ class TaskManagementService
                             $task->pivot->administrativeApprover = $taskUser->administrativeApprover ?? null;
                             $task->pivot->technicalApprover = $taskUser->technicalApprover ?? null;
 
-                            // ✅ إضافة معلومات المستخدم المنقول إليه
                             $task->transferredToUser = $taskUser->transferredToUser;
                             $task->transferred_at = $taskUser->transferred_at;
 
-                            // ✅ إضافة معلومات المستخدم الأصلي (للمهام المنقولة إليك)
                             if ($taskUser->originalTaskUser) {
                                 $task->original_user = $taskUser->originalTaskUser->user;
                             }
                         }
 
-                        // Add notes count for current user
                         if (isset($task->pivot->id) && $task->pivot->id) {
                             $task->notes_count = \App\Models\TaskNote::where('task_type', 'regular')
                                 ->where('task_user_id', $task->pivot->id)
@@ -317,7 +315,6 @@ class TaskManagementService
                 'error' => $e->getMessage()
             ]);
 
-            // إرجاع paginator فارغ في حالة الخطأ
             return new \Illuminate\Pagination\LengthAwarePaginator(
                 collect([]),
                 0,
@@ -330,7 +327,6 @@ class TaskManagementService
 
     public function enrichTaskWithUserData(Task $task, int $userId): Task
     {
-        // ✅ استخدام Eloquent بدلاً من Query Builder لتحميل العلاقات
         $taskUser = TaskUser::with(['transferredToUser', 'originalTaskUser.user', 'administrativeApprover', 'technicalApprover'])
             ->where('task_id', $task->id)
             ->where('user_id', $userId)
@@ -340,12 +336,10 @@ class TaskManagementService
             $task->user_status = $taskUser->status;
             $task->user_role = $taskUser->role;
 
-            // ✅ إضافة معلومات النقل
             $task->is_transferred = $taskUser->is_transferred ?? false;
             $task->is_additional_task = $taskUser->is_additional_task ?? false;
             $task->task_source = $taskUser->task_source ?? null;
 
-            // ✅ إضافة بيانات الاعتماد الإداري والفني
             $task->administrative_approval = $taskUser->administrative_approval ?? false;
             $task->technical_approval = $taskUser->technical_approval ?? false;
             $task->administrative_approval_at = $taskUser->administrative_approval_at ?? null;
@@ -353,11 +347,9 @@ class TaskManagementService
             $task->administrativeApprover = $taskUser->administrativeApprover ?? null;
             $task->technicalApprover = $taskUser->technicalApprover ?? null;
 
-            // ✅ إضافة معلومات المستخدم المنقول إليه
             $task->transferredToUser = $taskUser->transferredToUser;
             $task->transferred_at = $taskUser->transferred_at;
 
-            // ✅ إضافة معلومات المستخدم الأصلي (للمهام المنقولة إليك)
             if ($taskUser->originalTaskUser) {
                 $task->original_user = $taskUser->originalTaskUser->user;
             }
@@ -366,23 +358,20 @@ class TaskManagementService
         return $task;
     }
 
-    /**
-     * الحصول على مهام القوالب للمستخدم
-     */
     public function getUserTemplateTasks(int $userId, array $filters = [])
     {
         try {
-                        $query = TemplateTaskUser::with([
-                    'templateTask.template',
-                    'project',
-                    'season',
-                    'assignedBy',
-                    'transferredToUser', // ✅ المستخدم المنقول إليه
-                    'originalTemplateTaskUser.user', // ✅ المستخدم الأصلي (للمهام المنقولة)
-                    'administrativeApprover', // ✅ المعتمد الإداري
-                    'technicalApprover' // ✅ المعتمد الفني
-                ])
-                ->withCount(['notes', 'revisions', 'revisions as pending_revisions_count' => function($query) {
+            $query = TemplateTaskUser::with([
+                'templateTask.template',
+                'project',
+                'season',
+                'assignedBy',
+                'transferredToUser',
+                'originalTemplateTaskUser.user',
+                'administrativeApprover',
+                'technicalApprover'
+            ])
+                ->withCount(['notes', 'revisions', 'revisions as pending_revisions_count' => function ($query) {
                     $query->where('status', 'pending');
                 }])
                 ->where('user_id', $userId)
@@ -414,7 +403,7 @@ class TaskManagementService
                 $task->id = $templateTaskUser->id;
                 $task->name = ($templateTask->name ?? 'مهمة قالب') . ' (قالب)';
                 $task->description = $templateTask->description ?? 'مهمة من قالب';
-                $task->is_template = true; // علامة للتمييز
+                $task->is_template = true;
                 $task->template_name = $template->name ?? 'قالب غير محدد';
 
                 $task->project = $templateTaskUser->project;
@@ -432,7 +421,6 @@ class TaskManagementService
 
                 $task->status = $templateTaskUser->status ?? 'new';
                 $task->user_status = $templateTaskUser->status ?? 'new';
-                // ✅ إضافة due_date و deadline من TemplateTaskUser
                 $task->due_date = $templateTaskUser->due_date ?? null;
                 $task->deadline = $templateTaskUser->deadline ?? null;
                 $task->created_at = $templateTaskUser->created_at;
@@ -451,37 +439,29 @@ class TaskManagementService
                 $task->pivot->estimated_minutes = $task->estimated_minutes;
                 $task->pivot->actual_hours = $task->actual_hours;
                 $task->pivot->actual_minutes = $task->actual_minutes;
-                // ✅ إضافة due_date للـ pivot
                 $task->pivot->due_date = $templateTaskUser->due_date ?? $templateTaskUser->deadline ?? null;
-                // ✅ إضافة بيانات النقل للـ pivot
                 $task->pivot->is_additional_task = $templateTaskUser->is_additional_task ?? false;
                 $task->pivot->task_source = $templateTaskUser->task_source ?? 'assigned';
                 $task->pivot->is_transferred = $templateTaskUser->is_transferred ?? false;
 
-                // ✅ إضافة معلومات النقل للـ task
                 $task->is_transferred = $templateTaskUser->is_transferred ?? false;
                 $task->is_additional_task = $templateTaskUser->is_additional_task ?? false;
                 $task->task_source = $templateTaskUser->task_source ?? null;
 
-                // ✅ إضافة معلومات المستخدم المنقول إليه
                 $task->transferredToUser = $templateTaskUser->transferredToUser;
                 $task->transferred_at = $templateTaskUser->transferred_at;
 
-                // ✅ إضافة معلومات المستخدم الأصلي (للمهام المنقولة إليك)
                 if ($templateTaskUser->originalTemplateTaskUser) {
                     $task->original_user = $templateTaskUser->originalTemplateTaskUser->user;
                 }
 
-                // Add notes count
                 $task->notes_count = $templateTaskUser->notes_count ?? 0;
 
-                // Add revisions count
                 $task->revisions_count = $templateTaskUser->revisions_count ?? 0;
                 $task->pending_revisions_count = $templateTaskUser->pending_revisions_count ?? 0;
                 $task->approved_revisions_count = $templateTaskUser->approved_revisions_count ?? 0;
                 $task->rejected_revisions_count = $templateTaskUser->rejected_revisions_count ?? 0;
 
-                // Calculate revisions status
                 $task->revisions_status = $this->calculateRevisionsStatus(
                     $task->revisions_count,
                     $task->pending_revisions_count,
@@ -489,7 +469,6 @@ class TaskManagementService
                     $task->rejected_revisions_count
                 );
 
-                // ✅ إضافة بيانات النقل لمهام القوالب للعرض الصحيح في صفحة My Tasks
                 $task->is_transferred = $templateTaskUser->is_transferred ?? false;
                 $task->is_additional_task = $templateTaskUser->is_additional_task ?? false;
                 $task->task_source = $templateTaskUser->task_source ?? 'assigned';
@@ -497,11 +476,9 @@ class TaskManagementService
                 $task->transfer_reason = $templateTaskUser->transfer_reason ?? null;
                 $task->transferred_at = $templateTaskUser->transferred_at ?? null;
 
-                // ✅ إضافة معلومات المنشئ (assigned_by) لمهام القوالب
                 $task->created_by = $templateTaskUser->assigned_by ?? null;
                 $task->createdBy = $templateTaskUser->assignedBy ?? null;
 
-                // ✅ إضافة بيانات الاعتماد الإداري والفني
                 $task->administrative_approval = $templateTaskUser->administrative_approval ?? false;
                 $task->technical_approval = $templateTaskUser->technical_approval ?? false;
                 $task->administrative_approval_at = $templateTaskUser->administrative_approval_at ?? null;
@@ -510,8 +487,7 @@ class TaskManagementService
                 $task->technicalApprover = $templateTaskUser->technicalApprover ?? null;
 
                 return $task;
-                })->filter();
-
+            })->filter();
         } catch (\Exception $e) {
             Log::error('Error getting user template tasks', [
                 'user_id' => $userId,
@@ -522,31 +498,26 @@ class TaskManagementService
         }
     }
 
-    /**
-     * الحصول على مهام القوالب للإدارة (مع الفلترة الهرمية)
-     */
     public function getAllTemplateTasks(array $filters = [])
     {
         try {
             $query = TemplateTaskUser::with([
-                    'templateTask.template',
-                    'user',
-                    'project',
-                    'assignedBy',
-                    'transferredToUser', // ✅ إضافة المستخدم المنقول إليه
-                    'originalTemplateTaskUser.user', // ✅ المستخدم الأصلي للمهام المنقولة
-                    'administrativeApprover', // ✅ المعتمد الإداري
-                    'technicalApprover' // ✅ المعتمد الفني
-                ])
-                ->withCount(['notes', 'revisions', 'revisions as pending_revisions_count' => function($query) {
+                'templateTask.template',
+                'user',
+                'project',
+                'assignedBy',
+                'transferredToUser',
+                'originalTemplateTaskUser.user',
+                'administrativeApprover',
+                'technicalApprover'
+            ])
+                ->withCount(['notes', 'revisions', 'revisions as pending_revisions_count' => function ($query) {
                     $query->where('status', 'pending');
                 }]);
 
-            // تطبيق الفلترة الهرمية
             $taskFilterService = app(\App\Services\TaskController\TaskFilterService::class);
             $query = $taskFilterService->applyHierarchicalTemplateTaskFiltering($query);
 
-            // تطبيق الفلاتر الإضافية
             if (isset($filters['project_id']) && $filters['project_id']) {
                 $query->where('project_id', $filters['project_id']);
             }
@@ -561,7 +532,6 @@ class TaskManagementService
 
             $templateTaskUsers = $query->orderBy('created_at', 'desc')->get();
 
-            // تحويل مهام القوالب إلى شكل يشبه المهام العادية للعرض
             return $templateTaskUsers->map(function ($templateTaskUser) {
                 if (!$templateTaskUser || !$templateTaskUser->templateTask) {
                     return null;
@@ -570,29 +540,23 @@ class TaskManagementService
                 $templateTask = $templateTaskUser->templateTask;
                 $template = $templateTask->template ?? null;
 
-                // إنشاء كائن يحاكي Task
                 $task = new \stdClass();
                 $task->id = $templateTaskUser->id;
                 $task->name = ($templateTask->name ?? 'مهمة قالب');
                 $task->description = $templateTask->description ?? 'مهمة من قالب';
-                $task->is_template = true; // علامة للتمييز
+                $task->is_template = true;
                 $task->template_name = $template->name ?? 'قالب غير محدد';
 
-                // المشروع
                 $task->project = $templateTaskUser->project;
                 $task->project_id = $templateTaskUser->project_id;
 
-                // الخدمة من القالب
                 $task->service = $template->service ?? null;
                 $task->service_id = $template->service_id ?? null;
 
-                // حساب الأوقات أولاً
                 $actualMinutes = (int)($templateTaskUser->actual_minutes ?? 0);
 
-                // المستخدم المخصص له المهمة
                 if ($templateTaskUser->user) {
                     $user = $templateTaskUser->user;
-                    // إضافة pivot object للتوافق مع المهام العادية
                     $user->pivot = (object) [
                         'role' => 'منفذ قالب',
                         'status' => $templateTaskUser->status ?? 'new',
@@ -600,7 +564,6 @@ class TaskManagementService
                         'estimated_minutes' => $templateTask->estimated_minutes ?? 0,
                         'actual_hours' => $actualMinutes > 0 ? intval($actualMinutes / 60) : 0,
                         'actual_minutes' => $actualMinutes > 0 ? ($actualMinutes % 60) : 0,
-                        // ✅ إضافة due_date للـ pivot
                         'due_date' => $templateTaskUser->due_date ?? $templateTaskUser->deadline ?? null,
                     ];
                     $task->users = collect([$user]);
@@ -608,11 +571,9 @@ class TaskManagementService
                     $task->users = collect([]);
                 }
 
-                // منشئ المهمة (القالب لا يحتوي على منشئ)
                 $task->createdBy = null;
                 $task->created_by = null;
 
-                // الأوقات
                 $task->estimated_hours = $templateTask->estimated_hours ?? 0;
                 $task->estimated_minutes = $templateTask->estimated_minutes ?? 0;
 
@@ -620,30 +581,24 @@ class TaskManagementService
                 $task->actual_minutes = $actualMinutes > 0 ? ($actualMinutes % 60) : 0;
                 $task->actual_minutes_raw = $actualMinutes;
 
-                // الحالة والتواريخ
                 $task->status = $templateTaskUser->status ?? 'new';
-                // ✅ إضافة due_date و deadline من TemplateTaskUser
                 $task->due_date = $templateTaskUser->due_date ?? null;
                 $task->deadline = $templateTaskUser->deadline ?? null;
                 $task->created_at = $templateTaskUser->created_at;
                 $task->updated_at = $templateTaskUser->updated_at;
 
-                // بيانات إضافية
                 $task->started_at = $templateTaskUser->started_at;
                 $task->paused_at = $templateTaskUser->paused_at;
                 $task->completed_at = $templateTaskUser->completed_at;
                 $task->season_id = $templateTaskUser->season_id;
 
-                // Add notes count
                 $task->notes_count = $templateTaskUser->notes_count ?? 0;
 
-                // Add revisions count
                 $task->revisions_count = $templateTaskUser->revisions_count ?? 0;
                 $task->pending_revisions_count = $templateTaskUser->pending_revisions_count ?? 0;
                 $task->approved_revisions_count = $templateTaskUser->approved_revisions_count ?? 0;
                 $task->rejected_revisions_count = $templateTaskUser->rejected_revisions_count ?? 0;
 
-                // Calculate revisions status
                 $task->revisions_status = $this->calculateRevisionsStatus(
                     $task->revisions_count,
                     $task->pending_revisions_count,
@@ -651,7 +606,6 @@ class TaskManagementService
                     $task->rejected_revisions_count
                 );
 
-                // ✅ إضافة بيانات النقل لمهام القوالب للعرض الصحيح في صفحة Tasks Index
                 $task->is_transferred = $templateTaskUser->is_transferred ?? false;
                 $task->is_additional_task = $templateTaskUser->is_additional_task ?? false;
                 $task->task_source = $templateTaskUser->task_source ?? 'assigned';
@@ -660,7 +614,6 @@ class TaskManagementService
                 $task->transferred_at = $templateTaskUser->transferred_at ?? null;
                 $task->transferred_to_user_id = $templateTaskUser->transferred_to_user_id ?? null;
 
-                // ✅ إضافة بيانات الاعتماد الإداري والفني
                 $task->administrative_approval = $templateTaskUser->administrative_approval ?? false;
                 $task->technical_approval = $templateTaskUser->technical_approval ?? false;
                 $task->administrative_approval_at = $templateTaskUser->administrative_approval_at ?? null;
@@ -668,20 +621,17 @@ class TaskManagementService
                 $task->administrativeApprover = $templateTaskUser->administrativeApprover ?? null;
                 $task->technicalApprover = $templateTaskUser->technicalApprover ?? null;
 
-                // ✅ إضافة المستخدم المنقول إليه
                 $task->transferred_to_user = $templateTaskUser->transferredToUser ?? null;
 
-                // ✅ إضافة المستخدم الأصلي (للمهام المنقولة)
                 if ($templateTaskUser->is_additional_task && $templateTaskUser->originalTemplateTaskUser) {
                     $task->original_user = $templateTaskUser->originalTemplateTaskUser->user ?? null;
                 }
 
-                // ✅ إضافة معلومات المنشئ (assigned_by) لمهام القوالب
                 $task->created_by = $templateTaskUser->assigned_by ?? null;
                 $task->createdBy = $templateTaskUser->assignedBy ?? null;
 
                 return $task;
-            })->filter(); // إزالة القيم null
+            })->filter();
 
         } catch (\Exception $e) {
             Log::error('Error getting all template tasks', [
@@ -692,29 +642,26 @@ class TaskManagementService
             return collect([]);
         }
     }
-
-    /**
-     * حساب حالة التعديلات بناءً على الأعداد
-     */
+    
     private function calculateRevisionsStatus($total, $pending, $approved, $rejected)
     {
         if ($total == 0) return 'none';
 
         if ($pending > 0) {
             if ($approved > 0 || $rejected > 0) {
-                return 'mixed'; // خليط من الحالات
+                return 'mixed';
             }
-            return 'pending'; // كلها معلقة
+            return 'pending';
         }
 
         if ($approved > 0 && $rejected == 0) {
-            return 'approved'; // كلها مقبولة
+            return 'approved';
         }
 
         if ($rejected > 0 && $approved == 0) {
-            return 'rejected'; // كلها مرفوضة
+                return 'rejected';
         }
 
-        return 'mixed'; // خليط من مقبول ومرفوض
+        return 'mixed';
     }
 }

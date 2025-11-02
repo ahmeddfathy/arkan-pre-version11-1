@@ -36,7 +36,6 @@ class TaskStatusService
 
     public function changeTaskStatus(Task $task, string $newStatus): array
     {
-        // التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
         if (!$task->canUpdateStatus()) {
             $errorMessage = $task->getStatusUpdateErrorMessage();
 
@@ -98,7 +97,6 @@ class TaskStatusService
         try {
             $taskUser = TaskUser::findOrFail($taskUserId);
 
-            // التحقق من إمكانية تحديث حالة المهمة بناءً على حالة المشروع
             $task = $taskUser->task;
             if ($task && !$task->canUpdateStatus()) {
                 $errorMessage = $task->getStatusUpdateErrorMessage();
@@ -151,7 +149,6 @@ class TaskStatusService
                 ];
             }
 
-            // التحقق من أن المهمة لم يتم اعتمادها مسبقاً
             if (!$taskUser->canChangeStatus()) {
                 Log::info('Blocked status update on approved task', [
                     'task_user_id' => $taskUserId,
@@ -177,7 +174,6 @@ class TaskStatusService
                 ];
             }
 
-            // 📋 التحقق من البنود قبل التحويل لـ "مكتمل"
             if ($status === 'completed') {
                 $itemsValidation = $this->validateTaskItems($taskUser);
                 if (!$itemsValidation['valid']) {
@@ -202,7 +198,6 @@ class TaskStatusService
             if ($status === 'completed') {
                 $this->checkAndUpdateTaskCompletion($taskUser);
 
-                // 🔔 إرسال إشعارات عند اكتمال التاسك
                 try {
                     $this->taskDeliveryNotificationService->notifyTaskCompleted($taskUser->fresh());
                 } catch (\Exception $e) {
@@ -441,17 +436,10 @@ class TaskStatusService
         return $query->orderBy('due_date')->get();
     }
 
-    /**
-     * التحقق من أن جميع البنود تم تحديد حالتها
-     *
-     * @param TaskUser $taskUser
-     * @return array
-     */
     private function validateTaskItems(TaskUser $taskUser): array
     {
         $items = $taskUser->items ?? [];
 
-        // إذا لم يكن هناك بنود، التحقق ناجح
         if (empty($items)) {
             return ['valid' => true];
         }
@@ -461,7 +449,6 @@ class TaskStatusService
         foreach ($items as $item) {
             $status = $item['status'] ?? 'pending';
 
-            // إذا كان البند لا يزال pending (لم يتم تحديد حالته)
             if ($status === 'pending') {
                 $pendingItems[] = [
                     'id' => $item['id'] ?? '',

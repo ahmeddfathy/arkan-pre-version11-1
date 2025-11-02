@@ -8,9 +8,6 @@ use Illuminate\Validation\Validator as ValidationValidator;
 
 class TaskValidationService
 {
-    /**
-     * التحقق الأساسي من بيانات المهمة
-     */
     public function validateBasicTaskData(Request $request): ValidationValidator
     {
         $basicValidationRules = [
@@ -21,7 +18,7 @@ class TaskValidationService
             'graphic_task_type_id' => 'nullable|exists:graphic_task_types,id',
             'points' => 'nullable|integer|min:0|max:1000',
             'due_date' => 'nullable|date',
-            'assigned_users' => 'required|array|min:1', // ✅ إجباري ولازم موظف واحد على الأقل
+            'assigned_users' => 'required|array|min:1',
             'assigned_users.*.user_id' => 'required|exists:users,id',
             'assigned_users.*.role' => 'nullable|string',
             'is_flexible_time' => 'nullable|in:true,false,1,0',
@@ -30,9 +27,6 @@ class TaskValidationService
         return Validator::make($request->all(), $basicValidationRules);
     }
 
-    /**
-     * التحقق من بيانات المهمة مع قواعد الوقت
-     */
     public function validateTaskWithTimeRules(Request $request, bool $isFlexible): ValidationValidator
     {
         $validationRules = $this->getBasicValidationRules();
@@ -46,9 +40,6 @@ class TaskValidationService
         return Validator::make($request->all(), $validationRules);
     }
 
-    /**
-     * التحقق من بيانات تحديث المهمة
-     */
     public function validateTaskUpdate(Request $request, bool $isFlexible): ValidationValidator
     {
         $validationRules = [
@@ -60,7 +51,7 @@ class TaskValidationService
             'status' => 'required|in:new,cancelled',
             'due_date' => 'nullable|date',
             'points' => 'nullable|integer|min:0|max:1000',
-            'assigned_users' => 'required|array|min:1', // ✅ إجباري ولازم موظف واحد على الأقل
+            'assigned_users' => 'required|array|min:1',
             'assigned_users.*.user_id' => 'required|exists:users,id',
             'assigned_users.*.role' => 'nullable|string',
             'is_flexible_time' => 'nullable|in:true,false,1,0',
@@ -85,9 +76,6 @@ class TaskValidationService
         return Validator::make($request->all(), $validationRules);
     }
 
-    /**
-     * التحقق من بيانات مهمة القالب
-     */
     public function validateTemplateTask(Request $request): ValidationValidator
     {
         $validationRules = [
@@ -105,18 +93,12 @@ class TaskValidationService
         return Validator::make($request->all(), $validationRules);
     }
 
-    /**
-     * تحديد ما إذا كانت المهمة مرنة الوقت
-     */
     public function determineFlexibleTime(Request $request): bool
     {
         $flexibleTimeValue = $request->input('is_flexible_time', '0');
         return filter_var($flexibleTimeValue, FILTER_VALIDATE_BOOLEAN) || $flexibleTimeValue === '1';
     }
 
-    /**
-     * الحصول على قواعد التحقق الأساسية
-     */
     private function getBasicValidationRules(): array
     {
         return [
@@ -127,16 +109,13 @@ class TaskValidationService
             'graphic_task_type_id' => 'nullable|exists:graphic_task_types,id',
             'points' => 'nullable|integer|min:0|max:1000',
             'due_date' => 'nullable|date',
-            'assigned_users' => 'required|array|min:1', // ✅ إجباري ولازم موظف واحد على الأقل
+            'assigned_users' => 'required|array|min:1',
             'assigned_users.*.user_id' => 'required|exists:users,id',
             'assigned_users.*.role' => 'nullable|string',
             'is_flexible_time' => 'nullable|in:true,false,1,0',
         ];
     }
 
-    /**
-     * الحصول على قواعد الوقت المطلوبة
-     */
     private function getRequiredTimeRules(): array
     {
         return [
@@ -147,9 +126,6 @@ class TaskValidationService
         ];
     }
 
-    /**
-     * الحصول على قواعد الوقت الاختيارية
-     */
     private function getOptionalTimeRules(): array
     {
         return [

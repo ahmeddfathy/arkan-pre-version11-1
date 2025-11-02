@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskActivityService
 {
-    /**
-     * تسجيل نشاط دخول صفحة المهام
-     */
     public function logTasksIndexView(Request $request): void
     {
         if (!Auth::check()) {
@@ -32,9 +29,6 @@ class TaskActivityService
             ->log('دخل على صفحة المهام');
     }
 
-    /**
-     * تسجيل نشاط عرض المهمة
-     */
     public function logTaskView(Task $task, Request $request): void
     {
         if (!Auth::check()) {
@@ -57,9 +51,6 @@ class TaskActivityService
             ->log('شاهد المهمة');
     }
 
-    /**
-     * تسجيل نشاط عرض مهمة القالب
-     */
     public function logTemplateTaskView($templateTaskUser, Request $request): void
     {
         if (!Auth::check()) {
@@ -83,9 +74,6 @@ class TaskActivityService
             ->log('شاهد مهمة القالب');
     }
 
-    /**
-     * تسجيل نشاط دخول مهام المشروع
-     */
     public function logProjectTasksView(Project $project, int $projectId, Request $request): void
     {
         if (!Auth::check()) {
@@ -106,9 +94,6 @@ class TaskActivityService
             ->log('دخل على مهام المشروع');
     }
 
-    /**
-     * تسجيل نشاط دخول صفحة مهامي
-     */
     public function logMyTasksView(Request $request): void
     {
         if (!Auth::check()) {

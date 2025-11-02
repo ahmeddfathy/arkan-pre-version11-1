@@ -37,7 +37,6 @@ class TaskUserAssignmentService
 
         foreach ($assignedUsers as $index => $assignedUser) {
             try {
-                // ✅ التحقق من أن المستخدم مشارك في المشروع (إذا كانت المهمة مرتبطة بمشروع)
                 if ($task->project_id) {
                     $isParticipant = \App\Models\ProjectServiceUser::where('project_id', $task->project_id)
                         ->where('user_id', $assignedUser['user_id'])
@@ -67,13 +66,11 @@ class TaskUserAssignmentService
 
                 $taskUser = TaskUser::create($taskUserData);
 
-                // نسخ البنود من المهمة الأساسية إلى TaskUser
                 $taskItemService = app(\App\Services\Tasks\TaskItemService::class);
                 $taskItemService->copyItemsToTaskUser($task, $taskUser);
 
                 $results[] = $taskUser;
 
-                // إرسال إشعار Slack للمستخدم المعين للمهمة
                 $user = User::find($assignedUser['user_id']);
                 $currentUser = Auth::user();
 
@@ -109,7 +106,6 @@ class TaskUserAssignmentService
         });
 
         foreach ($assignedUsers as $assignedUser) {
-            // ✅ التحقق من أن المستخدم مشارك في المشروع (إذا كانت المهمة مرتبطة بمشروع)
             if ($task->project_id) {
                 $isParticipant = \App\Models\ProjectServiceUser::where('project_id', $task->project_id)
                     ->where('user_id', $assignedUser['user_id'])
@@ -160,7 +156,6 @@ class TaskUserAssignmentService
                     'task_source' => $isAdditionalTask ? 'additional' : 'assigned',
                 ]);
 
-                // إرسال إشعار Slack للمستخدم الجديد المعين للمهمة
                 $user = User::find($assignedUser['user_id']);
                 $currentUser = Auth::user();
 
@@ -195,7 +190,6 @@ class TaskUserAssignmentService
             ];
         }
 
-        // التحقق من أن المهمة لم يتم اعتمادها مسبقاً
         if (!$taskUser->canChangeStatus()) {
             return [
                 'success' => false,
@@ -246,7 +240,6 @@ class TaskUserAssignmentService
             'task_source' => $isAdditionalTask ? 'additional' : 'assigned',
         ];
 
-        // إضافة ربط مباشر بالمهمة الإضافية إذا كان موجود
         if ($additionalTaskUserId) {
             $taskUserData['additional_task_user_id'] = $additionalTaskUserId;
         }
@@ -299,10 +292,9 @@ class TaskUserAssignmentService
 
         $currentSeasonId = $this->getCurrentSeasonId();
 
-        // إذا لم يوجد موسم نشط، استخدم موسم افتراضي (أول موسم في النظام)
         if (!$currentSeasonId) {
             $firstSeason = \App\Models\Season::orderBy('id', 'asc')->first();
-            return $firstSeason ? $firstSeason->id : 1; // قيمة افتراضية كحل أخير
+            return $firstSeason ? $firstSeason->id : 1;
         }
 
         return $currentSeasonId;
