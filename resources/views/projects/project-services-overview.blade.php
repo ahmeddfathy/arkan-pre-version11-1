@@ -507,10 +507,18 @@
                     <!-- Services row (initially hidden) -->
                     <tr class="services-row" id="services-{{ $project->id }}" style="display: none;">
                         <td colspan="5" class="services-cell">
-                            <div class="services-container">
+                            <div class="services-container" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; background: #fafafa;">
                                 <div class="services-loading">
                                     <i class="fas fa-spinner fa-spin"></i>
                                     جاري تحميل الخدمات...
+                                </div>
+                                <div style="margin-top: 1rem; text-align: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                                    <button data-project-id="{{ $project->id }}" class="hide-services-btn" onclick="(function(btn){ const servicesBtn = document.querySelector('[data-project-id=\'' + btn.getAttribute('data-project-id') + '\'].services-btn'); if(servicesBtn) toggleServices(servicesBtn); })(this);"
+                                        style="background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s ease;"
+                                        onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-1px)'"
+                                        onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)'">
+                                        <i class="fas fa-eye-slash"></i> إخفاء الخدمات
+                                    </button>
                                 </div>
                             </div>
                         </td>

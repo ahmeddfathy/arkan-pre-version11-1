@@ -47,7 +47,12 @@ function loadServices(projectId, projectName, container) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                displayServicesInline(data.services, projectName, container);
+                displayServicesInline(
+                    data.services,
+                    projectName,
+                    container,
+                    projectId
+                );
             } else {
                 container.innerHTML = `
                     <div class="services-error">
@@ -68,15 +73,45 @@ function loadServices(projectId, projectName, container) {
         });
 }
 
-function displayServicesInline(services, projectName, container) {
+function displayServicesInline(
+    services,
+    projectName,
+    container,
+    projectId = null
+) {
+    projectId =
+        projectId ||
+        currentProjectId ||
+        container.closest(".services-row")?.id?.replace("services-", "") ||
+        container.parentElement?.parentElement?.id?.replace("services-", "");
+
     if (services.length === 0) {
-        container.innerHTML = `
+        const html = `
             <div class="services-empty">
                 <i class="fas fa-list"></i>
                 <h4>لا توجد خدمات</h4>
                 <p>هذا المشروع لا يحتوي على أي خدمات</p>
             </div>
+            <div style="margin-top: 1rem; text-align: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                <button data-project-id="${projectId}" class="hide-services-btn"
+                    style="background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s ease;"
+                    onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-1px)'"
+                    onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)'">
+                    <i class="fas fa-eye-slash"></i> إخفاء الخدمات
+                </button>
+            </div>
         `;
+        container.innerHTML = html;
+        const hideBtn = container.querySelector(".hide-services-btn");
+        if (hideBtn) {
+            hideBtn.addEventListener("click", function () {
+                const projectId = this.getAttribute("data-project-id");
+                const btn = document.querySelector(
+                    '[data-project-id="' + projectId + '"].services-btn'
+                );
+                if (btn) toggleServices(btn);
+            });
+        }
         return;
     }
 
@@ -132,7 +167,28 @@ function displayServicesInline(services, projectName, container) {
     });
 
     html += "</div>";
+    html += `
+        <div style="margin-top: 1rem; text-align: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+            <button data-project-id="${projectId}" class="hide-services-btn"
+                style="background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s ease;"
+                onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)'">
+                <i class="fas fa-eye-slash"></i> إخفاء الخدمات
+            </button>
+        </div>
+    `;
     container.innerHTML = html;
+
+    container
+        .querySelector(".hide-services-btn")
+        ?.addEventListener("click", function () {
+            const btn = document.querySelector(
+                '[data-project-id="' +
+                    this.getAttribute("data-project-id") +
+                    '"].services-btn'
+            );
+            if (btn) toggleServices(btn);
+        });
 }
 
 // دالة جديدة لعرض قائمة المشاركين تحت كل خدمة
