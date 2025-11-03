@@ -33,6 +33,90 @@ class TaskRevisionService
     }
 
     /**
+     * توليد كود فريد للتعديل
+     *
+     * نظام الأكواد:
+     * - تعديل مشروع: PROJECT_CODE-REV-# (مثال: PRJ-001-REV-1)
+     * - تعديل مهمة: REV-TASK-TASK_ID-# (مثال: REV-TASK-123-1)
+     * - تعديل عام: REV-YYYY-#### (مثال: REV-2025-0001)
+     *
+     * @param string $revisionType نوع التعديل (project, task, general)
+     * @param int|null $projectId معرف المشروع (للتعديلات الخاصة بالمشاريع)
+     * @param int|null $taskId معرف المهمة (للتعديلات الخاصة بالمهام)
+     * @return string الكود الفريد للتعديل
+     */
+    protected function generateRevisionCode(string $revisionType, ?int $projectId = null, ?int $taskId = null): string
+    {
+        try {
+            if ($revisionType === 'project' && $projectId) {
+                // تعديل مشروع: PROJECT_CODE-REV-#
+                $project = \App\Models\Project::find($projectId);
+
+                if (!$project || !$project->code) {
+                    // إذا لم يكن للمشروع كود، استخدم نظام عام
+                    return $this->generateGeneralRevisionCode();
+                }
+
+                // عد التعديلات السابقة لهذا المشروع
+                $revisionCount = TaskRevision::where('revision_type', 'project')
+                    ->where('project_id', $projectId)
+                    ->count() + 1;
+
+                return "{$project->code}-REV-{$revisionCount}";
+            } elseif ($revisionType === 'task' && $taskId) {
+                // تعديل مهمة: REV-TASK-TASK_ID-#
+
+                // عد التعديلات السابقة لهذه المهمة
+                $revisionCount = TaskRevision::where('revision_type', 'task')
+                    ->where('task_id', $taskId)
+                    ->count() + 1;
+
+                return "REV-TASK-{$taskId}-{$revisionCount}";
+            } else {
+                // تعديل عام: REV-YYYY-####
+                return $this->generateGeneralRevisionCode();
+            }
+        } catch (\Exception $e) {
+            Log::error('Error generating revision code', [
+                'revision_type' => $revisionType,
+                'project_id' => $projectId,
+                'task_id' => $taskId,
+                'error' => $e->getMessage()
+            ]);
+
+            // في حالة الخطأ، نستخدم النظام العام
+            return $this->generateGeneralRevisionCode();
+        }
+    }
+
+    /**
+     * توليد كود عام للتعديل
+     *
+     * @return string الكود بصيغة REV-YYYY-####
+     */
+    protected function generateGeneralRevisionCode(): string
+    {
+        $year = now()->year;
+
+        // عد التعديلات العامة في السنة الحالية
+        $revisionCount = TaskRevision::where('revision_type', 'general')
+            ->whereYear('created_at', $year)
+            ->count();
+
+        // إذا لم يكن هناك تعديلات عامة، عد جميع التعديلات في السنة
+        if ($revisionCount === 0) {
+            $revisionCount = TaskRevision::whereYear('created_at', $year)->count();
+        }
+
+        $revisionCount++;
+
+        // تنسيق الرقم بـ 4 خانات (0001, 0002, ...)
+        $formattedNumber = str_pad($revisionCount, 4, '0', STR_PAD_LEFT);
+
+        return "REV-{$year}-{$formattedNumber}";
+    }
+
+    /**
      * إنشاء تعديل جديد
      */
     public function createRevision(array $data): array
@@ -59,7 +143,7 @@ class TaskRevisionService
                 'revision_deadline' => isset($data['revision_deadline']) ? $data['revision_deadline'] : null,
             ];
 
-            // ربط التعديل حسب النوع
+            // ربط التعديل حسب النوع وتوليد الكود المناسب
             if ($data['revision_type'] === 'project') {
                 // تعديل مشروع
                 $revisionData['project_id'] = $data['project_id'];
@@ -69,6 +153,9 @@ class TaskRevisionService
                 $revisionData['template_task_user_id'] = null;
                 $revisionData['task_type'] = null;
                 $revisionData['assigned_to'] = $data['assigned_to'] ?? null;
+
+                // توليد كود التعديل للمشروع
+                $revisionData['revision_code'] = $this->generateRevisionCode('project', $data['project_id']);
 
                 // معالجة المرفق (ملف أو لينك) - تمرير بيانات التعديل
                 $attachmentData = $this->handleAttachment($data, 'project', $data['project_id'], $revisionData);
@@ -83,6 +170,9 @@ class TaskRevisionService
                 $revisionData['template_task_user_id'] = null;
                 $revisionData['task_type'] = null;
                 $revisionData['assigned_to'] = $data['assigned_to'] ?? null;
+
+                // توليد كود التعديل العام
+                $revisionData['revision_code'] = $this->generateRevisionCode('general');
 
                 // معالجة المرفق (ملف أو لينك) - تمرير بيانات التعديل
                 $attachmentData = $this->handleAttachment($data, 'general', 'general', $revisionData);
@@ -104,10 +194,16 @@ class TaskRevisionService
                     $revisionData['template_task_user_id'] = $data['task_id'];
                     $revisionData['task_id'] = null;
                     $revisionData['task_user_id'] = null;
+
+                    // توليد كود التعديل العام للمهام القالبية
+                    $revisionData['revision_code'] = $this->generateRevisionCode('general');
                 } else {
                     $revisionData['task_id'] = $taskData['task_id'];
                     $revisionData['task_user_id'] = $data['task_user_id'] ?? null;
                     $revisionData['template_task_user_id'] = null;
+
+                    // توليد كود التعديل للمهمة
+                    $revisionData['revision_code'] = $this->generateRevisionCode('task', null, $taskData['task_id']);
 
                     Log::info('Task revision data validated', [
                         'resolved_task_id' => $taskData['task_id'],

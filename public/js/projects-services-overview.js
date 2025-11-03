@@ -685,18 +685,20 @@ function displayProjectDetails(data) {
     document.getElementById("sidebarContent").style.display = "block";
 
     // Handle different response formats
-    let projectData, servicesData, participantsData;
+    let projectData, servicesData, participantsData, revisionsData;
 
     if (data.success !== undefined) {
         // Response from ProjectAnalyticsTrait
         projectData = data.project;
         servicesData = data.services;
         participantsData = data.participants;
+        revisionsData = data.revisions || [];
     } else {
         // Response from ProjectParticipantsTrait (if used)
         projectData = data.project;
         servicesData = data.services;
         participantsData = data.participants;
+        revisionsData = data.revisions || [];
     }
 
     // Update project name and code
@@ -713,6 +715,9 @@ function displayProjectDetails(data) {
 
     // Display participants
     displaySidebarParticipants(participantsData);
+
+    // Display revisions
+    displaySidebarRevisions(revisionsData);
 }
 
 function displaySidebarServices(services) {
@@ -1575,6 +1580,106 @@ function showTaskDetailsError(message) {
 function closeTaskDetailsModal() {
     const modals = document.querySelectorAll(".task-details-modal");
     modals.forEach((modal) => modal.remove());
+}
+
+function displaySidebarRevisions(revisions) {
+    const container = document.getElementById("sidebarRevisions");
+
+    if (!revisions || revisions.length === 0) {
+        container.innerHTML = '<p class="empty-message">لا توجد تعديلات</p>';
+        return;
+    }
+
+    let html = "";
+    revisions.forEach((revision) => {
+        // تحديد لون الحالة
+        const statusClass = revision.status_color || "secondary";
+        const statusText = revision.status_text || "غير محدد";
+
+        // تحديد لون المصدر
+        const sourceClass = revision.source_color || "secondary";
+        const sourceText = revision.source_text || "غير محدد";
+
+        // أيقونة المصدر
+        const sourceIcon = revision.source === "internal" ? "🏢" : "🌐";
+
+        // تحديد لون البطاقة حسب الحالة
+        let cardBgColor = "white";
+        let cardBorderColor = "#e5e7eb";
+
+        if (revision.status === "completed") {
+            cardBgColor = "#f0fdf4";
+            cardBorderColor = "#10b981";
+        } else if (revision.status === "paused") {
+            cardBgColor = "#fef2f2";
+            cardBorderColor = "#ef4444";
+        } else if (revision.status === "in_progress") {
+            cardBgColor = "#eff6ff";
+            cardBorderColor = "#3b82f6";
+        } else if (revision.status === "new") {
+            cardBgColor = "#fffbeb";
+            cardBorderColor = "#f59e0b";
+        }
+
+        html += `
+            <div class="revision-card" style="background: ${cardBgColor}; border: 2px solid ${cardBorderColor}; border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem; transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none'; this.style.transform='translateY(0)'">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; font-size: 0.9rem;">
+                            ${revision.title || "بدون عنوان"}
+                        </div>
+                        ${
+                            revision.revision_code
+                                ? `<div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">كود: ${revision.revision_code}</div>`
+                                : ""
+                        }
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: end; gap: 0.25rem;">
+                        <span class="badge badge-${statusClass}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+                            ${statusText}
+                        </span>
+                        <span class="badge badge-${sourceClass}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+                            ${sourceIcon} ${sourceText}
+                        </span>
+                    </div>
+                </div>
+
+                ${
+                    revision.description
+                        ? `<div style="font-size: 0.85rem; color: #4b5563; margin-bottom: 0.5rem; line-height: 1.5;">
+                    ${
+                        revision.description.length > 100
+                            ? revision.description.substring(0, 100) + "..."
+                            : revision.description
+                    }
+                </div>`
+                        : ""
+                }
+
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #6b7280; padding-top: 0.5rem; border-top: 1px solid #f3f4f6;">
+                    <div>
+                        ${
+                            revision.service_name
+                                ? `<span style="margin-left: 0.5rem;">📋 ${revision.service_name}</span>`
+                                : ""
+                        }
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        ${
+                            revision.creator_name
+                                ? `<span>👤 ${revision.creator_name}</span>`
+                                : ""
+                        }
+                        <span>🕒 ${
+                            revision.created_at_diff || revision.created_at
+                        }</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
 }
 
 // ===================================

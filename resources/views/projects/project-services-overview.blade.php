@@ -661,7 +661,7 @@
                     <i class="fas fa-folder project-icon"></i>
                     <h3 id="sidebarProjectName">تفاصيل المشروع</h3>
                 </div>
-                <p id="sidebarProjectCode" class="project-code">كود المشروع</p>
+                <p id="sidebarProjectCode" class="project-code" style="color: white;">كود المشروع</p>
             </div>
             <button class="sidebar-close" onclick="closeProjectSidebar()">
                 <i class="fas fa-times"></i>
@@ -707,6 +707,43 @@
                     </h4>
                     <div id="sidebarTasks" class="tasks-container">
                         <!-- Tasks will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Revisions Section -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-edit"></i>
+                        التعديلات
+                    </h4>
+                    <div id="sidebarRevisions" class="revisions-container">
+                        <!-- Revisions will be loaded here -->
+                    </div>
+
+                    <!-- Color Guide -->
+                    <div style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border-radius: 12px; border: 1px solid #e5e7eb;">
+                        <div style="font-weight: 700; font-size: 0.85rem; color: #374151; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
+                            دليل الألوان
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 24px; height: 24px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 6px; flex-shrink: 0;"></div>
+                                <span style="color: #4b5563;">✅ مكتمل - تم إنجاز التعديل بنجاح</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 24px; height: 24px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 6px; flex-shrink: 0;"></div>
+                                <span style="color: #4b5563;">🔄 جاري العمل - في مرحلة التنفيذ</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 24px; height: 24px; background: #fef2f2; border: 2px solid #ef4444; border-radius: 6px; flex-shrink: 0;"></div>
+                                <span style="color: #4b5563;">⏸️ متوقف - يحتاج متابعة</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 24px; height: 24px; background: #fffbeb; border: 2px solid #f59e0b; border-radius: 6px; flex-shrink: 0;"></div>
+                                <span style="color: #4b5563;">🆕 جديد - في انتظار البدء</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

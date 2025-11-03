@@ -43,6 +43,7 @@ class TaskRevision extends Model implements Auditable
     ];
 
     protected $fillable = [
+        'revision_code', // كود التعديل الفريد
         'task_id',
         'task_user_id',
         'template_task_user_id',
@@ -231,8 +232,8 @@ class TaskRevision extends Model implements Auditable
     public function executorDeadline()
     {
         return $this->hasOne(RevisionDeadline::class, 'revision_id')
-                    ->where('deadline_type', 'executor')
-                    ->latest();
+            ->where('deadline_type', 'executor')
+            ->latest();
     }
 
     /**
@@ -241,8 +242,8 @@ class TaskRevision extends Model implements Auditable
     public function reviewerDeadlines()
     {
         return $this->hasMany(RevisionDeadline::class, 'revision_id')
-                    ->where('deadline_type', 'reviewer')
-                    ->orderBy('reviewer_order');
+            ->where('deadline_type', 'reviewer')
+            ->orderBy('reviewer_order');
     }
 
     /**
@@ -359,7 +360,6 @@ class TaskRevision extends Model implements Auditable
                                 'next_reviewer_id' => $nextReviewerUser->id,
                                 'reviewer_order' => $index + 2,
                             ]);
-
                         } catch (\Exception $e) {
                             \Illuminate\Support\Facades\Log::error('Error sending notification to next reviewer', [
                                 'revision_id' => $this->id,
@@ -448,7 +448,7 @@ class TaskRevision extends Model implements Auditable
      */
     public function getStatusColorAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'new' => 'secondary',
             'in_progress' => 'primary',
             'paused' => 'warning',
@@ -462,7 +462,7 @@ class TaskRevision extends Model implements Auditable
      */
     public function getStatusTextAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'new' => 'جديد',
             'in_progress' => 'جاري العمل',
             'paused' => 'متوقف',
@@ -503,7 +503,7 @@ class TaskRevision extends Model implements Auditable
      */
     public function getRevisionSourceTextAttribute()
     {
-        return match($this->revision_source) {
+        return match ($this->revision_source) {
             'internal' => 'تعديل داخلي',
             'external' => 'تعديل خارجي',
             default => 'غير محدد'
@@ -515,7 +515,7 @@ class TaskRevision extends Model implements Auditable
      */
     public function getRevisionSourceColorAttribute()
     {
-        return match($this->revision_source) {
+        return match ($this->revision_source) {
             'internal' => 'primary',
             'external' => 'warning',
             default => 'secondary'
@@ -527,7 +527,7 @@ class TaskRevision extends Model implements Auditable
      */
     public function getRevisionSourceIconAttribute()
     {
-        return match($this->revision_source) {
+        return match ($this->revision_source) {
             'internal' => 'fas fa-users',
             'external' => 'fas fa-external-link-alt',
             default => 'fas fa-question'
@@ -565,10 +565,10 @@ class TaskRevision extends Model implements Auditable
         }
 
         return $query->where('task_type', 'regular')
-                    ->where('task_id', $actualTaskId)
-                    ->when($taskUserId, function($q) use ($taskUserId) {
-                        return $q->orWhere('task_user_id', $taskUserId);
-                    });
+            ->where('task_id', $actualTaskId)
+            ->when($taskUserId, function ($q) use ($taskUserId) {
+                return $q->orWhere('task_user_id', $taskUserId);
+            });
     }
 
     /**
@@ -577,7 +577,7 @@ class TaskRevision extends Model implements Auditable
     public function scopeForTemplateTask($query, $templateTaskUserId)
     {
         return $query->where('task_type', 'template')
-                    ->where('template_task_user_id', $templateTaskUserId);
+            ->where('template_task_user_id', $templateTaskUserId);
     }
 
     /**
@@ -610,7 +610,7 @@ class TaskRevision extends Model implements Auditable
     public function scopeForProject($query, $projectId)
     {
         return $query->where('revision_type', 'project')
-                    ->where('project_id', $projectId);
+            ->where('project_id', $projectId);
     }
 
     /**
@@ -789,7 +789,6 @@ class TaskRevision extends Model implements Auditable
                     'reviewer_id' => $firstReviewer->id,
                     'reviewer_order' => 1,
                 ]);
-
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Error sending notification to reviewer', [
                     'revision_id' => $this->id,
@@ -864,7 +863,7 @@ class TaskRevision extends Model implements Auditable
     public function scopeActiveForUser($query, $userId)
     {
         return $query->where('created_by', $userId)
-                     ->where('status', 'in_progress');
+            ->where('status', 'in_progress');
     }
 
     // =====================================================

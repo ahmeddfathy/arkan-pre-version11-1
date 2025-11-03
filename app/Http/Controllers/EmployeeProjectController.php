@@ -128,23 +128,14 @@ class EmployeeProjectController extends Controller
         $projectServiceUser->updateStatus($request->status);
 
         $user = Auth::user();
-        $hierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
+
+        $totalParticipants = ProjectServiceUser::where('project_id', $projectServiceUser->project_id)
+            ->where('service_id', $projectServiceUser->service_id)
+            ->count();
+
         $serviceStatusUpdated = false;
 
-        // لوج عام لتحديث حالة الموظف
-        Log::info('Employee Status Updated', [
-            'project_service_user_id' => $projectServiceUser->id,
-            'project_id' => $projectServiceUser->project_id,
-            'service_id' => $projectServiceUser->service_id,
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'hierarchy_level' => $hierarchyLevel,
-            'old_status' => $oldStatus,
-            'new_status' => $request->status,
-            'timestamp' => now()->format('Y-m-d H:i:s')
-        ]);
-
-        if ($hierarchyLevel == 2) {
+        if ($totalParticipants == 1) {
             $project = Project::find($projectServiceUser->project_id);
             if ($project) {
                 $project->services()->updateExistingPivot($projectServiceUser->service_id, [
@@ -153,26 +144,30 @@ class EmployeeProjectController extends Controller
                 ]);
                 $serviceStatusUpdated = true;
 
-                // لوج خاص بالمستوى الهرمي 2 - تحديث حالة الخدمة بالكامل
-                Log::info('🔥 HIERARCHY LEVEL 2: Service Status Updated', [
-                    'action' => 'FULL_SERVICE_STATUS_UPDATE',
+                Log::info('Service Status Updated - Single Participant', [
+                    'action' => 'AUTO_SERVICE_STATUS_UPDATE',
                     'project_id' => $projectServiceUser->project_id,
-                    'project_name' => $project->name,
                     'service_id' => $projectServiceUser->service_id,
-                    'service_name' => $projectServiceUser->service->name ?? 'N/A',
                     'user_id' => $user->id,
-                    'user_name' => $user->name,
-                    'user_email' => $user->email,
-                    'hierarchy_level' => $hierarchyLevel,
                     'old_status' => $oldStatus,
                     'new_status' => $request->status,
-                    'service_status_updated' => true,
-                    'pivot_table_updated' => true,
-                    'timestamp' => now()->format('Y-m-d H:i:s'),
-                    'impact' => 'يؤثر على حالة الخدمة بالكامل في المشروع'
+                    'reason' => 'Only one participant in service'
                 ]);
             }
         }
+
+        Log::info('Employee Status Updated', [
+            'project_service_user_id' => $projectServiceUser->id,
+            'project_id' => $projectServiceUser->project_id,
+            'service_id' => $projectServiceUser->service_id,
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'old_status' => $oldStatus,
+            'new_status' => $request->status,
+            'total_participants' => $totalParticipants,
+            'service_status_updated' => $serviceStatusUpdated,
+            'timestamp' => now()->format('Y-m-d H:i:s')
+        ]);
 
         try {
             $project = $projectServiceUser->project;
@@ -517,12 +512,7 @@ class EmployeeProjectController extends Controller
         ], $result['status_code'] ?? 500);
     }
 
-    /**
-     * عرض صفحة المشاريع لـ Team Leader
-     * يعرض المشاريع مجموعة حسب الخدمة مع الموظفين في كل خدمة
-     * - التيم ليدر (hierarchy_level = 3) يستطيع المشاهدة فقط
-     * - المسؤول عن الخدمة (hierarchy_level = 2) يستطيع تغيير حالة الخدمة
-     */
+
     public function teamLeaderIndex(Request $request)
     {
         $user = Auth::user();
@@ -678,7 +668,7 @@ class EmployeeProjectController extends Controller
     }
 
     /**
-     * تحديث حالة الخدمة بالكامل (للمسؤول عن الخدمة الذي له hierarchy_level = 2)
+     * تحديث حالة المستخدم في الخدمة
      */
     public function updateServiceStatus(Request $request, $projectId, $serviceId)
     {
@@ -687,9 +677,6 @@ class EmployeeProjectController extends Controller
         ]);
 
         $user = Auth::user();
-
-        // التحقق من المستوى الهرمي للمستخدم
-        $hierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel($user);
 
         // التحقق من أن المستخدم يعمل على هذا المشروع والخدمة
         $isWorking = ProjectServiceUser::where('user_id', $user->id)
@@ -730,73 +717,47 @@ class EmployeeProjectController extends Controller
         $myRecord->status = $request->status;
         $myRecord->save();
 
-        // تحديث حالة الخدمة في المشروع (project_service pivot table) فقط للمستوى الهرمي 2
+        $totalParticipants = ProjectServiceUser::where('project_id', $projectId)
+            ->where('service_id', $serviceId)
+            ->count();
+
         $serviceStatusUpdated = false;
 
-        // لوج عام لتحديث حالة الموظف
-        Log::info('Employee Status Updated via updateServiceStatus', [
-            'project_service_user_id' => $myRecord->id,
-            'project_id' => $projectId,
-            'service_id' => $serviceId,
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'hierarchy_level' => $hierarchyLevel,
-            'old_status' => $oldStatus,
-            'new_status' => $request->status,
-            'timestamp' => now()->format('Y-m-d H:i:s')
-        ]);
-
-        if ($hierarchyLevel == 2) {
+        if ($totalParticipants == 1) {
             $project = Project::find($projectId);
             if ($project) {
-                $service = $project->services()->find($serviceId);
-
                 $project->services()->updateExistingPivot($serviceId, [
                     'service_status' => $request->status,
                     'updated_at' => now()
                 ]);
                 $serviceStatusUpdated = true;
 
-                // لوج خاص بالمستوى الهرمي 2 - تحديث حالة الخدمة بالكامل
-                Log::info('🔥 HIERARCHY LEVEL 2: Service Status Updated via updateServiceStatus', [
-                    'action' => 'FULL_SERVICE_STATUS_UPDATE_FROM_TEAM_LEADER_PAGE',
+                Log::info('Service Status Updated via updateServiceStatus - Single Participant', [
+                    'action' => 'AUTO_SERVICE_STATUS_UPDATE',
                     'method' => 'updateServiceStatus',
                     'project_id' => $projectId,
-                    'project_name' => $project->name,
-                    'project_code' => $project->code,
                     'service_id' => $serviceId,
-                    'service_name' => $service->name ?? 'N/A',
                     'user_id' => $user->id,
-                    'user_name' => $user->name,
-                    'user_email' => $user->email,
-                    'hierarchy_level' => $hierarchyLevel,
                     'old_status' => $oldStatus,
                     'new_status' => $request->status,
-                    'service_status_updated' => true,
-                    'pivot_table_updated' => true,
-                    'timestamp' => now()->format('Y-m-d H:i:s'),
-                    'impact' => 'يؤثر على حالة الخدمة بالكامل في المشروع (تم التحديث من صفحة قائد الفريق)'
+                    'reason' => 'Only one participant in service'
                 ]);
             }
-        } else {
-            // لوج للمستويات الأخرى (مثل Team Leader مستوى 3)
-            Log::info('Team Leader Personal Status Updated', [
-                'action' => 'PERSONAL_STATUS_UPDATE_ONLY',
-                'method' => 'updateServiceStatus',
-                'project_id' => $projectId,
-                'service_id' => $serviceId,
-                'user_id' => $user->id,
-                'user_name' => $user->name,
-                'hierarchy_level' => $hierarchyLevel,
-                'old_status' => $oldStatus,
-                'new_status' => $request->status,
-                'service_status_updated' => false,
-                'timestamp' => now()->format('Y-m-d H:i:s'),
-                'note' => 'تم تحديث الحالة الشخصية فقط - لا يؤثر على حالة الخدمة الكلية'
-            ]);
         }
 
-        // رسالة مختلفة حسب المستوى الهرمي
+        Log::info('Employee Status Updated via updateServiceStatus', [
+            'project_service_user_id' => $myRecord->id,
+            'project_id' => $projectId,
+            'service_id' => $serviceId,
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'old_status' => $oldStatus,
+            'new_status' => $request->status,
+            'total_participants' => $totalParticipants,
+            'service_status_updated' => $serviceStatusUpdated,
+            'timestamp' => now()->format('Y-m-d H:i:s')
+        ]);
+
         $message = $serviceStatusUpdated
             ? 'تم تحديث حالتك وحالة الخدمة بنجاح'
             : 'تم تحديث حالتك بنجاح';

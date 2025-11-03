@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Traits\Projects;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\ProjectServiceUser;
+use App\Models\TaskRevision;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -588,6 +589,33 @@ trait ProjectAnalyticsTrait
                     ];
                 })->values();
 
+            // جلب التعديلات
+            $revisions = TaskRevision::where('project_id', $project->id)
+                ->with(['creator', 'service', 'assignedUser', 'responsibleUser'])
+                ->latest()
+                ->limit(50)
+                ->get()
+                ->map(function ($revision) {
+                    return [
+                        'id' => $revision->id,
+                        'revision_code' => $revision->revision_code,
+                        'title' => $revision->title,
+                        'description' => $revision->description,
+                        'status' => $revision->status,
+                        'status_text' => $revision->status_text,
+                        'status_color' => $revision->status_color,
+                        'source' => $revision->revision_source,
+                        'source_text' => $revision->revision_source_text,
+                        'source_color' => $revision->revision_source_color,
+                        'service_name' => $revision->service ? $revision->service->name : 'عام',
+                        'creator_name' => $revision->creator ? $revision->creator->name : 'غير معروف',
+                        'assigned_to_name' => $revision->assignedUser ? $revision->assignedUser->name : null,
+                        'responsible_name' => $revision->responsibleUser ? $revision->responsibleUser->name : null,
+                        'created_at' => $revision->created_at->format('Y-m-d H:i'),
+                        'created_at_diff' => $revision->created_at->diffForHumans(),
+                    ];
+                });
+
             return response()->json([
                 'success' => true,
                 'project' => [
@@ -597,7 +625,8 @@ trait ProjectAnalyticsTrait
                     'description' => $project->description,
                 ],
                 'services' => $services,
-                'participants' => $participants
+                'participants' => $participants,
+                'revisions' => $revisions
             ]);
         } catch (\Exception $e) {
             Log::error('Error fetching project details for sidebar', [

@@ -697,6 +697,52 @@ function calculateInitialReviewTime(revision) {
     return totalSeconds;
 }
 
+function syncAllRevisionTimersWithRealTime() {
+    Object.keys(revisionTimers).forEach(revisionId => {
+        const timer = revisionTimers[revisionId];
+        if (timer && timer.status === 'in_progress' && timer.revision) {
+            const newSeconds = calculateInitialRevisionTime(timer.revision);
+            if (newSeconds > timer.seconds) {
+                timer.seconds = newSeconds;
+                updateRevisionTimerDisplay(revisionId, newSeconds);
+            }
+        }
+    });
+
+    Object.keys(reviewTimers).forEach(revisionId => {
+        const timer = reviewTimers[revisionId];
+        if (timer && timer.status === 'in_progress' && timer.revision) {
+            const newSeconds = calculateInitialReviewTime(timer.revision);
+            if (newSeconds > timer.seconds) {
+                timer.seconds = newSeconds;
+                updateReviewTimerDisplay(revisionId, newSeconds);
+            }
+        }
+    });
+}
+
+function initializeRevisionTimersPageVisibilityHandler() {
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            syncAllRevisionTimersWithRealTime();
+        }
+    });
+
+    setInterval(function() {
+        if (!document.hidden) {
+            syncAllRevisionTimersWithRealTime();
+        }
+    }, 10000);
+
+    document.addEventListener('click', function() {
+        if (!document.hidden) {
+            setTimeout(() => {
+                syncAllRevisionTimersWithRealTime();
+            }, 100);
+        }
+    });
+}
+
 // تحديث التايمر بعد أي عملية (بدون reload كامل)
 function refreshRevisionTimers() {
     console.log('🔄 تحديث التايمرات بدون reload...');
@@ -711,6 +757,16 @@ function refreshRevisionTimers() {
 $(window).on('beforeunload', function() {
     stopAllRevisionTimers();
 });
+
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeRevisionTimersPageVisibilityHandler();
+        });
+    } else {
+        initializeRevisionTimersPageVisibilityHandler();
+    }
+}
 
 // ====================================
 

@@ -818,78 +818,85 @@ async function saveNewRevision() {
             .getElementById("newResponsibilityNotes")
             .value.trim();
 
-        if (responsibleUserId) {
-            formData.append("responsible_user_id", responsibleUserId);
+        if (!responsibleUserId) {
+            resetSaveButton();
+            Swal.fire("خطأ", "الرجاء اختيار المسؤول", "error");
+            return;
         }
-        if (executorUserId) {
-            formData.append("executor_user_id", executorUserId);
 
-            const executorDeadline = document.getElementById(
-                "newExecutorDeadline"
-            )?.value;
-            if (executorDeadline) {
-                const executorDeadlineDate = new Date(executorDeadline);
+        if (!executorUserId) {
+            resetSaveButton();
+            Swal.fire("خطأ", "الرجاء اختيار المنفذ", "error");
+            return;
+        }
 
-                if (
-                    window.selectedReviewers &&
-                    window.selectedReviewers.length > 0
-                ) {
-                    const sortedReviewers = [...window.selectedReviewers].sort(
-                        (a, b) => {
-                            const aOrder =
-                                parseInt(
-                                    document.querySelector(`#${a.id} .badge`)
-                                        ?.textContent || a.order
-                                ) || 0;
-                            const bOrder =
-                                parseInt(
-                                    document.querySelector(`#${b.id} .badge`)
-                                        ?.textContent || b.order
-                                ) || 0;
-                            return aOrder - bOrder;
-                        }
+        formData.append("responsible_user_id", responsibleUserId);
+        formData.append("executor_user_id", executorUserId);
+
+        const executorDeadline = document.getElementById(
+            "newExecutorDeadline"
+        )?.value;
+        if (executorDeadline) {
+            const executorDeadlineDate = new Date(executorDeadline);
+
+            if (
+                window.selectedReviewers &&
+                window.selectedReviewers.length > 0
+            ) {
+                const sortedReviewers = [...window.selectedReviewers].sort(
+                    (a, b) => {
+                        const aOrder =
+                            parseInt(
+                                document.querySelector(`#${a.id} .badge`)
+                                    ?.textContent || a.order
+                            ) || 0;
+                        const bOrder =
+                            parseInt(
+                                document.querySelector(`#${b.id} .badge`)
+                                    ?.textContent || b.order
+                            ) || 0;
+                        return aOrder - bOrder;
+                    }
+                );
+
+                const firstReviewer = sortedReviewers.find((r) => r.userId);
+                if (firstReviewer) {
+                    const firstReviewerRow = document.getElementById(
+                        firstReviewer.id
                     );
-
-                    const firstReviewer = sortedReviewers.find((r) => r.userId);
-                    if (firstReviewer) {
-                        const firstReviewerRow = document.getElementById(
-                            firstReviewer.id
-                        );
-                        if (firstReviewerRow) {
-                            const firstReviewerDeadlineInput =
-                                firstReviewerRow.querySelector(
-                                    ".reviewer-deadline"
-                                );
-                            if (
-                                firstReviewerDeadlineInput &&
+                    if (firstReviewerRow) {
+                        const firstReviewerDeadlineInput =
+                            firstReviewerRow.querySelector(
+                                ".reviewer-deadline"
+                            );
+                        if (
+                            firstReviewerDeadlineInput &&
+                            firstReviewerDeadlineInput.value
+                        ) {
+                            const firstReviewerDeadlineDate = new Date(
                                 firstReviewerDeadlineInput.value
+                            );
+                            if (
+                                executorDeadlineDate > firstReviewerDeadlineDate
                             ) {
-                                const firstReviewerDeadlineDate = new Date(
-                                    firstReviewerDeadlineInput.value
+                                resetSaveButton();
+                                Swal.fire(
+                                    "خطأ في الترتيب",
+                                    "ديدلاين المنفذ يجب أن يكون قبل ديدلاين المراجع الأول",
+                                    "error"
                                 );
-                                if (
-                                    executorDeadlineDate >
-                                    firstReviewerDeadlineDate
-                                ) {
-                                    resetSaveButton();
-                                    Swal.fire(
-                                        "خطأ في الترتيب",
-                                        "ديدلاين المنفذ يجب أن يكون قبل ديدلاين المراجع الأول",
-                                        "error"
-                                    );
-                                    return;
-                                }
+                                return;
                             }
                         }
                     }
                 }
-
-                const formattedDeadline = executorDeadlineDate
-                    .toISOString()
-                    .slice(0, 19)
-                    .replace("T", " ");
-                formData.append("executor_deadline", formattedDeadline);
             }
+
+            const formattedDeadline = executorDeadlineDate
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ");
+            formData.append("executor_deadline", formattedDeadline);
         }
 
         if (window.selectedReviewers && window.selectedReviewers.length > 0) {

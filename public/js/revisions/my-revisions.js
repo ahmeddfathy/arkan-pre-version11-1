@@ -163,16 +163,18 @@ function loadProjectsRevisions(page = 1, filters = {}) {
         <div class="revisions-table"><div class="table-responsive"><table class="table mb-0">
             <thead><tr>
                 <th style="width: 5%;">#</th>
-                <th style="width: 25%;">العنوان</th>
-                <th style="width: 15%;">المشروع</th>
-                <th style="width: 10%;">النوع</th>
-                <th style="width: 10%;">المصدر</th>
-                <th style="width: 10%;">الحالة</th>
-                <th style="width: 10%;">دوري</th>
-                <th style="width: 10%;">الديدلاين</th>
+                <th style="width: 20%;">العنوان</th>
+                <th style="width: 12%;">المشروع</th>
+                <th style="width: 8%;">النوع</th>
+                <th style="width: 8%;">المصدر</th>
+                <th style="width: 8%;">الحالة</th>
+                <th style="width: 8%;">دوري</th>
+                <th style="width: 8%;">الديدلاين</th>
+                <th style="width: 6%;">تايمر التنفيذ</th>
+                <th style="width: 6%;">تايمر المراجعة</th>
                 <th style="width: 5%;">الإجراءات</th>
             </tr></thead>
-            <tbody><tr><td colspan="9" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i>جاري التحميل...</td></tr></tbody>
+            <tbody><tr><td colspan="11" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i>جاري التحميل...</td></tr></tbody>
         </table></div></div>
     `);
 
@@ -197,6 +199,9 @@ function loadProjectsRevisions(page = 1, filters = {}) {
                     response.revisions,
                     "projectsRevisionsPagination"
                 );
+                if (typeof initializeRevisionTimers === 'function') {
+                    initializeRevisionTimers();
+                }
             }
         },
         error: function (xhr) {
@@ -223,14 +228,16 @@ function loadTasksRevisions(page = 1, filters = {}) {
         <div class="revisions-table"><div class="table-responsive"><table class="table mb-0">
             <thead><tr>
                 <th style="width: 5%;">#</th>
-                <th style="width: 30%;">العنوان</th>
-                <th style="width: 10%;">المصدر</th>
-                <th style="width: 10%;">الحالة</th>
-                <th style="width: 10%;">دوري</th>
-                <th style="width: 10%;">الديدلاين</th>
+                <th style="width: 25%;">العنوان</th>
+                <th style="width: 8%;">المصدر</th>
+                <th style="width: 8%;">الحالة</th>
+                <th style="width: 8%;">دوري</th>
+                <th style="width: 8%;">الديدلاين</th>
+                <th style="width: 6%;">تايمر التنفيذ</th>
+                <th style="width: 6%;">تايمر المراجعة</th>
                 <th style="width: 5%;">الإجراءات</th>
             </tr></thead>
-            <tbody><tr><td colspan="7" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i>جاري التحميل...</td></tr></tbody>
+            <tbody><tr><td colspan="9" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i>جاري التحميل...</td></tr></tbody>
         </table></div></div>
     `);
 
@@ -253,6 +260,9 @@ function loadTasksRevisions(page = 1, filters = {}) {
                     response.revisions,
                     "tasksRevisionsPagination"
                 );
+                if (typeof initializeRevisionTimers === 'function') {
+                    initializeRevisionTimers();
+                }
             }
         },
         error: function (xhr) {
@@ -300,10 +310,12 @@ function renderMyRevisionsList(
         html += '<th style="width: 15%;">المشروع</th>';
         html += '<th style="width: 10%;">النوع</th>';
     }
-    html += '<th style="width: 10%;">المصدر</th>';
-    html += '<th style="width: 10%;">الحالة</th>';
-    html += '<th style="width: 10%;">دوري</th>';
-    html += '<th style="width: 10%;">الديدلاين</th>';
+    html += '<th style="width: 8%;">المصدر</th>';
+    html += '<th style="width: 8%;">الحالة</th>';
+    html += '<th style="width: 8%;">دوري</th>';
+    html += '<th style="width: 8%;">الديدلاين</th>';
+    html += '<th style="width: 6%;">تايمر التنفيذ</th>';
+    html += '<th style="width: 6%;">تايمر المراجعة</th>';
     html += '<th style="width: 5%;">الإجراءات</th>';
     html += "</tr></thead><tbody>";
 
@@ -314,7 +326,36 @@ function renderMyRevisionsList(
                 ? revision.project.code
                 : "";
 
-        // تحديد دور المستخدم
+        let initialTimerSeconds = 0;
+        if (revision.status === "in_progress") {
+            initialTimerSeconds = calculateInitialRevisionTime(revision);
+            if (!revisionTimers[revision.id]) {
+                revisionTimers[revision.id] = {
+                    status: revision.status,
+                    seconds: initialTimerSeconds,
+                    revision: revision,
+                };
+            } else {
+                revisionTimers[revision.id].status = revision.status;
+                revisionTimers[revision.id].revision = revision;
+            }
+        }
+
+        let initialReviewTimerSeconds = 0;
+        if (revision.review_status === "in_progress") {
+            initialReviewTimerSeconds = calculateInitialReviewTime(revision);
+            if (!reviewTimers[revision.id]) {
+                reviewTimers[revision.id] = {
+                    status: revision.review_status,
+                    seconds: initialReviewTimerSeconds,
+                    revision: revision,
+                };
+            } else {
+                reviewTimers[revision.id].status = revision.review_status;
+                reviewTimers[revision.id].revision = revision;
+            }
+        }
+
         let userRole = "";
 
         // التحقق من المسؤول (responsible_user_id)
@@ -352,7 +393,14 @@ function renderMyRevisionsList(
 
         html += `<tr onclick="showRevisionDetails(${revision.id})" style="cursor: pointer;" data-revision-id="${revision.id}">`;
         html += `<td>${index + 1}</td>`;
-        html += `<td><strong>${revision.title || "-"}</strong></td>`;
+        html += `<td><strong>${revision.title || "-"}</strong>`;
+        if (revision.revision_code) {
+            html += `<small class="text-dark d-block text-truncate" style="max-width: 200px; font-weight: 600; font-family: 'Courier New', monospace; font-size: 0.75rem;" title="كود التعديل: ${revision.revision_code}">
+                <i class="fas fa-barcode me-1"></i>
+                ${revision.revision_code}
+            </small>`;
+        }
+        html += `</td>`;
         if (!isTasksTable) {
             html += `<td>${
                 projectCode ? projectCode + " - " : ""
@@ -377,6 +425,26 @@ function renderMyRevisionsList(
                   )
                 : "-"
         }</td>`;
+        html += `<td onclick="showRevisionDetails(${revision.id})" style="cursor: pointer;">`;
+        if (revision.status === "in_progress") {
+            html += `<div class="revision-timer" style="font-family: 'Courier New', monospace; font-weight: bold; color: #059669; padding: 2px 6px; background: #dcfce7; border-radius: 4px; font-size: 11px; text-align: center;">
+                <i class="fas fa-clock"></i>
+                <span id="revision-timer-${revision.id}">${formatRevisionTime(revisionTimers[revision.id] ? revisionTimers[revision.id].seconds : initialTimerSeconds)}</span>
+            </div>`;
+        } else {
+            html += '<small class="text-muted">-</small>';
+        }
+        html += `</td>`;
+        html += `<td onclick="showRevisionDetails(${revision.id})" style="cursor: pointer;">`;
+        if (revision.review_status === "in_progress") {
+            html += `<div class="revision-timer" style="font-family: 'Courier New', monospace; font-weight: bold; color: #198754; padding: 2px 6px; background: #d1e7dd; border-radius: 4px; font-size: 11px; text-align: center;">
+                <i class="fas fa-clock"></i>
+                <span id="review-timer-${revision.id}">${formatRevisionTime(reviewTimers[revision.id] ? reviewTimers[revision.id].seconds : initialReviewTimerSeconds)}</span>
+            </div>`;
+        } else {
+            html += '<small class="text-muted">-</small>';
+        }
+        html += `</td>`;
         html += `<td><button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showRevisionDetails(${revision.id})"><i class="fas fa-eye"></i></button></td>`;
         html += "</tr>";
     });
@@ -811,6 +879,7 @@ function renderMyRevisionsKanban(revisions) {
                             <div class="revision-kanban-card-title">
                                 ${workTypeBadge}
                                 ${revision.title || "-"}
+                                ${revision.revision_code ? `<div><small class="text-dark d-block" style="font-weight: 600; font-family: 'Courier New', monospace; font-size: 0.7rem; margin-top: 4px;"><i class="fas fa-barcode me-1"></i>${revision.revision_code}</small></div>` : ""}
                             </div>
                             <span class="revision-kanban-card-source source-${
                                 revision.revision_source
