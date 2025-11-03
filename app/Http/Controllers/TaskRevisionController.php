@@ -49,7 +49,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'revisions' => $result['revisions']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching task revisions', [
                 'task_type' => $taskType,
@@ -156,7 +155,6 @@ class TaskRevisionController extends Controller
                 'message' => $result['message'],
                 'revision' => $result['revision']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error creating task revision', [
                 'request_data' => $request->all(),
@@ -216,7 +214,6 @@ class TaskRevisionController extends Controller
                 'message' => $result['message'],
                 'revision' => $result['revision']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error updating revision status', [
                 'revision_id' => $revision->id,
@@ -250,7 +247,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'message' => $result['message']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error deleting revision', [
                 'revision_id' => $revision->id,
@@ -308,7 +304,6 @@ class TaskRevisionController extends Controller
 
                 return redirect($downloadUrl);
             }
-
         } catch (\Exception $e) {
             Log::error('Error downloading revision attachment', [
                 'revision_id' => $revision->id,
@@ -376,7 +371,6 @@ class TaskRevisionController extends Controller
 
                 return redirect($viewUrl);
             }
-
         } catch (\Exception $e) {
             Log::error('Error viewing revision attachment', [
                 'revision_id' => $revision->id,
@@ -411,7 +405,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'revisions' => $result['revisions']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching project revisions', [
                 'project_id' => $projectId,
@@ -444,7 +437,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'revisions' => $result['revisions']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching general revisions', [
                 'error' => $e->getMessage()
@@ -477,7 +469,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'revisions' => $result['revisions']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching all project related revisions', [
                 'project_id' => $projectId,
@@ -511,7 +502,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'revisions' => $result['revisions']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching internal revisions', [
                 'error' => $e->getMessage()
@@ -544,7 +534,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'revisions' => $result['revisions']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching external revisions', [
                 'error' => $e->getMessage()
@@ -566,7 +555,6 @@ class TaskRevisionController extends Controller
             $result = $this->revisionService->getProjectRevisionStats($projectId);
 
             return response()->json($result);
-
         } catch (\Exception $e) {
             Log::error('Error fetching project revision stats', [
                 'project_id' => $projectId,
@@ -600,7 +588,6 @@ class TaskRevisionController extends Controller
             $result = $this->statusService->startRevision($revision);
 
             return response()->json($result);
-
         } catch (\Exception $e) {
             Log::error('Error starting revision', [
                 'revision_id' => $revisionId,
@@ -627,7 +614,6 @@ class TaskRevisionController extends Controller
             $result = $this->statusService->pauseRevision($revision);
 
             return response()->json($result);
-
         } catch (\Exception $e) {
             Log::error('Error pausing revision', [
                 'revision_id' => $revisionId,
@@ -654,7 +640,6 @@ class TaskRevisionController extends Controller
             $result = $this->statusService->resumeRevision($revision);
 
             return response()->json($result);
-
         } catch (\Exception $e) {
             Log::error('Error resuming revision', [
                 'revision_id' => $revisionId,
@@ -681,7 +666,6 @@ class TaskRevisionController extends Controller
             $result = $this->statusService->completeRevision($revision);
 
             return response()->json($result);
-
         } catch (\Exception $e) {
             Log::error('Error completing revision', [
                 'revision_id' => $revisionId,
@@ -708,7 +692,6 @@ class TaskRevisionController extends Controller
                 'has_active' => $activeRevision !== null,
                 'revision' => $activeRevision
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error getting active revision', [
                 'error' => $e->getMessage()
@@ -733,7 +716,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'stats' => $stats
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error getting user revision stats', [
                 'error' => $e->getMessage()
@@ -748,8 +730,8 @@ class TaskRevisionController extends Controller
 
     /**
      * 🎯 الحصول على المسؤولين المناسبين حسب role المستخدم الحالي
-     * - لـ coordination-team-employee و technical_reviewer: المراجعين فقط (hierarchy = 2)
-     * - لباقي الأدوار: كل المشاركين في المشروع
+     * - جميع الموظفين النشطين مع تقديم المراجعين في البداية
+     * - المراجعون في المشروع أولاً، ثم المراجعون الآخرون، ثم باقي الموظفين
      */
     public function getReviewersOnly(Request $request)
     {
@@ -774,100 +756,85 @@ class TaskRevisionController extends Controller
                 ], 404);
             }
 
-            // جلب IDs المشاركين في المشروع
             $participantIds = $project->participants->pluck('id')->toArray();
 
-            if (empty($participantIds)) {
-                return response()->json([
-                    'success' => true,
-                    'reviewers' => []
-                ]);
+            // ✅ جلب أدوار المراجعين
+            $reviewerRoleIds = \App\Models\RoleHierarchy::getReviewerRoleIds();
+            $generalReviewerRole = \Spatie\Permission\Models\Role::where('name', 'general_reviewer')->first();
+            if ($generalReviewerRole && !in_array($generalReviewerRole->id, $reviewerRoleIds)) {
+                $reviewerRoleIds[] = $generalReviewerRole->id;
             }
 
-            // 🎯 التحقق من role المستخدم الحالي
-            $restrictedRoles = ['coordination-team-employee', 'technical_reviewer'];
-            $userRoleNames = $currentUser->roles->pluck('name')->toArray();
-            $hasRestrictedRole = !empty(array_intersect($restrictedRoles, $userRoleNames));
+            // 1️⃣ المراجعون في المشروع
+            $reviewersInProject = \App\Models\User::whereHas('roles', function ($query) use ($reviewerRoleIds) {
+                $query->whereIn('roles.id', $reviewerRoleIds);
+            })
+                ->whereIn('id', $participantIds)
+                ->where('employee_status', 'active')
+                ->with(['roles' => function ($query) {
+                    $query->select('id', 'name');
+                }])
+                ->select('id', 'name', 'email', 'department')
+                ->orderBy('name')
+                ->get();
 
-            if ($hasRestrictedRole) {
+            // 2️⃣ المراجعون خارج المشروع (نشطين)
+            $reviewersNotInProject = \App\Models\User::whereHas('roles', function ($query) use ($reviewerRoleIds) {
+                $query->whereIn('roles.id', $reviewerRoleIds);
+            })
+                ->whereNotIn('id', $participantIds)
+                ->where('employee_status', 'active')
+                ->with(['roles' => function ($query) {
+                    $query->select('id', 'name');
+                }])
+                ->select('id', 'name', 'email', 'department')
+                ->orderBy('name')
+                ->get();
 
-                $reviewerRoleIds = \App\Models\RoleHierarchy::getReviewerRoleIds();
+            // 3️⃣ باقي الموظفين في المشروع (ليسوا مراجعين)
+            $allReviewerUserIds = $reviewersInProject->pluck('id')->merge($reviewersNotInProject->pluck('id'))->toArray();
 
+            $otherParticipants = \App\Models\User::whereIn('id', $participantIds)
+                ->whereNotIn('id', $allReviewerUserIds)
+                ->where('employee_status', 'active')
+                ->select('id', 'name', 'email', 'department')
+                ->orderBy('name')
+                ->get();
 
-                $generalReviewerRole = \Spatie\Permission\Models\Role::where('name', 'general_reviewer')->first();
-                if ($generalReviewerRole && !in_array($generalReviewerRole->id, $reviewerRoleIds)) {
-                    $reviewerRoleIds[] = $generalReviewerRole->id;
-                }
+            // 4️⃣ باقي الموظفين النشطين (ليسوا في المشروع وليسوا مراجعين)
+            $otherActiveUsers = \App\Models\User::whereNotIn('id', $participantIds)
+                ->whereNotIn('id', $allReviewerUserIds)
+                ->where('employee_status', 'active')
+                ->select('id', 'name', 'email', 'department')
+                ->orderBy('name')
+                ->get();
 
-                Log::info('🔍 Reviewer Role IDs (hierarchy_level = 2 + general_reviewer)', [
-                    'reviewer_role_ids' => $reviewerRoleIds,
-                    'count' => count($reviewerRoleIds),
-                    'includes_general_reviewer' => $generalReviewerRole ? 'YES ✅' : 'NO ❌'
-                ]);
+            // ✅ دمج القوائم بالترتيب: مراجعون في المشروع → مراجعون خارج المشروع → موظفون في المشروع → موظفون نشطين آخرين
+            $allUsers = $reviewersInProject
+                ->concat($reviewersNotInProject)
+                ->concat($otherParticipants)
+                ->concat($otherActiveUsers);
 
-                if (empty($reviewerRoleIds)) {
-                    return response()->json([
-                        'success' => true,
-                        'reviewers' => []
-                    ]);
-                }
-
-                // ✅ جلب كل المراجعين في النظام (من كل المشاريع)
-                $reviewers = \App\Models\User::whereHas('roles', function($query) use ($reviewerRoleIds) {
-                        $query->whereIn('roles.id', $reviewerRoleIds);
-                    })
-                    ->with(['roles' => function($query) {
-                        $query->select('id', 'name');
-                    }])
-                    ->select('id', 'name', 'email', 'department')
-                    ->orderBy('name')
-                    ->get();
-
-                // 📝 Log تفصيلي لكل مراجع وأدواره (مع توضيح مين في المشروع)
-                $reviewersDetails = $reviewers->map(function($reviewer) use ($reviewerRoleIds, $participantIds) {
-                    $userRoleIds = $reviewer->roles->pluck('id')->toArray();
-                    $matchingRoleIds = array_intersect($userRoleIds, $reviewerRoleIds);
-                    $isInProject = in_array($reviewer->id, $participantIds);
-
-                    return [
-                        'id' => $reviewer->id,
-                        'name' => $reviewer->name,
-                        'all_roles' => $reviewer->roles->pluck('name')->toArray(),
-                        'all_role_ids' => $userRoleIds,
-                        'matching_reviewer_role_ids' => array_values($matchingRoleIds),
-                        'in_project' => $isInProject ? 'YES ✅' : 'NO ❌',
-                        'passed_filter' => !empty($matchingRoleIds) ? 'YES ✅' : 'NO ❌'
-                    ];
-                });
-
-                Log::info('Restricted role - showing ALL reviewers from system', [
-                    'user_id' => $currentUser->id,
-                    'user_roles' => $currentUser->roles->pluck('name'),
-                    'total_reviewers_in_system' => $reviewers->count(),
-                    'reviewers_in_project' => $reviewers->whereIn('id', $participantIds)->count(),
-                    'reviewers_details' => $reviewersDetails->toArray()
-                ]);
-
-            } else {
-                // ✅ لباقي الأدوار: عرض كل المشاركين في المشروع
-                $reviewers = \App\Models\User::whereIn('id', $participantIds)
-                    ->select('id', 'name', 'email', 'department')
-                    ->orderBy('name')
-                    ->get();
-
-                Log::info('Normal role - showing all participants', [
-                    'user_id' => $currentUser->id,
-                    'user_roles' => $currentUser->roles->pluck('name'),
-                    'participants_count' => $reviewers->count()
-                ]);
-            }
+            Log::info('📋 Users list for revision reviewers', [
+                'user_id' => $currentUser->id,
+                'user_roles' => $currentUser->roles->pluck('name'),
+                'reviewers_in_project' => $reviewersInProject->count(),
+                'reviewers_not_in_project' => $reviewersNotInProject->count(),
+                'other_participants' => $otherParticipants->count(),
+                'other_active_users' => $otherActiveUsers->count(),
+                'total_users' => $allUsers->count()
+            ]);
 
             return response()->json([
                 'success' => true,
-                'reviewers' => $reviewers,
-                'is_restricted' => $hasRestrictedRole
+                'reviewers' => $allUsers,
+                'counts' => [
+                    'reviewers_in_project' => $reviewersInProject->count(),
+                    'reviewers_not_in_project' => $reviewersNotInProject->count(),
+                    'other_participants' => $otherParticipants->count(),
+                    'other_active' => $otherActiveUsers->count(),
+                ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching responsible users for project', [
                 'project_id' => $request->input('project_id'),
@@ -979,7 +946,6 @@ class TaskRevisionController extends Controller
                 'message' => 'تم تحديث التعديل بنجاح',
                 'revision' => $revision->load(['deadlines', 'executorDeadline', 'reviewerDeadlines'])
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error updating revision: ' . $e->getMessage());
 
@@ -1027,7 +993,6 @@ class TaskRevisionController extends Controller
             }
 
             return response()->json($result);
-
         } catch (\Exception $e) {
             Log::error('Error reassigning executor: ' . $e->getMessage());
 
@@ -1069,7 +1034,6 @@ class TaskRevisionController extends Controller
             }
 
             return response()->json($result);
-
         } catch (\Exception $e) {
             Log::error('Error reassigning reviewer: ' . $e->getMessage());
 
@@ -1093,7 +1057,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'history' => $history
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching transfer history: ' . $e->getMessage());
 
@@ -1125,7 +1088,6 @@ class TaskRevisionController extends Controller
                 'success' => true,
                 'stats' => $stats
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching user transfer stats: ' . $e->getMessage());
 
@@ -1189,7 +1151,6 @@ class TaskRevisionController extends Controller
                 'message' => 'تم بدء المراجعة بنجاح',
                 'revision' => $revision->fresh()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error starting review', [
                 'revision_id' => $revisionId,
@@ -1227,7 +1188,6 @@ class TaskRevisionController extends Controller
                 'message' => 'تم إيقاف المراجعة مؤقتاً',
                 'revision' => $revision->fresh()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error pausing review', [
                 'revision_id' => $revisionId,
@@ -1288,7 +1248,6 @@ class TaskRevisionController extends Controller
                 'message' => 'تم استئناف المراجعة بنجاح',
                 'revision' => $revision->fresh()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error resuming review', [
                 'revision_id' => $revisionId,
@@ -1327,7 +1286,6 @@ class TaskRevisionController extends Controller
                 'total_minutes' => $revision->fresh()->review_actual_minutes,
                 'revision' => $revision->fresh()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error completing review', [
                 'revision_id' => $revisionId,
@@ -1377,7 +1335,6 @@ class TaskRevisionController extends Controller
                 'message' => 'تم إعادة فتح العمل بنجاح',
                 'revision' => $revision->fresh()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error reopening work', [
                 'revision_id' => $revisionId,
@@ -1428,7 +1385,6 @@ class TaskRevisionController extends Controller
                 'message' => 'تم إعادة فتح المراجعة بنجاح',
                 'revision' => $revision->fresh()
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error reopening review', [
                 'revision_id' => $revisionId,

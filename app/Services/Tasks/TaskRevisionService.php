@@ -153,7 +153,7 @@ class TaskRevisionService
                     'name' => \App\Models\User::find($revision->executor_user_id)?->name ?? 'N/A',
                     'role' => 'المنفذ (اللي هيصلح)'
                 ] : null,
-                'reviewers' => $revision->reviewers ? collect($revision->reviewers)->map(function($r) {
+                'reviewers' => $revision->reviewers ? collect($revision->reviewers)->map(function ($r) {
                     $user = \App\Models\User::find($r['reviewer_id']);
                     return [
                         'id' => $r['reviewer_id'],
@@ -195,7 +195,6 @@ class TaskRevisionService
                 'message' => 'تم إنشاء التعديل بنجاح',
                 'revision' => $revision->load(['creator', 'reviewer', 'project', 'assignedUser', 'responsibleUser', 'executorUser'])
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating revision', [
@@ -222,7 +221,7 @@ class TaskRevisionService
             $taskUserId = $taskUserId ? (int) $taskUserId : null;
 
             $query = TaskRevision::with(['creator', 'reviewer', 'assignedUser', 'responsibleUser', 'executorUser'])
-                                ->latest();
+                ->latest();
 
             if ($taskType === 'template') {
                 $query = $query->forTemplateTask($taskId);
@@ -239,7 +238,6 @@ class TaskRevisionService
                 'success' => true,
                 'revisions' => $revisions
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching task revisions', [
                 'task_type' => $taskType,
@@ -264,8 +262,8 @@ class TaskRevisionService
             $projectId = (int) $projectId;
 
             $query = TaskRevision::with(['creator', 'reviewer', 'project', 'service', 'assignedUser', 'responsibleUser', 'executorUser'])
-                                ->forProject($projectId)
-                                ->latest();
+                ->forProject($projectId)
+                ->latest();
 
             // تطبيق الفلترة الهرمية
             $query = $this->revisionFilterService->applyHierarchicalRevisionFiltering($query);
@@ -276,7 +274,6 @@ class TaskRevisionService
                 'success' => true,
                 'revisions' => $revisions
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching project revisions', [
                 'project_id' => $projectId,
@@ -298,8 +295,8 @@ class TaskRevisionService
     {
         try {
             $query = TaskRevision::with(['creator', 'reviewer', 'assignedUser'])
-                                ->general()
-                                ->latest();
+                ->general()
+                ->latest();
 
             // تطبيق الفلترة الهرمية
             $query = $this->revisionFilterService->applyHierarchicalRevisionFiltering($query);
@@ -310,7 +307,6 @@ class TaskRevisionService
                 'success' => true,
                 'revisions' => $revisions
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching general revisions', [
                 'error' => $e->getMessage()
@@ -334,16 +330,16 @@ class TaskRevisionService
             $projectId = (int) $projectId;
 
             $query = TaskRevision::with(['creator', 'reviewer', 'project', 'service', 'assignedUser', 'responsibleUser', 'executorUser'])
-                                ->where(function($query) use ($projectId) {
-                                    // تعديلات المشروع
-                                    $query->where('revision_type', 'project')
-                                          ->where('project_id', $projectId);
-                                })
-                                ->orWhere(function($query) {
-                                    // التعديلات العامة
-                                    $query->where('revision_type', 'general');
-                                })
-                                ->latest();
+                ->where(function ($query) use ($projectId) {
+                    // تعديلات المشروع
+                    $query->where('revision_type', 'project')
+                        ->where('project_id', $projectId);
+                })
+                ->orWhere(function ($query) {
+                    // التعديلات العامة
+                    $query->where('revision_type', 'general');
+                })
+                ->latest();
 
             // فلترة حسب الخدمة إذا تم تحديدها
             if (isset($filters['service_id']) && $filters['service_id']) {
@@ -359,7 +355,6 @@ class TaskRevisionService
                 'success' => true,
                 'revisions' => $revisions
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching all project related revisions', [
                 'project_id' => $projectId,
@@ -436,7 +431,6 @@ class TaskRevisionService
                 'message' => $status === 'approved' ? 'تم الموافقة على التعديل' : 'تم رفض التعديل',
                 'revision' => $revision->load(['creator', 'reviewer', 'responsibleUser', 'executorUser'])
             ];
-
         } catch (\Exception $e) {
             Log::error('Error updating revision status', [
                 'revision_id' => $revisionId,
@@ -474,7 +468,6 @@ class TaskRevisionService
                 'success' => true,
                 'message' => 'تم حذف التعديل بنجاح'
             ];
-
         } catch (\Exception $e) {
             Log::error('Error deleting revision', [
                 'revision_id' => $revisionId,
@@ -589,7 +582,6 @@ class TaskRevisionService
                 ->causedBy(Auth::user())
                 ->withProperties($allProperties)
                 ->log("تعديل المهمة - {$action}");
-
         } catch (\Exception $e) {
             Log::warning('Failed to log revision activity', [
                 'revision_id' => $revision->id,
@@ -604,7 +596,7 @@ class TaskRevisionService
     {
         try {
             $query = TaskRevision::with(['creator', 'reviewer', 'project', 'assignedUser', 'responsibleUser', 'executorUser'])
-                                ->latest();
+                ->latest();
 
             // تطبيق الفلاتر
             if (isset($filters['revision_type']) && $filters['revision_type']) {
@@ -632,7 +624,6 @@ class TaskRevisionService
                 'success' => true,
                 'revisions' => $revisions
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching all revisions', [
                 'filters' => $filters,
@@ -654,8 +645,8 @@ class TaskRevisionService
     {
         try {
             $query = TaskRevision::with(['creator', 'reviewer', 'project', 'assignedUser', 'responsibleUser', 'executorUser'])
-                                ->bySource($source)
-                                ->latest();
+                ->bySource($source)
+                ->latest();
 
             // تطبيق الفلاتر
             if (isset($filters['revision_type'])) {
@@ -679,7 +670,6 @@ class TaskRevisionService
                 'success' => true,
                 'revisions' => $revisions
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching revisions by source', [
                 'source' => $source,
@@ -746,7 +736,6 @@ class TaskRevisionService
                 'internal' => $internal,
                 'external' => $external
             ];
-
         } catch (\Exception $e) {
             return [
                 'total' => 0,
@@ -787,7 +776,6 @@ class TaskRevisionService
                     'external' => $external
                 ]
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching project revision stats', [
                 'project_id' => $projectId,
@@ -865,7 +853,7 @@ class TaskRevisionService
                 Log::info('📧 Processing REVIEWERS notifications', [
                     'revision_id' => $revision->id,
                     'total_reviewers' => count($revision->reviewers),
-                    'reviewers_list' => collect($revision->reviewers)->map(function($r) {
+                    'reviewers_list' => collect($revision->reviewers)->map(function ($r) {
                         $user = \App\Models\User::find($r['reviewer_id']);
                         return [
                             'id' => $r['reviewer_id'],
@@ -940,7 +928,6 @@ class TaskRevisionService
                 'notified_users_count' => count($notifiedUsers),
                 'notified_users' => $notifiedUsers
             ]);
-
         } catch (\Exception $e) {
             Log::error('Failed to send internal notifications for revision', [
                 'revision_id' => $revision->id,
@@ -1020,7 +1007,6 @@ class TaskRevisionService
                     'revision_id' => $revision->id
                 ]);
             }
-
         } catch (\Exception $e) {
             Log::error('❌ Failed to send single notification', [
                 'user_id' => $userId,

@@ -360,7 +360,22 @@ function handleMyTaskTimerStatusChange(taskUserId, newStatus) {
     const task = document.querySelector(
         `.my-kanban-card[data-task-user-id="${taskUserId}"]`
     );
-    if (!task) return;
+    if (!task) {
+        // Try with kanban-card class (without my- prefix)
+        const taskAlt = document.querySelector(
+            `.kanban-card[data-task-user-id="${taskUserId}"]`
+        );
+        if (taskAlt) {
+            handleTimerUIUpdate(taskAlt, taskUserId, newStatus);
+        }
+        return;
+    }
+
+    handleTimerUIUpdate(task, taskUserId, newStatus);
+}
+
+function handleTimerUIUpdate(task, taskUserId, newStatus) {
+    // Update CSS classes
     task.classList.remove(
         "task-in-progress",
         "task-paused",
@@ -368,18 +383,68 @@ function handleMyTaskTimerStatusChange(taskUserId, newStatus) {
         "task-new"
     );
     task.classList.add(`task-${newStatus}`);
+
+    // Update data-status attribute
+    task.setAttribute("data-status", newStatus);
+
+    // Get or create timer container
+    const timerContainer = task.querySelector(
+        ".kanban-card-timer, .my-kanban-card-timer"
+    );
+    const taskId = task.getAttribute("data-task-id") || taskUserId;
+
+    // Dispatch event
     window.MyTasksUtils.dispatchTimerEvent(newStatus, taskUserId);
+
     switch (newStatus) {
         case "in_progress":
+            // إضافة/إظهار التايمر
+            if (!timerContainer) {
+                // Create timer element if it doesn't exist
+                const newTimer = document.createElement("div");
+                newTimer.className = "kanban-card-timer";
+                newTimer.innerHTML = `<i class="fas fa-clock"></i> <span id="my-kanban-timer-${taskId}">00:00:00</span>`;
+
+                // Insert timer before due date or actions
+                const dueDate = task.querySelector(".kanban-card-due-date");
+                const actions = task.querySelector(".kanban-card-actions");
+                if (dueDate) {
+                    dueDate.parentNode.insertBefore(newTimer, dueDate);
+                } else if (actions) {
+                    actions.parentNode.insertBefore(newTimer, actions);
+                } else {
+                    task.appendChild(newTimer);
+                }
+            } else {
+                // Show existing timer
+                timerContainer.style.display = "block";
+            }
+
+            // Start the timer
             window.MyTasksTimers.startTimer(taskUserId);
             break;
+
         case "paused":
+            // إخفاء التايمر وإيقافه
+            if (timerContainer) {
+                timerContainer.style.display = "none";
+            }
             window.MyTasksTimers.pauseTimer(taskUserId);
             break;
+
         case "completed":
+            // إخفاء التايمر وإنهائه
+            if (timerContainer) {
+                timerContainer.style.display = "none";
+            }
             window.MyTasksTimers.finishTimer(taskUserId);
             break;
+
         default:
+            // إخفاء التايمر وإيقافه
+            if (timerContainer) {
+                timerContainer.style.display = "none";
+            }
             window.MyTasksTimers.pauseTimer(taskUserId);
             break;
     }

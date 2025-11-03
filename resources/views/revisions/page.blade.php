@@ -1079,6 +1079,23 @@
                 </select>
             </div>
 
+            <!-- ديدلاين التعديل العام -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-calendar-times me-1"></i>
+                    ديدلاين التعديل <span class="text-muted" style="font-size: 11px;">(اختياري)</span>
+                </label>
+                <input type="datetime-local"
+                    id="newRevisionDeadline"
+                    class="form-control"
+                    min=""
+                    onchange="validateRevisionDeadlineOrder()">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    تاريخ ووقت الانتهاء المتوقع للتعديل ككل (يجب أن يكون بعد جميع الديدلاينات الأخرى)
+                </small>
+            </div>
+
             <!-- اختيار المشروع (يظهر للمشروعات فقط) -->
             <div class="mb-3 d-none" id="projectSelectContainer">
                 <label class="form-label fw-bold">
@@ -1221,23 +1238,6 @@
                 </div>
             </div>
 
-            <!-- ديدلاين التعديل العام -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">
-                    <i class="fas fa-calendar-times me-1"></i>
-                    ديدلاين التعديل <span class="text-muted" style="font-size: 11px;">(اختياري)</span>
-                </label>
-                <input type="datetime-local"
-                    id="newRevisionDeadline"
-                    class="form-control"
-                    min=""
-                    onchange="validateRevisionDeadlineOrder()">
-                <small class="text-muted">
-                    <i class="fas fa-info-circle me-1"></i>
-                    تاريخ ووقت الانتهاء المتوقع للتعديل ككل (يجب أن يكون بعد جميع الديدلاينات الأخرى)
-                </small>
-            </div>
-
             <!-- العنوان -->
             <div class="mb-3">
                 <label class="form-label fw-bold">
@@ -1312,9 +1312,12 @@
 
             <!-- أزرار الحفظ -->
             <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-success flex-fill">
+                <button type="submit" class="btn btn-success flex-fill" id="saveRevisionBtn">
                     <i class="fas fa-save me-1"></i>
-                    حفظ التعديل
+                    <span id="saveRevisionBtnText">حفظ التعديل</span>
+                    <span id="saveRevisionBtnSpinner" class="spinner-border spinner-border-sm ms-1 d-none" role="status">
+                        <span class="visually-hidden">جاري الحفظ...</span>
+                    </span>
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="closeAddRevisionSidebar()">
                     <i class="fas fa-times me-1"></i>

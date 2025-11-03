@@ -51,11 +51,15 @@ function closeAddRevisionSidebar() {
             '<i class="fas fa-plus me-2"></i>إضافة تعديل جديد';
     }
 
+    // إعادة تعيين زر الحفظ
+    resetSaveButton();
+
     const saveButton = sidebar.querySelector(
         'button[onclick*="saveNewRevision"]'
     );
     if (saveButton) {
-        saveButton.innerHTML = '<i class="fas fa-save me-1"></i>حفظ التعديل';
+        saveButton.innerHTML =
+            '<i class="fas fa-save me-1"></i><span id="saveRevisionBtnText">حفظ التعديل</span><span id="saveRevisionBtnSpinner" class="spinner-border spinner-border-sm ms-1 d-none" role="status"><span class="visually-hidden">جاري الحفظ...</span></span>';
     }
 
     sidebar.style.right = "-600px";
@@ -192,8 +196,11 @@ function handleExecutorSelection() {
     if (!searchInput || !hiddenInput) return;
 
     const inputValue = searchInput.value;
-
-    const searchName = inputValue.replace(" ✅ من المشروع", "").trim();
+    // إزالة " ✅ من المشروع" و "- القسم" من النص للبحث
+    const searchName = inputValue
+        .replace(" ✅ من المشروع", "")
+        .replace(/\s*-\s*[^-]+$/, "")
+        .trim();
 
     if (window.allUsersForRevision) {
         const selectedUser = window.allUsersForRevision.find(
@@ -230,8 +237,11 @@ function handleResponsibleSelection() {
     if (!searchInput || !hiddenInput) return;
 
     const inputValue = searchInput.value;
-
-    const searchName = inputValue.replace(" ✅ من المشروع", "").trim();
+    // إزالة " ✅ من المشروع" و "- القسم" من النص للبحث
+    const searchName = inputValue
+        .replace(" ✅ من المشروع", "")
+        .replace(/\s*-\s*[^-]+$/, "")
+        .trim();
 
     if (window.allUsersForRevision) {
         const selectedUser = window.allUsersForRevision.find(
@@ -331,7 +341,11 @@ function handleReviewerInputChange(reviewerId) {
     if (!searchInput || !hiddenInput) return;
 
     const inputValue = searchInput.value;
-    const searchName = inputValue.replace(" ✅ من المشروع", "").trim();
+    // إزالة " ✅ من المشروع" و "- القسم" من النص للبحث
+    const searchName = inputValue
+        .replace(" ✅ من المشروع", "")
+        .replace(/\s*-\s*[^-]+$/, "")
+        .trim();
 
     if (window.allUsersForRevision) {
         const selectedUser = window.allUsersForRevision.find(
@@ -563,50 +577,45 @@ async function loadReviewerUsersForRevision(
         reviewerDatalist.innerHTML = "";
 
         if (result.success && result.reviewers && result.reviewers.length > 0) {
-            if (result.is_restricted) {
-                const reviewersInProject = result.reviewers.filter((user) =>
-                    projectParticipantIds.includes(user.id)
-                );
-                const reviewersNotInProject = result.reviewers.filter(
-                    (user) => !projectParticipantIds.includes(user.id)
-                );
-                const sortedReviewers = [
-                    ...reviewersInProject,
-                    ...reviewersNotInProject,
-                ];
+            // ✅ الترتيب: المراجعين الحاليين أولاً، ثم باقي الموظفين النشطين
+            const reviewerIds = result.reviewers.map((r) => r.id);
 
-                sortedReviewers.forEach((user) => {
-                    const option = document.createElement("option");
-                    const isInProject = projectParticipantIds.includes(user.id);
-                    option.value =
-                        user.name + (isInProject ? " ✅ من المشروع" : "");
-                    option.setAttribute("data-user-id", user.id);
-                    option.setAttribute("data-user-name", user.name);
-                    option.setAttribute("data-in-project", isInProject);
-                    reviewerDatalist.appendChild(option);
-                });
-            } else {
-                console.log("🔓 Normal mode: showing all users");
+            // 1️⃣ عرض المراجعين الحاليين أولاً
+            result.reviewers.forEach((user) => {
+                const option = document.createElement("option");
+                const isInProject = projectParticipantIds.includes(user.id);
+                const departmentText = user.department
+                    ? ` - ${user.department}`
+                    : "";
+                option.value =
+                    user.name +
+                    departmentText +
+                    (isInProject ? " ✅ من المشروع" : "");
+                option.setAttribute("data-user-id", user.id);
+                option.setAttribute("data-user-name", user.name);
+                option.setAttribute("data-in-project", isInProject);
+                reviewerDatalist.appendChild(option);
+            });
 
-                const usersInProject = allUsers.filter((user) =>
-                    projectParticipantIds.includes(user.id)
-                );
-                const usersNotInProject = allUsers.filter(
-                    (user) => !projectParticipantIds.includes(user.id)
-                );
-                const sortedUsers = [...usersInProject, ...usersNotInProject];
-
-                sortedUsers.forEach((user) => {
-                    const option = document.createElement("option");
-                    const isInProject = projectParticipantIds.includes(user.id);
-                    option.value =
-                        user.name + (isInProject ? " ✅ من المشروع" : "");
-                    option.setAttribute("data-user-id", user.id);
-                    option.setAttribute("data-user-name", user.name);
-                    option.setAttribute("data-in-project", isInProject);
-                    reviewerDatalist.appendChild(option);
-                });
-            }
+            // 2️⃣ عرض باقي الموظفين النشطين (اللي مش من المراجعين)
+            const otherUsers = allUsers.filter(
+                (user) => !reviewerIds.includes(user.id)
+            );
+            otherUsers.forEach((user) => {
+                const option = document.createElement("option");
+                const isInProject = projectParticipantIds.includes(user.id);
+                const departmentText = user.department
+                    ? ` - ${user.department}`
+                    : "";
+                option.value =
+                    user.name +
+                    departmentText +
+                    (isInProject ? " ✅ من المشروع" : "");
+                option.setAttribute("data-user-id", user.id);
+                option.setAttribute("data-user-name", user.name);
+                option.setAttribute("data-in-project", isInProject);
+                reviewerDatalist.appendChild(option);
+            });
         } else {
             console.log(
                 "⚠️ No results from API, showing all users as fallback"
@@ -623,8 +632,13 @@ async function loadReviewerUsersForRevision(
             sortedUsers.forEach((user) => {
                 const option = document.createElement("option");
                 const isInProject = projectParticipantIds.includes(user.id);
+                const departmentText = user.department
+                    ? ` - ${user.department}`
+                    : "";
                 option.value =
-                    user.name + (isInProject ? " ✅ من المشروع" : "");
+                    user.name +
+                    departmentText +
+                    (isInProject ? " ✅ من المشروع" : "");
                 option.setAttribute("data-user-id", user.id);
                 option.setAttribute("data-user-name", user.name);
                 option.setAttribute("data-in-project", isInProject);
@@ -647,7 +661,13 @@ async function loadReviewerUsersForRevision(
         sortedUsers.forEach((user) => {
             const option = document.createElement("option");
             const isInProject = projectParticipantIds.includes(user.id);
-            option.value = user.name + (isInProject ? " ✅ من المشروع" : "");
+            const departmentText = user.department
+                ? ` - ${user.department}`
+                : "";
+            option.value =
+                user.name +
+                departmentText +
+                (isInProject ? " ✅ من المشروع" : "");
             option.setAttribute("data-user-id", user.id);
             option.setAttribute("data-user-name", user.name);
             option.setAttribute("data-in-project", isInProject);
@@ -671,7 +691,33 @@ function toggleNewAttachmentType(type) {
     }
 }
 
+// دالة مساعدة لإعادة تفعيل زر الحفظ
+function resetSaveButton() {
+    const saveBtn = document.getElementById("saveRevisionBtn");
+    const saveBtnText = document.getElementById("saveRevisionBtnText");
+    const saveBtnSpinner = document.getElementById("saveRevisionBtnSpinner");
+
+    if (saveBtn && saveBtnText && saveBtnSpinner) {
+        saveBtn.disabled = false;
+        saveBtnText.textContent = editingRevisionId
+            ? "حفظ التعديلات"
+            : "حفظ التعديل";
+        saveBtnSpinner.classList.add("d-none");
+    }
+}
+
 async function saveNewRevision() {
+    // ✅ تعطيل الزر وإظهار loading
+    const saveBtn = document.getElementById("saveRevisionBtn");
+    const saveBtnText = document.getElementById("saveRevisionBtnText");
+    const saveBtnSpinner = document.getElementById("saveRevisionBtnSpinner");
+
+    if (saveBtn && saveBtnText && saveBtnSpinner) {
+        saveBtn.disabled = true;
+        saveBtnText.textContent = "جاري الحفظ...";
+        saveBtnSpinner.classList.remove("d-none");
+    }
+
     const revisionType = document.getElementById("newRevisionType").value;
     const revisionSource = document.getElementById("newRevisionSource").value;
     const title = document.getElementById("newRevisionTitle").value.trim();
@@ -681,6 +727,7 @@ async function saveNewRevision() {
     const notes = document.getElementById("newRevisionNotes").value.trim();
 
     if (!revisionType || !title || !description) {
+        resetSaveButton();
         Swal.fire("خطأ", "الرجاء ملء جميع الحقول المطلوبة", "error");
         return;
     }
@@ -707,6 +754,7 @@ async function saveNewRevision() {
         if (executorDeadline) {
             const executorDeadlineDate = new Date(executorDeadline);
             if (revisionDeadlineDate < executorDeadlineDate) {
+                resetSaveButton();
                 Swal.fire(
                     "خطأ في الترتيب",
                     "ديدلاين التعديل يجب أن يكون بعد ديدلاين المنفذ",
@@ -731,6 +779,7 @@ async function saveNewRevision() {
                                 reviewerDeadlineInput.value
                             );
                             if (revisionDeadlineDate < reviewerDeadlineDate) {
+                                resetSaveButton();
                                 Swal.fire(
                                     "خطأ في الترتيب",
                                     `ديدلاين التعديل يجب أن يكون بعد ديدلاين المراجع ${reviewer.order}`,
@@ -754,6 +803,7 @@ async function saveNewRevision() {
     if (revisionType === "project") {
         const projectId = document.getElementById("newRevisionProjectId").value;
         if (!projectId) {
+            resetSaveButton();
             Swal.fire("خطأ", "الرجاء اختيار المشروع", "error");
             return;
         }
@@ -821,6 +871,7 @@ async function saveNewRevision() {
                                     executorDeadlineDate >
                                     firstReviewerDeadlineDate
                                 ) {
+                                    resetSaveButton();
                                     Swal.fire(
                                         "خطأ في الترتيب",
                                         "ديدلاين المنفذ يجب أن يكون قبل ديدلاين المراجع الأول",
@@ -855,6 +906,7 @@ async function saveNewRevision() {
                 (r) => r.reviewer_id == executorUserId
             );
             if (duplicateReviewers.length > 0) {
+                resetSaveButton();
                 Swal.fire(
                     "تحذير",
                     "لا يمكن أن يكون المنفذ مراجعاً في نفس التعديل. الرجاء اختيار مراجعين مختلفين.",
@@ -866,6 +918,7 @@ async function saveNewRevision() {
             const reviewerIds = reviewersData.map((r) => r.reviewer_id);
             const uniqueReviewerIds = [...new Set(reviewerIds)];
             if (reviewerIds.length !== uniqueReviewerIds.length) {
+                resetSaveButton();
                 Swal.fire(
                     "تحذير",
                     "لا يمكن إضافة نفس المراجع أكثر من مرة. الرجاء اختيار مراجعين مختلفين.",
@@ -933,6 +986,7 @@ async function saveNewRevision() {
                                         if (
                                             deadlineDate < previousDeadlineDate
                                         ) {
+                                            resetSaveButton();
                                             Swal.fire(
                                                 "خطأ في الترتيب",
                                                 `ديدلاين المراجع ${reviewer.order} يجب أن يكون بعد ديدلاين المراجع ${previousReviewer.order}`,
@@ -954,6 +1008,7 @@ async function saveNewRevision() {
                                         executorDeadline
                                     );
                                     if (deadlineDate < executorDeadlineDate) {
+                                        resetSaveButton();
                                         Swal.fire(
                                             "خطأ في الترتيب",
                                             "ديدلاين المراجع الأول يجب أن يكون بعد ديدلاين المنفذ",
@@ -1044,6 +1099,7 @@ async function saveNewRevision() {
             closeAddRevisionSidebar();
             refreshData();
         } else {
+            resetSaveButton();
             Swal.fire(
                 "خطأ",
                 result.message || "حدث خطأ في حفظ التعديل",
@@ -1051,6 +1107,7 @@ async function saveNewRevision() {
             );
         }
     } catch (error) {
+        resetSaveButton();
         console.error("Error saving revision:", error);
         Swal.fire("خطأ", "حدث خطأ في الاتصال بالخادم", "error");
     }
@@ -1448,7 +1505,6 @@ async function openEditRevisionForm(revisionId) {
     }
 }
 
-
 function updateRevisionDeadlineMin() {
     const revisionDeadlineInput = document.getElementById(
         "newRevisionDeadline"
@@ -1675,7 +1731,6 @@ function validateRevisionDeadlineOrder() {
 
     return true;
 }
-
 
 function updateExecutorDeadlineMin() {
     const executorDeadlineInput = document.getElementById(
