@@ -181,22 +181,22 @@ class ProjectService
             $oldServices = $project->services->pluck('id')->sort()->values()->toArray();
 
             $project->update([
-                'name' => $data['name'],
+                'name' => $data['name'] ?? $project->name,
                 'company_type' => $data['company_type'] ?? $project->company_type,
-                'description' => $data['description'],
-                'client_id' => $data['client_id'],
-                'start_date' => $data['start_date'],
+                'description' => $data['description'] ?? $project->description,
+                'client_id' => $data['client_id'] ?? $project->client_id,
+                'start_date' => $data['start_date'] ?? $project->start_date,
                 'team_delivery_date' => $data['team_delivery_date'] ?? $project->team_delivery_date,
                 'actual_delivery_date' => $data['actual_delivery_date'] ?? $project->actual_delivery_date,
                 'client_agreed_delivery_date' => $data['client_agreed_delivery_date'] ?? $project->client_agreed_delivery_date,
-                'status' => $data['status'],
+                'status' => $data['status'] ?? $project->status,
                 'is_urgent' => isset($data['is_urgent']) ? (bool)$data['is_urgent'] : $project->is_urgent,
                 'preparation_enabled' => isset($data['preparation_enabled']) ? (bool)$data['preparation_enabled'] : $project->preparation_enabled,
                 'preparation_start_date' => $data['preparation_start_date'] ?? $project->preparation_start_date,
                 'preparation_days' => $data['preparation_days'] ?? $project->preparation_days,
-                'manager' => $data['manager'],
-                'note' => $data['note'],
-                'package_id' => $data['package_id'] ?? null,
+                'manager' => $data['manager'] ?? $project->manager,
+                'note' => $data['note'] ?? $project->note,
+                'package_id' => $data['package_id'] ?? $project->package_id,
 
             ]);
 
@@ -241,13 +241,13 @@ class ProjectService
             $reasons = [];
 
             // فحص التغييرات التي تؤثر على بنية الفولدرات
-            if ($oldName !== $data['name']) {
+            if (isset($data['name']) && $oldName !== $data['name']) {
                 $needsFolderUpdate = true;
                 $reasons[] = 'تغيير اسم المشروع';
                 $this->storageService->updateProjectAttachmentPaths($project, $oldName);
             }
 
-            if ($oldClientId !== $data['client_id']) {
+            if (isset($data['client_id']) && $oldClientId !== $data['client_id']) {
                 $needsFolderUpdate = true;
                 $reasons[] = 'تغيير العميل';
             }
@@ -336,16 +336,16 @@ class ProjectService
         $userTasks[$currentUser->id] = TemplateTaskUser::with(['templateTask.template.service'])
             ->where('user_id', $currentUser->id)
             ->where('project_id', $project->id)
-            ->whereHas('templateTask.template', function($query) use ($currentUserServiceIds) {
+            ->whereHas('templateTask.template', function ($query) use ($currentUserServiceIds) {
                 $query->whereIn('service_id', $currentUserServiceIds);
             })
             ->get();
 
         // المهام العادية للمستخدم الحالي فقط ومن خدماته فقط
         $userActualTasks[$currentUser->id] = TaskUser::with(['task.service'])
-            ->whereHas('task', function($query) use ($project, $currentUserServiceIds) {
+            ->whereHas('task', function ($query) use ($project, $currentUserServiceIds) {
                 $query->where('project_id', $project->id)
-                      ->whereIn('service_id', $currentUserServiceIds);
+                    ->whereIn('service_id', $currentUserServiceIds);
             })
             ->where('user_id', $currentUser->id)
             ->get();
@@ -388,9 +388,9 @@ class ProjectService
                 ->join('users as owners', 'teams.user_id', '=', 'owners.id')
                 ->leftJoin('team_user', 'teams.id', '=', 'team_user.team_id')
                 ->leftJoin('users as members', 'team_user.user_id', '=', 'members.id')
-                ->where(function($query) use ($department) {
+                ->where(function ($query) use ($department) {
                     $query->where('owners.department', $department)
-                          ->orWhere('members.department', $department);
+                        ->orWhere('members.department', $department);
                 })
                 ->where('teams.personal_team', false)
                 ->select('teams.id', 'teams.name', 'teams.user_id', 'owners.name as owner_name')
@@ -403,13 +403,13 @@ class ProjectService
             // جلب أعضاء كل فريق
             foreach ($teams as $team) {
                 $members = DB::table('users')
-                    ->leftJoin('team_user', function($join) use ($team) {
+                    ->leftJoin('team_user', function ($join) use ($team) {
                         $join->on('users.id', '=', 'team_user.user_id')
-                             ->where('team_user.team_id', '=', $team->id);
+                            ->where('team_user.team_id', '=', $team->id);
                     })
-                    ->where(function($query) use ($team) {
+                    ->where(function ($query) use ($team) {
                         $query->where('users.id', $team->user_id)
-                              ->orWhereNotNull('team_user.user_id');
+                            ->orWhereNotNull('team_user.user_id');
                     })
                     ->select('users.id', 'users.name', 'users.email', 'users.department')
                     ->orderBy('users.name')
@@ -434,12 +434,12 @@ class ProjectService
             ->get();
 
         foreach ($allParticipants as $participant) {
-            $hasTemplateTasks = TemplateTaskUser::whereHas('templateTask.template', function($query) use ($participant) {
+            $hasTemplateTasks = TemplateTaskUser::whereHas('templateTask.template', function ($query) use ($participant) {
                 $query->where('service_id', $participant->service_id);
             })
-            ->where('user_id', $participant->user_id)
-            ->where('project_id', $project->id)
-            ->exists();
+                ->where('user_id', $participant->user_id)
+                ->where('project_id', $project->id)
+                ->exists();
 
             $participantsWithTaskStatus[] = [
                 'user_id' => $participant->user_id,
@@ -536,7 +536,7 @@ class ProjectService
         }
 
         // المستخدم العادي يرى مرفقاته ومرفقات مهامه فقط
-        return $attachments->filter(function($attachment) use ($currentUser) {
+        return $attachments->filter(function ($attachment) use ($currentUser) {
             // إذا كان الملف بدون مهمة (عام) أو من رفعه المستخدم الحالي
             if (empty($attachment->task_type) || $attachment->user_id == $currentUser->id) {
                 return true;

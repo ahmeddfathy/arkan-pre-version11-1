@@ -35,7 +35,7 @@ class ProjectCRUDService
         }
 
         // تحميل الباقات مع خدماتها
-        $packages = \App\Models\Package::all()->map(function($package) {
+        $packages = \App\Models\Package::all()->map(function ($package) {
             return [
                 'id' => $package->id,
                 'name' => $package->name,
@@ -135,7 +135,7 @@ class ProjectCRUDService
         $project->load(['client', 'services']);
 
         // تحميل الباقات مع خدماتها
-        $packages = \App\Models\Package::all()->map(function($package) {
+        $packages = \App\Models\Package::all()->map(function ($package) {
             return [
                 'id' => $package->id,
                 'name' => $package->name,
@@ -155,7 +155,7 @@ class ProjectCRUDService
     /**
      * Update project
      */
-public function update(Request $request, Project $project)
+    public function update(Request $request, Project $project)
     {
         if (!$this->roleCheckService->userHasRole('sales_employee')) {
             abort(403, 'غير مسموح لك بتنفيذ هذا الإجراء. يجب أن تكون موظف مبيعات.');
@@ -173,24 +173,41 @@ public function update(Request $request, Project $project)
         $isOldProject = $daysAgo >= 2; // >= بدل > لتغطية جميع الحالات
 
         if ($isOldProject) {
-            // الحقول المسموحة فقط للمشاريع القديمة (التواريخ وفترات التحضير فقط)
             $allowedFieldsForOldProjects = [
                 'start_date',
                 'team_delivery_date',
                 'client_agreed_delivery_date',
                 'preparation_enabled',
                 'preparation_start_date',
-                'preparation_days'
+                'preparation_days',
+                'note',
+                'description'
             ];
 
-            // التحقق من أن المستخدم لا يحاول تعديل حقول ممنوعة
-            // نتحقق فقط من الحقول التي لها قيم فعلية (ليست فارغة)
+            $fieldsToIgnoreCompletely = ['_token', '_method', 'code', 'manager', 'selected_services', 'service_statuses', 'package_id', 'selection_type'];
+
             $submittedFields = collect($request->all())
-                ->filter(function($value, $key) {
-                    return !in_array($key, ['_token', '_method']) &&
-                           $value !== null &&
-                           $value !== '' &&
-                           $value !== [];
+                ->filter(function ($value, $key) use ($fieldsToIgnoreCompletely, $project) {
+                    if (in_array($key, $fieldsToIgnoreCompletely)) {
+                        return false;
+                    }
+
+                    if ($value === null || $value === '' || $value === []) {
+                        return false;
+                    }
+
+                    if (in_array($key, ['name', 'company_type', 'client_id', 'status', 'is_urgent'])) {
+                        $oldValue = $project->{$key} ?? null;
+                        if ($key === 'is_urgent') {
+                            $oldValue = $oldValue ? '1' : '0';
+                            $value = ($value == '1' || $value === 1 || $value === true) ? '1' : '0';
+                        }
+                        if ($value == $oldValue) {
+                            return false;
+                        }
+                    }
+
+                    return true;
                 })
                 ->keys()
                 ->toArray();
@@ -200,7 +217,7 @@ public function update(Request $request, Project $project)
             if (!empty($forbiddenFields)) {
                 return [
                     'success' => false,
-                    'message' => 'لا يمكن تعديل هذا المشروع بعد ' . $daysAgo . ' أيام من الإنشاء. يمكنك فقط تعديل التواريخ وفترات التحضير.',
+                    'message' => 'لا يمكن تعديل هذا المشروع بعد ' . $daysAgo . ' أيام من الإنشاء. يمكنك فقط تعديل التواريخ وفترات التحضير والملاحظات والوصف.',
                     'redirect' => 'projects.edit'
                 ];
             }
@@ -385,7 +402,7 @@ public function update(Request $request, Project $project)
             'service_statuses.*' => 'in:لم تبدأ,قيد التنفيذ,مكتملة',
             'manager' => 'nullable|string|max:255',
             'note' => 'nullable|string',
-            'code' => 'nullable|string|max:50|unique:projects,code,'.$project->id,
+            'code' => 'nullable|string|max:50|unique:projects,code,' . $project->id,
         ];
     }
 }
