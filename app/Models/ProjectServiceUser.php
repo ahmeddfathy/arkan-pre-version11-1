@@ -126,15 +126,28 @@ class ProjectServiceUser extends Model
     {
         return LogOptions::defaults()
             ->logOnly([
-                'project_id', 'service_id', 'user_id', 'team_id', 'project_share',
-                'is_acknowledged', 'acknowledged_at', 'deadline', 'delivered_at', 'status',
-                'administrative_approval', 'administrative_approval_at', 'administrative_approver_id',
-                'technical_approval', 'technical_approval_at', 'technical_approver_id',
-                'administrative_notes', 'technical_notes'
+                'project_id',
+                'service_id',
+                'user_id',
+                'team_id',
+                'project_share',
+                'is_acknowledged',
+                'acknowledged_at',
+                'deadline',
+                'delivered_at',
+                'status',
+                'administrative_approval',
+                'administrative_approval_at',
+                'administrative_approver_id',
+                'technical_approval',
+                'technical_approval_at',
+                'technical_approver_id',
+                'administrative_notes',
+                'technical_notes'
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+            ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => 'تم تعيين مستخدم لخدمة مشروع',
                 'updated' => 'تم تحديث تعيين مستخدم المشروع',
                 'deleted' => 'تم إلغاء تعيين مستخدم المشروع',
@@ -371,6 +384,15 @@ class ProjectServiceUser extends Model
 
     public function getRequiredApprovals(): array
     {
+        if (!$this->user) {
+            return [
+                'needs_administrative' => false,
+                'needs_technical' => false,
+                'administrative_approvers' => collect(),
+                'technical_approvers' => collect(),
+            ];
+        }
+
         $userRoles = $this->user->roles;
         $needsAdministrative = false;
         $needsTechnical = false;
@@ -402,6 +424,10 @@ class ProjectServiceUser extends Model
     {
         $user = User::find($userId);
         if (!$user) {
+            return false;
+        }
+
+        if (!$this->user) {
             return false;
         }
 
@@ -551,10 +577,10 @@ class ProjectServiceUser extends Model
     public function tasks()
     {
         return $this->hasMany(TaskUser::class, 'user_id', 'user_id')
-                    ->whereHas('task', function($query) {
-                        $query->where('project_id', $this->project_id)
-                              ->where('service_id', $this->service_id);
-                    });
+            ->whereHas('task', function ($query) {
+                $query->where('project_id', $this->project_id)
+                    ->where('service_id', $this->service_id);
+            });
     }
 
     /**
@@ -578,9 +604,9 @@ class ProjectServiceUser extends Model
      */
     public function getOverdueTasksCountAttribute()
     {
-        return $this->tasks()->whereHas('task', function($query) {
+        return $this->tasks()->whereHas('task', function ($query) {
             $query->where('due_date', '<', now())
-                  ->where('status', '!=', 'completed');
+                ->where('status', '!=', 'completed');
         })->count();
     }
 
@@ -605,7 +631,7 @@ class ProjectServiceUser extends Model
      */
     public function getStatusColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_IN_PROGRESS => 'success',
             self::STATUS_WAITING_FORM => 'warning',
             self::STATUS_WAITING_QUESTIONS => 'warning',
@@ -662,7 +688,7 @@ class ProjectServiceUser extends Model
     public function scopeOverdue($query)
     {
         return $query->where('deadline', '<', now())
-                    ->whereNotIn('status', [self::STATUS_FINAL_DELIVERY]);
+            ->whereNotIn('status', [self::STATUS_FINAL_DELIVERY]);
     }
 
     /**

@@ -90,7 +90,7 @@ class TeamManagementController extends Controller
         $team->load(['owner', 'users', 'teamInvitations']);
 
         // إزالة المستخدمين المحذوفين (null) من المجموعة
-        $team->users = $team->users->filter(function($user) {
+        $team->users = $team->users->filter(function ($user) {
             return $user !== null;
         });
 
@@ -204,5 +204,23 @@ class TeamManagementController extends Controller
 
         return back()->with('success', 'تم نقل ملكية الفريق بنجاح');
     }
-}
 
+    public function destroy(Team $team)
+    {
+        if (!auth()->user()->hasRole('hr')) {
+            abort(403, 'غير مصرح لك بحذف الفرق');
+        }
+
+        if ($team->personal_team) {
+            return back()->withErrors(['error' => 'لا يمكن حذف الفريق الشخصي']);
+        }
+
+        $teamName = $team->name;
+
+        $team->users()->detach();
+        $team->delete();
+
+        return redirect()->route('admin.teams.index')
+            ->with('success', "تم حذف الفريق '{$teamName}' بنجاح");
+    }
+}

@@ -36,23 +36,45 @@ class UsersImport implements ToModel, WithEvents
             return null;
         }
 
-        // Improve checks for existing user with more detailed conditions
-        $existingUserQuery = User::query();
-
-        if (!empty($row[20])) {
-            $existingUserQuery->orWhere('employee_id', $row[20]);
+        $dateOfBirth = null;
+        if (!empty($row[6]) && is_numeric($row[6])) {
+            try {
+                $dateOfBirth = Carbon::createFromFormat('Y-m-d', Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[6]))->format('Y-m-d'));
+            } catch (\Exception $e) {
+                Log::error('Error parsing date of birth', ['exception' => $e->getMessage(), 'row' => $row]);
+                $dateOfBirth = null;
+            }
         }
+
+        $startDateOfEmployment = null;
+        if (!empty($row[14]) && is_numeric($row[14])) {
+            try {
+                $startDateOfEmployment = Carbon::createFromFormat('Y-m-d', Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[14]))->format('Y-m-d'));
+            } catch (\Exception $e) {
+                Log::error('Error parsing employment start date', ['exception' => $e->getMessage(), 'row' => $row]);
+                $startDateOfEmployment = null;
+            }
+        }
+
+        $existingUser = null;
 
         if (!empty($row[9])) {
-            $existingUserQuery->orWhere('national_id_number', $row[9]);
+            $existingUser = User::findByNationalId($row[9]);
         }
 
-        $existingUser = $existingUserQuery->first();
+        if (!$existingUser && !empty($row[5])) {
+            $existingUser = User::findByEmail($row[5]);
+        }
+
+        if (!$existingUser && !empty($row[22])) {
+            $existingUser = User::where('employee_id', $row[22])->first();
+        }
 
         if ($existingUser) {
             try {
                 // تحديث بيانات الموظف الموجود بدلاً من تخطيه
                 $existingUser->update([
+                    'employee_id' => isset($row[22]) && !empty($row[22]) ? (int)$row[22] : $existingUser->employee_id,
                     'name' => $row[1] ?? $existingUser->name,
                     'gender' => $row[2] ?? $existingUser->gender,
                     'address' => $row[3] ?? $existingUser->address,
@@ -70,7 +92,7 @@ class UsersImport implements ToModel, WithEvents
                 // تسجيل الموظف الذي تم تحديثه في مصفوفة المحدثين بدلاً من المكررين
                 $this->updatedUsers[] = [
                     'employee_name' => $row[1],
-                    'employee_id' => $row[20] ?? 'N/A',
+                    'employee_id' => $row[22] ?? 'N/A',
                     'national_id' => $row[9] ?? 'N/A'
                 ];
 
@@ -96,26 +118,6 @@ class UsersImport implements ToModel, WithEvents
             }
         }
 
-        $dateOfBirth = null;
-        if (!empty($row[6]) && is_numeric($row[6])) {
-            try {
-                $dateOfBirth = Carbon::createFromFormat('Y-m-d', Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[6]))->format('Y-m-d'));
-            } catch (\Exception $e) {
-                Log::error('Error parsing date of birth', ['exception' => $e->getMessage(), 'row' => $row]);
-                $dateOfBirth = null;
-            }
-        }
-
-        $startDateOfEmployment = null;
-        if (!empty($row[14]) && is_numeric($row[14])) {
-            try {
-                $startDateOfEmployment = Carbon::createFromFormat('Y-m-d', Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[14]))->format('Y-m-d'));
-            } catch (\Exception $e) {
-                Log::error('Error parsing employment start date', ['exception' => $e->getMessage(), 'row' => $row]);
-                $startDateOfEmployment = null;
-            }
-        }
-
         $age = 0;
         if ($dateOfBirth) {
             $now = Carbon::now();
@@ -127,7 +129,7 @@ class UsersImport implements ToModel, WithEvents
 
         try {
             $user = new User([
-                'employee_id' => isset($row[20]) && !empty($row[20]) ? (int)$row[20] : null,
+                'employee_id' => isset($row[22]) && !empty($row[22]) ? (int)$row[22] : null,
                 'name' => $row[1] ?? null,
                 'gender' => $row[2] ?? null,
                 'password' => bcrypt($row[9] ?? 'default_password'),
@@ -152,7 +154,7 @@ class UsersImport implements ToModel, WithEvents
             // Track successfully imported users
             $this->importedUsers[] = [
                 'employee_name' => $row[1] ?? null,
-                'employee_id' => $row[20] ?? null,
+                'employee_id' => $row[22] ?? null,
                 'national_id' => $row[9] ?? null
             ];
 

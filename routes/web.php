@@ -949,6 +949,7 @@ Route::prefix('admin/teams')->name('admin.teams.')->middleware(['auth', 'verifie
     Route::post('/{team}/add-member', [App\Http\Controllers\TeamManagementController::class, 'addMember'])->name('add-member');
     Route::delete('/{team}/remove-member/{user}', [App\Http\Controllers\TeamManagementController::class, 'removeMember'])->name('remove-member');
     Route::post('/{team}/transfer-ownership', [App\Http\Controllers\TeamManagementController::class, 'transferOwnership'])->name('transfer-ownership');
+    Route::delete('/{team}', [App\Http\Controllers\TeamManagementController::class, 'destroy'])->name('destroy');
 });
 
 Route::prefix('employee/projects')->name('employee.projects.')->middleware(['auth', 'verified'])->group(function () {

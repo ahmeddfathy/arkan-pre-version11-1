@@ -39,14 +39,14 @@
                                         اسم المشروع *
                                     </label>
                                     <input type="text"
-                                        class="create-form-control @error('name') is-invalid @enderror"
-                                        id="name"
-                                        name="name"
-                                        value="{{ old('name') }}"
-                                        placeholder="اكتب اسم مشروعك هنا..."
-                                        required>
+                                           class="create-form-control @error('name') is-invalid @enderror"
+                                           id="name"
+                                           name="name"
+                                           value="{{ old('name') }}"
+                                           placeholder="اكتب اسم مشروعك هنا..."
+                                           required>
                                     @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -57,15 +57,15 @@
                                         نوع الشركة *
                                     </label>
                                     <select class="create-form-control @error('company_type') is-invalid @enderror"
-                                        id="company_type"
-                                        name="company_type"
-                                        required>
+                                            id="company_type"
+                                            name="company_type"
+                                            required>
                                         <option value="">🏢 اختر نوع الشركة</option>
                                         <option value="A" {{ old('company_type') == 'A' ? 'selected' : '' }}>A - أركان</option>
                                         <option value="K" {{ old('company_type') == 'K' ? 'selected' : '' }}>K - خبراء</option>
                                     </select>
                                     @error('company_type')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -76,16 +76,16 @@
                                     </label>
                                     <div class="create-input-group">
                                         <input type="text"
-                                            class="create-form-control @error('code') is-invalid @enderror"
-                                            id="code"
-                                            name="code"
-                                            value="{{ old('code') }}"
-                                            placeholder="سيتم توليد الكود تلقائياً...">
+                                               class="create-form-control @error('code') is-invalid @enderror"
+                                               id="code"
+                                               name="code"
+                                               value="{{ old('code') }}"
+                                               placeholder="سيتم توليد الكود تلقائياً...">
                                         <button class="create-generate-btn" type="button" id="generate-code">
                                             <i class="fas fa-magic"></i> توليد تلقائي
                                         </button>
                                         @error('code')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     <small class="form-text text-muted">
@@ -102,12 +102,12 @@
                                         وصف المشروع
                                     </label>
                                     <textarea class="create-form-control @error('description') is-invalid @enderror"
-                                        id="description"
-                                        name="description"
-                                        rows="4"
-                                        placeholder="اكتب وصفاً مفصلاً عن مشروعك وأهدافه...">{{ old('description') }}</textarea>
+                                              id="description"
+                                              name="description"
+                                              rows="4"
+                                              placeholder="اكتب وصفاً مفصلاً عن مشروعك وأهدافه...">{{ old('description') }}</textarea>
                                     @error('description')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -124,13 +124,14 @@
                                         placeholder="ابحث بالاسم أو الكود أو اختر من القائمة..."
                                         autocomplete="off"
                                         required
-                                        value="{{ old('client_id') ? $clients->firstWhere('id', old('client_id'))?->name . ' - ' . ($clients->firstWhere('id', old('client_id'))?->code ?? $clients->firstWhere('id', old('client_id'))?->client_code) : '' }}" />
+                                        value="{{ old('client_id') ? $clients->firstWhere('id', old('client_id'))?->name . ' - ' . ($clients->firstWhere('id', old('client_id'))?->code ?? $clients->firstWhere('id', old('client_id'))?->client_code) : '' }}"
+                                    />
                                     <input type="hidden" id="client_id" name="client_id" value="{{ old('client_id') }}" />
                                     <datalist id="clients_list">
                                         @foreach($clients as $client)
-                                        <option value="{{ $client->name }} - {{ $client->code ?? $client->client_code }}" data-id="{{ $client->id }}">
-                                            {{ $client->name }} - {{ $client->code ?? $client->client_code }}
-                                        </option>
+                                            <option value="{{ $client->name }} - {{ $client->code ?? $client->client_code }}" data-id="{{ $client->id }}">
+                                                {{ $client->name }} - {{ $client->code ?? $client->client_code }}
+                                            </option>
                                         @endforeach
                                     </datalist>
                                     <small class="form-text text-muted">
@@ -138,7 +139,7 @@
                                         ابحث باسم العميل أو الكود للاختيار السريع
                                     </small>
                                     @error('client_id')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -150,12 +151,12 @@
                                                 تاريخ البداية
                                             </label>
                                             <input type="date"
-                                                class="create-form-control @error('start_date') is-invalid @enderror"
-                                                id="start_date"
-                                                name="start_date"
-                                                value="{{ old('start_date') }}">
+                                                   class="create-form-control @error('start_date') is-invalid @enderror"
+                                                   id="start_date"
+                                                   name="start_date"
+                                                   value="{{ old('start_date') }}">
                                             @error('start_date')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
@@ -166,12 +167,12 @@
                                                 تاريخ التسليم المتفق عليه
                                             </label>
                                             <input type="date"
-                                                class="create-form-control @error('client_agreed_delivery_date') is-invalid @enderror"
-                                                id="client_agreed_delivery_date"
-                                                name="client_agreed_delivery_date"
-                                                value="{{ old('client_agreed_delivery_date') }}">
+                                                   class="create-form-control @error('client_agreed_delivery_date') is-invalid @enderror"
+                                                   id="client_agreed_delivery_date"
+                                                   name="client_agreed_delivery_date"
+                                                   value="{{ old('client_agreed_delivery_date') }}">
                                             @error('client_agreed_delivery_date')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
@@ -183,10 +184,10 @@
                                         ملاحظات هامة
                                     </label>
                                     <textarea class="create-form-control @error('note') is-invalid @enderror"
-                                        id="note" name="note" rows="3"
-                                        placeholder="اكتب أي ملاحظات هامة حول المشروع...">{{ old('note') }}</textarea>
+                                              id="note" name="note" rows="3"
+                                              placeholder="اكتب أي ملاحظات هامة حول المشروع...">{{ old('note') }}</textarea>
                                     @error('note')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -198,9 +199,9 @@
                                                 تاريخ تسليم الفريق
                                             </label>
                                             <input type="date" class="create-form-control @error('team_delivery_date') is-invalid @enderror"
-                                                id="team_delivery_date" name="team_delivery_date" value="{{ old('team_delivery_date') }}">
+                                                   id="team_delivery_date" name="team_delivery_date" value="{{ old('team_delivery_date') }}">
                                             @error('team_delivery_date')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
@@ -229,12 +230,12 @@
                                     <div class="create-alert" style="background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.3);">
                                         <div class="form-check form-switch" style="display: flex; align-items: center; gap: 1rem; margin: 0;">
                                             <input class="form-check-input @error('is_urgent') is-invalid @enderror"
-                                                type="checkbox"
-                                                id="is_urgent"
-                                                name="is_urgent"
-                                                value="1"
-                                                style="width: 20px; height: 20px; accent-color: #ff6b6b;"
-                                                {{ old('is_urgent') ? 'checked' : '' }}>
+                                                   type="checkbox"
+                                                   id="is_urgent"
+                                                   name="is_urgent"
+                                                   value="1"
+                                                   style="width: 20px; height: 20px; accent-color: #ff6b6b;"
+                                                   {{ old('is_urgent') ? 'checked' : '' }}>
                                             <div>
                                                 <label class="form-check-label" for="is_urgent" style="color: #dc3545; font-weight: 700; margin: 0; cursor: pointer;">
                                                     <i class="fas fa-exclamation-triangle me-2"></i>
@@ -246,7 +247,7 @@
                                             </div>
                                         </div>
                                         @error('is_urgent')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
@@ -256,12 +257,12 @@
                                     <div class="create-alert" style="background: rgba(103, 126, 234, 0.1); border-color: rgba(103, 126, 234, 0.3);">
                                         <div class="form-check form-switch mb-3" style="display: flex; align-items: center; gap: 1rem; margin: 0;">
                                             <input class="form-check-input @error('preparation_enabled') is-invalid @enderror"
-                                                type="checkbox"
-                                                id="preparation_enabled"
-                                                name="preparation_enabled"
-                                                value="1"
-                                                style="width: 20px; height: 20px; accent-color: #667eea;"
-                                                {{ old('preparation_enabled') ? 'checked' : '' }}>
+                                                   type="checkbox"
+                                                   id="preparation_enabled"
+                                                   name="preparation_enabled"
+                                                   value="1"
+                                                   style="width: 20px; height: 20px; accent-color: #667eea;"
+                                                   {{ old('preparation_enabled') ? 'checked' : '' }}>
                                             <div>
                                                 <label class="form-check-label" for="preparation_enabled" style="color: #667eea; font-weight: 700; margin: 0; cursor: pointer;">
                                                     <i class="fas fa-clock me-2"></i>
@@ -273,7 +274,7 @@
                                             </div>
                                         </div>
                                         @error('preparation_enabled')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
 
                                         <div id="preparation-fields" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(103, 126, 234, 0.2);">
@@ -284,13 +285,13 @@
                                                         تاريخ ووقت بداية التحضير
                                                     </label>
                                                     <input type="datetime-local"
-                                                        class="create-form-control @error('preparation_start_date') is-invalid @enderror"
-                                                        id="preparation_start_date"
-                                                        name="preparation_start_date"
-                                                        value="{{ old('preparation_start_date') }}"
-                                                        style="font-size: 0.85rem;">
+                                                           class="create-form-control @error('preparation_start_date') is-invalid @enderror"
+                                                           id="preparation_start_date"
+                                                           name="preparation_start_date"
+                                                           value="{{ old('preparation_start_date') }}"
+                                                           style="font-size: 0.85rem;">
                                                     @error('preparation_start_date')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                        <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-6 mb-3">
@@ -299,15 +300,15 @@
                                                         عدد أيام التحضير
                                                     </label>
                                                     <input type="number"
-                                                        class="create-form-control @error('preparation_days') is-invalid @enderror"
-                                                        id="preparation_days"
-                                                        name="preparation_days"
-                                                        value="{{ old('preparation_days') }}"
-                                                        min="1"
-                                                        placeholder="مثال: 5"
-                                                        style="font-size: 0.85rem;">
+                                                           class="create-form-control @error('preparation_days') is-invalid @enderror"
+                                                           id="preparation_days"
+                                                           name="preparation_days"
+                                                           value="{{ old('preparation_days') }}"
+                                                           min="1"
+                                                           placeholder="مثال: 5"
+                                                           style="font-size: 0.85rem;">
                                                     @error('preparation_days')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                        <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                     <small class="form-text text-muted" style="font-size: 0.75rem;">
                                                         <i class="fas fa-info-circle me-1"></i>
@@ -351,7 +352,7 @@
                                         <select name="package_id" id="package_id" class="create-form-control">
                                             <option value="">🎁 اختر باقة مناسبة</option>
                                             @foreach($packages as $package)
-                                            <option value="{{ $package['id'] }}" data-services="{{ json_encode($package['services']) }}">{{ $package['name'] }} ({{ $package['total_points'] }} نقطة)</option>
+                                                <option value="{{ $package['id'] }}" data-services="{{ json_encode($package['services']) }}">{{ $package['name'] }} ({{ $package['total_points'] }} نقطة)</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -383,32 +384,32 @@
                                     </div>
                                     <div class="create-services-container">
                                         @foreach($services as $service)
-                                        <div class="create-service-card">
-                                            <div class="create-service-content">
-                                                <div class="create-service-header">
-                                                    <input class="create-service-checkbox" type="checkbox" value="{{ $service->id }}" id="service_{{ $service->id }}" name="selected_services[]">
-                                                    <div>
-                                                        <h6 class="create-service-title">{{ $service->name }}</h6>
-                                                        <p class="create-service-description">{{ $service->description }}</p>
-                                                        <span class="create-service-points">
-                                                            <i class="fas fa-star me-1"></i>
-                                                            {{ $service->points }} نقطة
-                                                        </span>
+                                            <div class="create-service-card">
+                                                <div class="create-service-content">
+                                                    <div class="create-service-header">
+                                                        <input class="create-service-checkbox" type="checkbox" value="{{ $service->id }}" id="service_{{ $service->id }}" name="selected_services[]">
+                                                        <div>
+                                                            <h6 class="create-service-title">{{ $service->name }}</h6>
+                                                            <p class="create-service-description">{{ $service->description }}</p>
+                                                            <span class="create-service-points">
+                                                                <i class="fas fa-star me-1"></i>
+                                                                {{ $service->points }} نقطة
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="create-service-status">
+                                                        <label class="create-form-label">
+                                                            <i class="fas fa-tasks"></i>
+                                                            حالة الخدمة:
+                                                        </label>
+                                                        <select class="create-form-control" name="service_statuses[{{ $service->id }}]">
+                                                            <option value="لم تبدأ">📅 لم تبدأ</option>
+                                                            <option value="قيد التنفيذ">⚙️ قيد التنفيذ</option>
+                                                            <option value="مكتملة">✅ مكتملة</option>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                                <div class="create-service-status">
-                                                    <label class="create-form-label">
-                                                        <i class="fas fa-tasks"></i>
-                                                        حالة الخدمة:
-                                                    </label>
-                                                    <select class="create-form-control" name="service_statuses[{{ $service->id }}]">
-                                                        <option value="لم تبدأ">📅 لم تبدأ</option>
-                                                        <option value="قيد التنفيذ">⚙️ قيد التنفيذ</option>
-                                                        <option value="مكتملة">✅ مكتملة</option>
-                                                    </select>
-                                                </div>
                                             </div>
-                                        </div>
                                         @endforeach
                                     </div>
                                 </div>
@@ -443,130 +444,126 @@
 
 @push('styles')
 <style>
-    .create-status-display {
-        padding: 12px;
-        background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(25, 135, 84, 0.1));
-        border: 1px solid rgba(40, 167, 69, 0.3);
-        border-radius: 8px;
-        text-align: center;
-    }
+.create-status-display {
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(25, 135, 84, 0.1));
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    border-radius: 8px;
+    text-align: center;
+}
 
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 14px;
-        color: white;
-        box-shadow: none;
-    }
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    box-shadow: none;
+}
 
-    .status-badge.status-new {
-        background: linear-gradient(135deg, #28a745, #20c997);
-    }
+.status-badge.status-new {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
 
-    .status-badge i {
-        font-size: 16px;
-    }
+.status-badge i {
+    font-size: 16px;
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
-    // تمرير بيانات الخدمات لـ JavaScript
-    const allServices = @json($services);
+// تمرير بيانات الخدمات لـ JavaScript
+const allServices = @json($services);
 
-    // Build client map for datalist
-    const projectClientsMap = new Map();
-    const projectClientData = {
-        !!json_encode($clients - > map(function($c) {
-            return ['display' => $c - > name.
-                ' - '.($c - > code ?? $c - > client_code), 'id' => (string) $c - > id
-            ];
-        }) - > values()) !!
-    };
+// Build client map for datalist
+const projectClientsMap = new Map();
+const projectClientData = {!! json_encode($clients->map(function($c) {
+    return ['display' => $c->name . ' - ' . ($c->code ?? $c->client_code), 'id' => (string)$c->id];
+})->values()) !!};
 
-    projectClientData.forEach(client => {
-        projectClientsMap.set(client.display, client.id);
-    });
+projectClientData.forEach(client => {
+    projectClientsMap.set(client.display, client.id);
+});
 
-    // Handle client search input
-    document.addEventListener('DOMContentLoaded', function() {
-        const clientSearchInput = document.getElementById('client_search');
-        const clientIdInput = document.getElementById('client_id');
+// Handle client search input
+document.addEventListener('DOMContentLoaded', function() {
+    const clientSearchInput = document.getElementById('client_search');
+    const clientIdInput = document.getElementById('client_id');
 
-        if (clientSearchInput) {
-            clientSearchInput.addEventListener('input', function() {
-                const selectedValue = this.value.trim();
+    if (clientSearchInput) {
+        clientSearchInput.addEventListener('input', function() {
+            const selectedValue = this.value.trim();
 
-                // Check if the value matches a client in our map
-                if (projectClientsMap.has(selectedValue)) {
-                    clientIdInput.value = projectClientsMap.get(selectedValue);
-                } else {
-                    clientIdInput.value = '';
-                }
-            });
+            // Check if the value matches a client in our map
+            if (projectClientsMap.has(selectedValue)) {
+                clientIdInput.value = projectClientsMap.get(selectedValue);
+            } else {
+                clientIdInput.value = '';
+            }
+        });
 
-            // Event listener for blur (when user leaves the input)
-            clientSearchInput.addEventListener('blur', function() {
-                // If the value doesn't match any client, clear the input
-                if (!projectClientsMap.has(this.value.trim()) && this.value.trim() !== '') {
-                    setTimeout(() => {
-                        if (!projectClientsMap.has(this.value.trim())) {
-                            this.value = '';
-                            clientIdInput.value = '';
-                        }
-                    }, 200);
-                }
-            });
+        // Event listener for blur (when user leaves the input)
+        clientSearchInput.addEventListener('blur', function() {
+            // If the value doesn't match any client, clear the input
+            if (!projectClientsMap.has(this.value.trim()) && this.value.trim() !== '') {
+                setTimeout(() => {
+                    if (!projectClientsMap.has(this.value.trim())) {
+                        this.value = '';
+                        clientIdInput.value = '';
+                    }
+                }, 200);
+            }
+        });
+    }
+});
+
+// توليد كود المشروع بناءً على نوع الشركة
+document.getElementById('generate-code').addEventListener('click', function() {
+    const companyType = document.getElementById('company_type').value;
+
+    if (!companyType) {
+        alert('يجب اختيار نوع الشركة أولاً');
+        return;
+    }
+
+    const originalButton = this;
+    const originalContent = this.innerHTML;
+
+    originalButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التوليد...';
+    originalButton.disabled = true;
+
+    fetch('/projects/generate-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            company_type: companyType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const codeInput = document.getElementById('code');
+            codeInput.value = data.code;
+        } else {
+            alert('خطأ: ' + (data.message || 'حدث خطأ في توليد الكود'));
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('حدث خطأ في الاتصال بالخادم');
+    })
+    .finally(() => {
+        originalButton.innerHTML = originalContent;
+        originalButton.disabled = false;
     });
-
-    // توليد كود المشروع بناءً على نوع الشركة
-    document.getElementById('generate-code').addEventListener('click', function() {
-        const companyType = document.getElementById('company_type').value;
-
-        if (!companyType) {
-            alert('يجب اختيار نوع الشركة أولاً');
-            return;
-        }
-
-        const originalButton = this;
-        const originalContent = this.innerHTML;
-
-        originalButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التوليد...';
-        originalButton.disabled = true;
-
-        fetch('/projects/generate-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    company_type: companyType
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const codeInput = document.getElementById('code');
-                    codeInput.value = data.code;
-                } else {
-                    alert('خطأ: ' + (data.message || 'حدث خطأ في توليد الكود'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('حدث خطأ في الاتصال بالخادم');
-            })
-            .finally(() => {
-                originalButton.innerHTML = originalContent;
-                originalButton.disabled = false;
-            });
-    });
+});
 </script>
 <script>
     function switchSection(showPackage) {
@@ -669,9 +666,11 @@
                 }
             });
 
+            // عرض الخدمات الإضافية (غير محددة، خارج الباقة)
             allServices.forEach(service => {
-                if (!packageServices.some(pkgServiceId => parseInt(pkgServiceId) === parseInt(service.id))) {
-                    const serviceCard = createServiceCard(service, false, false);
+                // إذا لم تكن الخدمة ضمن خدمات الباقة
+                if (!packageServices.includes(service.id)) {
+                    const serviceCard = createServiceCard(service, false, false); // false للتحديد، false للباقة
                     additionalServicesList.appendChild(serviceCard);
                 }
             });

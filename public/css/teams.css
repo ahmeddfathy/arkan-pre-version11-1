@@ -215,6 +215,16 @@ body {
     box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
 }
 
+.team-action-btn.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.team-action-btn.danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
 /* ============================================
    TEAM MANAGEMENT PAGE
    ============================================ */

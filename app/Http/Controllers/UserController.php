@@ -411,6 +411,4 @@ class UserController extends Controller
 
         return response()->json(array_values($additionalPermissions));
     }
-
-
 }

@@ -49,7 +49,15 @@ class ProjectStatsService
             'cancelledProjects' => (clone $baseQuery)->where('status', 'ملغي')->count(),
             'pausedProjects' => (clone $baseQuery)->where('status', 'موقوف')->count(),
 
-            // إحصائيات التسليمات
+            'projectsWithInternalDraft' => (clone $baseQuery)
+                ->where('delivery_type', 'مسودة')
+                ->whereNotNull('actual_delivery_date')
+                ->count(),
+            'projectsWithInternalFinal' => (clone $baseQuery)
+                ->where('delivery_type', 'كامل')
+                ->whereNotNull('actual_delivery_date')
+                ->count(),
+
             'projectsWithDraft' => (clone $baseQuery)->whereHas('lastDraftDelivery')->count(),
             'projectsWithFinal' => (clone $baseQuery)->whereHas('lastFinalDelivery')->count(),
             'projectsWithoutDelivery' => (clone $baseQuery)->doesntHave('deliveries')->count(),
@@ -137,16 +145,16 @@ class ProjectStatsService
         }
 
         return $projectsQuery->with(['client'])
-            ->where(function($query) {
-                $query->where(function($subQuery) {
+            ->where(function ($query) {
+                $query->where(function ($subQuery) {
                     // إذا كان هناك تاريخ متفق عليه مع العميل، استخدمه
                     $subQuery->whereNotNull('client_agreed_delivery_date')
-                             ->whereDate('client_agreed_delivery_date', '<', Carbon::today());
-                })->orWhere(function($subQuery) {
+                        ->whereDate('client_agreed_delivery_date', '<', Carbon::today());
+                })->orWhere(function ($subQuery) {
                     // إذا لم يكن هناك تاريخ متفق مع العميل، استخدم تاريخ الفريق
                     $subQuery->whereNull('client_agreed_delivery_date')
-                             ->whereNotNull('team_delivery_date')
-                             ->whereDate('team_delivery_date', '<', Carbon::today());
+                        ->whereNotNull('team_delivery_date')
+                        ->whereDate('team_delivery_date', '<', Carbon::today());
                 });
             })
             ->whereIn('status', ['جديد', 'جاري التنفيذ'])
@@ -299,11 +307,11 @@ class ProjectStatsService
      */
     public function filterOverdueProjects($projects)
     {
-        return $projects->filter(function($project) {
+        return $projects->filter(function ($project) {
             $deliveryDate = $project->client_agreed_delivery_date ?? $project->team_delivery_date;
             return $deliveryDate &&
-                   Carbon::parse($deliveryDate)->isPast() &&
-                   in_array($project->status, ['جديد', 'جاري التنفيذ']);
+                Carbon::parse($deliveryDate)->isPast() &&
+                in_array($project->status, ['جديد', 'جاري التنفيذ']);
         });
     }
 
@@ -347,7 +355,7 @@ class ProjectStatsService
      */
     public function getCompletedLateProjects($projects)
     {
-        return $projects->filter(function($project) {
+        return $projects->filter(function ($project) {
             // التحقق من أن المشروع مكتمل
             if ($project->status !== 'مكتمل') {
                 return false;

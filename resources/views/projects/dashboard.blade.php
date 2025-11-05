@@ -66,12 +66,12 @@
                             <div class="date-filter-options">
                                 <div class="date-option">
                                     <input type="radio" id="quick_filter" name="filter_type" value="quick"
-                                           {{ request('filter_type', 'quick') == 'quick' ? 'checked' : '' }}>
+                                        {{ request('filter_type', 'quick') == 'quick' ? 'checked' : '' }}>
                                     <label for="quick_filter">فلتر سريع</label>
                                 </div>
                                 <div class="date-option">
                                     <input type="radio" id="custom_filter" name="filter_type" value="custom"
-                                           {{ request('filter_type') == 'custom' ? 'checked' : '' }}>
+                                        {{ request('filter_type') == 'custom' ? 'checked' : '' }}>
                                     <label for="custom_filter">تاريخ مخصص</label>
                                 </div>
                             </div>
@@ -191,6 +191,33 @@
                 </div>
             </div>
         </div>
+
+        <div class="stat-card-modern primary">
+            <div class="stat-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ $projectsWithInternalDraft ?? 0 }}</div>
+                <div class="stat-label">تسليم مسودة (تنفيذي)</div>
+                <div class="stat-trend">
+                    {{ $projectsWithInternalDraft > 0 ? round(($projectsWithInternalDraft / max($totalProjects, 1)) * 100) : 0 }}% من الإجمالي
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-modern success">
+            <div class="stat-icon">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ $projectsWithInternalFinal ?? 0 }}</div>
+                <div class="stat-label">تسليم كامل (تنفيذي)</div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-trophy"></i>
+                    {{ $projectsWithInternalFinal > 0 ? round(($projectsWithInternalFinal / max($totalProjects, 1)) * 100) : 0 }}% من الإجمالي
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Deliveries Stats Section -->
@@ -252,7 +279,7 @@
                 <div class="stat-content">
                     <div class="stat-number" style="color: white; -webkit-text-fill-color: white; background: none;">
                         @php
-                            $totalDelivered = ($projectsWithDraft ?? 0) + ($projectsWithFinal ?? 0);
+                        $totalDelivered = ($projectsWithDraft ?? 0) + ($projectsWithFinal ?? 0);
                         @endphp
                         {{ $totalDelivered }}
                     </div>
@@ -669,13 +696,13 @@
                                 <div class="simple-white-board-list-title">{{ $transfer->revision->title ?? 'تعديل محذوف' }}</div>
                                 <div class="simple-white-board-list-meta">
                                     @if($transfer->fromUser)
-                                        من: {{ $transfer->fromUser->name }}
+                                    من: {{ $transfer->fromUser->name }}
                                     @else
-                                        تعيين جديد
+                                    تعيين جديد
                                     @endif
                                     | {{ $transfer->assignment_type == 'executor' ? 'منفذ' : 'مراجع' }}
                                     @if($transfer->reason)
-                                        | السبب: {{ \Str::limit($transfer->reason, 30) }}
+                                    | السبب: {{ \Str::limit($transfer->reason, 30) }}
                                     @endif
                                     <br>
                                     <small>{{ $transfer->created_at->diffForHumans() }}</small>
@@ -1136,10 +1163,10 @@
                     <svg viewBox="0 0 36 36" class="circular-chart">
                         <path class="circle-bg" d="M18 2.0845
                             a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="circle" stroke-dasharray="{{ $allTotalTasks > 0 ? round(($allCompletedTasks / $allTotalTasks) * 100) : 0 }}, 100" d="M18 2.0845
                             a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <text x="18" y="20.35" class="percentage">{{ $allTotalTasks > 0 ? round(($allCompletedTasks / $allTotalTasks) * 100) : 0 }}%</text>
                     </svg>
                 </div>
@@ -1156,7 +1183,7 @@
         <div class="section-header">
             <h2>
                 <i class="fas fa-calendar-day"></i>
-            اجتماعات اليوم
+                اجتماعات اليوم
             </h2>
         </div>
 
@@ -1215,7 +1242,7 @@
         <div class="section-header">
             <h2>
                 <i class="fas fa-star"></i>
-            أفضل الموظفين
+                أفضل الموظفين
             </h2>
         </div>
 
@@ -1224,13 +1251,13 @@
             <div class="employee-card-modern">
                 <div class="employee-avatar">
                     @if($index == 0)
-                        <i class="fas fa-crown"></i>
+                    <i class="fas fa-crown"></i>
                     @elseif($index == 1)
-                        <i class="fas fa-medal"></i>
+                    <i class="fas fa-medal"></i>
                     @elseif($index == 2)
-                        <i class="fas fa-award"></i>
+                    <i class="fas fa-award"></i>
                     @else
-                        {{ $index + 1 }}
+                    {{ $index + 1 }}
                     @endif
                 </div>
                 <div class="employee-name">{{ $employee->name }}</div>
@@ -1246,7 +1273,7 @@
     <!-- Departments & Teams -->
     @if(isset($departmentsData) && is_object($departmentsData) && $departmentsData->count() > 0)
     @php
-        $currentUserHierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
+    $currentUserHierarchyLevel = \App\Models\RoleHierarchy::getUserMaxHierarchyLevel(Auth::user());
     @endphp
     <div class="section-modern">
         <div class="section-header">
@@ -1261,8 +1288,8 @@
             @if(isset($departmentsData) && is_object($departmentsData))
             @foreach($departmentsData as $department)
             @php
-                $canAccessDepartment = $currentUserHierarchyLevel >= 5 ||
-                    ($currentUserHierarchyLevel == 4 && Auth::user()->department == $department->department);
+            $canAccessDepartment = $currentUserHierarchyLevel >= 5 ||
+            ($currentUserHierarchyLevel == 4 && Auth::user()->department == $department->department);
             @endphp
             <div class="department-card-modern {{ !$canAccessDepartment ? 'opacity-50' : '' }}" data-department="{{ $department->department }}">
                 <div class="department-header">
@@ -1309,15 +1336,15 @@
 
                 <div class="department-footer">
                     @if($canAccessDepartment)
-                        <a href="{{ route('departments.show', ['department' => urlencode($department->department)]) }}" class="view-team-btn">
-                            <i class="fas fa-users"></i>
-                            عرض القسم
-                        </a>
+                    <a href="{{ route('departments.show', ['department' => urlencode($department->department)]) }}" class="view-team-btn">
+                        <i class="fas fa-users"></i>
+                        عرض القسم
+                    </a>
                     @else
-                        <button class="view-team-btn" disabled title="غير مسموح لك بالوصول">
-                            <i class="fas fa-lock"></i>
-                            غير متاح
-                        </button>
+                    <button class="view-team-btn" disabled title="غير مسموح لك بالوصول">
+                        <i class="fas fa-lock"></i>
+                        غير متاح
+                    </button>
                     @endif
                 </div>
             </div>
@@ -1334,49 +1361,49 @@
         <div class="section-header">
             <h2>
                 <i class="fas fa-play-circle"></i>
-                        المشاريع النشطة
+                المشاريع النشطة
             </h2>
             <span class="section-count">{{ $activeProjects->count() }}</span>
-                </div>
+        </div>
 
         <div class="modern-table-container">
-                <div class="table-responsive">
+            <div class="table-responsive">
                 <table class="modern-table">
-                        <thead>
-                            <tr>
-                                <th>المشروع</th>
-                                <th>العميل</th>
-                                <th>الحالة</th>
-                                <th>التقدم</th>
-                                <th>الموعد النهائي</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($activeProjects as $project)
+                    <thead>
                         <tr>
-                                <td>
+                            <th>المشروع</th>
+                            <th>العميل</th>
+                            <th>الحالة</th>
+                            <th>التقدم</th>
+                            <th>الموعد النهائي</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($activeProjects as $project)
+                        <tr>
+                            <td>
                                 <div class="project-info">
                                     <div class="project-avatar">
-                                            {{ substr($project->name, 0, 1) }}
-                                        </div>
+                                        {{ substr($project->name, 0, 1) }}
+                                    </div>
                                     <div class="project-details">
                                         <div class="project-name">
                                             <a href="{{ route('projects.show', $project) }}">{{ $project->name }}</a>
                                         </div>
                                         <div class="project-description">{{ Str::limit($project->description, 50) }}</div>
-                                        </div>
                                     </div>
-                                </td>
-                                <td>
+                                </div>
+                            </td>
+                            <td>
                                 <span class="client-name">{{ optional($project->client)->name ?? '-' }}</span>
-                                </td>
-                                <td>
+                            </td>
+                            <td>
                                 <span class="status-badge status-{{ str_replace(' ', '-', $project->status) }}">
                                     {{ $project->status }}
                                 </span>
-                                </td>
-                                <td>
+                            </td>
+                            <td>
                                 <div class="progress-container">
                                     <div class="progress-bar">
                                         @php $progressValue = $project->progress ?? 0; @endphp
@@ -1384,42 +1411,42 @@
                                     </div>
                                     <span class="progress-text">{{ $progressValue }}%</span>
                                 </div>
-                                </td>
-                                <td>
-                                    @php
-                                        $deliveryDate = $project->client_agreed_delivery_date ?? $project->team_delivery_date;
-                                    @endphp
-                                    @if($deliveryDate)
-                                    <span class="date {{ \Carbon\Carbon::parse($deliveryDate)->isPast() ? 'overdue' : '' }}">
-                                            {{ \Carbon\Carbon::parse($deliveryDate)->format('Y/m/d') }}
-                                        </span>
-                                    @else
-                                    <span class="date no-date">غير محدد</span>
-                                    @endif
-                                </td>
-                                <td>
+                            </td>
+                            <td>
+                                @php
+                                $deliveryDate = $project->client_agreed_delivery_date ?? $project->team_delivery_date;
+                                @endphp
+                                @if($deliveryDate)
+                                <span class="date {{ \Carbon\Carbon::parse($deliveryDate)->isPast() ? 'overdue' : '' }}">
+                                    {{ \Carbon\Carbon::parse($deliveryDate)->format('Y/m/d') }}
+                                </span>
+                                @else
+                                <span class="date no-date">غير محدد</span>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="table-actions">
                                     <a href="{{ route('projects.show', $project) }}" class="action-btn-small primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <a href="{{ route('projects.edit', $project) }}" class="action-btn-small secondary">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
                             <td colspan="6" class="empty-state">
                                 <div class="empty-icon">
                                     <i class="fas fa-inbox"></i>
                                 </div>
                                 <div class="empty-text">لا توجد مشاريع نشطة حالياً</div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1511,36 +1538,36 @@
                     <div class="activity-item" data-task-type="{{ $recentTask->task_type }}" data-status="{{ $recentTask->status }}">
                         <div class="activity-icon">
                             @if($recentTask->task_type === 'template')
-                                <i class="fas fa-layer-group"></i>
+                            <i class="fas fa-layer-group"></i>
                             @else
-                                @switch($recentTask->status)
-                                    @case('completed')
-                                        <i class="fas fa-check-circle"></i>
-                                        @break
-                                    @case('in_progress')
-                                        <i class="fas fa-play-circle"></i>
-                                        @break
-                                    @case('paused')
-                                        <i class="fas fa-pause-circle"></i>
-                                        @break
-                                    @default
-                                        <i class="fas fa-tasks"></i>
-                                @endswitch
+                            @switch($recentTask->status)
+                            @case('completed')
+                            <i class="fas fa-check-circle"></i>
+                            @break
+                            @case('in_progress')
+                            <i class="fas fa-play-circle"></i>
+                            @break
+                            @case('paused')
+                            <i class="fas fa-pause-circle"></i>
+                            @break
+                            @default
+                            <i class="fas fa-tasks"></i>
+                            @endswitch
                             @endif
                         </div>
                         <div class="activity-content">
                             <div class="activity-title">
                                 <span class="task-name">{{ Str::limit($recentTask->task_name, 40) }}</span>
                                 @if($recentTask->task_type === 'template')
-                                    <span class="task-type-badge template">
-                                        <i class="fas fa-layer-group"></i>
-                                        قالب
-                                    </span>
+                                <span class="task-type-badge template">
+                                    <i class="fas fa-layer-group"></i>
+                                    قالب
+                                </span>
                                 @else
-                                    <span class="task-type-badge regular">
-                                        <i class="fas fa-tasks"></i>
-                                        عادية
-                                    </span>
+                                <span class="task-type-badge regular">
+                                    <i class="fas fa-tasks"></i>
+                                    عادية
+                                </span>
                                 @endif
                             </div>
                             <div class="activity-meta">
@@ -1562,24 +1589,24 @@
                         </div>
                         <div class="activity-status status-{{ $recentTask->status }}">
                             @switch($recentTask->status)
-                                @case('completed')
-                                    <i class="fas fa-check"></i>
-                                    مكتملة
-                                    @break
-                                @case('in_progress')
-                                    <i class="fas fa-play"></i>
-                                    قيد التنفيذ
-                                    @break
-                                @case('paused')
-                                    <i class="fas fa-pause"></i>
-                                    متوقفة
-                                    @break
-                                @case('new')
-                                    <i class="fas fa-plus"></i>
-                                    جديدة
-                                    @break
-                                @default
-                                    {{ $recentTask->status }}
+                            @case('completed')
+                            <i class="fas fa-check"></i>
+                            مكتملة
+                            @break
+                            @case('in_progress')
+                            <i class="fas fa-play"></i>
+                            قيد التنفيذ
+                            @break
+                            @case('paused')
+                            <i class="fas fa-pause"></i>
+                            متوقفة
+                            @break
+                            @case('new')
+                            <i class="fas fa-plus"></i>
+                            جديدة
+                            @break
+                            @default
+                            {{ $recentTask->status }}
                             @endswitch
                         </div>
                     </div>
@@ -1641,24 +1668,24 @@
                         </div>
                         <div class="project-status status-{{ str_replace(' ', '-', $recentProject->status) }}">
                             @switch($recentProject->status)
-                                @case('جديد')
-                                    <i class="fas fa-plus"></i>
-                                    جديد
-                                    @break
-                                @case('جاري التنفيذ')
-                                    <i class="fas fa-play"></i>
-                                    جاري التنفيذ
-                                    @break
-                                @case('مكتمل')
-                                    <i class="fas fa-check"></i>
-                                    مكتمل
-                                    @break
-                                @case('ملغي')
-                                    <i class="fas fa-times"></i>
-                                    ملغي
-                                    @break
-                                @default
-                                    {{ $recentProject->status }}
+                            @case('جديد')
+                            <i class="fas fa-plus"></i>
+                            جديد
+                            @break
+                            @case('جاري التنفيذ')
+                            <i class="fas fa-play"></i>
+                            جاري التنفيذ
+                            @break
+                            @case('مكتمل')
+                            <i class="fas fa-check"></i>
+                            مكتمل
+                            @break
+                            @case('ملغي')
+                            <i class="fas fa-times"></i>
+                            ملغي
+                            @break
+                            @default
+                            {{ $recentProject->status }}
                             @endswitch
                         </div>
                     </div>
@@ -1718,24 +1745,24 @@
                             <div class="meeting-time">
                                 <i class="fas fa-clock"></i>
                                 @if($recentMeeting->start_time)
-                                    {{ \Carbon\Carbon::parse($recentMeeting->start_time)->format('Y/m/d H:i') }}
+                                {{ \Carbon\Carbon::parse($recentMeeting->start_time)->format('Y/m/d H:i') }}
                                 @else
-                                    {{ $recentMeeting->created_at->diffForHumans() }}
+                                {{ $recentMeeting->created_at->diffForHumans() }}
                                 @endif
                             </div>
                         </div>
                         <div class="meeting-status">
                             @if($recentMeeting->start_time)
-                                @if(\Carbon\Carbon::parse($recentMeeting->start_time)->isFuture())
-                                    <i class="fas fa-clock"></i>
-                                    قادم
-                                @else
-                                    <i class="fas fa-check"></i>
-                                    منتهي
-                                @endif
+                            @if(\Carbon\Carbon::parse($recentMeeting->start_time)->isFuture())
+                            <i class="fas fa-clock"></i>
+                            قادم
                             @else
-                                <i class="fas fa-calendar-plus"></i>
-                                مجدول
+                            <i class="fas fa-check"></i>
+                            منتهي
+                            @endif
+                            @else
+                            <i class="fas fa-calendar-plus"></i>
+                            مجدول
                             @endif
                         </div>
                     </div>
@@ -1763,50 +1790,50 @@
 
                 <div class="recent-updates-list">
                     @if($latestRevisions->count() > 0)
-                        @foreach($latestRevisions->take(6) as $revision)
-                        <div class="alert-item" data-revision-type="{{ $revision->revision_type }}" data-status="{{ $revision->status }}">
-                            <div class="alert-icon">
-                                @if($revision->status == 'approved')
-                                    <i class="fas fa-check-circle"></i>
-                                @elseif($revision->status == 'rejected')
-                                    <i class="fas fa-times-circle"></i>
-                                @else
-                                    <i class="fas fa-clock"></i>
-                                @endif
-                            </div>
-                            <div class="alert-content">
-                                <div class="alert-title">
-                                    <span class="revision-name">{{ Str::limit($revision->title, 35) }}</span>
-                                    <div class="revision-type-badge">
-                                        <i class="fas fa-{{ $revision->revision_type == 'project' ? 'project-diagram' : ($revision->revision_type == 'general' ? 'globe' : 'tasks') }}"></i>
-                                        {{ $revision->revision_type == 'project' ? 'مشروع' : ($revision->revision_type == 'general' ? 'عام' : 'مهمة') }}
-                                    </div>
-                                </div>
-                                <div class="alert-meta">
-                                    <div class="revision-creator">
-                                        <i class="fas fa-user"></i>
-                                        {{ $revision->creator->name }}
-                                    </div>
-                                    <div class="revision-time">
-                                        <i class="fas fa-clock"></i>
-                                        {{ $revision->revision_date->diffForHumans() }}
-                                    </div>
+                    @foreach($latestRevisions->take(6) as $revision)
+                    <div class="alert-item" data-revision-type="{{ $revision->revision_type }}" data-status="{{ $revision->status }}">
+                        <div class="alert-icon">
+                            @if($revision->status == 'approved')
+                            <i class="fas fa-check-circle"></i>
+                            @elseif($revision->status == 'rejected')
+                            <i class="fas fa-times-circle"></i>
+                            @else
+                            <i class="fas fa-clock"></i>
+                            @endif
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">
+                                <span class="revision-name">{{ Str::limit($revision->title, 35) }}</span>
+                                <div class="revision-type-badge">
+                                    <i class="fas fa-{{ $revision->revision_type == 'project' ? 'project-diagram' : ($revision->revision_type == 'general' ? 'globe' : 'tasks') }}"></i>
+                                    {{ $revision->revision_type == 'project' ? 'مشروع' : ($revision->revision_type == 'general' ? 'عام' : 'مهمة') }}
                                 </div>
                             </div>
-                            <div class="alert-status status-{{ $revision->status }}">
-                                @if($revision->status == 'approved')
-                                    <i class="fas fa-check-circle"></i>
-                                    موافق عليه
-                                @elseif($revision->status == 'rejected')
-                                    <i class="fas fa-times-circle"></i>
-                                    مرفوض
-                                @else
+                            <div class="alert-meta">
+                                <div class="revision-creator">
+                                    <i class="fas fa-user"></i>
+                                    {{ $revision->creator->name }}
+                                </div>
+                                <div class="revision-time">
                                     <i class="fas fa-clock"></i>
-                                    في الانتظار
-                                @endif
+                                    {{ $revision->revision_date->diffForHumans() }}
+                                </div>
                             </div>
                         </div>
-                        @endforeach
+                        <div class="alert-status status-{{ $revision->status }}">
+                            @if($revision->status == 'approved')
+                            <i class="fas fa-check-circle"></i>
+                            موافق عليه
+                            @elseif($revision->status == 'rejected')
+                            <i class="fas fa-times-circle"></i>
+                            مرفوض
+                            @else
+                            <i class="fas fa-clock"></i>
+                            في الانتظار
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
                     @endif
                 </div>
             </div>
@@ -1826,14 +1853,14 @@
         inProgressProjects: @json($inProgressProjects),
         completedProjects: @json($completedProjects),
         pausedProjects: @json($pausedProjects ?? 0),
-        overdueProjectsCount: @json($overdueProjects->count())
+        overdueProjectsCount: @json(count($overdueProjects ?? []))
     };
 
     window.taskData = {
-        allNewTasks: {{ $allNewTasks }},
-        allInProgressTasks: {{ $allInProgressTasks }},
-        allPausedTasks: {{ $allPausedTasks }},
-        allCompletedTasks: {{ $allCompletedTasks }}
+        allNewTasks: @json($allNewTasks ?? 0),
+        allInProgressTasks: @json($allInProgressTasks ?? 0),
+        allPausedTasks: @json($allPausedTasks ?? 0),
+        allCompletedTasks: @json($allCompletedTasks ?? 0)
     };
 </script>
 <script src="{{ asset('js/project-dashboard/dashboard/main.js') }}"></script>
