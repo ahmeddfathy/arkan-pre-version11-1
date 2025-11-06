@@ -361,12 +361,16 @@ class ProjectService
                     ->get();
 
                 foreach ($packageServices as $service) {
-                    $serviceUsersMap[$service->id] = User::where('department', $service->department)->get();
+                    $serviceUsersMap[$service->id] = User::where('department', $service->department)
+                        ->where('employee_status', 'active')
+                        ->get();
                 }
             }
         } else {
             foreach ($project->services as $service) {
-                $serviceUsersMap[$service->id] = User::where('department', $service->department)->get();
+                $serviceUsersMap[$service->id] = User::where('department', $service->department)
+                    ->where('employee_status', 'active')
+                    ->get();
             }
         }
 
@@ -393,6 +397,7 @@ class ProjectService
                         ->orWhere('members.department', $department);
                 })
                 ->where('teams.personal_team', false)
+                ->where('owners.employee_status', 'active')
                 ->select('teams.id', 'teams.name', 'teams.user_id', 'owners.name as owner_name')
                 ->distinct()
                 ->orderBy('teams.name')
@@ -411,6 +416,7 @@ class ProjectService
                         $query->where('users.id', $team->user_id)
                             ->orWhereNotNull('team_user.user_id');
                     })
+                    ->where('users.employee_status', 'active')
                     ->select('users.id', 'users.name', 'users.email', 'users.department')
                     ->orderBy('users.name')
                     ->get();

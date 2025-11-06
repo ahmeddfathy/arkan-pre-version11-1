@@ -651,6 +651,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/employee-reports', [EmployeeReportController::class, 'index'])->name('employee-reports.index');
     Route::get('/employee-reports/{id}', [EmployeeReportController::class, 'show'])->name('employee-reports.show');
+    Route::post('/employee-reports/save-daily', [EmployeeReportController::class, 'saveDailyReport'])->name('employee-reports.save-daily');
 });
 
 Route::post('/projects/{project}/remove-participant', [App\Http\Controllers\ProjectController::class, 'removeParticipant'])

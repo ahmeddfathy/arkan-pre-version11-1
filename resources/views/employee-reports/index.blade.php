@@ -55,6 +55,56 @@
         </div>
     </div>
 
+    @if($selectedEmployeeId && Auth::id() == $selectedEmployeeId)
+    <div class="card mb-4 shadow-sm" style=" border-radius: 10px; overflow: hidden;">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-bottom: 2px solid #5a6fd8;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-white"><i class="fas fa-clipboard-list text-white"></i > التقرير اليومي</h5>
+                <span class="badge badge-light text-white">{{ $selectedDate ? $selectedDate->format('d/m/Y') : \Carbon\Carbon::today()->format('d/m/Y') }}</span>
+            </div>
+        </div>
+        <div class="card-body" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);">
+            <form id="dailyReportForm">
+                @csrf
+                <input type="hidden" name="report_date" value="{{ $selectedDate ? $selectedDate->format('Y-m-d') : \Carbon\Carbon::today()->format('Y-m-d') }}">
+                <div class="form-group">
+                    <label for="daily_work" class="font-weight-bold" style="color: #667eea;">
+                        <i class="fas fa-pencil-alt"></i> ما الذي قمت به اليوم؟
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="daily_work"
+                        name="daily_work"
+                        rows="6"
+                        placeholder=""
+                        required
+                        maxlength="5000"
+                        style="border: 2px solid #e0e0e0; border-radius: 8px; resize: vertical; min-height: 150px;">{{ $dailyReport ? $dailyReport->daily_work : '' }}</textarea>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i> اكتب تقريراً مفصلاً عن إنجازاتك اليومية
+                        </small>
+                        <small class="form-text text-muted">
+                            <span id="charCount" style="font-weight: bold; color: #667eea;">{{ $dailyReport ? strlen($dailyReport->daily_work) : 0 }}</span> / 5000 حرف
+                        </small>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 10px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);">
+                        <i class="fas fa-save"></i> حفظ التقرير
+                    </button>
+                    @if($dailyReport)
+                    <small class="text-muted" style="background: #f8f9fa; padding: 8px 15px; border-radius: 20px; border: 1px solid #e0e0e0;">
+                        <i class="fas fa-check-circle text-success"></i> آخر تحديث: {{ $dailyReport->updated_at->diffForHumans() }}
+                    </small>
+                    @endif
+                </div>
+                <div id="reportMessage" class="mt-3" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+    @endif
+
     <div class="row">
         <div class="col-lg-3">
             <div class="card employee-list-card">
@@ -603,6 +653,31 @@
                                 </div>
                                 @endif
 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                @if($dailyReport)
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card" style="border-left: 4px solid #667eea;">
+                            <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-bottom: 2px solid #5a6fd8;">
+                                <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> التقرير اليومي للموظف</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info mb-0" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%); border: 1px solid #667eea;">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 style="color: #667eea;"><i class="fas fa-user-edit"></i> ما قام به الموظف:</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock"></i> تم التحديث: {{ $dailyReport->updated_at->format('d/m/Y H:i') }}
+                                        </small>
+                                    </div>
+                                    <div style="white-space: pre-wrap; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                        {{ $dailyReport->daily_work }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1317,4 +1392,113 @@
 
 <!-- Initialization Script -->
 <script src="{{ asset('js/employee-reports/employee-reports-init.js') }}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#daily_work').on('input', function() {
+            var length = $(this).val().length;
+            $('#charCount').text(length);
+
+            if (length > 4500) {
+                $('#charCount').css('color', '#dc3545');
+            } else if (length > 4000) {
+                $('#charCount').css('color', '#ffc107');
+            } else {
+                $('#charCount').css('color', '#667eea');
+            }
+        });
+
+        $('#dailyReportForm').on('submit', function(e) {
+            e.preventDefault();
+
+            var submitBtn = $(this).find('button[type="submit"]');
+            var originalBtnText = submitBtn.html();
+            submitBtn.html('<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...').prop('disabled', true);
+
+            $.ajax({
+                url: '{{ route("employee-reports.save-daily") }}',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#reportMessage')
+                        .removeClass('alert-danger')
+                        .addClass('alert alert-success')
+                        .css({
+                            'border-radius': '8px',
+                            'border': '2px solid #28a745',
+                            'background': 'linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%)'
+                        })
+                        .html('<i class="fas fa-check-circle"></i> ' + response.message)
+                        .show()
+                        .css('animation', 'slideInDown 0.5s ease');
+
+                    setTimeout(function() {
+                        $('#reportMessage').fadeOut(500);
+                    }, 4000);
+                },
+                error: function(xhr) {
+                    var errorMessage = 'حدث خطأ أثناء حفظ التقرير';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        var errors = xhr.responseJSON.errors;
+                        errorMessage = Object.values(errors).flat().join('<br>');
+                    }
+
+                    $('#reportMessage')
+                        .removeClass('alert-success')
+                        .addClass('alert alert-danger')
+                        .css({
+                            'border-radius': '8px',
+                            'border': '2px solid #dc3545',
+                            'background': 'linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%)'
+                        })
+                        .html('<i class="fas fa-exclamation-circle"></i> ' + errorMessage)
+                        .show()
+                        .css('animation', 'shake 0.5s ease');
+                },
+                complete: function() {
+                    submitBtn.html(originalBtnText).prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+            transform: translateX(-5px);
+        }
+
+        20%,
+        40%,
+        60%,
+        80% {
+            transform: translateX(5px);
+        }
+    }
+</style>
 @endpush

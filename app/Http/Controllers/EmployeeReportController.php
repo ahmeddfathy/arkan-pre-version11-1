@@ -12,6 +12,7 @@ use App\Models\PermissionRequest;
 use App\Models\TaskRevision;
 use App\Models\ProjectServiceUser;
 use App\Models\Meeting;
+use App\Models\EmployeeDailyReport;
 use App\Services\TimeTracking\TimeTrackingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -98,6 +99,11 @@ class EmployeeReportController extends Controller
             $meetingsData = $this->getMeetingsData($selectedEmployeeId, $selectedDate);
         }
 
+        $dailyReport = null;
+        if ($selectedEmployeeId) {
+            $dailyReport = EmployeeDailyReport::getReportByDate($selectedEmployeeId, $selectedDate);
+        }
+
         return view('employee-reports.index', compact(
             'employees',
             'selectedEmployeeId',
@@ -110,8 +116,48 @@ class EmployeeReportController extends Controller
             'revisionsData',
             'deliveredProjectsData',
             'meetingsData',
-            'isManager'
+            'isManager',
+            'dailyReport'
         ));
+    }
+
+    public function saveDailyReport(Request $request)
+    {
+        $request->validate([
+            'daily_work' => 'required|string|max:5000',
+            'report_date' => 'required|date',
+        ]);
+
+        $user = Auth::user();
+        
+        $report = EmployeeDailyReport::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'report_date' => $request->report_date,
+            ],
+            [
+                'daily_work' => $request->daily_work,
+            ]
+        );
+
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            activity()
+                ->causedBy($user)
+                ->performedOn($report)
+                ->withProperties([
+                    'action_type' => 'save_daily_report',
+                    'report_date' => $request->report_date,
+                    'report_length' => strlen($request->daily_work),
+                    'saved_at' => now()->toDateTimeString(),
+                ])
+                ->log('حفظ التقرير اليومي');
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حفظ التقرير اليومي بنجاح',
+            'report' => $report
+        ]);
     }
 
 

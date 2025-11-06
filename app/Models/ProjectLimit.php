@@ -39,7 +39,7 @@ class ProjectLimit extends Model
             ->logOnly(['limit_type', 'month', 'entity_id', 'entity_name', 'monthly_limit', 'is_active'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+            ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => 'تم إنشاء حد شهري جديد',
                 'updated' => 'تم تحديث الحد الشهري',
                 'deleted' => 'تم حذف الحد الشهري',
@@ -136,7 +136,7 @@ class ProjectLimit extends Model
      */
     public function getLimitTypeTextAttribute(): string
     {
-        return match($this->limit_type) {
+        return match ($this->limit_type) {
             'company' => 'الشركة',
             'department' => 'قسم',
             'team' => 'فريق',
@@ -247,15 +247,21 @@ class ProjectLimit extends Model
 
             case 'department':
                 // عدد المشاريع في قسم معين (من خلال الخدمات)
-                return $query->whereHas('services', function($q) use ($entityId) {
+                return $query->whereHas('services', function ($q) use ($entityId) {
                     $q->where('department', $entityId);
                 })->count();
 
             case 'team':
-                // عدد المشاريع لفريق معين
-                return $query->whereHas('serviceParticipants', function($q) use ($entityId) {
-                    $q->where('team_id', $entityId);
-                })->distinct()->count();
+                $projectIds = DB::table('project_service_user')
+                    ->join('projects', 'project_service_user.project_id', '=', 'projects.id')
+                    ->where('project_service_user.team_id', $entityId)
+                    ->whereNotNull('project_service_user.team_id')
+                    ->whereMonth('projects.created_at', $month)
+                    ->whereYear('projects.created_at', $year)
+                    ->groupBy('projects.id')
+                    ->pluck('projects.id')
+                    ->toArray();
+                return count($projectIds);
 
             case 'user':
                 // عدد المشاريع لموظف معين (من project_service_user)
@@ -311,11 +317,10 @@ class ProjectLimit extends Model
                 break;
 
             case 'team':
-                // المشاريع من خلال الفريق
-                // نستخدم groupBy عشان نضمن إن كل مشروع يتحسب مرة واحدة بس
                 $projectIds = DB::table('project_service_user')
                     ->join('projects', 'project_service_user.project_id', '=', 'projects.id')
                     ->where('project_service_user.team_id', $entityId)
+                    ->whereNotNull('project_service_user.team_id')
                     ->whereMonth('projects.created_at', $month)
                     ->whereYear('projects.created_at', $year)
                     ->groupBy('projects.id')
@@ -444,6 +449,7 @@ class ProjectLimit extends Model
             $report['teams'][] = array_merge([
                 'limit_record' => $limit,
                 'team' => $limit->team,
+                'team_name' => $limit->team ? $limit->team->name : ($limit->entity_name ?? 'فريق محذوف'),
                 'month_name' => $limit->month_name,
             ], $stats);
         }
@@ -505,7 +511,7 @@ class ProjectLimit extends Model
         }
 
         // ترتيب الموظفين حسب عدد المشاريع (الأكثر أولاً)
-        usort($report['users'], function($a, $b) {
+        usort($report['users'], function ($a, $b) {
             return $b['current'] <=> $a['current'];
         });
 
