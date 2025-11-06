@@ -7,11 +7,13 @@ use App\Models\TemplateTaskUser;
 use App\Models\User;
 use App\Models\Season;
 use App\Models\UserSeasonPoint;
+use App\Models\Notification;
 use App\Services\BadgeService;
 use App\Services\Slack\TaskTransferSlackService;
 use App\Traits\HasNTPTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 
 
@@ -196,23 +198,7 @@ class TaskTransferService
                         ]
                     ];
 
-                    // إرسال إشعارات Slack
-                    try {
-                        $this->slackService->sendTaskTransferNotifications(
-                            $taskUser,
-                            null,
-                            $fromUser,
-                            $toUser,
-                            $transferType,
-                            $transferPoints,
-                            $reason
-                        );
-                    } catch (\Exception $e) {
-                        Log::warning('Failed to send task transfer Slack notifications', [
-                            'task_user_id' => $taskUser->id,
-                            'error' => $e->getMessage()
-                        ]);
-                    }
+                    $this->sendTaskTransferNotifications($taskUser, null, $fromUser, $toUser, $transferType, $transferPoints, $reason);
 
                     return $result;
                 }
@@ -353,24 +339,7 @@ class TaskTransferService
                     ]
                 ];
 
-                // إرسال إشعارات Slack
-                try {
-                    $this->slackService->sendTaskTransferNotifications(
-                        $taskUser,
-                        $newTaskUser,
-                        $fromUser,
-                        $toUser,
-                        $transferType,
-                        $transferPoints,
-                        $reason
-                    );
-                } catch (\Exception $e) {
-                    Log::warning('Failed to send task transfer Slack notifications', [
-                        'original_task_user_id' => $taskUser->id,
-                        'new_task_user_id' => $newTaskUser->id,
-                        'error' => $e->getMessage()
-                    ]);
-                }
+                $this->sendTaskTransferNotifications($taskUser, $newTaskUser, $fromUser, $toUser, $transferType, $transferPoints, $reason);
 
                 return $result;
             });
@@ -719,24 +688,7 @@ class TaskTransferService
                     ]
                 ];
 
-                // إرسال إشعارات Slack
-                try {
-                    $this->slackService->sendTemplateTaskTransferNotifications(
-                        $templateTaskUser,
-                        $newTemplateTaskUser,
-                        $fromUser,
-                        $toUser,
-                        $transferType,
-                        $transferPoints,
-                        $reason
-                    );
-                } catch (\Exception $e) {
-                    Log::warning('Failed to send template task transfer Slack notifications', [
-                        'original_template_task_user_id' => $templateTaskUser->id,
-                        'new_template_task_user_id' => $newTemplateTaskUser->id,
-                        'error' => $e->getMessage()
-                    ]);
-                }
+                $this->sendTemplateTaskTransferNotifications($templateTaskUser, $newTemplateTaskUser, $fromUser, $toUser, $transferType, $transferPoints, $reason);
 
                 return $result;
             });
@@ -1308,6 +1260,246 @@ class TaskTransferService
                 'success' => false,
                 'message' => 'حدث خطأ أثناء إلغاء النقل: ' . $e->getMessage()
             ];
+        }
+    }
+
+    private function sendTaskTransferNotifications(TaskUser $taskUser, ?TaskUser $newTaskUser, User $fromUser, User $toUser, string $transferType, int $transferPoints, ?string $reason): void
+    {
+        try {
+            $currentUser = Auth::user();
+            $task = $taskUser->task;
+            $transferTypeText = $transferType === 'positive' ? 'إيجابي' : 'سلبي';
+            $pointsText = $transferType === 'positive' ? 'بدون خصم نقاط' : "مع خصم {$transferPoints} نقطة";
+
+            $taskTitle = $task->title ?? 'غير محدد';
+            $taskUrl = route('tasks.my-tasks') . '?task_id=' . $task->id;
+
+            Notification::create([
+                'user_id' => $toUser->id,
+                'type' => 'task_transferred_to_you',
+                'data' => [
+                    'message' => "تم نقل مهمة إليك: {$taskTitle}",
+                    'task_id' => $task->id,
+                    'task_title' => $taskTitle,
+                    'task_user_id' => $newTaskUser ? $newTaskUser->id : $taskUser->id,
+                    'from_user_id' => $fromUser->id,
+                    'from_user_name' => $fromUser->name,
+                    'transferred_by_id' => $currentUser?->id,
+                    'transferred_by_name' => $currentUser?->name ?? 'النظام',
+                    'transfer_type' => $transferType,
+                    'transfer_type_text' => $transferTypeText,
+                    'transfer_points' => $transferPoints,
+                    'points_text' => $pointsText,
+                    'reason' => $reason,
+                    'url' => $taskUrl
+                ],
+                'related_id' => $newTaskUser ? $newTaskUser->id : $taskUser->id
+            ]);
+
+            Notification::create([
+                'user_id' => $fromUser->id,
+                'type' => 'task_transferred_from_you',
+                'data' => [
+                    'message' => "تم نقل مهمة منك: {$taskTitle}",
+                    'task_id' => $task->id,
+                    'task_title' => $taskTitle,
+                    'task_user_id' => $taskUser->id,
+                    'to_user_id' => $toUser->id,
+                    'to_user_name' => $toUser->name,
+                    'transferred_by_id' => $currentUser?->id,
+                    'transferred_by_name' => $currentUser?->name ?? 'النظام',
+                    'transfer_type' => $transferType,
+                    'transfer_type_text' => $transferTypeText,
+                    'transfer_points' => $transferPoints,
+                    'points_text' => $pointsText,
+                    'reason' => $reason,
+                    'url' => $taskUrl
+                ],
+                'related_id' => $taskUser->id
+            ]);
+
+            if ($toUser->fcm_token) {
+                try {
+                    $firebaseService = app(\App\Services\FirebaseNotificationService::class);
+                    $firebaseService->sendNotificationQueued(
+                        $toUser->fcm_token,
+                        'مهمة منقولة إليك',
+                        "تم نقل مهمة إليك: {$taskTitle}",
+                        $taskUrl
+                    );
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send Firebase notification for task transfer', [
+                        'user_id' => $toUser->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            if ($fromUser->fcm_token) {
+                try {
+                    $firebaseService = app(\App\Services\FirebaseNotificationService::class);
+                    $firebaseService->sendNotificationQueued(
+                        $fromUser->fcm_token,
+                        'مهمة منقولة منك',
+                        "تم نقل مهمة منك: {$taskTitle}",
+                        $taskUrl
+                    );
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send Firebase notification for task transfer', [
+                        'user_id' => $fromUser->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            try {
+                $this->slackService->sendTaskTransferNotifications(
+                    $taskUser,
+                    $newTaskUser,
+                    $fromUser,
+                    $toUser,
+                    $transferType,
+                    $transferPoints,
+                    $reason
+                );
+            } catch (\Exception $e) {
+                Log::warning('Failed to send task transfer Slack notifications', [
+                    'task_user_id' => $taskUser->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            Log::info('Task transfer notifications sent', [
+                'task_id' => $task->id,
+                'from_user_id' => $fromUser->id,
+                'to_user_id' => $toUser->id,
+                'transfer_type' => $transferType
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send task transfer notifications', [
+                'task_user_id' => $taskUser->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    private function sendTemplateTaskTransferNotifications(TemplateTaskUser $templateTaskUser, TemplateTaskUser $newTemplateTaskUser, User $fromUser, User $toUser, string $transferType, int $transferPoints, ?string $reason): void
+    {
+        try {
+            $currentUser = Auth::user();
+            $templateTask = $templateTaskUser->templateTask;
+            $transferTypeText = $transferType === 'positive' ? 'إيجابي' : 'سلبي';
+            $pointsText = $transferType === 'positive' ? 'بدون خصم نقاط' : "مع خصم {$transferPoints} نقطة";
+
+            $taskTitle = $templateTask->title ?? 'غير محدد';
+            $taskUrl = route('template-tasks.index');
+
+            Notification::create([
+                'user_id' => $toUser->id,
+                'type' => 'template_task_transferred_to_you',
+                'data' => [
+                    'message' => "تم نقل مهمة قالب إليك: {$taskTitle}",
+                    'template_task_id' => $templateTask->id,
+                    'template_task_title' => $taskTitle,
+                    'template_task_user_id' => $newTemplateTaskUser->id,
+                    'from_user_id' => $fromUser->id,
+                    'from_user_name' => $fromUser->name,
+                    'transferred_by_id' => $currentUser?->id,
+                    'transferred_by_name' => $currentUser?->name ?? 'النظام',
+                    'transfer_type' => $transferType,
+                    'transfer_type_text' => $transferTypeText,
+                    'transfer_points' => $transferPoints,
+                    'points_text' => $pointsText,
+                    'reason' => $reason,
+                    'url' => $taskUrl
+                ],
+                'related_id' => $newTemplateTaskUser->id
+            ]);
+
+            Notification::create([
+                'user_id' => $fromUser->id,
+                'type' => 'template_task_transferred_from_you',
+                'data' => [
+                    'message' => "تم نقل مهمة قالب منك: {$taskTitle}",
+                    'template_task_id' => $templateTask->id,
+                    'template_task_title' => $taskTitle,
+                    'template_task_user_id' => $templateTaskUser->id,
+                    'to_user_id' => $toUser->id,
+                    'to_user_name' => $toUser->name,
+                    'transferred_by_id' => $currentUser?->id,
+                    'transferred_by_name' => $currentUser?->name ?? 'النظام',
+                    'transfer_type' => $transferType,
+                    'transfer_type_text' => $transferTypeText,
+                    'transfer_points' => $transferPoints,
+                    'points_text' => $pointsText,
+                    'reason' => $reason,
+                    'url' => $taskUrl
+                ],
+                'related_id' => $templateTaskUser->id
+            ]);
+
+            if ($toUser->fcm_token) {
+                try {
+                    $firebaseService = app(\App\Services\FirebaseNotificationService::class);
+                    $firebaseService->sendNotificationQueued(
+                        $toUser->fcm_token,
+                        'مهمة قالب منقولة إليك',
+                        "تم نقل مهمة قالب إليك: {$taskTitle}",
+                        $taskUrl
+                    );
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send Firebase notification for template task transfer', [
+                        'user_id' => $toUser->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            if ($fromUser->fcm_token) {
+                try {
+                    $firebaseService = app(\App\Services\FirebaseNotificationService::class);
+                    $firebaseService->sendNotificationQueued(
+                        $fromUser->fcm_token,
+                        'مهمة قالب منقولة منك',
+                        "تم نقل مهمة قالب منك: {$taskTitle}",
+                        $taskUrl
+                    );
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send Firebase notification for template task transfer', [
+                        'user_id' => $fromUser->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            try {
+                $this->slackService->sendTemplateTaskTransferNotifications(
+                    $templateTaskUser,
+                    $newTemplateTaskUser,
+                    $fromUser,
+                    $toUser,
+                    $transferType,
+                    $transferPoints,
+                    $reason
+                );
+            } catch (\Exception $e) {
+                Log::warning('Failed to send template task transfer Slack notifications', [
+                    'template_task_user_id' => $templateTaskUser->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            Log::info('Template task transfer notifications sent', [
+                'template_task_id' => $templateTask->id,
+                'from_user_id' => $fromUser->id,
+                'to_user_id' => $toUser->id,
+                'transfer_type' => $transferType
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send template task transfer notifications', [
+                'template_task_user_id' => $templateTaskUser->id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }
