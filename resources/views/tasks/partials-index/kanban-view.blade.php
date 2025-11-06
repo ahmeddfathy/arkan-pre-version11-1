@@ -62,7 +62,7 @@
                 if($user) {
                 $assignees[] = [
                 'name' => $user->name,
-                'role' => $user->pivot?->role ?? 'غير محدد',
+                'role' => $user->pivot?->role ?? '',
                 'avatar' => $user->profile_photo_url
                 ];
                 }
@@ -239,28 +239,32 @@
                     </div>
                     @endif
 
+                    @if($task->project || ($task->service && $task->service->name))
                     <div class="kanban-card-meta">
+                        @if($task->project)
                         <span class="kanban-card-project">
-                            @if($task->project)
                             <strong>{{ $task->project->code ?? '' }}</strong> {{ $task->project->name }}
-                            @else
-                            غير محدد
-                            @endif
                         </span>
-                        <span class="kanban-card-service">{{ $task->service->name ?? 'غير محدد' }}</span>
+                        @endif
+                        @if($task->service && $task->service->name)
+                        <span class="kanban-card-service">{{ $task->service->name }}</span>
+                        @endif
                     </div>
+                    @endif
 
+                    @if($task->createdBy && $task->createdBy->name)
                     <div class="kanban-card-meta mb-2">
                         <span class="kanban-card-creator" data-creator-id="{{ $task->created_by }}">
-                            أنشأت بواسطة: {{ $task->createdBy->name ?? 'غير محدد' }}
+                            أنشأت بواسطة: {{ $task->createdBy->name }}
                         </span>
                     </div>
+                    @endif
 
                     {{-- معلومات النقل للمهمة الأصلية (المنقولة من) --}}
-                    @if(isset($task->is_transferred) && $task->is_transferred)
+                    @if(isset($task->is_transferred) && $task->is_transferred && isset($task->transferred_to_user) && $task->transferred_to_user->name)
                     <div class="kanban-card-transfer-info" style="background: #fee; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
                         <i class="fas fa-exchange-alt text-danger"></i>
-                        <strong class="text-danger">تم النقل إلى:</strong> {{ $task->transferred_to_user->name ?? 'غير محدد' }}
+                        <strong class="text-danger">تم النقل إلى:</strong> {{ $task->transferred_to_user->name }}
                         @if(isset($task->transferred_at))
                         <small class="d-block text-muted">في: {{ $task->transferred_at->format('Y-m-d H:i') }}</small>
                         @endif
@@ -268,10 +272,10 @@
                     @endif
 
                     {{-- معلومات النقل للمهمة المنقولة (منقولة إلى) --}}
-                    @if(isset($task->is_additional_task) && $task->is_additional_task && isset($task->task_source) && $task->task_source === 'transferred')
+                    @if(isset($task->is_additional_task) && $task->is_additional_task && isset($task->task_source) && $task->task_source === 'transferred' && isset($task->original_user) && $task->original_user->name)
                     <div class="kanban-card-transfer-info" style="background: #efe; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
                         <i class="fas fa-user-plus text-success"></i>
-                        <strong class="text-success">منقولة من:</strong> {{ $task->original_user->name ?? 'غير محدد' }}
+                        <strong class="text-success">منقولة من:</strong> {{ $task->original_user->name }}
                         @if(isset($task->transferred_at))
                         <small class="d-block text-muted">في: {{ $task->transferred_at->format('Y-m-d H:i') }}</small>
                         @endif
@@ -282,7 +286,7 @@
                     <div class="kanban-card-assignees">
                         <div class="avatar-group">
                             @foreach(array_slice($assignees, 0, 3) as $assignee)
-                            <div class="avatar" title="{{ $assignee['name'] }} ({{ $assignee['role'] }})">
+                            <div class="avatar" title="{{ $assignee['name'] }}{{ $assignee['role'] ? ' (' . $assignee['role'] . ')' : '' }}">
                                 <img src="{{ $assignee['avatar'] }}" alt="{{ $assignee['name'] }}">
                             </div>
                             @endforeach
@@ -376,7 +380,7 @@
                             data-task-id="{{ $task->id }}"
                             data-task-user-id="{{ isset($task->pivot->id) ? $task->pivot->id : (isset($task->task_user_id) ? $task->task_user_id : $task->id) }}"
                             data-task-name="{{ $task->name }}"
-                            data-current-user="{{ count($assignees) > 0 ? $assignees[0]['name'] : 'غير محدد' }}"
+                            data-current-user="{{ count($assignees) > 0 ? $assignees[0]['name'] : '' }}"
                             data-mode="{{ $transferBtnModeKanban }}"
                             title="{{ $transferBtnTitleKanban }}">
                             <i class="{{ $transferBtnIconKanban }}"></i>

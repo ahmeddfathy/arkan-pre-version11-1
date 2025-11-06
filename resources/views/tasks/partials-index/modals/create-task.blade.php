@@ -10,13 +10,24 @@
                 @csrf
                 <div class="modal-body">
                     <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="task_type">نوع المهمة</label>
+                                <select class="form-control" id="task_type" name="task_type" required>
+                                    <option value="regular" selected>مهمة عادية</option>
+                                    <option value="project">مهمة مشروع</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="name">اسم المهمة</label>
                                 <input type="text" class="form-control" id="name" name="name" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 project-task-fields" style="display: none;">
                             <div class="form-group">
                                 <label for="create_project_code">
                                     <i class="fas fa-hashtag"></i> كود المشروع (اختياري)
@@ -47,7 +58,7 @@
                                 <small class="text-muted">أدخل كود المشروع لاختياره تلقائياً</small>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 project-task-fields" style="display: none;">
                             <div class="form-group">
                                 <label for="project_id">المشروع (اختياري)</label>
                                 <select class="form-control" id="project_id" name="project_id">
@@ -63,7 +74,7 @@
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="{{ $isGraphicOnlyUser ? 'col-md-12' : 'col-md-6' }}">
+                        <div class="{{ $isGraphicOnlyUser ? 'col-md-12' : 'col-md-6' }} project-task-fields" style="display: none;">
                             <div class="form-group">
                                 <label for="service_id">الخدمة</label>
                                 <select class="form-control" id="service_id" name="service_id">
@@ -248,12 +259,20 @@
                         <label>تعيين الموظف</label>
                         <div class="row" id="assignUsersContainer">
                             <div class="col-12 mb-2 user-assignment-row">
-                                <select class="form-control user-select" name="users[]">
-                                    <option value="">اختر موظف</option>
+                                <input type="text"
+                                    class="form-control user-select"
+                                    id="user_name_input"
+                                    list="usersList"
+                                    placeholder="اكتب أو اختر موظف..."
+                                    autocomplete="off">
+                                <input type="hidden" id="user_id_hidden" name="users[]" value="">
+                                <datalist id="usersList">
                                     @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    <option value="{{ $user->name }}" data-user-id="{{ $user->id }}">
+                                        {{ $user->name }}
+                                    </option>
                                     @endforeach
-                                </select>
+                                </datalist>
                             </div>
                         </div>
                     </div>

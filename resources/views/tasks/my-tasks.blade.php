@@ -891,25 +891,27 @@
                                         </div>
                                         @endif
 
+                                        @if(isset($task->project) || (isset($task->service) && $task->service->name))
                                         <div class="kanban-card-meta">
+                                            @if(isset($task->project))
                                             <span class="kanban-card-project">
-                                                @if(isset($task->project))
                                                 <strong>{{ $task->project->code ?? '' }}</strong> {{ $task->project->name }}
-                                                @else
-                                                غير محدد
-                                                @endif
                                             </span>
-                                            <span class="kanban-card-service">{{ isset($task->service->name) ? $task->service->name : 'غير محدد' }}</span>
+                                            @endif
+                                            @if(isset($task->service) && $task->service->name)
+                                            <span class="kanban-card-service">{{ $task->service->name }}</span>
+                                            @endif
                                         </div>
+                                        @endif
 
                                         <div class="kanban-card-meta mb-2">
                                             <span class="kanban-card-role">{{ $userRole }}</span>
                                         </div>
 
-                                        @if(isset($task->is_transferred) && $task->is_transferred)
+                                        @if(isset($task->is_transferred) && $task->is_transferred && isset($task->transferredToUser) && $task->transferredToUser->name)
                                         <div class="kanban-card-transfer-info">
                                             <i class="fas fa-exchange-alt"></i>
-                                            <strong>تم النقل إلى:</strong> {{ $task->transferredToUser->name ?? 'غير محدد' }}
+                                            <strong>تم النقل إلى:</strong> {{ $task->transferredToUser->name }}
                                             @if(isset($task->transferred_at))
                                             <small class="d-block">في: {{ $task->transferred_at->format('Y-m-d H:i') }}</small>
                                             @endif

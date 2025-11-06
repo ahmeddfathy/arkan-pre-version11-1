@@ -110,6 +110,12 @@ function initializeModalHandlers() {
         resetCreateTaskModal();
     });
 
+    $('#createTaskModal').on('shown.bs.modal', function() {
+        if (typeof handleTaskTypeToggle === 'function') {
+            handleTaskTypeToggle();
+        }
+    });
+
     $('#editTaskModal').on('hidden.bs.modal', function() {
         resetEditTaskModal();
     });
@@ -529,16 +535,22 @@ function addUserRowToEdit(user) {
 
 function resetCreateTaskModal() {
     $('#createTaskModal form')[0].reset();
+    $('#task_type').val('regular');
     $('#time_estimation_section').show();
     $('#flexible_time_notice').remove();
     $('#estimated_hours, #estimated_minutes').attr('required', true);
     $('#role_filter').val('');
+    $('#user_name_input').val('');
+    $('#user_id_hidden').val('');
     if (typeof resetUserSelects === 'function') {
         resetUserSelects();
     }
     $('#graphic_task_type_section').hide();
     $('#graphic_task_type_id').attr('required', false).val('');
     $('#graphic_task_info').hide();
+    if (typeof handleTaskTypeToggle === 'function') {
+        handleTaskTypeToggle();
+    }
 }
 
 function loadAllUsersAsync(selectElement, selectedUserId) {
