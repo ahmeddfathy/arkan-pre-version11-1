@@ -343,6 +343,14 @@
                 </a>
             </li>
             @endif
+
+            <li>
+                <a href="{{ route('attendance.dashboard') }}" class="{{ request()->routeIs('attendance.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>لوحة تحكم الحضور</span>
+                </a>
+            </li>
+
             <li>
                 <a href="/attendance-system/my-attendance" class="{{ request()->is('attendance-system/my-attendance') ? 'active' : '' }}">
                     <i class="fas fa-clock"></i>

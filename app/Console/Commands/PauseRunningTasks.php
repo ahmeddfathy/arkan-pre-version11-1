@@ -10,16 +10,18 @@ use App\Services\TaskController\TaskStatusService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HasNTPTime;
 
 class PauseRunningTasks extends Command
 {
+    use HasNTPTime;
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'tasks:pause-running
-                            {--time=all : الوقت المحدد للإيقاف (1pm, 5pm, all)}
+                            {--time=all : الوقت المحدد للإيقاف (12pm, 4pm, all)}
                             {--dry-run : معاينة المهام بدون إيقافها فعلياً}
                             {--user= : إيقاف مهام مستخدم معين فقط}';
 
@@ -28,7 +30,7 @@ class PauseRunningTasks extends Command
      *
      * @var string
      */
-    protected $description = 'إيقاف جميع المهام النشطة مع حساب الأوقات بدقة - مجدولة للساعة 1 و 5';
+    protected $description = 'إيقاف جميع المهام النشطة مع حساب الأوقات بدقة - مجدولة للساعة 12 و 4';
 
     protected $taskTimeSplitService;
     protected $taskStatusService;
@@ -47,7 +49,7 @@ class PauseRunningTasks extends Command
      */
     public function handle()
     {
-        $now = Carbon::now('Africa/Cairo');
+        $now = $this->getCurrentCairoTime();
         $timeOption = $this->option('time');
         $isDryRun = $this->option('dry-run');
         $specificUser = $this->option('user');
@@ -102,7 +104,6 @@ class PauseRunningTasks extends Command
             }
 
             $this->displayResults($results, $isDryRun, $now);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -128,13 +129,13 @@ class PauseRunningTasks extends Command
         $currentHour = (int) $now->format('H');
 
         switch ($timeOption) {
-            case '1pm':
-                return $currentHour == 13; // الساعة 1 ظهراً
-            case '5pm':
-                return $currentHour == 17; // الساعة 5 عصراً
+            case '12pm':
+                return $currentHour == 12;
+            case '4pm':
+                return $currentHour == 16;
             case 'all':
             default:
-                return true; // تشغيل في أي وقت
+                return true;
         }
     }
 
@@ -148,9 +149,9 @@ class PauseRunningTasks extends Command
             ->with(['user', 'task']);
 
         if ($specificUser) {
-            $query->whereHas('user', function($q) use ($specificUser) {
+            $query->whereHas('user', function ($q) use ($specificUser) {
                 $q->where('name', 'like', "%{$specificUser}%")
-                  ->orWhere('email', 'like', "%{$specificUser}%");
+                    ->orWhere('email', 'like', "%{$specificUser}%");
             });
         }
 
@@ -208,7 +209,6 @@ class PauseRunningTasks extends Command
                 ];
 
                 $this->line("  ✅ {$taskUser->user->name} - {$taskUser->task->name} ({$allocatedMinutes} دقيقة)");
-
             } catch (\Exception $e) {
                 $results['errors'][] = "خطأ في مهمة {$taskUser->task->name}: " . $e->getMessage();
                 $this->error("  ❌ خطأ في إيقاف مهمة {$taskUser->task->name}: " . $e->getMessage());
@@ -228,9 +228,9 @@ class PauseRunningTasks extends Command
             ->with(['user', 'templateTask']);
 
         if ($specificUser) {
-            $query->whereHas('user', function($q) use ($specificUser) {
+            $query->whereHas('user', function ($q) use ($specificUser) {
                 $q->where('name', 'like', "%{$specificUser}%")
-                  ->orWhere('email', 'like', "%{$specificUser}%");
+                    ->orWhere('email', 'like', "%{$specificUser}%");
             });
         }
 
@@ -286,7 +286,6 @@ class PauseRunningTasks extends Command
                 ];
 
                 $this->line("  ✅ {$templateTaskUser->user->name} - {$templateTaskUser->templateTask->name} ({$allocatedMinutes} دقيقة)");
-
             } catch (\Exception $e) {
                 $results['errors'][] = "خطأ في مهمة قالب {$templateTaskUser->templateTask->name}: " . $e->getMessage();
                 $this->error("  ❌ خطأ في إيقاف مهمة القالب {$templateTaskUser->templateTask->name}: " . $e->getMessage());

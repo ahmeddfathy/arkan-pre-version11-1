@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::command('inspire')->hourly();
 
 Schedule::command('attendance:create-daily')
-    ->everyMinute()
+    ->dailyAt('10:30')
+    ->timezone('Africa/Cairo')
     ->name('attendance:create-daily');
 
 Schedule::command('check:birthdays')
@@ -17,16 +18,16 @@ Schedule::command('check:contracts')
     ->everyMinute()
     ->name('check:contracts');
 
-// 🍽️ إيقاف المهام في وقت البريك - الساعة 1 ظهراً
-Schedule::command('tasks:pause-running --time=1pm')
-    ->dailyAt('13:00')
+
+Schedule::command('tasks:pause-running --time=12pm')
+    ->dailyAt('12:00')
     ->timezone('Africa/Cairo')
     ->name('pause-tasks-break-time')
     ->description('إيقاف المهام في وقت البريك');
 
-// 🏠 إيقاف المهام في نهاية العمل - كل دقيقة
-Schedule::command('tasks:pause-running --time=all')
-    ->everyMinute()
-    ->name('pause-tasks-end-work')
-    ->description('إيقاف المهام النشطة كل دقيقة');
 
+Schedule::command('tasks:pause-running --time=4pm')
+    ->dailyAt('16:00')
+    ->timezone('Africa/Cairo')
+    ->name('pause-tasks-end-work')
+    ->description('إيقاف المهام النشطة في نهاية العمل');
