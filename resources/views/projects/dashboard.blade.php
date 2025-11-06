@@ -390,6 +390,24 @@
                                 <div class="simple-white-board-list-meta">{{ $revisionsByCategory['project_revisions']['total'] ?? 0 }} تعديل</div>
                             </div>
                         </div>
+                        <div class="simple-white-board-list-item">
+                            <div class="simple-white-board-list-icon primary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="simple-white-board-list-content">
+                                <div class="simple-white-board-list-title">تعديلات داخلية</div>
+                                <div class="simple-white-board-list-meta">{{ $revisionStats['internal'] ?? 0 }} تعديل</div>
+                            </div>
+                        </div>
+                        <div class="simple-white-board-list-item">
+                            <div class="simple-white-board-list-icon warning">
+                                <i class="fas fa-external-link-alt"></i>
+                            </div>
+                            <div class="simple-white-board-list-content">
+                                <div class="simple-white-board-list-title">تعديلات خارجية</div>
+                                <div class="simple-white-board-list-meta">{{ $revisionStats['external'] ?? 0 }} تعديل</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
