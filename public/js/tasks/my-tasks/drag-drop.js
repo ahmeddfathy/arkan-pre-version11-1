@@ -280,7 +280,7 @@ async function updateMyTaskStatus(dragData, newStatus, cardElement) {
                     const currentTimestamp = new Date().getTime();
                     cardElement.attr("data-started-at", currentTimestamp);
                 }
-            } else if (newStatus !== "in_progress") {
+            } else {
                 cardElement.attr("data-started-at", "");
                 if (result.minutesSpent !== undefined) {
                     const currentMinutes = parseInt(
@@ -290,6 +290,10 @@ async function updateMyTaskStatus(dragData, newStatus, cardElement) {
                         currentMinutes + result.minutesSpent;
                     cardElement.attr("data-initial-minutes", newTotalMinutes);
                 }
+            }
+
+            if (result.task) {
+                updateActualTimeDisplay(cardElement, result.task);
             }
             window.MyTasksUtils.updateMyTasksCounters();
             handleMyTaskTimerStatusChange(dragData.taskUserId, newStatus);
@@ -450,10 +454,41 @@ function handleTimerUIUpdate(task, taskUserId, newStatus) {
     }
 }
 
+function updateActualTimeDisplay(cardElement, taskData) {
+    let actualHours = 0;
+    let actualMinutes = 0;
+
+    if (taskData.actual_hours !== undefined) {
+        actualHours = parseInt(taskData.actual_hours) || 0;
+    }
+    if (taskData.actual_minutes !== undefined) {
+        actualMinutes = parseInt(taskData.actual_minutes) || 0;
+    }
+
+    const timeContainer = cardElement.find(".kanban-card-time");
+    if (timeContainer.length) {
+        const spans = timeContainer.find("span");
+        if (spans.length >= 2) {
+            const actualTimeSpan = spans.eq(1);
+            const formattedMinutes = String(actualMinutes).padStart(2, "0");
+            actualTimeSpan.text(`فعلي: ${actualHours}:${formattedMinutes}`);
+        } else if (spans.length === 1) {
+            const actualTimeSpan = spans.first();
+            if (actualTimeSpan.text().includes("فعلي:")) {
+                const formattedMinutes = String(actualMinutes).padStart(2, "0");
+                actualTimeSpan.text(`فعلي: ${actualHours}:${formattedMinutes}`);
+            }
+        }
+    }
+
+    cardElement.attr("data-initial-minutes", actualHours * 60 + actualMinutes);
+}
+
 window.MyTasksDragDrop = {
     initializeMyTasksDragDrop,
     addDragDropToCard,
     initializeDropZones,
     updateMyTaskStatus,
     handleMyTaskTimerStatusChange,
+    updateActualTimeDisplay,
 };

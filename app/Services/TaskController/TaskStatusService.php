@@ -210,10 +210,20 @@ class TaskStatusService
 
             $this->updateProjectServiceStatus($taskUser);
 
+            $taskUser = $taskUser->fresh();
+
             return [
                 'success' => true,
                 'message' => 'تم تحديث حالة المهمة بنجاح',
-                'task' => $taskUser,
+                'task' => [
+                    'id' => $taskUser->id,
+                    'actual_hours' => $taskUser->actual_hours ?? 0,
+                    'actual_minutes' => $taskUser->actual_minutes ?? 0,
+                    'estimated_hours' => $taskUser->estimated_hours ?? 0,
+                    'estimated_minutes' => $taskUser->estimated_minutes ?? 0,
+                    'status' => $taskUser->status,
+                    'started_at' => $taskUser->start_date ?? $taskUser->started_at ?? null,
+                ],
                 'minutesSpent' => ($taskUser->actual_hours * 60) + $taskUser->actual_minutes
             ];
         } catch (\Exception $e) {
