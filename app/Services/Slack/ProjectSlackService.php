@@ -55,6 +55,15 @@ class ProjectSlackService extends BaseSlackService
         return $this->sendSlackNotification($participant, $message, $context, true);
     }
 
+    public function sendProjectCancelledNotification(Project $project, User $participant, User $cancelledBy): bool
+    {
+        $message = $this->buildProjectCancelledMessage($project, $participant, $cancelledBy);
+        $context = 'إشعار إلغاء مشروع';
+        $this->setNotificationContext($context);
+
+        return $this->sendSlackNotification($participant, $message, $context, true);
+    }
+
     private function buildProjectNoteMentionMessage(ProjectNote $note, User $mentionedUser, User $author): array
     {
         $note->load(['project']);
@@ -294,7 +303,7 @@ class ProjectSlackService extends BaseSlackService
             ]
         ];
     }
-        
+
     private function buildAttachmentUploadedMessage(Project $project, User $uploadedBy, string $folderName, string $fileName): array
     {
         $projectUrl = url("/projects/{$project->id}");
@@ -313,6 +322,30 @@ class ProjectSlackService extends BaseSlackService
                 ]),
                 $this->buildActionsSection([
                     $this->buildActionButton('🔗 عرض المشروع', $projectUrl, 'primary')
+                ]),
+                $this->buildContextSection()
+            ]
+        ];
+    }
+
+    private function buildProjectCancelledMessage(Project $project, User $participant, User $cancelledBy): array
+    {
+        $projectUrl = url("/projects/{$project->id}");
+        $projectCode = $project->code ?? 'غير محدد';
+
+        return [
+            'text' => "تم إلغاء المشروع: {$project->name}",
+            'blocks' => [
+                $this->buildHeader('🚫 تم إلغاء المشروع'),
+                $this->buildInfoSection([
+                    "*اسم المشروع:*\n{$project->name}",
+                    "*الكود:*\n{$projectCode}",
+                    "*ألغاه:*\n{$cancelledBy->name}"
+                ]),
+                $this->buildTextSection("*الوصف:*\n" . ($project->description ?: 'لا يوجد وصف')),
+                $this->buildTextSection("⚠️ *تم إلغاء هذا المشروع. لن تكون قادراً على العمل على مهامه.*"),
+                $this->buildActionsSection([
+                    $this->buildActionButton('🔗 عرض المشروع', $projectUrl)
                 ]),
                 $this->buildContextSection()
             ]

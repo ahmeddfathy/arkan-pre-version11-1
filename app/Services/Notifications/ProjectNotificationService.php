@@ -353,4 +353,86 @@ class ProjectNotificationService
             ]);
         }
     }
+
+    public function notifyProjectCancelled(Project $project, ?User $cancelledBy = null): void
+    {
+        try {
+            $participants = DB::table('project_service_user')
+                ->where('project_id', $project->id)
+                ->distinct()
+                ->pluck('user_id');
+
+            if ($participants->isEmpty()) {
+                return;
+            }
+
+            $cancelledByName = $cancelledBy ? $cancelledBy->name : 'المدير';
+            $projectCode = $project->code ?? 'غير محدد';
+            $message = "تم إلغاء المشروع \"{$project->name}\" (كود: {$projectCode})";
+
+            foreach ($participants as $participantId) {
+                if ($cancelledBy && $participantId == $cancelledBy->id) {
+                    continue;
+                }
+
+                $participant = User::find($participantId);
+                if (!$participant) {
+                    continue;
+                }
+
+                Notification::create([
+                    'user_id' => $participant->id,
+                    'type' => 'project_cancelled',
+                    'data' => [
+                        'message' => $message,
+                        'project_id' => $project->id,
+                        'project_name' => $project->name,
+                        'project_code' => $projectCode,
+                        'cancelled_by_id' => $cancelledBy?->id,
+                        'cancelled_by_name' => $cancelledByName,
+                        'notification_time' => now()->format('Y-m-d H:i:s'),
+                        'cancelled_at' => now()->format('Y-m-d H:i:s')
+                    ],
+                    'related_id' => $project->id
+                ]);
+
+                if ($participant->fcm_token) {
+                    $this->sendTypedFirebaseNotification(
+                        $participant,
+                        'projects',
+                        'cancelled',
+                        $message,
+                        $project->id
+                    );
+                }
+
+                if ($participant->slack_user_id && $cancelledBy) {
+                    try {
+                        $this->slackNotificationService->sendProjectCancelledNotification(
+                            $project,
+                            $participant,
+                            $cancelledBy
+                        );
+                    } catch (\Exception $e) {
+                        Log::warning('خطأ في إرسال إشعار Slack لإلغاء المشروع', [
+                            'error' => $e->getMessage(),
+                            'participant_id' => $participant->id,
+                            'project_id' => $project->id
+                        ]);
+                    }
+                }
+            }
+
+            Log::info('تم إرسال إشعارات إلغاء المشروع للمشاركين', [
+                'project_id' => $project->id,
+                'participants_count' => $participants->count(),
+                'cancelled_by' => $cancelledBy?->id
+            ]);
+        } catch (\Exception $e) {
+            Log::error('خطأ في إرسال إشعارات إلغاء المشروع', [
+                'error' => $e->getMessage(),
+                'project_id' => $project->id
+            ]);
+        }
+    }
 }

@@ -7,14 +7,25 @@ use App\Models\Project;
 use App\Models\TaskUser;
 use App\Models\TemplateTaskUser;
 use App\Models\TemplateTask;
+use App\Models\User;
+use App\Models\Notification;
+use App\Services\SlackNotificationService;
 use App\Traits\HasNTPTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class TaskManagementService
 {
     use HasNTPTime;
+
+    protected $slackNotificationService;
+
+    public function __construct(SlackNotificationService $slackNotificationService)
+    {
+        $this->slackNotificationService = $slackNotificationService;
+    }
     public function createTask(array $taskData, ?int $graphicTaskTypeId = null): Task
     {
         $nextOrder = Task::where('project_id', $taskData['project_id'])->max('order') + 1;
@@ -58,6 +69,11 @@ class TaskManagementService
     {
         $oldStatus = $task->status;
         $oldProjectId = $task->project_id;
+        $oldTitle = $task->title;
+        $oldDescription = $task->description;
+        $oldDueDate = $task->due_date;
+        $oldEstimatedHours = $task->estimated_hours;
+        $oldEstimatedMinutes = $task->estimated_minutes;
 
         if ($oldProjectId != $updateData['project_id']) {
             $nextOrder = Task::where('project_id', $updateData['project_id'])->max('order') + 1;
@@ -93,6 +109,15 @@ class TaskManagementService
         if ($graphicTaskTypeId) {
             $task->graphicTaskTypes()->attach($graphicTaskTypeId);
         }
+
+        $this->notifyAssignedUsersOnTaskUpdate($task, $updateData, [
+            'old_title' => $oldTitle,
+            'old_description' => $oldDescription,
+            'old_due_date' => $oldDueDate,
+            'old_estimated_hours' => $oldEstimatedHours,
+            'old_estimated_minutes' => $oldEstimatedMinutes,
+            'old_status' => $oldStatus
+        ]);
 
         Log::info('Task updated successfully', [
             'task_id' => $task->id,
@@ -632,7 +657,6 @@ class TaskManagementService
 
                 return $task;
             })->filter();
-
         } catch (\Exception $e) {
             Log::error('Error getting all template tasks', [
                 'error' => $e->getMessage(),
@@ -642,7 +666,113 @@ class TaskManagementService
             return collect([]);
         }
     }
-    
+
+    private function notifyAssignedUsersOnTaskUpdate(Task $task, array $updateData, array $oldValues): void
+    {
+        try {
+            $currentUser = Auth::user();
+            if (!$currentUser) {
+                return;
+            }
+
+            $taskUsers = TaskUser::where('task_id', $task->id)
+                ->with('user')
+                ->get();
+
+            if ($taskUsers->isEmpty()) {
+                return;
+            }
+
+            $changedFields = [];
+
+            if (isset($updateData['title']) && $oldValues['old_title'] !== ($updateData['title'] ?? null)) {
+                $changedFields[] = 'العنوان';
+            }
+            if (isset($updateData['description']) && $oldValues['old_description'] !== ($updateData['description'] ?? null)) {
+                $changedFields[] = 'الوصف';
+            }
+            if (isset($updateData['due_date'])) {
+                $oldDueDate = $oldValues['old_due_date'];
+                $newDueDate = $updateData['due_date'];
+
+                $oldFormatted = $oldDueDate ? (is_string($oldDueDate) ? Carbon::parse($oldDueDate)->format('Y-m-d H:i') : Carbon::parse($oldDueDate)->format('Y-m-d H:i')) : null;
+                $newFormatted = $newDueDate ? (is_string($newDueDate) ? Carbon::parse($newDueDate)->format('Y-m-d H:i') : Carbon::parse($newDueDate)->format('Y-m-d H:i')) : null;
+
+                if ($oldFormatted !== $newFormatted) {
+                    $changedFields[] = 'تاريخ الاستحقاق';
+                }
+            }
+            if (isset($updateData['estimated_hours']) || isset($updateData['estimated_minutes'])) {
+                $oldHours = $oldValues['old_estimated_hours'];
+                $oldMinutes = $oldValues['old_estimated_minutes'];
+                $newHours = $updateData['estimated_hours'] ?? $oldHours;
+                $newMinutes = $updateData['estimated_minutes'] ?? $oldMinutes;
+
+                if ($oldHours != $newHours || $oldMinutes != $newMinutes) {
+                    $changedFields[] = 'الوقت المقدر';
+                }
+            }
+            if (isset($updateData['status']) && $oldValues['old_status'] !== ($updateData['status'] ?? null)) {
+                $changedFields[] = 'الحالة';
+            }
+
+            if (empty($changedFields)) {
+                return;
+            }
+
+            $changedFieldsText = implode('، ', $changedFields);
+            $message = "تم تحديث المهمة: {$task->title} - تم تعديل: {$changedFieldsText}";
+
+            foreach ($taskUsers as $taskUser) {
+                if (!$taskUser->user) {
+                    continue;
+                }
+
+                $dueDate = $task->due_date ? (is_string($task->due_date) ? Carbon::parse($task->due_date)->format('Y-m-d H:i') : $task->due_date->format('Y-m-d H:i')) : null;
+
+                Notification::create([
+                    'user_id' => $taskUser->user->id,
+                    'type' => 'task_updated',
+                    'data' => [
+                        'message' => $message,
+                        'task_id' => $task->id,
+                        'task_title' => $task->title,
+                        'task_user_id' => $taskUser->id,
+                        'updated_by_id' => $currentUser->id,
+                        'updated_by_name' => $currentUser->name,
+                        'changed_fields' => $changedFields,
+                        'changed_fields_text' => $changedFieldsText,
+                        'due_date' => $dueDate,
+                        'url' => route('tasks.my-tasks') . '?task_id=' . $task->id
+                    ],
+                    'related_id' => $taskUser->id
+                ]);
+
+                if ($taskUser->user->slack_user_id) {
+                    try {
+                        $this->slackNotificationService->sendTaskUpdatedNotification(
+                            $task,
+                            $taskUser->user,
+                            $currentUser,
+                            $changedFields
+                        );
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to send Slack notification for task update', [
+                            'task_id' => $task->id,
+                            'user_id' => $taskUser->user->id,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to notify users on task update', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
     private function calculateRevisionsStatus($total, $pending, $approved, $rejected)
     {
         if ($total == 0) return 'none';
@@ -659,7 +789,7 @@ class TaskManagementService
         }
 
         if ($rejected > 0 && $approved == 0) {
-                return 'rejected';
+            return 'rejected';
         }
 
         return 'mixed';

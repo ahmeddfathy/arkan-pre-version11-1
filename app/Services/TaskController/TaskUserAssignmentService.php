@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\Notification;
 use App\Traits\SeasonAwareTrait;
 use App\Traits\HasNTPTime;
 use App\Services\SlackNotificationService;
@@ -74,12 +75,33 @@ class TaskUserAssignmentService
                 $user = User::find($assignedUser['user_id']);
                 $currentUser = Auth::user();
 
-                if ($user && $user->slack_user_id && $currentUser) {
-                    $this->slackNotificationService->sendTaskAssignmentNotification(
-                        $task,
-                        $user,
-                        $currentUser
-                    );
+                if ($user && $currentUser) {
+                    $message = "تم تعيينك للمهمة: {$task->title}";
+
+                    Notification::create([
+                        'user_id' => $user->id,
+                        'type' => 'task_assigned',
+                        'data' => [
+                            'message' => $message,
+                            'task_id' => $task->id,
+                            'task_title' => $task->title,
+                            'task_user_id' => $taskUser->id,
+                            'assigned_by_id' => $currentUser->id,
+                            'assigned_by_name' => $currentUser->name,
+                            'role' => $assignedUser['role'] ?? 'غير محدد',
+                            'due_date' => $task->due_date ? (is_string($task->due_date) ? Carbon::parse($task->due_date)->format('Y-m-d H:i') : $task->due_date->format('Y-m-d H:i')) : null,
+                            'url' => route('tasks.my-tasks') . '?task_id=' . $task->id
+                        ],
+                        'related_id' => $taskUser->id
+                    ]);
+
+                    if ($user->slack_user_id) {
+                        $this->slackNotificationService->sendTaskAssignmentNotification(
+                            $task,
+                            $user,
+                            $currentUser
+                        );
+                    }
                 }
 
                 Log::info("TaskUser created successfully", ['id' => $taskUser->id]);
@@ -159,12 +181,33 @@ class TaskUserAssignmentService
                 $user = User::find($assignedUser['user_id']);
                 $currentUser = Auth::user();
 
-                if ($user && $user->slack_user_id && $currentUser) {
-                    $this->slackNotificationService->sendTaskAssignmentNotification(
-                        $task,
-                        $user,
-                        $currentUser
-                    );
+                if ($user && $currentUser) {
+                    $message = "تم تعيينك للمهمة: {$task->title}";
+
+                    Notification::create([
+                        'user_id' => $user->id,
+                        'type' => 'task_assigned',
+                        'data' => [
+                            'message' => $message,
+                            'task_id' => $task->id,
+                            'task_title' => $task->title,
+                            'task_user_id' => $taskUser->id,
+                            'assigned_by_id' => $currentUser->id,
+                            'assigned_by_name' => $currentUser->name,
+                            'role' => $assignedUser['role'] ?? 'غير محدد',
+                            'due_date' => $task->due_date ? (is_string($task->due_date) ? Carbon::parse($task->due_date)->format('Y-m-d H:i') : $task->due_date->format('Y-m-d H:i')) : null,
+                            'url' => route('tasks.my-tasks') . '?task_id=' . $task->id
+                        ],
+                        'related_id' => $taskUser->id
+                    ]);
+
+                    if ($user->slack_user_id) {
+                        $this->slackNotificationService->sendTaskAssignmentNotification(
+                            $task,
+                            $user,
+                            $currentUser
+                        );
+                    }
                 }
 
                 $results[] = $taskUser;

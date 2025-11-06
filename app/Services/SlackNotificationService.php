@@ -12,6 +12,7 @@ use App\Services\Slack\RequestSlackService;
 use App\Services\Slack\AdditionalTaskSlackService;
 use App\Services\Slack\TicketSlackService;
 use App\Services\Slack\MeetingSlackService;
+use Illuminate\Support\Facades\Log;
 
 class SlackNotificationService
 {
@@ -63,6 +64,14 @@ class SlackNotificationService
     }
 
     /**
+     * إرسال إشعار عند إلغاء مشروع
+     */
+    public function sendProjectCancelledNotification(Project $project, User $participant, User $cancelledBy): bool
+    {
+        return $this->projectSlackService->sendProjectCancelledNotification($project, $participant, $cancelledBy);
+    }
+
+    /**
      * إرسال إشعار عند رفع مرفق جديد في المجلدات الثابتة
      */
     public function sendAttachmentUploadedNotification(Project $project, User $participant, User $uploadedBy, string $folderName, string $fileName): bool
@@ -76,6 +85,14 @@ class SlackNotificationService
     public function sendTaskAssignmentNotification($task, User $assignedUser, User $author): bool
     {
         return $this->taskSlackService->sendTaskAssignmentNotification($task, $assignedUser, $author);
+    }
+
+    /**
+     * إرسال إشعار عند تحديث مهمة
+     */
+    public function sendTaskUpdatedNotification($task, User $assignedUser, User $updatedBy, array $changedFields): bool
+    {
+        return $this->taskSlackService->sendTaskUpdatedNotification($task, $assignedUser, $updatedBy, $changedFields);
     }
 
     /**
@@ -207,7 +224,7 @@ class SlackNotificationService
             $slackWebhookUrl = env('SLACK_WEBHOOK_URL');
 
             if (!$slackWebhookUrl) {
-                \Log::warning('SLACK_WEBHOOK_URL not configured');
+                Log::warning('SLACK_WEBHOOK_URL not configured');
                 return false;
             }
 
@@ -266,20 +283,20 @@ class SlackNotificationService
             curl_close($ch);
 
             if ($httpCode === 200) {
-                \Log::info('Task cancelled notification sent successfully', [
+                Log::info('Task cancelled notification sent successfully', [
                     'slack_user_id' => $slackUserId,
                     'task_name' => $taskName
                 ]);
                 return true;
             } else {
-                \Log::error('Failed to send task cancelled notification', [
+                Log::error('Failed to send task cancelled notification', [
                     'http_code' => $httpCode,
                     'result' => $result
                 ]);
                 return false;
             }
         } catch (\Exception $e) {
-            \Log::error('Error sending task cancelled notification', [
+            Log::error('Error sending task cancelled notification', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);

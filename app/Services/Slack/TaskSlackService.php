@@ -201,8 +201,7 @@ class TaskSlackService extends BaseSlackService
     {
         $isTemplateTask = get_class($taskUser) === 'App\Models\TemplateTaskUser';
         $taskName = $isTemplateTask ?
-            ($taskUser->templateTask->name ?? 'غير محدد') :
-            ($taskUser->task->name ?? 'غير محدد');
+            ($taskUser->templateTask->name ?? 'غير محدد') : ($taskUser->task->name ?? 'غير محدد');
 
         $employeeName = $taskUser->user->name ?? 'غير محدد';
         $completedAt = $taskUser->completed_at ?
@@ -260,12 +259,54 @@ class TaskSlackService extends BaseSlackService
         return $this->sendSlackNotification($employee, $message, $context, true);
     }
 
+    public function sendTaskUpdatedNotification(Task $task, User $assignedUser, User $updatedBy, array $changedFields): bool
+    {
+        $message = $this->buildTaskUpdatedMessage($task, $assignedUser, $updatedBy, $changedFields);
+        $context = 'إشعار تحديث مهمة';
+        $this->setNotificationContext($context);
+
+        return $this->sendSlackNotification($assignedUser, $message, $context, true);
+    }
+
+    private function buildTaskUpdatedMessage(Task $task, User $assignedUser, User $updatedBy, array $changedFields): array
+    {
+        if (is_object($task) && method_exists($task, 'load')) {
+            $task->load(['project', 'service']);
+        }
+
+        $changedFieldsText = implode('، ', $changedFields);
+        $projectUrl = url("/projects/{$task->project_id}");
+        $taskUrl = route('tasks.my-tasks') . '?task_id=' . $task->id;
+
+        $taskName = $task->title ?? $task->name ?? 'غير محدد';
+
+        return [
+            'text' => "تم تحديث مهمة: {$taskName}",
+            'blocks' => [
+                $this->buildHeader('🔄 تم تحديث المهمة'),
+                $this->buildInfoSection([
+                    "*اسم المهمة:*\n{$taskName}",
+                    "*حدثها:*\n{$updatedBy->name}"
+                ]),
+                $this->buildTextSection("*الحقول المحدثة:*\n{$changedFieldsText}"),
+                $this->buildInfoSection([
+                    "*المشروع:*\n" . $this->getProjectName($task),
+                    "*تاريخ الاستحقاق:*\n" . $this->getDueDate($task)
+                ]),
+                $this->buildActionsSection([
+                    $this->buildActionButton('🔍 عرض المهمة', $taskUrl, 'primary'),
+                    $this->buildActionButton('🔗 عرض المشروع', $projectUrl)
+                ]),
+                $this->buildContextSection()
+            ]
+        ];
+    }
+
     private function buildTaskApprovedMessage($taskUser, User $employee, User $approver, string $approvalType): array
     {
         $isTemplateTask = get_class($taskUser) === 'App\Models\TemplateTaskUser';
         $taskName = $isTemplateTask ?
-            ($taskUser->templateTask->name ?? 'غير محدد') :
-            ($taskUser->task->name ?? 'غير محدد');
+            ($taskUser->templateTask->name ?? 'غير محدد') : ($taskUser->task->name ?? 'غير محدد');
 
         $typeArabic = $approvalType === 'administrative' ? 'الإداري' : 'الفني';
         $notes = $approvalType === 'administrative' ?

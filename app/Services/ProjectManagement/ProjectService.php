@@ -179,6 +179,7 @@ class ProjectService
             $oldName = $project->name;
             $oldClientId = $project->client_id;
             $oldServices = $project->services->pluck('id')->sort()->values()->toArray();
+            $oldStatus = $project->status;
 
             $project->update([
                 'name' => $data['name'] ?? $project->name,
@@ -280,6 +281,10 @@ class ProjectService
             }
 
             DB::commit();
+
+            if (isset($data['status']) && $oldStatus !== $data['status'] && $data['status'] === 'ملغي') {
+                $this->notificationService->notifyProjectCancelled($project, Auth::user());
+            }
 
             return [
                 'success' => true,
