@@ -592,28 +592,19 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th style="width: 5%">#</th>
-                                        <th style="width: 12%">الموظف</th>
-                                        <th style="width: 18%">عنوان الخطأ</th>
-                                        <th style="width: 25%">الوصف</th>
-                                        <th style="width: 10%">التصنيف</th>
-                                        <th style="width: 10%">المصدر</th>
-                                        <th style="width: 10%">سجله</th>
+                                        <th style="width: 25%">عنوان الخطأ</th>
+                                        <th style="width: 30%">الوصف</th>
+                                        <th style="width: 12%">التصنيف</th>
+                                        <th style="width: 12%">المصدر</th>
+                                        <th style="width: 12%">سجله</th>
                                         <th style="width: 12%">التاريخ</th>
-                                        <th style="width: 10%" class="text-center">إجراءات</th>
+                                        <th style="width: 12%" class="text-center">إجراءات</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($criticalErrors as $index => $error)
                                     <tr style="background-color: rgba(220, 53, 69, 0.02);">
                                         <td>{{ $index + 1 }}</td>
-                                        <td>
-                                            <div class="d-flex align-items-center user-info">
-                                                <div class="user-avatar me-2" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                                                    <i class="fas fa-user"></i>
-                                                </div>
-                                                <strong>{{ $error->user->name }}</strong>
-                                            </div>
-                                        </td>
                                         <td>
                                             <strong style="color: #dc3545;">{{ $error->title }}</strong>
                                             <br>
@@ -641,12 +632,12 @@
                                             </small>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('employee-errors.show', $error->id) }}"
+                                            <button onclick="openErrorDetailsSidebar({{ $error->id }})"
                                                 class="btn btn-outline-danger btn-sm"
                                                 title="عرض التفاصيل">
                                                 <i class="fas fa-eye"></i>
                                                 عرض
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -696,7 +687,7 @@
 </div>
 
 <!-- Sidebar Overlay -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeAllSidebars()"></div>
 
 <!-- Sidebar: Create Error -->
 <div class="sidebar-panel" id="createErrorSidebar">
@@ -837,6 +828,27 @@
             </button>
         </div>
     </form>
+</div>
+
+<!-- Sidebar: Error Details (for Critical Errors) -->
+<div class="sidebar-panel" id="errorDetailsSidebar">
+    <div class="sidebar-header">
+        <h5 class="sidebar-title">
+            <i class="fas fa-info-circle me-2"></i>
+            تفاصيل الخطأ
+        </h5>
+        <button type="button" class="sidebar-close" onclick="closeErrorDetailsSidebar()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sidebar-body" id="errorDetailsContent">
+        <div class="text-center py-5">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+            <p class="mt-3 text-muted">جاري تحميل التفاصيل...</p>
+        </div>
+    </div>
 </div>
 
 <!-- Sidebar: Edit Error -->
@@ -1272,6 +1284,147 @@
         const projectCodeContainer = document.getElementById('project_code_container_create');
         if (errorableSelectContainer) errorableSelectContainer.classList.add('d-none');
         if (projectCodeContainer) projectCodeContainer.classList.add('d-none');
+    }
+
+    function openErrorDetailsSidebar(errorId) {
+        const sidebar = document.getElementById('errorDetailsSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const content = document.getElementById('errorDetailsContent');
+
+        if (sidebar && overlay) {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            content.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-3 text-muted">جاري تحميل التفاصيل...</p>
+                </div>
+            `;
+
+            fetch(`/employee-errors/${errorId}/details`, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const error = data.error;
+                        const errorTypeBadge = error.error_type === 'critical' ?
+                            '<span class="badge badge-critical"><i class="fas fa-exclamation-circle"></i> جوهري</span>' :
+                            '<span class="badge badge-normal"><i class="fas fa-exclamation-triangle"></i> عادي</span>';
+
+                        const sourceType = error.errorable_type === 'App\\Models\\TaskUser' ?
+                            'مهمة عادية' :
+                            error.errorable_type === 'App\\Models\\TemplateTaskUser' ?
+                            'مهمة قالب' :
+                            error.errorable_type === 'App\\Models\\ProjectServiceUser' ?
+                            'مشروع' :
+                            'غير محدد';
+
+                        content.innerHTML = `
+                        <div class="error-details-content">
+                            <div class="mb-4">
+                                <h4 class="mb-3" style="color: #dc3545;">${error.title}</h4>
+                                <div class="d-flex gap-2 mb-3">
+                                    ${errorTypeBadge}
+                                    <span class="badge badge-category">${error.error_category_text}</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-2">وصف الخطأ</h6>
+                                <p class="mb-0" style="line-height: 1.8;">${error.description}</p>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">معلومات المصدر</h6>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon-box bg-light rounded p-2 me-3">
+                                        ${error.errorable_type === 'App\\Models\\TaskUser'
+                                            ? '<i class="fas fa-tasks text-purple"></i>'
+                                            : error.errorable_type === 'App\\Models\\TemplateTaskUser'
+                                            ? '<i class="fas fa-file-alt text-indigo"></i>'
+                                            : error.errorable_type === 'App\\Models\\ProjectServiceUser'
+                                            ? '<i class="fas fa-project-diagram text-success"></i>'
+                                            : '<i class="fas fa-link"></i>'}
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">نوع المصدر</small>
+                                        <p class="mb-0 fw-bold">${sourceType}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">معلومات إضافية</h6>
+                                <div class="mb-3">
+                                    <small class="text-muted">سجل الخطأ</small>
+                                    <p class="mb-0 fw-bold">${error.reported_by_name}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">تاريخ التسجيل</small>
+                                    <p class="mb-0">${error.created_at}</p>
+                                    <small class="text-muted">${error.created_at_human}</small>
+                                </div>
+                                ${error.updated_at && error.updated_at !== error.created_at ? `
+                                <div>
+                                    <small class="text-muted">آخر تعديل</small>
+                                    <p class="mb-0">${error.updated_at}</p>
+                                    <small class="text-muted">${error.updated_at_human}</small>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    } else {
+                        content.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            حدث خطأ أثناء تحميل التفاصيل
+                        </div>
+                    `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    content.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        حدث خطأ أثناء تحميل التفاصيل
+                    </div>
+                `;
+                });
+        }
+    }
+
+    function closeErrorDetailsSidebar() {
+        const sidebar = document.getElementById('errorDetailsSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (sidebar) {
+            sidebar.classList.remove('active');
+        }
+
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+
+        document.body.style.overflow = '';
+    }
+
+    function closeAllSidebars() {
+        closeSidebar();
+        closeErrorDetailsSidebar();
     }
 
     // Store users data globally

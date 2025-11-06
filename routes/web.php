@@ -920,6 +920,7 @@ Route::prefix('employee-errors')->name('employee-errors.')->middleware(['auth'])
     Route::post('/project/{projectServiceUserId}', [App\Http\Controllers\EmployeeErrorController::class, 'storeProjectError'])->name('project.store');
     Route::put('/{errorId}', [App\Http\Controllers\EmployeeErrorController::class, 'update'])->name('update');
     Route::delete('/{errorId}', [App\Http\Controllers\EmployeeErrorController::class, 'destroy'])->name('destroy');
+    Route::get('/{errorId}/details', [App\Http\Controllers\EmployeeErrorController::class, 'getErrorDetails'])->name('details');
     Route::get('/{errorId}', [App\Http\Controllers\EmployeeErrorController::class, 'show'])->name('show');
     Route::get('/project/{projectId}/errors', [App\Http\Controllers\EmployeeErrorController::class, 'projectErrors'])->name('project.errors');
     Route::get('/team/stats', [App\Http\Controllers\EmployeeErrorController::class, 'teamStats'])->name('team.stats');

@@ -322,6 +322,33 @@ class EmployeeErrorController extends Controller
     }
 
     /**
+     * جلب تفاصيل خطأ كـ JSON (للسايد بار)
+     */
+    public function getErrorDetails($errorId)
+    {
+        $error = EmployeeError::with(['reportedBy', 'errorable'])->findOrFail($errorId);
+
+        return response()->json([
+            'success' => true,
+            'error' => [
+                'id' => $error->id,
+                'title' => $error->title,
+                'description' => $error->description,
+                'error_type' => $error->error_type,
+                'error_type_text' => $error->error_type === 'critical' ? 'جوهري' : 'عادي',
+                'error_category' => $error->error_category,
+                'error_category_text' => $error->error_category_text,
+                'errorable_type' => $error->errorable_type,
+                'reported_by_name' => $error->reportedBy->name ?? 'غير محدد',
+                'created_at' => $error->created_at->format('Y-m-d h:i A'),
+                'created_at_human' => $error->created_at->diffForHumans(),
+                'updated_at' => $error->updated_at->format('Y-m-d h:i A'),
+                'updated_at_human' => $error->updated_at->diffForHumans(),
+            ]
+        ]);
+    }
+
+    /**
      * الحصول على إحصائيات الأخطاء للفريق
      */
     public function teamStats(Request $request)

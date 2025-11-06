@@ -375,6 +375,24 @@
         }, 100);
     });
 
+    // ✅ تهيئة Page Visibility Handler لضمان عمل التايمر عند تبديل التبويب
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+            if (
+                window.MyTasksTimers &&
+                typeof window.MyTasksTimers.initializePageVisibilityHandler ===
+                    "function"
+            ) {
+                window.MyTasksTimers.initializePageVisibilityHandler();
+                console.log("✅ Page Visibility Handler initialized for My Tasks");
+            } else {
+                console.warn(
+                    "⚠️ MyTasksTimers.initializePageVisibilityHandler not available"
+                );
+            }
+        }, 500);
+    });
+
     // Handle kanban card click events for task sidebar
     document.addEventListener("click", function (e) {
         if (e.target.closest(".kanban-card .view-task")) {
