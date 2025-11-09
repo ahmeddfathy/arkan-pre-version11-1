@@ -14,11 +14,23 @@ function initializeFormHandlers() {
         let foundUserId = null;
 
         if (enteredName) {
+            const normalizedEntered = enteredName
+                .toLowerCase()
+                .replace(/\s+/g, " ")
+                .trim();
+
             $("#usersList option").each(function () {
                 const optionValue = $(this).val();
+                const normalizedOption = optionValue
+                    .toLowerCase()
+                    .replace(/\s+/g, " ")
+                    .trim();
+
                 if (
                     optionValue === enteredName ||
-                    optionValue.toLowerCase() === enteredName.toLowerCase()
+                    normalizedOption === normalizedEntered ||
+                    normalizedOption.includes(normalizedEntered) ||
+                    normalizedEntered.includes(normalizedOption)
                 ) {
                     foundUserId = $(this).data("user-id");
                     return false;

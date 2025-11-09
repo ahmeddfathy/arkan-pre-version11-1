@@ -17,17 +17,17 @@
         <!-- Show All / Paginated Toggle -->
         <div class="btn-group me-3" role="group" aria-label="Pagination Mode">
             @if(request('show_all') == '1')
-                <a href="{{ route('tasks.index', array_merge(request()->except('show_all'), [])) }}"
-                   class="btn btn-outline-secondary" id="showPaginatedBtn">
-                    <i class="fas fa-list"></i> عرض مقسم
-                    <span class="badge bg-secondary ms-1">15/صفحة</span>
-                </a>
+            <a href="{{ route('tasks.index', array_merge(request()->except('show_all'), [])) }}"
+                class="btn btn-outline-secondary" id="showPaginatedBtn">
+                <i class="fas fa-list"></i> عرض مقسم
+                <span class="badge bg-secondary ms-1">15/صفحة</span>
+            </a>
             @else
-                <a href="{{ route('tasks.index', array_merge(request()->all(), ['show_all' => '1'])) }}"
-                   class="btn btn-outline-success" id="showAllBtn">
-                    <i class="fas fa-expand-arrows-alt"></i> عرض الكل
-                    <span class="badge bg-success ms-1">{{ $tasks->total() ?? 0 }}</span>
-                </a>
+            <a href="{{ route('tasks.index', array_merge(request()->all(), ['show_all' => '1'])) }}"
+                class="btn btn-outline-success" id="showAllBtn">
+                <i class="fas fa-expand-arrows-alt"></i> عرض الكل
+                <span class="badge bg-success ms-1">{{ $tasks->total() ?? 0 }}</span>
+            </a>
             @endif
         </div>
 
@@ -37,34 +37,34 @@
 
         <!-- زر نظام الموافقة مع مؤشر -->
         @php
-            $user = Auth::user();
-            // التحقق من كون المستخدم HR أو Admin
-            $userRoles = $user->roles->pluck('name')->toArray();
-            $isHrOrAdmin = !empty(array_intersect(['super-admin', 'admin', 'hr'], $userRoles));
+        $user = Auth::user();
+        // التحقق من كون المستخدم HR أو Admin
+        $userRoles = $user->roles->pluck('name')->toArray();
+        $isHrOrAdmin = !empty(array_intersect(['super-admin', 'admin', 'hr'], $userRoles));
 
-            // حساب المهام المنتظرة للموافقة
-            $regularTasksQuery = \App\Models\TaskUser::where('status', 'completed')
-                ->where('is_approved', false);
+        // حساب المهام المنتظرة للموافقة
+        $regularTasksQuery = \App\Models\TaskUser::where('status', 'completed')
+        ->where('is_approved', false);
 
-            $templateTasksQuery = \App\Models\TemplateTaskUser::where('status', 'completed')
-                ->where('is_approved', false);
+        $templateTasksQuery = \App\Models\TemplateTaskUser::where('status', 'completed')
+        ->where('is_approved', false);
 
-            // إذا لم يكن HR أو Admin، قيد النتائج للمشاريع التي يديرها فقط
-            if (!$isHrOrAdmin) {
-                $regularTasksQuery->whereHas('task', function ($query) use ($user) {
-                    $query->whereHas('project', function ($projectQuery) use ($user) {
-                        $projectQuery->where('manager', $user->name);
-                    });
-                });
+        // إذا لم يكن HR أو Admin، قيد النتائج للمشاريع التي يديرها فقط
+        if (!$isHrOrAdmin) {
+        $regularTasksQuery->whereHas('task', function ($query) use ($user) {
+        $query->whereHas('project', function ($projectQuery) use ($user) {
+        $projectQuery->where('manager', $user->name);
+        });
+        });
 
-                $templateTasksQuery->whereHas('project', function ($query) use ($user) {
-                    $query->where('manager', $user->name);
-                });
-            }
+        $templateTasksQuery->whereHas('project', function ($query) use ($user) {
+        $query->where('manager', $user->name);
+        });
+        }
 
-            $pendingRegularTasks = $regularTasksQuery->count();
-            $pendingTemplateTasks = $templateTasksQuery->count();
-            $totalPendingApproval = $pendingRegularTasks + $pendingTemplateTasks;
+        $pendingRegularTasks = $regularTasksQuery->count();
+        $pendingTemplateTasks = $templateTasksQuery->count();
+        $totalPendingApproval = $pendingRegularTasks + $pendingTemplateTasks;
         @endphp
 
         <div class="position-relative me-2">
@@ -72,9 +72,9 @@
                 <i class="fas fa-check-circle"></i> تسليمات التاسكات
             </a>
             @if($totalPendingApproval > 0)
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    {{ $totalPendingApproval }}
-                </span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ $totalPendingApproval }}
+            </span>
             @endif
         </div>
 

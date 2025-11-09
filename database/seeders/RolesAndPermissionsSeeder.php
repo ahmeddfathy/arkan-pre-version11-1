@@ -33,33 +33,15 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_own_data',
             'view_team_data',
             'view_department_data',
-            'view_all_data',
-            // Technical Team Review Permissions
-            'view_technical_team_review',
-            'create_technical_team_review',
-            'update_technical_team_review',
-            'delete_technical_team_review',
-            // Marketing Review Permissions
-            'view_marketing_review',
-            'create_marketing_review',
-            'update_marketing_review',
-            'delete_marketing_review',
-            // Customer Service Review Permissions
-            'view_customer_service_review',
-            'create_customer_service_review',
-            'update_customer_service_review',
-            'delete_customer_service_review',
-            // Coordination Review Permissions
-            'view_coordination_review',
-            'create_coordination_review',
-            'update_coordination_review',
-            'delete_coordination_review',
+
             // Review Management Permission
             'manage_reviews',
             // Technical Support Permissions - Client Meetings
             'schedule_client_meetings',
             // Team Management Permissions
             'create_teams',
+            // Tasks Management Permissions
+            'create_own_tasks',
         ];
 
         foreach ($permissions as $permission) {
@@ -142,61 +124,21 @@ class RolesAndPermissionsSeeder extends Seeder
         $teamLeader->givePermissionTo($managerBasePermissions);
         $departmentManager->givePermissionTo($departmentManagerBasePermissions);
 
-        $technicalTeamLeader->givePermissionTo(array_merge($managerBasePermissions, [
-            'view_technical_team_review',
-            'create_technical_team_review',
-            'update_technical_team_review',
-            'delete_technical_team_review',
-        ]));
+        $technicalTeamLeader->givePermissionTo($managerBasePermissions);
 
-        $marketingTeamLeader->givePermissionTo(array_merge($managerBasePermissions, [
-            'view_marketing_review',
-            'create_marketing_review',
-            'update_marketing_review',
-            'delete_marketing_review',
-        ]));
+        $marketingTeamLeader->givePermissionTo($managerBasePermissions);
 
-        $customerServiceTeamLeader->givePermissionTo(array_merge($managerBasePermissions, [
-            'view_customer_service_review',
-            'create_customer_service_review',
-            'update_customer_service_review',
-            'delete_customer_service_review',
-        ]));
+        $customerServiceTeamLeader->givePermissionTo($managerBasePermissions);
 
-        $coordinationTeamLeader->givePermissionTo(array_merge($managerBasePermissions, [
-            'view_coordination_review',
-            'create_coordination_review',
-            'update_coordination_review',
-            'delete_coordination_review',
-        ]));
+        $coordinationTeamLeader->givePermissionTo($managerBasePermissions);
 
-        $technicalDepartmentManager->givePermissionTo(array_merge($departmentManagerBasePermissions, [
-            'view_technical_team_review',
-            'create_technical_team_review',
-            'update_technical_team_review',
-            'delete_technical_team_review',
-        ]));
+        $technicalDepartmentManager->givePermissionTo($departmentManagerBasePermissions);
 
-        $marketingDepartmentManager->givePermissionTo(array_merge($departmentManagerBasePermissions, [
-            'view_marketing_review',
-            'create_marketing_review',
-            'update_marketing_review',
-            'delete_marketing_review',
-        ]));
+        $marketingDepartmentManager->givePermissionTo($departmentManagerBasePermissions);
 
-        $customerServiceDepartmentManager->givePermissionTo(array_merge($departmentManagerBasePermissions, [
-            'view_customer_service_review',
-            'create_customer_service_review',
-            'update_customer_service_review',
-            'delete_customer_service_review',
-        ]));
+        $customerServiceDepartmentManager->givePermissionTo($departmentManagerBasePermissions);
 
-        $coordinationDepartmentManager->givePermissionTo(array_merge($departmentManagerBasePermissions, [
-            'view_coordination_review',
-            'create_coordination_review',
-            'update_coordination_review',
-            'delete_coordination_review',
-        ]));
+        $coordinationDepartmentManager->givePermissionTo($departmentManagerBasePermissions);
 
 
         $projectManager->givePermissionTo([
@@ -218,22 +160,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_own_data',
             'view_department_data',
             'view_team_data',
-            'view_technical_team_review',
-            'create_technical_team_review',
-            'update_technical_team_review',
-            'delete_technical_team_review',
-            'view_marketing_review',
-            'create_marketing_review',
-            'update_marketing_review',
-            'delete_marketing_review',
-            'view_customer_service_review',
-            'create_customer_service_review',
-            'update_customer_service_review',
-            'delete_customer_service_review',
-            'view_coordination_review',
-            'create_coordination_review',
-            'update_coordination_review',
-            'delete_coordination_review',
         ]);
 
         // Operations Manager - نفس صلاحيات مدير المشاريع
@@ -256,22 +182,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_own_data',
             'view_department_data',
             'view_team_data',
-            'view_technical_team_review',
-            'create_technical_team_review',
-            'update_technical_team_review',
-            'delete_technical_team_review',
-            'view_marketing_review',
-            'create_marketing_review',
-            'update_marketing_review',
-            'delete_marketing_review',
-            'view_customer_service_review',
-            'create_customer_service_review',
-            'update_customer_service_review',
-            'delete_customer_service_review',
-            'view_coordination_review',
-            'create_coordination_review',
-            'update_coordination_review',
-            'delete_coordination_review',
         ]);
 
         $hr->givePermissionTo([
@@ -291,14 +201,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete_overtime',
             'hr_respond_overtime_request',
             'view_all_data',
-            'view_technical_team_review',
-            'update_technical_team_review',
-            'view_marketing_review',
-            'update_marketing_review',
-            'view_customer_service_review',
-            'update_customer_service_review',
-            'view_coordination_review',
-            'update_coordination_review',
             'manage_reviews',
         ]);
 
@@ -322,22 +224,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'hr_respond_overtime_request',
             'manager_respond_overtime_request',
             'view_all_data',
-            'view_technical_team_review',
-            'create_technical_team_review',
-            'update_technical_team_review',
-            'delete_technical_team_review',
-            'view_marketing_review',
-            'create_marketing_review',
-            'update_marketing_review',
-            'delete_marketing_review',
-            'view_customer_service_review',
-            'create_customer_service_review',
-            'update_customer_service_review',
-            'delete_customer_service_review',
-            'view_coordination_review',
-            'create_coordination_review',
-            'update_coordination_review',
-            'delete_coordination_review',
         ]);
 
         $users = User::whereDoesntHave('roles')->get();
@@ -404,15 +290,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_team_data',
         ]);
 
-        $technicalReviewer->givePermissionTo(array_merge($reviewerBasePermissions, [
-            'view_technical_team_review',
-            'update_technical_team_review',
-        ]));
+        $technicalReviewer->givePermissionTo($reviewerBasePermissions);
 
-        $marketingReviewer->givePermissionTo(array_merge($reviewerBasePermissions, [
-            'view_marketing_review',
-            'update_marketing_review',
-        ]));
+        $marketingReviewer->givePermissionTo($reviewerBasePermissions);
 
         $financialReviewer->givePermissionTo($reviewerBasePermissions);
     }

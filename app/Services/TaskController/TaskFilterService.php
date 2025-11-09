@@ -39,21 +39,21 @@ class TaskFilterService
             if ($userHierarchyLevel >= 5) {
                 return CompanyService::orderBy('name')->get();
             } elseif ($userHierarchyLevel >= 3) {
-                return CompanyService::where(function($query) use ($user) {
+                return CompanyService::where(function ($query) use ($user) {
                     $query->where('department', $user->department)
-                          ->orWhere(function($subQuery) {
-                              $subQuery->where('name', 'LIKE', '%جرافيك%')
-                                       ->orWhere('name', 'LIKE', '%تصميم%')
-                                       ->orWhere('name', 'LIKE', '%graphic%')
-                                       ->orWhere('name', 'LIKE', '%design%');
-                          });
+                        ->orWhere(function ($subQuery) {
+                            $subQuery->where('name', 'LIKE', '%جرافيك%')
+                                ->orWhere('name', 'LIKE', '%تصميم%')
+                                ->orWhere('name', 'LIKE', '%graphic%')
+                                ->orWhere('name', 'LIKE', '%design%');
+                        });
                 })->orderBy('name')->get();
             } else {
-                return CompanyService::where(function($query) {
+                return CompanyService::where(function ($query) {
                     $query->where('name', 'LIKE', '%جرافيك%')
-                          ->orWhere('name', 'LIKE', '%تصميم%')
-                          ->orWhere('name', 'LIKE', '%graphic%')
-                          ->orWhere('name', 'LIKE', '%design%');
+                        ->orWhere('name', 'LIKE', '%تصميم%')
+                        ->orWhere('name', 'LIKE', '%graphic%')
+                        ->orWhere('name', 'LIKE', '%design%');
                 })->orderBy('name')->get();
             }
         }
@@ -66,28 +66,59 @@ class TaskFilterService
         /** @var \App\Models\User $currentUser */
         $currentUser = Auth::user();
 
-
+        $hasCreateOwnTasksPermission = $currentUser->hasPermissionTo('create_own_tasks');
 
         if ($currentUser->hasRole(['company_manager', 'hr', 'project_manager'])) {
-                        return User::whereDoesntHave('roles', function($query) {
-                        $query->where('name', 'company_manager');
-                    })
-                    ->where('employee_status', 'active')
-                    ->select('id', 'name', 'email', 'department')
-                    ->orderBy('name')
-                    ->get();
+            $users = User::whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'company_manager');
+            })
+                ->where('employee_status', 'active')
+                ->select('id', 'name', 'email', 'department')
+                ->orderBy('name')
+                ->get();
+
+            if ($hasCreateOwnTasksPermission) {
+                $currentUserInList = $users->contains('id', $currentUser->id);
+                if (!$currentUserInList) {
+                    $currentUserData = User::where('id', $currentUser->id)
+                        ->select('id', 'name', 'email', 'department')
+                        ->first();
+                    if ($currentUserData) {
+                        $users->push($currentUserData);
+                        $users = $users->sortBy('name')->values();
+                    }
+                }
+            } else {
+                $users = $users->reject(function ($user) use ($currentUser) {
+                    return $user->id == $currentUser->id;
+                })->values();
+            }
+
+            return $users;
         }
 
         $globalLevel = $this->hierarchyService->getCurrentUserHierarchyLevel($currentUser);
         $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($currentUser);
 
         if (!$currentUser->department) {
+            if ($hasCreateOwnTasksPermission) {
+                $currentUserData = User::where('id', $currentUser->id)
+                    ->select('id', 'name', 'email', 'department')
+                    ->first();
+                return $currentUserData ? collect([$currentUserData]) : collect();
+            }
             return collect();
         }
 
         $userRoleIds = $currentUser->roles->pluck('id')->toArray();
         foreach ($userRoleIds as $userRoleId) {
             if (!DepartmentRole::mappingExists($currentUser->department, $userRoleId)) {
+                if ($hasCreateOwnTasksPermission) {
+                    $currentUserData = User::where('id', $currentUser->id)
+                        ->select('id', 'name', 'email', 'department')
+                        ->first();
+                    return $currentUserData ? collect([$currentUserData]) : collect();
+                }
                 return collect();
             }
         }
@@ -97,18 +128,37 @@ class TaskFilterService
                 ->pluck('role_id')
                 ->toArray();
 
-            $users = User::whereHas('roles', function($query) use ($availableRoleIds) {
-                        $query->whereIn('id', $availableRoleIds);
-                    })
-                    ->whereDoesntHave('roles', function($query) {
-                        $query->where('name', 'company_manager');
-                    })
-                    ->where('employee_status', 'active')
-                    ->select('id', 'name', 'email', 'department')
-                    ->orderBy('name')
-                    ->get();
+            $users = User::whereHas('roles', function ($query) use ($availableRoleIds) {
+                $query->whereIn('id', $availableRoleIds);
+            })
+                ->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'company_manager');
+                })
+                ->where('employee_status', 'active')
+                ->select('id', 'name', 'email', 'department')
+                ->orderBy('name')
+                ->get();
 
-            return $this->hierarchyService->addTeamInfoToUsers($users, true);
+            $users = $this->hierarchyService->addTeamInfoToUsers($users, true);
+
+            if ($hasCreateOwnTasksPermission) {
+                $currentUserInList = $users->contains('id', $currentUser->id);
+                if (!$currentUserInList) {
+                    $currentUserData = User::where('id', $currentUser->id)
+                        ->select('id', 'name', 'email', 'department')
+                        ->first();
+                    if ($currentUserData) {
+                        $users->push($currentUserData);
+                        $users = $users->sortBy('name')->values();
+                    }
+                }
+            } else {
+                $users = $users->reject(function ($user) use ($currentUser) {
+                    return $user->id == $currentUser->id;
+                })->values();
+            }
+
+            return $users;
         }
 
         if (($departmentLevel && $departmentLevel >= 3) || ($globalLevel && $globalLevel >= 3 && $globalLevel <= 4)) {
@@ -119,17 +169,17 @@ class TaskFilterService
                 ->pluck('role_id')
                 ->toArray();
 
-            $users = User::whereHas('roles', function($query) use ($departmentRoleIds) {
-                        $query->whereIn('id', $departmentRoleIds);
-                    })
-                    ->where('department', $currentUser->department)
-                    ->whereDoesntHave('roles', function($query) {
-                        $query->where('name', 'company_manager');
-                    })
-                    ->where('employee_status', 'active')
-                    ->select('id', 'name', 'email', 'department')
-                    ->orderBy('name')
-                    ->get();
+            $users = User::whereHas('roles', function ($query) use ($departmentRoleIds) {
+                $query->whereIn('id', $departmentRoleIds);
+            })
+                ->where('department', $currentUser->department)
+                ->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'company_manager');
+                })
+                ->where('employee_status', 'active')
+                ->select('id', 'name', 'email', 'department')
+                ->orderBy('name')
+                ->get();
 
             $users = $this->hierarchyService->filterUsersByNewHierarchy($users, $currentUser);
 
@@ -137,20 +187,54 @@ class TaskFilterService
                 $users = $this->hierarchyService->addTeamInfoToUsers($users, true);
             }
 
+            if ($hasCreateOwnTasksPermission) {
+                $currentUserInList = $users->contains('id', $currentUser->id);
+                if (!$currentUserInList) {
+                    $currentUserData = User::where('id', $currentUser->id)
+                        ->select('id', 'name', 'email', 'department')
+                        ->first();
+                    if ($currentUserData) {
+                        $users->push($currentUserData);
+                        $users = $users->sortBy('name')->values();
+                    }
+                }
+            } else {
+                $users = $users->reject(function ($user) use ($currentUser) {
+                    return $user->id == $currentUser->id;
+                })->values();
+            }
+
             return $users;
         }
 
         $users = User::where('department', $currentUser->department)
-                    ->whereHas('roles', function($query) {
-                        $query->whereIn('name', ['employee']);
-                    })
-                    ->whereDoesntHave('roles', function($query) {
-                        $query->where('name', 'company_manager');
-                    })
-                    ->where('employee_status', 'active')
+            ->whereHas('roles', function ($query) {
+                $query->whereIn('name', ['employee']);
+            })
+            ->whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'company_manager');
+            })
+            ->where('employee_status', 'active')
+            ->select('id', 'name', 'email', 'department')
+            ->orderBy('name')
+            ->get();
+
+        if ($hasCreateOwnTasksPermission) {
+            $currentUserInList = $users->contains('id', $currentUser->id);
+            if (!$currentUserInList) {
+                $currentUserData = User::where('id', $currentUser->id)
                     ->select('id', 'name', 'email', 'department')
-                    ->orderBy('name')
-                    ->get();
+                    ->first();
+                if ($currentUserData) {
+                    $users->push($currentUserData);
+                    $users = $users->sortBy('name')->values();
+                }
+            }
+        } else {
+            $users = $users->reject(function ($user) use ($currentUser) {
+                return $user->id == $currentUser->id;
+            })->values();
+        }
 
         return $users;
     }
@@ -173,9 +257,9 @@ class TaskFilterService
                 ->toArray();
 
             return Role::whereIn('id', $availableRoleIds)
-                      ->where('name', '!=', 'company_manager')
-                      ->orderBy('name')
-                      ->get();
+                ->where('name', '!=', 'company_manager')
+                ->orderBy('name')
+                ->get();
         }
 
         if (($user->department && $departmentLevel && $departmentLevel >= 3) || ($globalLevel && $globalLevel >= 3 && $globalLevel <= 4)) {
@@ -191,15 +275,15 @@ class TaskFilterService
             }
 
             return Role::whereIn('id', $departmentRoleIds)
-                      ->where('name', '!=', 'company_manager')
-                      ->orderBy('name')
-                      ->get();
+                ->where('name', '!=', 'company_manager')
+                ->orderBy('name')
+                ->get();
         }
 
         return Role::where('name', '!=', 'company_manager')
-                   ->whereIn('name', ['employee'])
-                   ->orderBy('name')
-                   ->get();
+            ->whereIn('name', ['employee'])
+            ->orderBy('name')
+            ->get();
     }
 
     public function getUsersByService(int $serviceId): array
@@ -209,19 +293,39 @@ class TaskFilterService
             $currentUser = Auth::user();
             $service = CompanyService::findOrFail($serviceId);
 
-
+            $hasCreateOwnTasksPermission = $currentUser->hasPermissionTo('create_own_tasks');
 
             $globalLevel = $this->hierarchyService->getCurrentUserHierarchyLevel($currentUser);
             $departmentLevel = DepartmentRole::getUserDepartmentHierarchyLevel($currentUser);
 
             if ($currentUser->hasRole(['company_manager', 'hr', 'project_manager'])) {
                 $users = $service->specializedUsers()
-                            ->where('employee_status', 'active')
-                            ->select('id', 'name', 'email', 'department')
-                            ->orderBy('name')
-                            ->get();
+                    ->where('employee_status', 'active')
+                    ->select('id', 'name', 'email', 'department')
+                    ->orderBy('name')
+                    ->get();
 
                 $users = $this->hierarchyService->addTeamInfoToUsers($users, true);
+
+                if ($hasCreateOwnTasksPermission) {
+                    $currentUserInList = $users->contains('id', $currentUser->id);
+                    if (!$currentUserInList) {
+                        $serviceUserIds = $service->specializedUsers()->pluck('id')->toArray();
+                        if (in_array($currentUser->id, $serviceUserIds)) {
+                            $currentUserData = User::where('id', $currentUser->id)
+                                ->select('id', 'name', 'email', 'department')
+                                ->first();
+                            if ($currentUserData) {
+                                $users->push($currentUserData);
+                                $users = $users->sortBy('name')->values();
+                            }
+                        }
+                    }
+                } else {
+                    $users = $users->reject(function ($user) use ($currentUser) {
+                        return $user->id == $currentUser->id;
+                    })->values();
+                }
 
                 return [
                     'success' => true,
@@ -231,13 +335,33 @@ class TaskFilterService
 
             if ($globalLevel && $globalLevel >= 5) {
                 $users = $service->specializedUsers()
-                            ->where('employee_status', 'active')
-                            ->select('id', 'name', 'email', 'department')
-                            ->orderBy('name')
-                            ->get();
+                    ->where('employee_status', 'active')
+                    ->select('id', 'name', 'email', 'department')
+                    ->orderBy('name')
+                    ->get();
 
                 $users = $this->hierarchyService->filterUsersByNewHierarchy($users, $currentUser);
                 $users = $this->hierarchyService->addTeamInfoToUsers($users, true);
+
+                if ($hasCreateOwnTasksPermission) {
+                    $currentUserInList = $users->contains('id', $currentUser->id);
+                    if (!$currentUserInList) {
+                        $serviceUserIds = $service->specializedUsers()->pluck('id')->toArray();
+                        if (in_array($currentUser->id, $serviceUserIds)) {
+                            $currentUserData = User::where('id', $currentUser->id)
+                                ->select('id', 'name', 'email', 'department')
+                                ->first();
+                            if ($currentUserData) {
+                                $users->push($currentUserData);
+                                $users = $users->sortBy('name')->values();
+                            }
+                        }
+                    }
+                } else {
+                    $users = $users->reject(function ($user) use ($currentUser) {
+                        return $user->id == $currentUser->id;
+                    })->values();
+                }
 
                 return [
                     'success' => true,
@@ -249,10 +373,10 @@ class TaskFilterService
 
             if ($isGraphicService) {
                 $users = $service->specializedUsers()
-                            ->where('employee_status', 'active')
-                            ->select('id', 'name', 'email', 'department')
-                                                        ->orderBy('name')
-                            ->get();
+                    ->where('employee_status', 'active')
+                    ->select('id', 'name', 'email', 'department')
+                    ->orderBy('name')
+                    ->get();
             } else {
                 if ($currentUser->department && !$currentUser->hasRole(['company_manager', 'hr', 'project_manager'])) {
                     $userRoleIds = $currentUser->roles->pluck('id')->toArray();
@@ -270,13 +394,33 @@ class TaskFilterService
                 $allowedUsers = $this->getFilteredUsersForCurrentUser();
 
                 $serviceUserIds = $service->specializedUsers()->pluck('id')->toArray();
-                                $users = $allowedUsers->filter(function($user) use ($serviceUserIds) {
+                $users = $allowedUsers->filter(function ($user) use ($serviceUserIds) {
                     return in_array($user->id, $serviceUserIds);
                 });
             }
 
             if ($departmentLevel >= 4 || $globalLevel >= 4) {
                 $users = $this->hierarchyService->addTeamInfoToUsers($users, true);
+            }
+
+            if ($hasCreateOwnTasksPermission) {
+                $currentUserInList = $users->contains('id', $currentUser->id);
+                if (!$currentUserInList) {
+                    $serviceUserIds = $service->specializedUsers()->pluck('id')->toArray();
+                    if (in_array($currentUser->id, $serviceUserIds)) {
+                        $currentUserData = User::where('id', $currentUser->id)
+                            ->select('id', 'name', 'email', 'department')
+                            ->first();
+                        if ($currentUserData) {
+                            $users->push($currentUserData);
+                            $users = $users->sortBy('name')->values();
+                        }
+                    }
+                }
+            } else {
+                $users = $users->reject(function ($user) use ($currentUser) {
+                    return $user->id == $currentUser->id;
+                })->values();
             }
 
             return [
@@ -297,6 +441,8 @@ class TaskFilterService
             /** @var \App\Models\User $currentUser */
             $currentUser = Auth::user();
 
+            $hasCreateOwnTasksPermission = $currentUser->hasPermissionTo('create_own_tasks');
+
             if (!$this->hierarchyService->canViewRoleUsers($roleName)) {
                 return [
                     'success' => false,
@@ -306,13 +452,30 @@ class TaskFilterService
 
             if ($currentUser->hasRole(['company_manager', 'hr', 'project_manager'])) {
                 $users = User::role($roleName)
-                            ->whereDoesntHave('roles', function($query) {
-                                $query->where('name', 'company_manager');
-                            })
-                            ->where('employee_status', 'active')
+                    ->whereDoesntHave('roles', function ($query) {
+                        $query->where('name', 'company_manager');
+                    })
+                    ->where('employee_status', 'active')
+                    ->select('id', 'name', 'email', 'department')
+                    ->orderBy('name')
+                    ->get();
+
+                if ($hasCreateOwnTasksPermission && $currentUser->hasRole($roleName)) {
+                    $currentUserInList = $users->contains('id', $currentUser->id);
+                    if (!$currentUserInList) {
+                        $currentUserData = User::where('id', $currentUser->id)
                             ->select('id', 'name', 'email', 'department')
-                            ->orderBy('name')
-                            ->get();
+                            ->first();
+                        if ($currentUserData) {
+                            $users->push($currentUserData);
+                            $users = $users->sortBy('name')->values();
+                        }
+                    }
+                } else {
+                    $users = $users->reject(function ($user) use ($currentUser) {
+                        return $user->id == $currentUser->id;
+                    })->values();
+                }
 
                 return [
                     'success' => true,
@@ -364,30 +527,46 @@ class TaskFilterService
 
             if ($currentUserLevel >= 5) {
                 $users = User::role($roleName)
-                            ->whereDoesntHave('roles', function($query) {
-                                $query->where('name', 'company_manager');
-                            })
-                            ->where('employee_status', 'active')
-                            ->select('id', 'name', 'email', 'department')
-                            ->orderBy('name')
-                            ->get();
-            }
-            else {
+                    ->whereDoesntHave('roles', function ($query) {
+                        $query->where('name', 'company_manager');
+                    })
+                    ->where('employee_status', 'active')
+                    ->select('id', 'name', 'email', 'department')
+                    ->orderBy('name')
+                    ->get();
+            } else {
                 $users = User::role($roleName)
-                            ->where('department', $currentUser->department)
-                            ->whereDoesntHave('roles', function($query) {
-                                $query->where('name', 'company_manager');
-                            })
-                            ->where('employee_status', 'active')
-                            ->select('id', 'name', 'email', 'department')
-                            ->orderBy('name')
-                            ->get();
+                    ->where('department', $currentUser->department)
+                    ->whereDoesntHave('roles', function ($query) {
+                        $query->where('name', 'company_manager');
+                    })
+                    ->where('employee_status', 'active')
+                    ->select('id', 'name', 'email', 'department')
+                    ->orderBy('name')
+                    ->get();
             }
 
             $users = $this->hierarchyService->filterUsersByNewHierarchy($users, $currentUser);
 
             if ($departmentLevel >= 4 || $currentUserLevel >= 4) {
                 $users = $this->hierarchyService->addTeamInfoToUsers($users, true);
+            }
+
+            if ($hasCreateOwnTasksPermission && $currentUser->hasRole($roleName)) {
+                $currentUserInList = $users->contains('id', $currentUser->id);
+                if (!$currentUserInList) {
+                    $currentUserData = User::where('id', $currentUser->id)
+                        ->select('id', 'name', 'email', 'department')
+                        ->first();
+                    if ($currentUserData) {
+                        $users->push($currentUserData);
+                        $users = $users->sortBy('name')->values();
+                    }
+                }
+            } else {
+                $users = $users->reject(function ($user) use ($currentUser) {
+                    return $user->id == $currentUser->id;
+                })->values();
             }
 
             return [
@@ -418,14 +597,14 @@ class TaskFilterService
                 $query->whereHas('serviceParticipants', function ($q) use ($userId) {
                     $q->where('user_id', $userId);
                 })
-                ->orWhereHas('tasks', function ($q) use ($userId) {
-                    $q->whereHas('users', function ($q2) use ($userId) {
-                        $q2->where('users.id', $userId);
+                    ->orWhereHas('tasks', function ($q) use ($userId) {
+                        $q->whereHas('users', function ($q2) use ($userId) {
+                            $q2->where('users.id', $userId);
+                        });
+                    })
+                    ->orWhereHas('templateTaskUsers', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
                     });
-                })
-                ->orWhereHas('templateTaskUsers', function ($q) use ($userId) {
-                    $q->where('user_id', $userId);
-                });
             })
             ->orderBy('name')
             ->get();
@@ -486,9 +665,9 @@ class TaskFilterService
         $creatorIds = $query->pluck('created_by')->unique()->filter();
 
         return User::whereIn('id', $creatorIds)
-                   ->select('id', 'name')
-                   ->orderBy('name')
-                   ->get();
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
     }
 
     public function applyHierarchicalTaskFiltering($query, ?User $currentUser = null)
@@ -519,8 +698,8 @@ class TaskFilterService
         }
 
         if ($hasInvalidRoleMapping) {
-            return $query->where(function($q) use ($currentUser) {
-                $q->whereHas('users', function($subQ) use ($currentUser) {
+            return $query->where(function ($q) use ($currentUser) {
+                $q->whereHas('users', function ($subQ) use ($currentUser) {
                     $subQ->where('users.id', $currentUser->id);
                 })->orWhere('created_by', $currentUser->id);
             });
@@ -531,8 +710,8 @@ class TaskFilterService
         }
 
         if (($currentUser->department && $departmentLevel && $departmentLevel >= 4) || ($globalLevel && $globalLevel == 4)) {
-            return $query->where(function($q) use ($currentUser) {
-                $q->whereHas('users', function($subQ) use ($currentUser) {
+            return $query->where(function ($q) use ($currentUser) {
+                $q->whereHas('users', function ($subQ) use ($currentUser) {
                     $subQ->where('users.department', $currentUser->department);
                 })->orWhere('created_by', $currentUser->id);
             });
@@ -549,7 +728,7 @@ class TaskFilterService
             }
 
             if (!$currentTeamId) {
-                return $query->whereHas('users', function($q) use ($currentUser) {
+                return $query->whereHas('users', function ($q) use ($currentUser) {
                     $q->where('users.id', $currentUser->id);
                 });
             }
@@ -567,32 +746,32 @@ class TaskFilterService
 
             $teamUserIds = $teamUserIds->unique()->toArray();
 
-            return $query->where(function($q) use ($teamUserIds, $currentUser) {
-                $q->whereHas('users', function($subQ) use ($teamUserIds) {
+            return $query->where(function ($q) use ($teamUserIds, $currentUser) {
+                $q->whereHas('users', function ($subQ) use ($teamUserIds) {
                     $subQ->whereIn('users.id', $teamUserIds);
                 })->orWhere('created_by', $currentUser->id);
             });
         }
 
         if ($this->hierarchyService->isGraphicOnlyUser()) {
-            return $query->where(function($q) use ($currentUser) {
-                $q->where(function($subQ) use ($currentUser) {
-                    $subQ->whereHas('service', function($serviceQ) {
-                        $serviceQ->where(function($serviceQuery) {
+            return $query->where(function ($q) use ($currentUser) {
+                $q->where(function ($subQ) use ($currentUser) {
+                    $subQ->whereHas('service', function ($serviceQ) {
+                        $serviceQ->where(function ($serviceQuery) {
                             $serviceQuery->where('name', 'LIKE', '%جرافيك%')
-                                       ->orWhere('name', 'LIKE', '%تصميم%')
-                                       ->orWhere('name', 'LIKE', '%graphic%')
-                                       ->orWhere('name', 'LIKE', '%design%');
+                                ->orWhere('name', 'LIKE', '%تصميم%')
+                                ->orWhere('name', 'LIKE', '%graphic%')
+                                ->orWhere('name', 'LIKE', '%design%');
                         });
-                    })->whereHas('users', function($userQ) use ($currentUser) {
+                    })->whereHas('users', function ($userQ) use ($currentUser) {
                         $userQ->where('users.id', $currentUser->id);
                     });
                 })->orWhere('created_by', $currentUser->id);
             });
         }
 
-        return $query->where(function($q) use ($currentUser) {
-            $q->whereHas('users', function($subQ) use ($currentUser) {
+        return $query->where(function ($q) use ($currentUser) {
+            $q->whereHas('users', function ($subQ) use ($currentUser) {
                 $subQ->where('users.id', $currentUser->id);
             })->orWhere('created_by', $currentUser->id);
         });
@@ -634,8 +813,8 @@ class TaskFilterService
         }
 
         if (($currentUser->department && $departmentLevel && $departmentLevel >= 4) || ($globalLevel && $globalLevel == 4)) {
-            return $query->where(function($q) use ($currentUser) {
-                $q->whereHas('user', function($subQ) use ($currentUser) {
+            return $query->where(function ($q) use ($currentUser) {
+                $q->whereHas('user', function ($subQ) use ($currentUser) {
                     $subQ->where('users.department', $currentUser->department);
                 });
             });

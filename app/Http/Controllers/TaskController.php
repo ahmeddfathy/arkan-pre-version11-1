@@ -143,7 +143,7 @@ class TaskController extends Controller
             'graphic_task_type_id' => 'nullable|exists:graphic_task_types,id',
             'points' => 'nullable|integer|min:0|max:1000',
             'due_date' => 'nullable|date',
-            'assigned_users' => 'required|array|min:1', // ✅ إجباري ولازم موظف واحد على الأقل
+            'assigned_users' => 'required|array|min:1',
             'assigned_users.*.user_id' => 'required|exists:users,id',
             'assigned_users.*.role' => 'nullable|string',
             'is_flexible_time' => 'nullable|in:true,false,1,0',
@@ -222,6 +222,32 @@ class TaskController extends Controller
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
+        }
+
+        // التحقق من أن المستخدم لا يمكنه إضافة مهمة لنفسه إلا إذا كان لديه صلاحية create_own_tasks
+        $currentUserId = Auth::id();
+        /** @var \App\Models\User $currentUser */
+        $currentUser = Auth::user();
+        $hasCreateOwnTasksPermission = $currentUser->hasPermissionTo('create_own_tasks');
+
+        if ($request->has('assigned_users') && is_array($request->assigned_users)) {
+            foreach ($request->assigned_users as $assignedUser) {
+                if (isset($assignedUser['user_id']) && $assignedUser['user_id'] == $currentUserId) {
+                    if (!$hasCreateOwnTasksPermission) {
+                        if ($request->ajax() || $request->wantsJson()) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'غير مسموح لك بإضافة مهام لنفسك. تحتاج إلى صلاحية "إنشاء مهام لنفسك" للقيام بذلك.',
+                                'errors' => ['assigned_users' => ['غير مسموح لك بإضافة مهام لنفسك']]
+                            ], 422);
+                        }
+
+                        return redirect()->back()
+                            ->with('error', 'غير مسموح لك بإضافة مهام لنفسك. تحتاج إلى صلاحية "إنشاء مهام لنفسك" للقيام بذلك.')
+                            ->withInput();
+                    }
+                }
+            }
         }
 
         // التحقق من حدود النقاط للخدمة في المشروع (إذا كان مشروع محدد)
@@ -754,6 +780,32 @@ class TaskController extends Controller
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
+        }
+
+        // التحقق من أن المستخدم لا يمكنه إضافة مهمة لنفسه إلا إذا كان لديه صلاحية create_own_tasks
+        $currentUserId = Auth::id();
+        /** @var \App\Models\User $currentUser */
+        $currentUser = Auth::user();
+        $hasCreateOwnTasksPermission = $currentUser->hasPermissionTo('create_own_tasks');
+
+        if ($request->has('assigned_users') && is_array($request->assigned_users)) {
+            foreach ($request->assigned_users as $assignedUser) {
+                if (isset($assignedUser['user_id']) && $assignedUser['user_id'] == $currentUserId) {
+                    if (!$hasCreateOwnTasksPermission) {
+                        if ($request->ajax() || $request->wantsJson()) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'غير مسموح لك بإضافة مهام لنفسك. تحتاج إلى صلاحية "إنشاء مهام لنفسك" للقيام بذلك.',
+                                'errors' => ['assigned_users' => ['غير مسموح لك بإضافة مهام لنفسك']]
+                            ], 422);
+                        }
+
+                        return redirect()->back()
+                            ->with('error', 'غير مسموح لك بإضافة مهام لنفسك. تحتاج إلى صلاحية "إنشاء مهام لنفسك" للقيام بذلك.')
+                            ->withInput();
+                    }
+                }
+            }
         }
 
         // التحقق من حدود النقاط عند التعديل (إذا تم تغيير النقاط)
