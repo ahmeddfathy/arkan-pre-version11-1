@@ -33,19 +33,25 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_own_data',
             'view_team_data',
             'view_department_data',
+            'view_all_data',
 
-            // Review Management Permission
             'manage_reviews',
-            // Technical Support Permissions - Client Meetings
             'schedule_client_meetings',
-            // Team Management Permissions
             'create_teams',
-            // Tasks Management Permissions
             'create_own_tasks',
         ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        $allAllowedPermissions = array_unique($permissions);
+
+        $existingPermissions = Permission::all();
+        foreach ($existingPermissions as $existingPermission) {
+            if (!in_array($existingPermission->name, $allAllowedPermissions)) {
+                $existingPermission->delete();
+            }
         }
 
         $hr = Role::firstOrCreate(['name' => 'hr']);

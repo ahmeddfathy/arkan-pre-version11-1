@@ -730,6 +730,20 @@ class TaskController extends Controller
                 ->withInput();
         }
 
+        $currentUser = Auth::user();
+        if ($task->created_by !== $currentUser->id) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'يمكنك تعديل المهام التي قمت بإنشائها فقط'
+                ], 403);
+            }
+
+            return redirect()->back()
+                ->with('error', 'يمكنك تعديل المهام التي قمت بإنشائها فقط')
+                ->withInput();
+        }
+
         // التحقق من صلاحية الوصول للخدمة (فقط إذا تم تحديد خدمة)
         if ($request->service_id && !$this->taskHierarchyService->canUserAccessService($request->service_id)) {
             return redirect()->back()
@@ -1239,7 +1253,19 @@ class TaskController extends Controller
                 'user'
             ])->findOrFail($templateTaskUserId);
 
-            // التحقق من الصلاحيات (يمكن تطبيق نفس منطق المهام العادية أو تخصيصه للقوالب)
+            $currentUser = Auth::user();
+            if ($templateTaskUser->assigned_by !== $currentUser->id) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'يمكنك تعديل المهام التي قمت بإنشائها فقط'
+                    ], 403);
+                }
+
+                return redirect()->back()
+                    ->with('error', 'يمكنك تعديل المهام التي قمت بإنشائها فقط')
+                    ->withInput();
+            }
 
             // قواعد التحقق لمهام القوالب
             $validationRules = [
