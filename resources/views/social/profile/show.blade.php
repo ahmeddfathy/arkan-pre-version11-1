@@ -78,9 +78,11 @@
                     <div class="recent-followers-label">آخر المتابعين:</div>
                     <div class="followers-avatars">
                         @foreach($recentFollowers as $follower)
+                        @if($follower)
                         <a href="{{ route('social.profile.show', $follower) }}" class="follower-avatar" title="{{ $follower->name }}">
                             <img src="{{ $follower->profile_photo_url }}" alt="{{ $follower->name }}">
                         </a>
+                        @endif
                         @endforeach
                     </div>
                 </div>

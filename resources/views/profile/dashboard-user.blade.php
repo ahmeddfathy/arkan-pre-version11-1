@@ -41,7 +41,7 @@
                 <i class="fas fa-times text-white text-xl"></i>
             </div>
             <div class="stat-value">{{ $attendanceStats['absent_days'] }}</div>
-            <div class="stat-label">أيام الاجازة</div>
+            <div class="stat-label">أيام الغياب</div>
         </div>
 
         <div class="stat-card">
@@ -190,5 +190,5 @@
     @endsection
 
     @push('styles')
-        <link rel="stylesheet" href="{{asset('css/dashboard-user.css')}}">
+    <link rel="stylesheet" href="{{asset('css/dashboard-user.css')}}">
     @endpush

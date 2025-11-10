@@ -1,14 +1,24 @@
 <div class="reply" data-reply-id="{{ $reply->id }}">
     <div class="reply-content">
+        @if($reply->user)
         <a href="{{ route('social.profile.show', $reply->user) }}" class="user-link">
             <img src="{{ $reply->user->profile_photo_url }}" alt="{{ $reply->user->name }}" class="reply-avatar-small">
         </a>
+        @else
+        <div class="user-link">
+            <img src="{{ asset('img/default-avatar.png') }}" alt="مستخدم محذوف" class="reply-avatar-small">
+        </div>
+        @endif
         <div class="reply-bubble">
             <div class="reply-header">
                 <div class="reply-user-name">
+                    @if($reply->user)
                     <a href="{{ route('social.profile.show', $reply->user) }}" class="user-name-link">
                         {{ $reply->user->name }}
                     </a>
+                    @else
+                    <span class="user-name-link">مستخدم محذوف</span>
+                    @endif
                 </div>
                 <div class="reply-time">{{ $reply->time_ago }}</div>
             </div>
@@ -21,7 +31,18 @@
             @endif
         </div>
 
-        @if(Auth::id() === $reply->user_id || Auth::user()->hasRole('hr'))
+        @if($reply->user && (Auth::id() === $reply->user_id || Auth::user()->hasRole('hr')))
+        <div class="reply-options">
+            <button class="reply-options-btn" onclick="toggleReplyOptions({{ $reply->id }})">
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="reply-options-menu" id="replyOptions{{ $reply->id }}" style="display: none;">
+                <button onclick="deleteComment({{ $reply->id }})" class="option-item text-red-600">
+                    <i class="fas fa-trash"></i> حذف
+                </button>
+            </div>
+        </div>
+        @elseif(!$reply->user && Auth::user()->hasRole('hr'))
         <div class="reply-options">
             <button class="reply-options-btn" onclick="toggleReplyOptions({{ $reply->id }})">
                 <i class="fas fa-ellipsis-h"></i>

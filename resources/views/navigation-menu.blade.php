@@ -26,14 +26,14 @@ use Illuminate\Support\Facades\Auth;
                     </x-nav-link>
 
                     <!-- Employee Profile Link -->
-                    <x-nav-link href="{{ route('employee.profile.show') }}" :active="request()->routeIs('employee.profile.*')">
-                        {{ __('ملفي الشخصي') }}
-                    </x-nav-link>
+                    {{-- <x-nav-link href="{{ route('employee.profile.show') }}" :active="request()->routeIs('employee.profile.*')">
+                    {{ __('ملفي الشخصي') }}
+                    </x-nav-link> --}}
 
                     <!-- Social Media Link -->
-                    <x-nav-link href="{{ route('social.index') }}" :active="request()->routeIs('social.*')">
-                        {{ __('التواصل الاجتماعي') }}
-                    </x-nav-link>
+                    {{-- <x-nav-link href="{{ route('social.index') }}" :active="request()->routeIs('social.*')">
+                    {{ __('التواصل الاجتماعي') }}
+                    </x-nav-link> --}}
 
                     <!-- Attendance Links -->
                     <x-nav-link href="{{ route('attendance.my') }}" :active="request()->routeIs('attendance.my')">
@@ -83,11 +83,11 @@ use Illuminate\Support\Facades\Auth;
                                 </x-dropdown-link>
                                 @endif
 
-                                                @if(Auth::user()->hasRole('hr'))
-                <x-dropdown-link href="{{ route('teams.create') }}">
-                    {{ __('Create New Team') }}
-                </x-dropdown-link>
-                @endif
+                                @if(Auth::user()->hasRole('hr'))
+                                <x-dropdown-link href="{{ route('teams.create') }}">
+                                    {{ __('Create New Team') }}
+                                </x-dropdown-link>
+                                @endif
 
                                 <!-- Team Switcher -->
                                 @if (Auth::user()->allTeams()->count() > 0)
@@ -203,9 +203,9 @@ use Illuminate\Support\Facades\Auth;
                                 {{ __('Manage Account') }}
                             </div>
 
-                            <x-dropdown-link href="{{ route('profile.show') }}">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
+                            {{-- <x-dropdown-link href="{{ route('profile.show') }}">
+                            {{ __('Profile') }}
+                            </x-dropdown-link> --}}
 
                             @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                             <x-dropdown-link href="{{ route('api-tokens.index') }}">
@@ -326,9 +326,9 @@ use Illuminate\Support\Facades\Auth;
 
             <div class="mt-3 space-y-1">
                 <!-- Account Management -->
-                <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
+                {{-- <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
+                {{ __('Profile') }}
+                </x-responsive-nav-link> --}}
 
                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                 <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">
@@ -616,7 +616,9 @@ use Illuminate\Support\Facades\Auth;
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
-                            body: JSON.stringify({ token })
+                            body: JSON.stringify({
+                                token
+                            })
                         });
 
                         const result = await response.json();
@@ -659,7 +661,9 @@ use Illuminate\Support\Facades\Auth;
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        body: JSON.stringify({ token: fcmToken })
+                        body: JSON.stringify({
+                            token: fcmToken
+                        })
                     });
 
                     // Remove token from localStorage

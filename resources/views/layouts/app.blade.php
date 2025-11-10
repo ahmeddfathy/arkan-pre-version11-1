@@ -244,18 +244,18 @@
                     <span>تقارير الموظفين</span>
                 </a>
             </li>
-            <li>
+            {{-- <li>
                 <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.show') ? 'active' : '' }}">
                     <i class="fas fa-user"></i>
                     <span>الملف الشخصي</span>
                 </a>
-            </li>
-            <li>
+            </li> --}}
+            {{-- <li>
                 <a href="{{ route('employee.profile.show') }}" class="{{ request()->routeIs('employee.profile.*') ? 'active' : '' }}">
                     <i class="fas fa-id-card"></i>
                     <span>ملفي الشامل</span>
                 </a>
-            </li>
+            </li> --}}
             <li>
                 <a href="{{ route('employee-errors.index') }}" class="{{ request()->routeIs('employee-errors.*') ? 'active' : '' }}">
                     <i class="fas fa-exclamation-triangle"></i>
